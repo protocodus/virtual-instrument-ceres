@@ -824,10 +824,210 @@ void finiteAtExtremes() {
         render(s,256);
     }
 }
+void panelParameterRanges() {
+    ceres::Patch p;
+    require(ceres::setParameter(p,"ring_rate",0) && p.ringRate==.2,"Ring carrier lower bound");
+    require(ceres::setParameter(p,"ring_rate",1000) && p.ringRate==220,"Ring carrier upper bound");
+    require(ceres::setParameter(p,"ring_depth",20) && p.ringDepth==8,"Ring octave excursion bound");
+    require(ceres::setParameter(p,"ring_mix",2) && p.ringMix==1,"Ring blend bound");
+    require(ceres::setParameter(p,"ring_attack",0) && p.ringAttack==.001,"Ring attack bound");
+    require(ceres::setParameter(p,"ring_decay",0) && p.ringDecay==.01,"Ring decay bound");
+    require(ceres::setParameter(p,"lfo_waveform",2.7) && p.lfoWaveform==3,"SUB selector quantization");
+    require(ceres::setParameter(p,"sustain_mode",1.7) && p.sustainMode==2,"Sustain selector quantization");
+    require(ceres::setParameter(p,"sustain_mode",-100) && p.sustainMode==1,"Sustain selector lower bound");
+    p.ringRate=std::numeric_limits<double>::quiet_NaN();
+    p.ringDepth=std::numeric_limits<double>::infinity();
+    p.lfoWaveform=std::numeric_limits<double>::quiet_NaN();
+    ceres::Synth synth(8000,7);synth.setPatch(p);synth.process();
+    require(synth.modulationState().ringFrequency==30,"Direct invalid ring controls use safe defaults");
+}
+
+void subOscillatorRoutes() {
+    constexpr double fs=8000,rate=2;
+    std::array<ceres::Synth,4> synths={ceres::Synth(fs,7),ceres::Synth(fs,7),
+                                    ceres::Synth(fs,7),ceres::Synth(fs,7)};
+    for(unsigned w=0;w<4;++w) {ceres::Patch p;p.lfoRate=rate;p.lfoWaveform=w;synths[w].setPatch(p);}
+    for(unsigned n=0;n<5000;++n) {
+        double values[4];
+        for(unsigned w=0;w<4;++w) {synths[w].process();values[w]=synths[w].modulationState().sub;}
+        const double phase=std::fmod((4*n+3)*rate/(4*fs),1.);
+        require(std::abs(values[0]-std::sin(2*pi*phase))<2e-11,"SUB sine frequency and continuous phase");
+        require(values[1]==-values[2],"SUB saws must be exact polar opposites");
+        if(phase>.001 && phase<.999)
+            require(std::abs(values[1]-(1-2*phase))<2e-11,"SUB down-saw slope");
+        if((phase>.001 && phase<.499) || (phase>.501 && phase<.999))
+            require(std::abs(values[3]-(phase<.5?1.:-1.))<2e-11,"SUB square polarity and duty");
+    }
+    ceres::Patch p;p.lfoWaveform=4;p.lfoRate=.05;
+    ceres::Synth noise(fs,91),other(fs,91);noise.setPatch(p);
+    p.lfoRate=100;p.noise=1;other.setPatch(p);
+    double sum=0,sum2=0,cross=0,previous=0;
+    for(unsigned n=0;n<20000;++n) {
+        noise.process();other.process();const double x=noise.modulationState().sub;
+        require(x==other.modulationState().sub,"SUB noise independent of Rate/audio NO mix");
+        require(std::abs(x)<=1,"SUB noise control remains bounded");
+        if(n>2000){sum+=x;sum2+=x*x;cross+=x*previous;}
+        previous=x;
+    }
+    require(sum2>100 && sum2<2500 && std::abs(sum/17999)<.05,"Noise has a bounded nonzero engineering level");
+    require(cross/sum2>.90 && cross/sum2<.99,"Sourced2.2ms noise RC must smooth white noise at8kHz");
+    // Selecting SUB alone must not change either the VCO waveform/PWM clock
+    // or random draws when the three SUB destinations and touch vibrato are0.
+    p=sinePatch();p.sine=0;p.pulse=1;p.pwmDepth=.2;p.pwmRate=7;p.lfoRate=29;
+    std::vector<float> reference;
+    for(unsigned w=0;w<5;++w) {
+        ceres::Synth s(8000,3);p.lfoWaveform=w;s.setPatch(p);s.noteOn(60);
+        auto x=render(s,2000);
+        if(w==0)reference=x;else require(x==reference,"SUB shape must not replace independent PWM sine");
+    }
+    // All existing destinations, including pressure VCO, use selected SUB.
+    for(unsigned route=0;route<4;++route) {
+        p=sinePatch();p.saw=1;p.sine=.2;p.lfoRate=17;
+        if(route==0)p.vibratoCents=70;
+        if(route==1)p.filterLfo=2;
+        if(route==2)p.tremolo=.8;
+        if(route==3)p.pressureVibrato=70;
+        ceres::Synth a(8000,4),b(8000,4);a.setPatch(p);p.lfoWaveform=3;b.setPatch(p);
+        a.pressure(1);b.pressure(1);a.noteOn(60);b.noteOn(60);
+        require(render(a,1500)!=render(b,1500),"Each SUB/touch destination must use the selected waveform");
+    }
+}
+
+void ringEnvelopeAndKeyLedger() {
+    constexpr double fs=8000,internal=fs*4;
+    auto p=sinePatch();p.ringAttack=.02;p.ringDecay=.2;p.ringRate=10;p.ringDepth=2;
+    ceres::Synth s(fs,9);s.setPatch(p);s.noteOn(60);
+    for(unsigned n=1;n<=100;++n) {
+        s.process();const auto state=s.modulationState();
+        const double expected=1.01*(1-std::exp(-std::log(101.)*(n/fs)/p.ringAttack));
+        require(std::abs(state.ringEnvelope-expected)<2e-13,"Ring RC attack must follow independent exponential solution");
+        require(std::abs(state.ringFrequency-10*std::exp2(2*expected))<2e-11,"Ring depth controls frequency, not mix amplitude");
+    }
+    // Last key-up interrupts attack through the separately sourced fixed RT.
+    const double initial=s.modulationState().ringEnvelope;s.noteOff(60);
+    constexpr double release=.4678104397473947;
+    for(unsigned n=1;n<=800;++n) {
+        s.process();require(std::abs(s.modulationState().ringEnvelope-
+            initial*std::exp(-std::log(1000.)*(n/fs)/release))<2e-13,"Ring fixed release toward0, independent of A/D");
+    }
+    // Full held attack followed by decay, with at most one internal comparator step.
+    s.reset();s.noteOn(60);double maxValue=0;
+    for(unsigned n=1;n<=2400;++n) {
+        s.process();maxValue=std::max(maxValue,s.modulationState().ringEnvelope);
+        if(n>fs*p.ringAttack+4) {
+            const double expected=std::exp(-std::log(1000.)*(n/fs-p.ringAttack)/p.ringDecay);
+            require(std::abs(s.modulationState().ringEnvelope-expected)<2*std::log(1000.)/(internal*p.ringDecay),
+                "Held ring envelope decays toward0 with declared T60");
+        }
+    }
+    require(maxValue>.999,"Ring attack must reach its normalized peak");
+    // A stolen voice does not erase a still-physically-held key from the trigger bus.
+    ceres::Synth many(fs,5),one(fs,5);many.setPatch(p);one.setPatch(p);
+    many.noteOn(60);one.noteOn(60);render(many,100);render(one,100);
+    for(int note:{61,62,63,64})many.noteOn(note);
+    require(many.modulationState().physicalKeyPresses==5,"Physical ledger survives fifth-note voice stealing");
+    for(unsigned n=0;n<100;++n) {
+        many.process();one.process();
+        require(many.modulationState().ringEnvelope==one.modulationState().ringEnvelope,
+                "Legato note-ons must not retrigger aggregate ring attack");
+    }
+    for(int note:{61,62,63,64})many.noteOff(note);
+    require(many.modulationState().physicalKeyPresses==1,"Stolen original key remains physically held");
+    many.noteOn(65);many.process();one.process();
+    require(many.modulationState().ringEnvelope==one.modulationState().ringEnvelope,
+            "Another note while stolen key remains down is still legato");
+    many.sustain(true);many.noteOff(60);many.noteOff(65);
+    require(many.modulationState().physicalKeyPresses==0,"Damper must not prevent physical all-keys-up rearm");
+    render(many,50);const auto before=many.modulationState();many.noteOn(67);
+    require(many.modulationState().ringEnvelope==before.ringEnvelope,"Retrigger preserves capacitor voltage immediately");
+    many.process();require(many.modulationState().ringEnvelope>before.ringEnvelope,"Rearmed trigger starts attack despite damper");
+    many.noteOn(67);many.noteOff(67);
+    require(many.modulationState().physicalKeyPresses==1,"Repeated-key ledger uses matched press counts");
+    many.allNotesOff();require(many.modulationState().physicalKeyPresses==0,"CC123 clears physical-key trigger ledger");
+    many.noteOff(-1);many.noteOff(128);many.noteOn(128);
+    require(many.modulationState().physicalKeyPresses==0,"Invalid notes cannot touch ring key ledger");
+    p.ringRate=220;p.ringDepth=8;p.ringAttack=.001;many.setPatch(p);many.noteOn(60);
+    render(many,16);require(many.modulationState().ringFrequency==220,"Total carrier respects220Hz ceiling including envelope");
+    many.allSoundOff();require(many.modulationState().ringEnvelope==0 && many.modulationState().physicalKeyPresses==0,
+        "Panic clears ring envelope/keys and wet output capacitor");
+    require(rms(render(many,1000))==0,"Panic leaves exact silence with wet capacitor cleared");
+}
+
+double toneMagnitude(const std::vector<float>& samples,double frequency,double fs) {
+    std::complex<double> sum=0;
+    for(std::size_t i=0;i<samples.size();++i) {
+        const double window=.5-.5*std::cos(2*pi*i/samples.size());
+        sum+=double(samples[i])*window*std::polar(1.,-2*pi*frequency*i/fs);
+    }
+    return std::abs(sum);
+}
+void ringAudioAndFreeCarrier() {
+    constexpr double fs=8000;
+    auto p=sinePatch();p.ringMix=1;p.ringRate=47;p.ringDepth=0;p.volume=.01;
+    ceres::Synth wet(fs,71),dry(fs,71),middle(fs,71);wet.setPatch(p);p.ringMix=0;dry.setPatch(p);
+    p.ringMix=.5;middle.setPatch(p);
+    wet.noteOn(69);dry.noteOn(69);middle.noteOn(69);render(wet,16000);render(dry,16000);render(middle,16000);
+    const auto w=render(wet,8000),d=render(dry,8000),m=render(middle,8000);
+    require(m!=w && m!=d,"Partial ring blend differs from both endpoints");
+    for(std::size_t i=0;i<m.size();++i)
+        require(std::abs(m[i]-.5*(w[i]+d[i]))<1e-7,"Ring blend is linear before the common output rail");
+    const double low=toneMagnitude(w,393,fs),high=toneMagnitude(w,487,fs);
+    require(low>1 && high>1 && std::abs(low/high-1)<.02,"Balanced product produces both sum/difference sidebands");
+    require(toneMagnitude(w,440,fs)<.002*low,"Fully wet ideal ring suppresses dry carrier");
+    require(toneMagnitude(d,440,fs)>low && toneMagnitude(d,393,fs)<.002*low,"Dry bypass retains fundamental without ring sidebands");
+    // Carrier phase is independent of note gates, allocation and mix bypass.
+    ceres::Synth a(fs,5),b(fs,5);p.ringRate=37;p.ringDepth=0;p.ringMix=0;a.setPatch(p);p.ringMix=1;b.setPatch(p);
+    for(unsigned i=0;i<3000;++i) {
+        if(i%137==0)a.noteOn(50+i%30);
+        if(i%233==0)a.allNotesOff();
+        if(i==1701)a.allSoundOff();
+        a.process();b.process();
+        require(a.modulationState().ringCarrier==b.modulationState().ringCarrier,
+            "Ring carrier must free-run through notes, bypass and panic");
+    }
+    b.reset();b.noteOn(60);const auto first=render(b,1000);b.reset();b.noteOn(60);
+    require(first==render(b,1000),"Reset restores ring phase/envelope/noise and deterministic audio");
+}
+
+void sustainKeyCvModes() {
+    auto p=sinePatch();p.ampRelease=2;p.filterRelease=2;p.filterInitial=-1;p.filterPeak=2;
+    p.hpCutoff=100;p.lpCutoff=1000;p.hpEnvelopeScale=.2;p.lpEnvelopeScale=.5;
+    ceres::Synth s(8000,8);s.setPatch(p);s.noteOn(60);render(s,100);s.noteOff(60);
+    const auto released=s.voiceState()[0];s.noteOn(72);
+    require(s.voiceState()[0].keyNote==60,"Sustain I retains released-board key CV");
+    p.sustainMode=2;s.setPatch(p);const auto opened=s.voiceState()[0];
+    require(opened.note==60 && opened.keyNote==72,"Entering II immediately tracks last assigned key without changing ownership");
+    require(opened.ampEnvelope==released.ampEnvelope && opened.filterEnvelope==released.filterEnvelope &&
+        opened.oscillatorPhase==released.oscillatorPhase && !opened.held,"Opening SH must preserve all board charge/phase/gates");
+    s.process();const auto sounding=s.voiceState()[0];
+    const double floor=1/(2*pi*1.5e-9*4.7e6);
+    require(std::abs(sounding.oscillatorFrequency-523.2511306011972)<1e-10,"Released tail VCO tracks updated key CV");
+    require(std::abs(sounding.hpFrequency-(floor+(p.hpCutoff-floor)*std::exp2(1+sounding.filterEnvelope*p.hpEnvelopeScale)))<1e-10,
+        "Released tail HP shares updated keyboard voltage");
+    require(std::abs(sounding.lpFrequency-(floor+(p.lpCutoff-floor)*std::exp2(1+sounding.filterEnvelope*p.lpEnvelopeScale)))<1e-9,
+        "Released tail LP shares updated keyboard voltage");
+    s.noteOn(67);require(s.voiceState()[0].keyNote==67 && s.voiceState()[1].keyNote==72,
+        "New assignments retune free tails while held boards remain unchanged");
+    p.sustainMode=1;s.setPatch(p);s.noteOn(76);
+    require(s.voiceState()[0].keyNote==67,"Returning to I captures the current released key CV");
+    s.allSoundOff();p.sustainMode=2;s.setPatch(p);s.sustain(true);s.noteOn(60);render(s,20);s.noteOff(60);
+    const auto protectedBoard=s.voiceState()[0];s.noteOn(72);
+    require(s.voiceState()[0].keyNote==60 && s.voiceState()[0].pedalHeld,"Software damper-held board stays protected in II");
+    require(s.voiceState()[0].ampEnvelope==protectedBoard.ampEnvelope,"New key must not re-gate protected tail");
+    s.sustain(false);require(s.voiceState()[0].keyNote==72 && !s.voiceState()[0].pedalHeld,
+        "Pedal-up frees board and follows last assigned key in II");
+    s.allSoundOff();require(s.activeVoices()==0 && rms(render(s,100))==0,"SustainII panic remains exact silence");
+}
+
 }
 
 int main() {
     try {
+        panelParameterRanges(); std::cout<<"PASS ring/SUB/Sustain mode ranges and validation\n";
+        subOscillatorRoutes(); std::cout<<"PASS SUB shapes, sourced noise pole, destinations and separate PWM\n";
+        ringEnvelopeAndKeyLedger(); std::cout<<"PASS ring RC timing, key ledger, legato/retrigger, bounds and panic\n";
+        ringAudioAndFreeCarrier(); std::cout<<"PASS global ring sidebands, dry bypass, free carrier and reset\n";
+        sustainKeyCvModes(); std::cout<<"PASS Sustain I/II live key CV, shared VCO/filters, state continuity and MIDI pedal adaptation\n";
         parametersAndConstruction(); std::cout<<"PASS parameter ranges and constructor validation\n";
         circuitResponse(); std::cout<<"PASS physical source/Q capacitor transfer, four source loads, DC rejection, Q and slope\n";
         physicalCascade(); std::cout<<"PASS production cascade physical voltages, passive mixer, fixed Q current and VCA calibration\n";

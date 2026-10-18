@@ -1,0 +1,40 @@
+{
+  "status": "pass",
+  "samples_per_variant": 384000,
+  "rates": [
+    44100,
+    48000,
+    96000,
+    192000
+  ],
+  "scenes_per_rate": 8,
+  "native_embedded_bit_identical": true,
+  "controls": "Ring blend/rate/depth/A/D, all five SUB shapes and both Sustain modes, with allocation/steal/pedal/live edits/panic/reset.",
+  "variants": {
+    "native": {
+      "binary_sha256": "45a03ce61afbc4cd9c447ae21e9b589eb955b1c0be3d1939d5f1c74668daf667",
+      "audio_sha256": "62051b9f822e92f56462ec89521e340624f477ef0be290657f1cf5b14057971f",
+      "bytes": 1536000,
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres/build/ceres_native_parity",
+        "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-panel-parity-zvi39ihw/native.f32",
+        "controls"
+      ]
+    },
+    "embedded": {
+      "binary_sha256": "a20ed228e3c4e947a36f3cc0552361dad80f777481e034b4d9a96d6452f0d08d",
+      "audio_sha256": "62051b9f822e92f56462ec89521e340624f477ef0be290657f1cf5b14057971f",
+      "bytes": 1536000,
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres/build/ceres_embedded_parity",
+        "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-panel-parity-zvi39ihw/embedded.f32",
+        "controls"
+      ]
+    }
+  },
+  "input_sha256": {
+    "Source/DSP/ceres.cpp": "ac10943cc36eca7605101a22cc5d0947f59f08bbff806c324ec2cb652bd13908",
+    "Source/DSP/ceres.hpp": "01ce1d02f39ad3f4db28ea5fa281ea82eb2163c15d4fb838d7944f6220701b9c",
+    "Tests/ParityDriver.cpp": "252c90f46ee52462646b5126f59691de03da78e225a15cf4224d941545d6ad63"
+  }
+}

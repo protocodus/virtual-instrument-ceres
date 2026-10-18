@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <memory>
 #if !defined(CERES_EMBEDDED_TARGET)
+#include <array>
 #include <string>
 #include <vector>
 #endif
@@ -59,6 +60,11 @@ struct Patch {
     // transistor and source-loading offsets remain unmodeled. Changes via
     // setPatch affect active releases without resetting capacitor state.
     double globalRelease = 0.0;
+    // I retains released-board key CV; II lets released/free boards follow
+    // newly assigned keys without retriggering envelopes or oscillator phase.
+    // Entering II immediately adopts the last assigned key on free boards.
+    // MIDI-pedal-held boards remain protected (software damper adaptation).
+    double sustainMode = 1.0;
     double filterLevel = 1.0, volume = 0.55;
     // TRANSPOSE changes the oscillator FT path, not filter keyboard voltage.
     double octave = 0.0;
@@ -69,6 +75,20 @@ struct Patch {
     // These modeled oscillator variations, like vibrato below, are VCO-only.
     double voiceSpreadCents = 0.0, driftCents = 0.0;
     double lfoRate = 5.0, vibratoCents = 0.0, tremolo = 0.0, filterLfo = 0.0;
+    // Shared SUB source: 0 sine, 1 down saw, 2 up saw, 3 square, 4 noise.
+    // Noise uses the sourced22k/.1uF low-pass; level is uncalibrated and
+    // independent of rate/audio Noise mix. The free-running PWM sine source is separate and is unaffected.
+    double lfoWaveform = 0.0;
+    // One global balanced ring multiplier after the voice bus. Base carrier
+    // Hz, positive frequency-envelope excursion in octaves, initial-to-peak
+    // attack seconds and decay T60. Engineering mapping, not panel calibration.
+    // Total carrier is bounded .2..220Hz, so rate/depth interact at the top.
+    // Trigger once per physical all-keys-up -> any-key-down transition; final
+    // key-up uses a fixed nominal .46781044s T60 return, independent of MIDI
+    // pedal/globalRelease. Retrigger retains capacitor charge, not phase reset.
+    // mix=0 preserves the previous signal path exactly; carrier phase is free.
+    double ringMix = 0.0, ringRate = 30.0, ringDepth = 0.0;
+    double ringAttack = 0.01, ringDecay = 0.35;
     double pressureVolume = 0.0, pressureFilter = 0.0, pressureVibrato = 0.0;
     // CS-50 has channel aftertouch, not velocity. Velocity response is off
     // unless explicitly requested for an experimental performance mapping.
@@ -103,7 +123,7 @@ public:
     void pressure(double value);
     void pitchBend(double semitones);
     // MIDI damper adaptation: holds envelope gates until pedal-up. Distinct
-    // from globalRelease and the unimplemented CS-50 SUSTAIN I/II key-CV modes.
+    // from globalRelease and the CS-50 SUSTAIN I/II key-CV modes.
     void sustain(bool down);
     void allNotesOff();
     // Clears voices, output-coupling capacitors and FIR history; preserves controllers.
@@ -120,6 +140,22 @@ public:
     // FIR group delay is 124 internal samples = 31 host samples. The
     // decimator's final-of-four sampling phase affects event alignment.
     static constexpr unsigned outputLatency = 31;
+#if !defined(CERES_EMBEDDED_TARGET)
+    // Read-only native diagnostics; excluded from the embedded ABI. Values
+    // expose modeled capacitor/CV state, not calibrated hardware voltages.
+    struct VoiceState {
+        int note, keyNote;
+        bool held, pedalHeld;
+        double ampEnvelope, filterEnvelope, oscillatorPhase;
+        double oscillatorFrequency, hpFrequency, lpFrequency;
+    };
+    struct ModulationState {
+        double sub, ringEnvelope, ringFrequency, ringCarrier;
+        std::size_t physicalKeyPresses;
+    };
+    std::array<VoiceState,voiceCount> voiceState() const;
+    ModulationState modulationState() const;
+#endif
 private:
     struct Impl;
     std::unique_ptr<Impl> impl_;

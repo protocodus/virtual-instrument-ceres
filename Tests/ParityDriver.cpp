@@ -6,7 +6,8 @@
 // Identical harness for the original experiment, current native and embedded
 // variants. Deliberately uses only the shared numeric Patch / Synth API.
 int main(int argc,char** argv) {
-    if(argc!=2)return 2;
+    if(argc<2 || argc>3)return 2;
+    const bool panelControls=argc==3;
     std::ofstream output(argv[1],std::ios::binary);
     if(!output)return 3;
     for(double rate:{44100.,48000.,96000.,192000.})for(unsigned scene=0;scene<8;++scene) {
@@ -33,6 +34,17 @@ int main(int argc,char** argv) {
         patch.pressureVolume=.2;patch.pressureFilter=.3;patch.pressureVibrato=4;
         patch.voiceSpreadCents=2;patch.driftCents=3;patch.velocitySensitivity=.4;
         patch.octave=scene==2 ? -1 : 0;patch.tuneCents=31.793;patch.drive=scene==3 ? .05 : 1;
+        if(panelControls) {
+            // String keys keep this default-path driver compilable against
+            // the frozen pre-controls core for exact legacy comparisons.
+            if(!ceres::setParameter(patch,"ring_mix",scene/7.) ||
+               !ceres::setParameter(patch,"ring_rate",7+scene*30) ||
+               !ceres::setParameter(patch,"ring_depth",scene) ||
+               !ceres::setParameter(patch,"ring_attack",.007+scene*.003) ||
+               !ceres::setParameter(patch,"ring_decay",.08+scene*.05) ||
+               !ceres::setParameter(patch,"lfo_waveform",scene%5) ||
+               !ceres::setParameter(patch,"sustain_mode",1+scene%2))return 6;
+        }
         ceres::Synth synth(rate,50+scene);synth.setPatch(patch);
         for(unsigned frame=0;frame<12000;++frame) {
             if(frame==0)synth.noteOn(60,.8);

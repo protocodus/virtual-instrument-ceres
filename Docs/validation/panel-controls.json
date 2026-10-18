@@ -1,0 +1,90 @@
+{
+  "status": "pass",
+  "created_utc": "2026-10-18T12:26:03.126290+00:00",
+  "product_version": "0.1.0",
+  "imported_model_version": "0.10.0",
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "source_scope": "Seven panel controls added; original defaults preserved; no sample playback or hardware calibration claim.",
+  "native_groups": 26,
+  "ctest_cases_release": 3,
+  "ctest_cases_asan_ubsan": 3,
+  "sanitizer_environment": "ASAN_OPTIONS=detect_leaks=0",
+  "embedded_keys_exercised": 52,
+  "embedded_frames": 32768,
+  "post_construction_new_new_array_calls": 0,
+  "default_parity_samples_per_variant": 384000,
+  "default_original_native_embedded_bit_identical": true,
+  "enabled_controls_native_embedded_samples_per_variant": 384000,
+  "enabled_controls_native_embedded_bit_identical": true,
+  "commands": [
+    "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release",
+    "cmake --build build -j 4",
+    "ctest --test-dir build --output-on-failure",
+    "cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCERES_SANITIZE=ON",
+    "cmake --build build-asan -j 4",
+    "ASAN_OPTIONS=detect_leaks=0 ctest --test-dir build-asan --output-on-failure",
+    "python3 Tools/check_embedded.py --build-dir build --baseline-source /tmp/ceres-cs50-1x8LGd/src --report Docs/validation/panel-default-parity.json",
+    "./build/ceres_native_parity /tmp/ceres-panel-native.f32 controls",
+    "./build/ceres_embedded_parity /tmp/ceres-panel-embedded.f32 controls",
+    "cmp /tmp/ceres-panel-native.f32 /tmp/ceres-panel-embedded.f32"
+  ],
+  "bounded_local_timing": [
+    {
+      "controls_enabled": false,
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres/build/ceres_embedded_parity",
+        "/dev/null"
+      ],
+      "frames": 384000,
+      "wall_seconds": 1.2005114589701407,
+      "mixed_rate_audio_seconds": 5.6768707482993195,
+      "wall_to_audio_ratio": 0.21147415754177434
+    },
+    {
+      "controls_enabled": true,
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres/build/ceres_embedded_parity",
+        "/dev/null",
+        "controls"
+      ],
+      "frames": 384000,
+      "wall_seconds": 1.1952151249861345,
+      "mixed_rate_audio_seconds": 5.6768707482993195,
+      "wall_to_audio_ratio": 0.2105411903810207
+    }
+  ],
+  "file_sha256": {
+    "Source/DSP/ceres.cpp": "ac10943cc36eca7605101a22cc5d0947f59f08bbff806c324ec2cb652bd13908",
+    "Source/DSP/ceres.hpp": "01ce1d02f39ad3f4db28ea5fa281ea82eb2163c15d4fb838d7944f6220701b9c",
+    "Tests/dsp_tests.cpp": "8d52b31c96f330641ec453db34d0ed492ca67515e26745341270982c21ecc439",
+    "Tests/EmbeddedContract.cpp": "3eb6d1d22bfa589e356d28171e8705ae1fc89af0810f298706d0db2c18e1e2bc",
+    "Tests/ParityDriver.cpp": "252c90f46ee52462646b5126f59691de03da78e225a15cf4224d941545d6ad63",
+    "Tools/check_embedded.py": "4fccbbcd4b79e10ee02f72b866b0789abd8fd9f3199e15c3f92c18c24d3a8da5",
+    "CMakeLists.txt": "266a99817309eda6093f9edb21089b5d459b36ccf65f96e6a2762fd35746436b",
+    "README.md": "bef7f28ccb818913f347f18e6605dbd1ded3f743ea14f84d0935c698ab3bd220",
+    "Docs/DSP_SOURCE.md": "31e8c8f013e02f2ace185a15fbddc7b51bd5a4c43c0c2d6c6cf5717d621a2d36",
+    "Docs/EXPERIMENT_IMPORT.json": "23fab3632d93660191ae2eb5ab1edabad20f67d7d1c7a659a742983f58c56bab",
+    "Docs/validation/controls-baseline-parity.json": "b6286cb2e99d0b8fd7625010766d4809c05f2dda112fdc8133897474143f0aa7",
+    "Docs/validation/panel-release-ctest.log": "a9926346544e85579ec3a8ca3d6361dd86011f257be99d6576d4127b0553fc2a",
+    "Docs/validation/panel-asan-ubsan-ctest.log": "047c0059113c080185d14838bb8029e40c19c029f098fecaf0c736b13863bf2e",
+    "Docs/validation/panel-default-parity.json": "2c17686846e74a0dfbb4535fb71624bec83fbc2f1cb72c2c224dafc00ad18d47",
+    "Docs/validation/panel-enabled-parity.json": "80d039bbc80b38db78f67ee76175b04c35c6529a4defa6323539cb99ade61f71"
+  },
+  "binary_sha256": {
+    "build/ceres_render": "62843dfa159a0e275fb068ce226e12c8db7186af9299045ebcb8cfd7a39aa0b5",
+    "build/ceres_tests": "772c611b7bc617b520a857d6393a42c66b263c8ffc881f8d233bcf912f5a56a5",
+    "build/ceres_embedded_contract": "38bbca36fc198b75dbb75b79b3a8be62fd7ccd285999b6d343f6e6743a1d39f4",
+    "build/ceres_native_parity": "45a03ce61afbc4cd9c447ae21e9b589eb955b1c0be3d1939d5f1c74668daf667",
+    "build/ceres_embedded_parity": "a20ed228e3c4e947a36f3cc0552361dad80f777481e034b4d9a96d6452f0d08d",
+    "build/libceres.a": "524012fd9d7f3eb353f467908acc43b5d1bf5644530595f93e01d482ba319a3a",
+    "build/libceres_embedded.a": "f3eaecc254eaf1cf28aae5f1570c4456adb506a258247a214f3687b72abdc74c"
+  },
+  "limits": [
+    "Local macOS/compiler validation; no SDK target/Reason host deadline claim.",
+    "Timing is one serial run per mode of an eight-scene/four-rate test driver including file writes; not a worst-case 64-frame deadline or old-core speed comparison.",
+    "Ring RT, depth law, carrier clamp and wet calibration are bounded engineering reductions, not identified transistor/slider behavior.",
+    "SUB noise RC is sourced; its fixed statistical normalization and soft bound are engineering assumptions.",
+    "Sustain II implements a stated modern allocator/MIDI adaptation, not exact Yamaha KAS scan timing.",
+    "Historical import/pre-edit reports preserve their original source identities and are not assertions that those sources remain current."
+  ]
+}

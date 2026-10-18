@@ -1,0 +1,49 @@
+{
+  "baseline_compile_command": [
+    "c++",
+    "-std=c++17",
+    "-O3",
+    "-DNDEBUG",
+    "-I",
+    "/private/tmp/ceres-cs50-1x8LGd/src",
+    "/Users/vojta/Dev/virtual-instrument-ceres/Tests/ParityDriver.cpp",
+    "/private/tmp/ceres-cs50-1x8LGd/src/ceres.cpp",
+    "-o",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-parity-15j77xfg/original"
+  ],
+  "status": "pass",
+  "comparison": "byte-exact float32 stream on this compiler/math-library build",
+  "rates": [
+    44100,
+    48000,
+    96000,
+    192000
+  ],
+  "scenes_per_rate": 8,
+  "frames_per_scene": 12000,
+  "samples_per_variant": 384000,
+  "variants": {
+    "native": {
+      "audio_sha256": "a83030a3efb47c5054d4bf2f2003e38b92502d62053f9812ba7ab09e3214fd9f",
+      "bytes": 1536000,
+      "binary_sha256": "45a03ce61afbc4cd9c447ae21e9b589eb955b1c0be3d1939d5f1c74668daf667"
+    },
+    "embedded": {
+      "audio_sha256": "a83030a3efb47c5054d4bf2f2003e38b92502d62053f9812ba7ab09e3214fd9f",
+      "bytes": 1536000,
+      "binary_sha256": "a20ed228e3c4e947a36f3cc0552361dad80f777481e034b4d9a96d6452f0d08d"
+    },
+    "original": {
+      "audio_sha256": "a83030a3efb47c5054d4bf2f2003e38b92502d62053f9812ba7ab09e3214fd9f",
+      "bytes": 1536000,
+      "binary_sha256": "8624c1b43e3fd8b2eb3816a7563c759dc92bdb80a0c5b402ffd96998b8c79198"
+    }
+  },
+  "input_sha256": {
+    "Source/DSP/ceres.hpp": "01ce1d02f39ad3f4db28ea5fa281ea82eb2163c15d4fb838d7944f6220701b9c",
+    "Source/DSP/ceres.cpp": "ac10943cc36eca7605101a22cc5d0947f59f08bbff806c324ec2cb652bd13908",
+    "Tests/ParityDriver.cpp": "252c90f46ee52462646b5126f59691de03da78e225a15cf4224d941545d6ad63",
+    "Tools/check_embedded.py": "4fccbbcd4b79e10ee02f72b866b0789abd8fd9f3199e15c3f92c18c24d3a8da5",
+    "Docs/EXPERIMENT_IMPORT.json": "23fab3632d93660191ae2eb5ab1edabad20f67d7d1c7a659a742983f58c56bab"
+  }
+}

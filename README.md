@@ -2,7 +2,7 @@
 
 Ceres is a four-voice, sample-free CS-50 research synthesizer core. This repository owns the reusable C++17 DSP. The Reason Rack Extension consumes it through a pinned `Instrument` Git submodule; host code, panel assets and Rack patches belong to that separate project.
 
-Product version **0.1.0** imports the canonical **v0.10.0 research model**. It preserves that model's audio calculations and adds a small embedded build interface. This is a reduced circuit model with provisional component/control calibration, not a verified transistor-level recreation or a completed hardware match. No hardware recordings, manuals or sampled instrument data are required at runtime.
+Product version **0.1.0** imports the canonical **v0.10.0 research model**. The original model remains the default signal path. The core now also implements the global ring modulator, the five internal SUB waveforms, and SUSTAIN I/II key-voltage behavior, with an embedded build interface. This is a reduced circuit model with provisional component/control calibration, not a verified transistor-level recreation or a completed hardware match. No hardware recordings, manuals or sampled instrument data are required at runtime.
 
 ## Build and test
 
@@ -12,7 +12,7 @@ cmake --build build -j 4
 ctest --test-dir build --output-on-failure
 ```
 
-The build creates `ceres` and `ceres_embedded` static libraries, the standalone `ceres_render`, and native tests. CTest includes the original 21 DSP groups, a 64-frame embedded allocation contract, and exact native/embedded audio comparison. Python 3 is required for the parity check.
+The build creates `ceres` and `ceres_embedded` static libraries, the standalone `ceres_render`, and native tests. CTest includes 26 DSP groups (the original 21 plus five control/routing groups), a 64-frame embedded allocation contract, and exact native/embedded audio comparison. Python 3 is required for the parity check.
 
 ```sh
 cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCERES_SANITIZE=ON
@@ -42,6 +42,26 @@ The embedded interface has a numeric `Patch`, a C-string parameter setter, no ex
 
 The output is mono. All four physical voices and their capacitor states continue running when no note is held. `activeVoices()==0` does **not** imply silence: the common output bus has a roughly 0.888-second time constant. `allNotesOff()` honors the MIDI pedal; `allSoundOff()` clears audio states while preserving controllers; `reset()` also restores seeded oscillator/controller state. The FIR has nominal group delay 31 host samples, with the decimator's sampling phase affecting event alignment.
 
+## Ring, SUB and SUSTAIN controls
+
+| Key | Range | Default | Meaning |
+| --- | --- | --- | --- |
+| `ring_mix` | 0..1 | 0 | Global dry/wet ring blend |
+| `ring_rate` | 0.2..220 Hz | 30 | Base free-running carrier frequency |
+| `ring_depth` | 0..8 octaves | 0 | Positive carrier-frequency envelope excursion |
+| `ring_attack` | 0.001..10 s | 0.01 | Frequency-envelope time to peak |
+| `ring_decay` | 0.01..10 s T60 | 0.35 | Frequency-envelope decay toward the base rate |
+| `lfo_waveform` | 0..4 | 0 | Sine, Down, Up, Square, Noise |
+| `sustain_mode` | 1..2 | 1 | I holds released key voltage; II follows the last assigned key |
+
+The ring envelope triggers when the first physical key is pressed after all keys have been released. Additional held keys do not retrigger it, including when four-voice stealing occurs. Final key-up returns its frequency envelope toward zero through a fixed nominal release; the carrier phase keeps running. The total carrier is bounded at 220 Hz, so SPEED and DEPTH interact near that limit. This is a circuit-informed balanced-multiplier model with provisional envelope and wet-gain calibration.
+
+The selected SUB waveform drives VCO, VCF, VCA and pressure vibrato. Noise uses the documented 22k/0.1µF low-pass and a fixed engineering level; it is independent of SUB rate and audio Noise mix. PWM retains its separate sine oscillator. No external modulation input is implemented.
+
+In Sustain II, released/free boards follow the last assigned key in both oscillator pitch and filter tracking. Their envelope charge, gates, oscillator phase and filter state remain continuous. Entering II applies this immediately; returning to I captures the current key voltage. MIDI-damper-held boards remain protected until pedal-up, an explicit software adaptation rather than recovered Yamaha allocation behavior. This selector is distinct from `global_release` and MIDI damper gating.
+
+The defaults (ring mix zero, SUB sine, Sustain I) preserve the original audio path exactly in the recorded same-build regression. Controls and circuit uncertainties are detailed in [DSP_SOURCE.md](Docs/DSP_SOURCE.md).
+
 ## Standalone render
 
 ```sh
@@ -53,4 +73,4 @@ Events are sorted `frame type note value` rows; supported types are `on`, `off`,
 
 The native research preset table is retained for regression and is excluded from the embedded target. Its presence does not establish a calibrated hardware preset bank or require that the Rack product expose it.
 
-See [DSP source and model limits](Docs/DSP_SOURCE.md), [import provenance](Docs/EXPERIMENT_IMPORT.json), and [initial validation](Docs/validation/initial-core.json).
+See [DSP source and model limits](Docs/DSP_SOURCE.md), [import provenance](Docs/EXPERIMENT_IMPORT.json), [initial validation](Docs/validation/initial-core.json), and [control validation](Docs/validation/panel-controls.json).
