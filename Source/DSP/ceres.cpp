@@ -74,6 +74,7 @@ const Parameter parameters[] = {
     {"pressure_volume", &Patch::pressureVolume, 0, 1},
     {"pressure_filter", &Patch::pressureFilter, 0, 5},
     {"pressure_vibrato", &Patch::pressureVibrato, 0, 100},
+    {"expression_source", &Patch::expressionSource, 0, 1},
     {"velocity_sensitivity", &Patch::velocitySensitivity, 0, 1},
     {"drive", &Patch::drive, .05, 8},
     {"reset_microseconds", &Patch::resetMicroseconds, .1, 50}
@@ -84,7 +85,8 @@ double parameterValue(const Parameter& parameter, double value) {
     if (value>0 && (parameter.member==&Patch::ampAttackSaturation ||
                    parameter.member==&Patch::filterAttackSaturation))
         value=std::max(.001,value);
-    if (parameter.member==&Patch::lfoWaveform || parameter.member==&Patch::sustainMode)
+    if (parameter.member==&Patch::lfoWaveform || parameter.member==&Patch::sustainMode ||
+        parameter.member==&Patch::expressionSource)
         value=std::round(value);
     return value;
 }
@@ -638,13 +640,18 @@ struct Synth::Impl {
         double mixed = 0;
         for (unsigned i = 0; i < voices.size(); ++i) {
             auto& v = voices[i];
+            // Velocity is stored per physical board on note assignment. Do
+            // not replace it when a released board follows another key CV.
+            // Channel pressure keeps smoothing in either mode, so switching
+            // back retains its ordinary controller history.
+            const double expression=patch.expressionSource==1 ? v.velocity : pressureValue;
             if (v.driftCountdown-- == 0) {
                 v.driftTarget = random.bipolar();
                 v.driftCountdown = static_cast<unsigned>(internalFs * (.2 + random.unit()*.5));
             }
             v.drift += (v.driftTarget-v.drift) * driftCoefficient;
             const double cents = patch.tuneCents + (static_cast<double>(i)-1.5)*patch.voiceSpreadCents
-                + v.drift*patch.driftCents + lfo*(patch.vibratoCents + pressureValue*patch.pressureVibrato);
+                + v.drift*patch.driftCents + lfo*(patch.vibratoCents + expression*patch.pressureVibrato);
             const double frequency = 440 * std::exp2((v.keyNote-69 + bend + 12*patch.octave + cents*.01)/12);
             const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
                                             patch.resetMicroseconds*1e-6,internalFs);
@@ -666,12 +673,12 @@ struct Synth::Impl {
             // VIB15 and the modeled oscillator drift/spread remain VCO-only.
             const double keyOctaves=(v.keyNote-60+bend)*patch.keyTrack/12+patch.tuneCents/1200;
             const double hpFactor=std::exp2(keyOctaves+filterEnvelope*patch.hpEnvelopeScale
-                + pressureValue*patch.pressureFilter+lfo*(patch.filterLfo*hpSubRelativeScale)
+                + expression*patch.pressureFilter+lfo*(patch.filterLfo*hpSubRelativeScale)
                 + patch.brilliance*hpBrillianceScale);
             const double lpFactor=patch.lpEnvelopeScale==patch.hpEnvelopeScale &&
                 patch.filterLfo==0 && patch.brilliance==0 ? hpFactor
                 : std::exp2(keyOctaves+filterEnvelope*patch.lpEnvelopeScale
-                    + pressureValue*patch.pressureFilter+lfo*patch.filterLfo
+                    + expression*patch.pressureFilter+lfo*patch.filterLfo
                     + patch.brilliance*lpBrillianceScale);
             const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*noise;
             const double hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor);
@@ -689,7 +696,7 @@ struct Synth::Impl {
             // IG00151 gain is LINEAR in envelope CV (guide pp.40–41). The
             // optional velocity term is zero in factory-derived presets.
             const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocity);
-            const double pressureGain = 1-patch.pressureVolume*(1-pressureValue);
+            const double pressureGain = 1-patch.pressureVolume*(1-expression);
             mixed += beforeVca * ampEnvelope * velocityGain * pressureGain * commonVcaGain;
         }
         // Output rail saturation is a deliberately mild, uncalibrated op-amp

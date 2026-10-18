@@ -9,7 +9,8 @@
 int main(int argc,char** argv) {
     if(argc<2 || argc>3)return 2;
     const bool panelControls=argc==3;
-    const bool soundPathControls=argc==3 && std::strcmp(argv[2],"soundpath")==0;
+    const bool expressionControls=argc==3 && std::strcmp(argv[2],"expression")==0;
+    const bool soundPathControls=argc==3 && (std::strcmp(argv[2],"soundpath")==0 || expressionControls);
     std::ofstream output(argv[1],std::ios::binary);
     if(!output)return 3;
     for(double rate:{44100.,48000.,96000.,192000.})for(unsigned scene=0;scene<8;++scene) {
@@ -56,6 +57,7 @@ int main(int argc,char** argv) {
                !ceres::setParameter(patch,"amp_level",scene/7.) ||
                !ceres::setParameter(patch,"output_trim_db",-24+scene*48./7))return 7;
         }
+        if(expressionControls && !ceres::setParameter(patch,"expression_source",1))return 8;
         ceres::Synth synth(rate,50+scene);synth.setPatch(patch);
         for(unsigned frame=0;frame<12000;++frame) {
             if(frame==0)synth.noteOn(60,.8);
@@ -75,6 +77,9 @@ int main(int argc,char** argv) {
                 ceres::setParameter(patch,"amp_level",.73);synth.setPatch(patch);
             }
             if(frame==6000)synth.allSoundOff();
+            if(expressionControls && (frame==5000 || frame==5500)) {
+                ceres::setParameter(patch,"expression_source",frame==5500 ? 1:0);synth.setPatch(patch);
+            }
             if(frame==6111)synth.noteOn(48,.9);
             if(frame==8192){synth.reset();synth.noteOn(76,.6);}
             if(frame==9100)synth.noteOff(76);

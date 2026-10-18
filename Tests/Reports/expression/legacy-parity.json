@@ -1,0 +1,47 @@
+{
+  "status": "pass",
+  "created_utc": "2026-10-18T14:34:34.263907+00:00",
+  "baseline_commit": "b22dda696090a754f0018f2646bf92b259de406f",
+  "baseline_source_sha256": {
+    "ceres.hpp": "42ca7aa529968edde3726a61713e9d4da59cd884db1a9e620db6c80b9fc86e36",
+    "ceres.cpp": "05e3ecfd53e9ccaa5901952cbdadf04d8b167ffe66df8064e13088da86913e4e"
+  },
+  "baseline_compile_command": [
+    "c++",
+    "-std=c++17",
+    "-O3",
+    "-DNDEBUG",
+    "-I",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-legacy-expression-mzc9kxyn",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tests/ParityDriver.cpp",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-legacy-expression-mzc9kxyn/ceres.cpp",
+    "-o",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-legacy-expression-mzc9kxyn/legacy"
+  ],
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+    "Source/DSP/ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d"
+  },
+  "streams": {
+    "baseline": {
+      "binary_sha256": "9fd664ccde706673a5f0fab5c3b91aad6b39a42d190cf136fc644a1188941614",
+      "audio_sha256": "aee69374b917cc881109fbc94e1ded52b0cc7af94fe7cb1974c1c8b0f81812ba",
+      "samples": 384000
+    },
+    "candidate": {
+      "binary_sha256": "43057a594496298edb43ff85d209a6f934ba81a8524bd266a008621508a91010",
+      "audio_sha256": "aee69374b917cc881109fbc94e1ded52b0cc7af94fe7cb1974c1c8b0f81812ba",
+      "samples": 384000
+    }
+  },
+  "scope": "Byte-exact default source0: 4 rates x8 scenes, all3 nonzero pressure depths, moving pressure, mixed velocities, chords, repeated-note steal, pedal, release, panic and reset.",
+  "verified_file_sha256": {
+    "Tests/ParityDriver.cpp": "ab9016cc0eadb561ff7b8e97fa7fc10bc83e261704f44fccabeae5d79d6775ea",
+    "Tests/check_expression_legacy.py": "d6048b12bc3c937c5dc76383a28f49243d22804e1c463d23c05baf7979320f84",
+    "Source/DSP/ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+    "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8"
+  }
+}

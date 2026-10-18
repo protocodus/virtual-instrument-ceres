@@ -112,8 +112,16 @@ struct Patch {
     double ringMix = 0.0, ringRate = 30.0, ringDepth = 0.0;
     double ringAttack = 0.01, ringDecay = 0.35;
     double pressureVolume = 0.0, pressureFilter = 0.0, pressureVibrato = 0.0;
-    // CS-50 has channel aftertouch, not velocity. Velocity response is off
-    // unless explicitly requested for an experimental performance mapping.
+    // Modern optional expression routing: 0=smoothed channel aftertouch
+    // (legacy/default), 1=each board's latched note-on velocity. The three
+    // pressure* depths above consume this selected value. Velocity remains
+    // unchanged through release, pedal and Sustain II pitch-following; only
+    // assigning/retriggering a board replaces it. Switching sources is live
+    // without regating/resetting circuit state. This is not a CS-50 circuit.
+    double expressionSource = 0.0;
+    // Independent legacy velocity-to-gain depth, multiplicative with the
+    // selected expression gain. Leave zero when using pressureVolume alone
+    // for velocity response; otherwise both gains intentionally apply.
     double velocitySensitivity = 0.0;
     // Effective differential-pair input scaling, uncalibrated. 1 is restrained.
     double drive = 1.0;

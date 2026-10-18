@@ -12,7 +12,7 @@ cmake --build build -j 4
 ctest --test-dir build --output-on-failure
 ```
 
-The build creates `ceres` and `ceres_embedded` static libraries, the standalone `ceres_render`, and native tests. CTest includes 26 existing DSP groups plus five sound-path/utility-gain groups, a 64-frame embedded allocation contract for all 56 keys, and two exact native/embedded audio comparisons. Python 3 is required for the parity checks.
+The build creates `ceres` and `ceres_embedded` static libraries, the standalone `ceres_render`, and native tests. CTest includes 26 existing DSP groups, five sound-path/utility-gain groups and five expression groups, a 64-frame embedded allocation contract for all 57 keys, and three exact native/embedded audio comparisons. Python 3 is required for the parity checks.
 
 ```sh
 cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCERES_SANITIZE=ON
@@ -75,6 +75,14 @@ The first two controls use an explicitly anchored stiff-source model, not recove
 
 Neutral offsets, common level 1 and output trim 0 preserve the prior paths when the intentionally corrected SUB filter route is inactive. The output trim is a modern linear utility, not part of the analog model; it adds no limiter and cannot promise a fixed peak under arbitrary MIDI. The [source audit](Docs/sound-path-gap-audit.md) distinguishes known resistor/capacitor relationships from provisional control calibration.
 
+## Velocity expression
+
+`expression_source` selects **0 = channel aftertouch** (the legacy default) or **1 = note-on velocity**. Values clamp to 0..1 and round to the nearest integer. The existing `pressure_volume`, `pressure_filter` and `pressure_vibrato` depths then use the selected source. This optional velocity mode is a modern DAW mapping, not a claim about the original hardware.
+
+Velocity is latched independently for each allocated voice and stays with its release tail, including during Sustain II pitch following. A new note assignment, repeated-note retrigger or steal stores the incoming velocity only on that board. Channel pressure has no audible effect in velocity mode; switching back uses its continuously smoothed history. Live source changes preserve oscillator/envelope/filter state and may change the expression gain immediately.
+
+Level gain is `1 − pressure_volume*(1 − expression)`; filter expression adds `expression*pressure_filter` octaves to each filter's variable conductance above its fixed resistor floor; vibrato adds `expression*pressure_vibrato` cents of the selected SUB waveform. The separate native `velocity_sensitivity` gain remains multiplicative and backward-compatible: leave it at zero when using only the selected expression level depth. All native research presets retain source 0. Hosts should default missing saved properties to 0 to preserve old patches, and explicitly save 1 for velocity-oriented patches.
+
 ## Standalone render
 
 ```sh
@@ -86,4 +94,6 @@ Events are sorted `frame type note value` rows; supported types are `on`, `off`,
 
 The native research preset table is retained for regression and is excluded from the embedded target. Its presence does not establish a calibrated hardware preset bank or require that the Rack product expose it.
 
-See [DSP source and model limits](Docs/DSP_SOURCE.md), [import provenance](Docs/EXPERIMENT_IMPORT.json), [initial validation](Docs/validation/initial-core.json), historical [panel-control validation](Docs/validation/panel-controls.json), and [sound-path implementation validation](Tests/Reports/soundpath/validation.json). The latter binds successful release and ASAN/UBSAN CTest logs to the compiled source; after both builds/tests, regenerate it with `python3 Tests/record_sound_path_validation.py` (or pass the build-directory options if using different paths).
+See [DSP source and model limits](Docs/DSP_SOURCE.md), [import provenance](Docs/EXPERIMENT_IMPORT.json), historical [initial validation](Docs/validation/initial-core.json), [panel-control validation](Docs/validation/panel-controls.json), [sound-path implementation validation](Tests/Reports/soundpath/validation.json), and current [expression validation](Tests/Reports/expression/validation.json). Historical reports are preserved with their original source hashes.
+
+To reproduce the explicit prior-core comparison, use `python3 Tests/check_expression_legacy.py --build-dir build`. It builds frozen commit `b22dda696090a754f0018f2646bf92b259de406f` and compares 384,000 samples with nonzero pressure depths and mixed note/controller events against the current default-source path. For the current validation recorder, retain CTest output as `Tests/Reports/expression/{release,sanitizer}.log`, run `python3 Tests/check_expression_performance.py build` for the bounded default timing measurement, then run `python3 Tests/record_expression_validation.py` (with build-directory options if needed). The recorder binds completed checks; it does not replace them.
