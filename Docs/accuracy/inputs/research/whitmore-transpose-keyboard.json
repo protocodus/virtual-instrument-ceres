@@ -1,0 +1,265 @@
+{
+  "schema_version": 1,
+  "status": "source_supported_physical_key_and_transpose_correction",
+  "no_native_render_or_fit": true,
+  "historical_artifacts_unchanged": true,
+  "source_url": "https://www.youtube.com/watch?v=Fj21t8MIS_o",
+  "creator": "Andy Whitmore",
+  "source_only": true,
+  "transpose": {
+    "panel_label": "1 OCT DOWN",
+    "octave": -1,
+    "footage": 16,
+    "confidence": "high: directly observed mechanical latch actuation and matching Flute state",
+    "actuation_seconds": [
+      49.76,
+      49.92
+    ],
+    "last_observed_normal_before_actuation": 49.68,
+    "first_unobstructed_one_octave_down": 50.0,
+    "normal_comparator_seconds": [
+      29,
+      45,
+      49.68
+    ],
+    "one_octave_down_observed_seconds": [
+      50,
+      55,
+      60,
+      65,
+      70,
+      75,
+      80,
+      82,
+      101,
+      135,
+      188,
+      203,
+      205.8,
+      207,
+      210.9,
+      211.5,
+      212
+    ],
+    "earlier_chapter_seconds": [
+      13,
+      29
+    ],
+    "earlier_chapter_status": "sampled oblique/front views insufficient for complete switch chronology",
+    "continuous_state_claim": false,
+    "evidence_image": "research/whitmore-transpose-keyboard/switch-actuation.png"
+  },
+  "keyboard": {
+    "key_count": 49,
+    "white_key_count": 29,
+    "black_key_count": 20,
+    "normal_midi_endpoints": [
+      48,
+      96
+    ],
+    "index_origin": "zero-based from physical leftmost C",
+    "white_C_indices": [
+      0,
+      7,
+      14,
+      21,
+      28
+    ],
+    "chromatic_C_indices": [
+      0,
+      12,
+      24,
+      36,
+      48
+    ],
+    "primary_mapping": "research/transpose-key-calibration.json",
+    "unobstructed_anchor_frame": "research/whitmore-flute-history-frames/205.20.png"
+  },
+  "notes": [
+    {
+      "id": "high",
+      "development_window_seconds": [
+        205.75,
+        207.65
+      ],
+      "sounding_midi_nominal": 76,
+      "sounding_pitch_name": "E5",
+      "white_key_index": 23,
+      "chromatic_key_index": 40,
+      "physical_normal_midi": 88,
+      "nominal_KV_volts": 2.5198420997897464,
+      "supporting_frames_seconds": [
+        205.6,
+        205.64,
+        205.8,
+        207.0
+      ],
+      "annotated_image": "research/whitmore-transpose-keyboard/205.80-ordinal.png"
+    },
+    {
+      "id": "lower",
+      "development_window_seconds": [
+        210.8,
+        212.0
+      ],
+      "sounding_midi_nominal": 72,
+      "sounding_pitch_name": "C5",
+      "white_key_index": 21,
+      "chromatic_key_index": 36,
+      "physical_normal_midi": 84,
+      "nominal_KV_volts": 2.0,
+      "supporting_frames_seconds": [
+        210.64,
+        210.9,
+        211.5
+      ],
+      "annotated_image": "research/whitmore-transpose-keyboard/210.90-ordinal.png"
+    }
+  ],
+  "key_assignment_confidence": "Strong joint visual geometry/contact-region plus sounding-pitch consistency; not a complete depressed-key or voice census. Other fingers occlude/touch keys.",
+  "comparison_implication": {
+    "old_assumed_notes": [
+      76,
+      72
+    ],
+    "old_octave": 0,
+    "source_supported_notes": [
+      88,
+      84
+    ],
+    "source_supported_octave": -1,
+    "variable_filter_conductance_ratio_at_key_track_1": 2,
+    "fixed_resistor_contribution_ratio": 1,
+    "original_MIDI_available": false,
+    "gates_remain_synthetic": true
+  },
+  "limitations": [
+    "Unknown active voice count and exact depressed-key set",
+    "Unknown gate times, pressure and sustain pedal",
+    "Source pitch-bend route remains unknown",
+    "Nominal KV values are calculated from primary documents, not measured from this instrument",
+    "Historical effective fits used conditional note coordinates and do not identify factory mapping",
+    "Sampled control history cannot prove no intervening changes",
+    "25fps frame sampling at least40ms; independent AV synchronization unknown"
+  ],
+  "frame_extraction": {
+    "source": "references/whitmore-preset-video.webm",
+    "command_template": "ffmpeg -v error -ss TIMESTAMP -i SOURCE -frames:v 1 OUTPUT.png",
+    "frame_dimensions": [
+      1920,
+      1012
+    ],
+    "fps": 25,
+    "timestamp_origin_seconds": 0,
+    "transpose_crop_xyxy": [
+      1260,
+      500,
+      1550,
+      680
+    ],
+    "keyboard_crop_xyxy": [
+      370,
+      645,
+      1780,
+      980
+    ],
+    "ordinal_annotation": "Manual white-key count, approximate front centers; colored labels are inspection aids, not detections",
+    "generative_enhancement": false
+  },
+  "independent_visual_review": {
+    "reviewer": "parent/root agent",
+    "images": [
+      "switch-actuation.png",
+      "205.80-ordinal.png",
+      "210.90-ordinal.png"
+    ],
+    "finding": "Latch transition clear;29-white-key ordinal placement consistent; polyphony and pressure remain unresolved"
+  },
+  "input_sha256": {
+    "references/whitmore-preset-video.webm": "3debd6a44350cf973de5c0ad85820acb0eaa1c5575b809e7c5340e6b8d0294ee",
+    "references/whitmore-original.wav": "cb765eee0f7eb6d0b0c9b4052b4d25f3dec21d94ac16e44302147d37c8fa4104",
+    "references/whitmore-original.info.json": "6eacf2197b45b0aece675ce2cadf79fedb996c138b2dd6f309ecbe862629001d",
+    "references/whitmore-acquisition.json": "49398f8a8c5b3ea5ff063fc9d44b27c00c540424bee5331e8013acc394cff5a7",
+    "research/transpose-key-calibration.json": "51659aad5c27c7eedff7664e33f634355e5eb1a0f290372231b67db99d50a1c4",
+    "research/transpose-key-calibration.md": "ed938904ac57b00d6ef8b10c588b950815968ca3ad037f6c5a24ea32d9d5d79d",
+    "research/transpose-cs50-keys.png": "2e674a1439f2464629ff0320fa2d13dd1999b09eee8f81753dd02f84776fc7b1",
+    "research/cs-servicing-guide.pdf": "2738f7ddc46f0bedbab38dcad8e2c112c41b3e6ca34670d471d0cb8c0dbde633",
+    "research/service2.pdf": "1102e55b949378e7776555bca1a4d73105ca2d76d6fcf3aa4c2b103566201cfc",
+    "calibration/whitmore-flute-source.json": "3531a16406135cdded2e76a0f9b56fd42f95fb3395daabc67871bdc0b7d5d8b8",
+    "calibration/whitmore-flute-history.json": "80dffe037b333d5b0d9c841cfdb8d9576ef677679a0220b4b8df674d411bbfcb",
+    "calibration/whitmore-flute-history-boundaries.json": "7218c77553f290e823e0f41bfb67b235273aa9928d5a3b80c4a952a02e20c1d1",
+    "research/whitmore-flute-history-frames/205.20.png": "ddae599df199bd40193b55e844e094a86d298980a8fba69656cb6fc691696447",
+    "research/whitmore-flute-history-frames/205.60.png": "ddc984c245739aad34a68a8a66c8c0b334354034955c066b43f96979f32abeb2",
+    "research/whitmore-flute-history-frames/205.64.png": "5427242e556fe1960545908c56a9966ce45f5dc4ddd61a5c00497f853be90b50",
+    "research/whitmore-flute-history-frames/210.64.png": "d30826dda5fc5f2a0603545554f7952dedddbe135dd68a8d54d61bcd8d6b5cd7"
+  },
+  "artifact_sha256": {
+    "research/whitmore-transpose-keyboard/101.00.png": "79f14da3bb5571506e7e76427a8533fd8ef429d663a6f438e9793dc7624285df",
+    "research/whitmore-transpose-keyboard/12.00.png": "df57d8225cec21802ac46026466d2767e5f36d6151eda9642c776cf8d57070db",
+    "research/whitmore-transpose-keyboard/13.00-overview.png": "d7b2276638befd4bc47bfbb6f5d214766339f0437a1a30f5e040a909cc3f9b3c",
+    "research/whitmore-transpose-keyboard/13.00.png": "6fd612530083f868f30b7e12f3bae62af8a5db67846dc193887c7f69076c7232",
+    "research/whitmore-transpose-keyboard/135.00.png": "f146efac32d84041c8c4ebf9c688b760ba7001ec2ea5ae248b9eb2210cea11b1",
+    "research/whitmore-transpose-keyboard/15.00-overview.png": "5c12a1c478917d235ff1d15014ba974e21b579194fdbf7e167e84df1affd74d2",
+    "research/whitmore-transpose-keyboard/15.00.png": "146474e13fabcf3ad98963fc1e07bc0fc70a7c3bd297b8e644e509ddc2a4479d",
+    "research/whitmore-transpose-keyboard/170.00.png": "b20881a555be24aaae1ad5bd21c5810c1730f76c3e4933a25565fd6a97a93d6e",
+    "research/whitmore-transpose-keyboard/18.00-overview.png": "1805ff91b38cbe7ed69aaa2b30898b36ab4b803deed93a3deffd5db36487e6ad",
+    "research/whitmore-transpose-keyboard/18.00.png": "4686890024c90710ec2e3f34893867930651f321c9eaedde283c81f4946f94ed",
+    "research/whitmore-transpose-keyboard/188.00.png": "2d19f17a8e32a329c7c91c732403ea143cfdb290333c2fb4171a17eb5dfd173d",
+    "research/whitmore-transpose-keyboard/203.00.png": "b9df615aeba2eca0d24d8c14b7399e7f1b801799fa4a3fab080b4662556058da",
+    "research/whitmore-transpose-keyboard/205.20-keyboard.png": "53ba1d233a50a8ac01bf0e2bffa3a79d3b8276f003e75fac856ba7885974ab86",
+    "research/whitmore-transpose-keyboard/205.80-keys.png": "903bb8d7ce4840380a66a50123893618311df023d2922093f866130ff2baa4be",
+    "research/whitmore-transpose-keyboard/205.80-ordinal.png": "38cd6923ddd723d8f47f46398651abb29ecacbe1016a03bca0c1f1b25917ae47",
+    "research/whitmore-transpose-keyboard/205.80-transpose.png": "a0edf7832201b8b951fc55b768be33a0c7b9172a4e04d6b0d9215144c42021a2",
+    "research/whitmore-transpose-keyboard/205.80.png": "516d83cc1835a32e3116652fa79ee67a3fb54e363901f9dbb0ba071f14d142d3",
+    "research/whitmore-transpose-keyboard/207.00-keys.png": "5114348fcf3e890fdabe1790c32c51eeb4a21bd2abb06ae9fd91387709ddb6d2",
+    "research/whitmore-transpose-keyboard/207.00-ordinal.png": "04daa4047be8a0b09ba0d6dff321b8af823036a691d7287c1fdc030e8298ced1",
+    "research/whitmore-transpose-keyboard/207.00.png": "83423c75e2f268a0b4b7b655d993dd5e49f40f91bf9418a05b80af09a5d5f7a6",
+    "research/whitmore-transpose-keyboard/21.00-overview.png": "233f4e6fc58b50c00d5485d8b679b80ac8c180a94e7eba43f5c2c91c0c02075e",
+    "research/whitmore-transpose-keyboard/21.00.png": "a3b79ea2c7e933d78d7ccc26557ca544a4b8a9c11954cf01fbf7cb3ac2504169",
+    "research/whitmore-transpose-keyboard/210.90-keys.png": "8708fdbcaaeab1023459db153e665f67277059efb40a8546a104b6bfeb4c27bf",
+    "research/whitmore-transpose-keyboard/210.90-ordinal.png": "a3d99585e80f8c0d4a1644b3df7340146c3048f4ee6312f7e3d5abe837d0eb30",
+    "research/whitmore-transpose-keyboard/210.90-transpose.png": "510e784c77fcf2c812f45497678fa0027f96f73ebd48bca6fa6663c5af9d15a8",
+    "research/whitmore-transpose-keyboard/210.90.png": "214a7929599092a2f51e4863eeef18f23c18a021740f1ce2c2138ced103be697",
+    "research/whitmore-transpose-keyboard/211.50-keys.png": "dcbf9389e5cdbbf3bdc65fc3ead9eb8f7678bddd371648d5d171e2cd3b101649",
+    "research/whitmore-transpose-keyboard/211.50-ordinal.png": "c5b845df40e9c7584980bbc4ca5e76c25aa43cb26da4276cae3bc711da8a1557",
+    "research/whitmore-transpose-keyboard/211.50.png": "99b953bd97fccbe755ed3ad06e882a159d603a0d7c86610c27dfabb0ed31f1ba",
+    "research/whitmore-transpose-keyboard/212.00.png": "61c7de6beee69dae5d21787e4496acb81a85e20ee61c832c2790861e842ae196",
+    "research/whitmore-transpose-keyboard/24.00-overview.png": "d64e2706db9d62168d2aa8365570969b771fce6f730b9f8b3f83adb197130a8b",
+    "research/whitmore-transpose-keyboard/24.00.png": "bc846a3072e93a44d39ac83d7d82d4caebf4e16ff0996401fae2807e4e15ce68",
+    "research/whitmore-transpose-keyboard/27.00-overview.png": "ee5ae122bc89ebe7f24451d0ad4535e976894a1ebe9c1f1fb401f34db7319cf8",
+    "research/whitmore-transpose-keyboard/27.00.png": "65e921f3adc465989cabd1571b144e88662e6ca86f5c60db984545389ee54213",
+    "research/whitmore-transpose-keyboard/29.00-transpose.png": "25afeec146d4022ce3fa7522cf0060def1d799a93947a563a053d2ef52cf17ef",
+    "research/whitmore-transpose-keyboard/29.00.png": "dcbf868936322d3cdd7be89fb566e7de4a1ee870e8f19f819a0922bc1ce386c2",
+    "research/whitmore-transpose-keyboard/45.00.png": "79bace05c5ca0896fbce862c655ebabd2813ad9728a8ca59855d2ddefc020974",
+    "research/whitmore-transpose-keyboard/45.50.png": "8137a69d5412c384e27ba1a8490a2e1fd01d6496cda633b316bcf88bc3c3fc80",
+    "research/whitmore-transpose-keyboard/46.00.png": "8a551ec8ee78893c200b0d1984041423b2361cdae1da5644f8f2a48aac687c5f",
+    "research/whitmore-transpose-keyboard/46.50.png": "1ac918d2c3520b9b9cb920e6f614379d48bcd9be852a6bbd3a6fcff10df6b6cf",
+    "research/whitmore-transpose-keyboard/47.00.png": "7d9ae0de3a04199cd19f398cc9bbbd4ec615978ac4001b180e780a8e22c3a02f",
+    "research/whitmore-transpose-keyboard/47.50.png": "b59fcc55edc05127c3a302fd35a9f02f93a43518a5e44a71de6439e0f21f7b72",
+    "research/whitmore-transpose-keyboard/48.00.png": "66cb9df140d0799cdb4539376dca31bdf338f0043d1a8dc0686b77d9263bea06",
+    "research/whitmore-transpose-keyboard/48.50.png": "ab4274c66f687ab16ad1f5fcec649e92cb91e3281c8ed7c051cbda287ae54ae6",
+    "research/whitmore-transpose-keyboard/49.00.png": "27cba34907101408b7c17fdf3edd494c6ff013a31dbdab01b438d8b98054f0be",
+    "research/whitmore-transpose-keyboard/49.50.png": "061d90bc4d5341c286d74cc1be58eff2c7021d84a087922f22b040b1b59777c0",
+    "research/whitmore-transpose-keyboard/49.60.png": "0171aca85ac4fb52f251b3c649da655bb26db01e309fb4028b80e017ccef4a2f",
+    "research/whitmore-transpose-keyboard/49.68.png": "86f9754d7b58c4320b7daffdf3168e4ddd2c8b1bccd1c95ea7b2f520510e3374",
+    "research/whitmore-transpose-keyboard/49.76.png": "a65822346e9a9dd2f0ab1039249d5af9f56fd607238e04001f32395afa92a82f",
+    "research/whitmore-transpose-keyboard/49.84.png": "43d974a3f2e58727e516e7675136686235ee28ebac66bb030d1713d5baaa002f",
+    "research/whitmore-transpose-keyboard/49.92.png": "b168d5a5ec3282ffb08497200e4d7417233b80e3bdd08de887a6536f21ddd29e",
+    "research/whitmore-transpose-keyboard/50.00.png": "9000737492af65b6c967b9bb535550cf283248b92512fe9daff5f5631550fda8",
+    "research/whitmore-transpose-keyboard/55.00.png": "a52670066e19799c31035f07c7ee82eecaa4b2854e3d7cf0e8715e5e51d8e1d5",
+    "research/whitmore-transpose-keyboard/60.00.png": "91a111d994fd214e24a0dbc4500759680809e67abb79879c74e49dcbd9ecf3a0",
+    "research/whitmore-transpose-keyboard/65.00.png": "5ba954feb791c38fcbbe562df2f6ac2d9cb42276e9637be4c654872236cb6ba1",
+    "research/whitmore-transpose-keyboard/70.00.png": "39aa408a069fc7f41075bce409ad696ff85cff664aebdcc3a96b387ca8760135",
+    "research/whitmore-transpose-keyboard/75.00.png": "23d8abd84ce78fd4c8deb88cd6b0ae7135b6562ee2fe5f44e2602ef55c6e29a4",
+    "research/whitmore-transpose-keyboard/8.00.png": "fe106a2ea36fa905bd601304559e0bb954263a0b4007b51c6714372032d77598",
+    "research/whitmore-transpose-keyboard/80.00.png": "d3d4e7b56b585a9e1a8fd3cb2ffdf52866dca0b06448693f4ca0e4cb8dd166ba",
+    "research/whitmore-transpose-keyboard/82.00.png": "cb8e1f6516773463df2314aa762789cd38fff276d1bca9db66a2decb19e7ae20",
+    "research/whitmore-transpose-keyboard/early-transpose-chapter.png": "470e0d187c6b150db06de9c0c4d926b10508f4919a49319e7d3e3a69fa0ce543",
+    "research/whitmore-transpose-keyboard/key-measurement-grid.png": "54480bdff44aa5106a2e45aea5af1d199890561019e12ef15727a78517c3a0d7",
+    "research/whitmore-transpose-keyboard/switch-actuation.png": "33a3e1d95ad43c7acb31a7b74407848fefb8a633746e1eb631ac2263931698a0",
+    "research/whitmore-transpose-keyboard/switch-transition.png": "ddbcf9868867b212104ef6b9ca5b39733accec10f8e20c76bec99a910a030b70",
+    "research/whitmore-transpose-keyboard/transition-contact-sheet.png": "8c00bc76a2b4625c86faddc754909a399a6dcd36bb83124847a58a6581a64337",
+    "research/whitmore-transpose-keyboard/transpose-contact-sheet.png": "0e7a07d18553afb6b11407472f4858db00fafcfc2a762b271dcf81e746af4bc8",
+    "research/whitmore-transpose-keyboard.md": "9cae46b87cab08f24ad9632adda83195a9a2f1a371d9d799080f1966ac1b54e4"
+  }
+}

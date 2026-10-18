@@ -1,0 +1,11 @@
+{
+  "historical_root": "/tmp/ceres-cs50-1x8LGd",
+  "source_sha256": {
+    "tools/check_release_factorial.py": "889ce8dd273b09a67fab1dc4e65a6a3457922bc585a820ef018e78aa84d76936",
+    "tools/check_brass_filter_grid.py": "38f0454579b1eb29dc6879a1f8060afa43b6aa387300211c8cc258a2aaf0068b",
+    "tools/check_lp_bus_candidate.py": "3f28b07f81f3b9bbe6356696f8f9c62e72f997fe7d41087e22d2171e1919b05c",
+    "tools/harmonics.py": "712effa13a276f9b6f38ade38003d5330f2b9c66699ff6f1aedad46d2bd63b23",
+    "tools/render.py": "34725c19fe869ed4f8c161c5f2dd1d06032aa4c9208f6d88928595225bc63360"
+  },
+  "extraction": "Named pure functions only; silence denominator guard documented in module."
+}

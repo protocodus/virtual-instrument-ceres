@@ -1,0 +1,327 @@
+{
+  "status": "acquisition_verified_not_hardware_calibration",
+  "recorded_at_utc": "2026-10-18T00:42:44.679546+00:00",
+  "source_url": "https://www.youtube.com/watch?v=Fj21t8MIS_o",
+  "creator": "Andy Whitmore",
+  "title_at_acquisition": "Yamaha CS-50: The Secret Budget CS-80",
+  "publication_date": "20240302",
+  "recording_date_creator_claim": "February 2024",
+  "dry_status": "Creator description states dry recording at Greystoke Studio; recording chain not independently measured.",
+  "format": {
+    "format_id": "251-18",
+    "format_note": "English (US) original (default), medium",
+    "language": "en-US",
+    "acodec": "opus",
+    "asr": 48000,
+    "audio_channels": 2
+  },
+  "encoded_probe": {
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "opus",
+        "codec_long_name": "Opus (Opus Interactive Audio Codec)",
+        "codec_type": "audio",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "mime_codec_string": "opus",
+        "sample_fmt": "fltp",
+        "sample_rate": "48000",
+        "channels": 2,
+        "channel_layout": "stereo",
+        "bits_per_sample": 0,
+        "initial_padding": 312,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "extradata_size": 19,
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "language": "eng"
+        }
+      }
+    ],
+    "format": {
+      "filename": "/private/tmp/ceres-cs50-1x8LGd/references/whitmore-original.webm",
+      "nb_streams": 1,
+      "nb_programs": 0,
+      "nb_stream_groups": 0,
+      "format_name": "matroska,webm",
+      "format_long_name": "Matroska / WebM",
+      "start_time": "0.000000",
+      "duration": "1285.081000",
+      "size": "18614905",
+      "bit_rate": "115883",
+      "probe_score": 100,
+      "tags": {
+        "encoder": "google/video-file"
+      }
+    }
+  },
+  "decoded_probe": {
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "pcm_f32le",
+        "codec_long_name": "PCM 32-bit floating point little-endian",
+        "codec_type": "audio",
+        "codec_tag_string": "[3][0][0][0]",
+        "codec_tag": "0x0003",
+        "sample_fmt": "flt",
+        "sample_rate": "48000",
+        "channels": 2,
+        "bits_per_sample": 32,
+        "initial_padding": 0,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "time_base": "1/48000",
+        "duration_ts": 61682688,
+        "duration": "1285.056000",
+        "bit_rate": "3072000",
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        }
+      }
+    ],
+    "format": {
+      "filename": "/private/tmp/ceres-cs50-1x8LGd/references/whitmore-original.wav",
+      "nb_streams": 1,
+      "nb_programs": 0,
+      "nb_stream_groups": 0,
+      "format_name": "wav",
+      "format_long_name": "WAV / WAVE (Waveform Audio)",
+      "duration": "1285.056000",
+      "size": "493461596",
+      "bit_rate": "3072000",
+      "probe_score": 99,
+      "tags": {
+        "encoder": "Lavf62.12.101"
+      }
+    }
+  },
+  "video_probe": {
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "vp9",
+        "codec_long_name": "Google VP9",
+        "profile": "Profile 0",
+        "codec_type": "video",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "mime_codec_string": "vp09.00.40.08",
+        "width": 1920,
+        "height": 1012,
+        "coded_width": 1920,
+        "coded_height": 1012,
+        "has_b_frames": 0,
+        "sample_aspect_ratio": "1:1",
+        "display_aspect_ratio": "480:253",
+        "pix_fmt": "yuv420p",
+        "level": -99,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "color_primaries": "bt709",
+        "r_frame_rate": "25/1",
+        "avg_frame_rate": "25/1",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "language": "eng",
+          "DURATION": "00:05:27.000000000"
+        }
+      }
+    ],
+    "format": {
+      "filename": "/private/tmp/ceres-cs50-1x8LGd/references/whitmore-preset-video.webm",
+      "nb_streams": 1,
+      "nb_programs": 0,
+      "nb_stream_groups": 0,
+      "format_name": "matroska,webm",
+      "format_long_name": "Matroska / WebM",
+      "start_time": "0.000000",
+      "duration": "327.000000",
+      "size": "44440726",
+      "bit_rate": "1087234",
+      "probe_score": 100,
+      "tags": {
+        "ENCODER": "Lavf62.12.101"
+      }
+    }
+  },
+  "creator_preset_chapters": [
+    {
+      "start_time": 8,
+      "title": "All the Factory presets - Strings I",
+      "end_time": 13,
+      "ceres_preset_label": "string1"
+    },
+    {
+      "start_time": 45,
+      "title": "Strings II",
+      "end_time": 82,
+      "ceres_preset_label": "string2"
+    },
+    {
+      "start_time": 135,
+      "title": "Brass I",
+      "end_time": 170,
+      "ceres_preset_label": "brass1"
+    },
+    {
+      "start_time": 188,
+      "title": "Brass II",
+      "end_time": 203,
+      "ceres_preset_label": "brass2"
+    },
+    {
+      "start_time": 203,
+      "title": "Flute",
+      "end_time": 231,
+      "ceres_preset_label": "flute"
+    },
+    {
+      "start_time": 231,
+      "title": "Electric Piano",
+      "end_time": 245,
+      "ceres_preset_label": "electric_piano"
+    },
+    {
+      "start_time": 245,
+      "title": "Clavichord",
+      "end_time": 252,
+      "ceres_preset_label": "clavichord"
+    },
+    {
+      "start_time": 252,
+      "title": "Harpsichord",
+      "end_time": 266,
+      "ceres_preset_label": "harpsichord"
+    },
+    {
+      "start_time": 266,
+      "title": "Guitar I",
+      "end_time": 280,
+      "ceres_preset_label": "guitar1"
+    },
+    {
+      "start_time": 280,
+      "title": "Guitar II",
+      "end_time": 298,
+      "ceres_preset_label": "guitar2"
+    },
+    {
+      "start_time": 298,
+      "title": "Funky I",
+      "end_time": 308,
+      "ceres_preset_label": "funky1"
+    },
+    {
+      "start_time": 308,
+      "title": "Funky II",
+      "end_time": 318,
+      "ceres_preset_label": "funky2"
+    },
+    {
+      "start_time": 318,
+      "title": "Funky III",
+      "end_time": 327,
+      "ceres_preset_label": "funky3"
+    }
+  ],
+  "chapter_interpretation": "Chapter timestamps label segments, not exact preset-switch sample times. Performance controls can be changed within or between segments.",
+  "midi_status": "No original MIDI supplied by source. Any event sequence made from this reference must be labeled inferred and state gate/pressure uncertainties.",
+  "development_scope_seconds": [
+    0,
+    327
+  ],
+  "remaining_scope": "Audio acquired but no blind holdout claim; source inspection and future selection must be recorded.",
+  "known_limits": [
+    "Lossy Opus source.",
+    "Speech and polyphonic performance may overlap music.",
+    "Aftertouch, global controls, output load, tuning and modification history need inspection.",
+    "Creator chapter at170s states custom installed buttons disconnected; this is not an independent electrical verification."
+  ],
+  "acquisition": {
+    "yt_dlp_version": "2026.08.19",
+    "audio_command": "tools/.reference-venv/bin/yt-dlp --ignore-config --no-playlist --no-progress -f 'bestaudio[language=en-US]' --write-info-json -o 'references/whitmore-original.%(ext)s' 'https://www.youtube.com/watch?v=Fj21t8MIS_o'",
+    "decode_command": "ffmpeg -hide_banner -loglevel error -i references/whitmore-original.webm -c:a pcm_f32le references/whitmore-original.wav",
+    "video_command": "tools/.reference-venv/bin/yt-dlp --ignore-config --no-playlist --no-progress -f 'bestvideo[height<=1080]' --download-sections '*0-327' -o 'references/whitmore-preset-video.%(ext)s' 'https://www.youtube.com/watch?v=Fj21t8MIS_o'",
+    "account_or_cookies_used": false,
+    "purchases_or_contacts": false,
+    "processing": "Decode only: preserve sample rate and stereo channels; no equalization, denoising, gain or sample synthesis."
+  },
+  "synthesis_asset": false,
+  "redistribution_license": null,
+  "file_sha256": {
+    "references/whitmore-original.info.json": "6eacf2197b45b0aece675ce2cadf79fedb996c138b2dd6f309ecbe862629001d",
+    "references/whitmore-original.webm": "7d24080933f39f767b748b410db1a634c0a40aad9bd3798fbb6e2e3cd37e7ac7",
+    "references/whitmore-original.wav": "cb765eee0f7eb6d0b0c9b4052b4d25f3dec21d94ac16e44302147d37c8fa4104",
+    "tools/record_whitmore_reference.py": "97cbdc69c8ac78c86c12f76a834cde153a9a96e5fcfc529164f1dbc5908439f6",
+    "references/whitmore-preset-video.webm": "3debd6a44350cf973de5c0ad85820acb0eaa1c5575b809e7c5340e6b8d0294ee",
+    "references/whitmore-video-acquisition.log": "17f4c8aa069e04a934161b3ce638759ce1a5a9d8dc46097b6bf6c1922e97536f"
+  }
+}

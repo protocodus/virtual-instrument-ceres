@@ -1,0 +1,412 @@
+{
+  "source_file": "ptk_cs50_square.mp3",
+  "source_sha256": "5ce48fbc8cfa128e9379f118ba85e625383df284eec15881de9a06c08a12dd1a",
+  "reference_audio_file": "ptk_cs50_square.wav",
+  "reference_audio_sha256": "2059f16fa8e924c2257a721622790d33b14a8e7c6a3d434bfbf29cb7b1269ee1",
+  "reference_audio_transform": "Full MP3 decode to original-rate stereo PCM24 WAV. No slicing, gain, effects, or sample-rate conversion.",
+  "excerpt_start_seconds": 0,
+  "reference_provenance": {
+    "hardware_model": "Yamaha CS-50",
+    "source_url": "https://web.archive.org/web/20070208025146/http://personal.inet.fi/private/matador/cs-50_index.html",
+    "recording_creator": "ptk / matador site; real-name attribution not independently established",
+    "preset": "square waveform demonstration; factory preset not specified",
+    "settings_status": "incomplete",
+    "midi_status": "inferred_not_original",
+    "effects_status": "dry_creator_claim",
+    "effects": "Primary creator page says no external effects for Square, Square & PWM and Sawtooth. Recording chain and encoding remain unknown.",
+    "exact_comparison_eligible": false
+  },
+  "sample_rate": 44100,
+  "decoded_frames": 178560,
+  "duration_seconds": 4.048979591836734,
+  "channel_note": "Stereo channels are highly correlated but unequally gained; side/mid energy alone would misclassify this as a wet recording.",
+  "left_right_correlation": 0.9959613631145866,
+  "left_to_right_rms_db": -7.239329927525484,
+  "envelope_observations": {
+    "method": "20ms centered RMS; threshold 30dB below clip peak; includes codec delay, capture noise and window smoothing, not original key events.",
+    "first_above_threshold_seconds": 0.25970521541950115,
+    "last_above_threshold_seconds": 3.5206349206349206,
+    "rms_peak_seconds": 1.1924036281179138,
+    "rms_at_1_4_seconds_relative_peak": 0.8898565015852983
+  },
+  "inferred_midi": {
+    "file": "ptk_cs50_square_inferred.mid",
+    "sha256": "66e59a9ef52ce0ac650b7191a85b8abb7a87123c2d4db3ce8c3aef2a287629c0",
+    "note": 53,
+    "note_name": "F3 (MIDI convention C4=60)",
+    "onset_seconds_estimate": 0.23,
+    "note_off_seconds_estimate": 1.96,
+    "original_gate_timing_known": false,
+    "onset_uncertainty_seconds_approximate": 0.04,
+    "note_off_uncertainty_seconds_approximate": 0.15,
+    "velocity": 100,
+    "confidence": "Pitch class high. Onset approximate; release transition only suggests gate. Velocity is placeholder. Pressure/controls/keyboard footage/tuning unknown. MIDI contains no tuning adjustment."
+  },
+  "suggested_comparison_windows": [
+    {
+      "start_seconds": 0.8,
+      "end_seconds": 1.0,
+      "use": "Oscillator/filter harmonic shape during attack; no claim that filter is static."
+    },
+    {
+      "start_seconds": 1.2,
+      "end_seconds": 1.4,
+      "use": "Near amplitude peak, before estimated note-off; compare spectral evolution with earlier window."
+    }
+  ],
+  "spectral_method": "200ms Hann window,131072 FFT; local peak within170..184Hz then +/-5Hz at harmonics; parabolic log peak frequency; magnitudes are FFT-bin maxima, approximate relative amplitudes. No time/gain normalization of source.",
+  "spectral_windows": [
+    {
+      "start_seconds": 0.4,
+      "end_seconds": 0.6,
+      "f0_hz": 177.6409444310782,
+      "midi_float": 53.29752747360772,
+      "harmonics": [
+        {
+          "harmonic": 1,
+          "frequency_hz": 177.6409444310782,
+          "db_relative_h1": 0.0
+        },
+        {
+          "harmonic": 2,
+          "frequency_hz": 355.29642010996554,
+          "db_relative_h1": -25.571454212722273
+        },
+        {
+          "harmonic": 3,
+          "frequency_hz": 532.8746079523506,
+          "db_relative_h1": -9.652099822474197
+        },
+        {
+          "harmonic": 4,
+          "frequency_hz": 710.615752166135,
+          "db_relative_h1": -25.691137656442905
+        },
+        {
+          "harmonic": 5,
+          "frequency_hz": 888.1216354565878,
+          "db_relative_h1": -14.404285138598585
+        },
+        {
+          "harmonic": 6,
+          "frequency_hz": 1065.6034701143637,
+          "db_relative_h1": -25.473729926434544
+        },
+        {
+          "harmonic": 7,
+          "frequency_hz": 1243.290202535615,
+          "db_relative_h1": -17.72325906330031
+        },
+        {
+          "harmonic": 8,
+          "frequency_hz": 1420.7366765090028,
+          "db_relative_h1": -25.529341793748088
+        },
+        {
+          "harmonic": 9,
+          "frequency_hz": 1598.5374296667546,
+          "db_relative_h1": -20.17070160204389
+        },
+        {
+          "harmonic": 10,
+          "frequency_hz": 1776.1662853029595,
+          "db_relative_h1": -26.160490616391485
+        },
+        {
+          "harmonic": 11,
+          "frequency_hz": 1953.7299158248168,
+          "db_relative_h1": -22.75928149526136
+        },
+        {
+          "harmonic": 12,
+          "frequency_hz": 2131.520620784903,
+          "db_relative_h1": -26.156985882993673
+        },
+        {
+          "harmonic": 13,
+          "frequency_hz": 2309.030128862632,
+          "db_relative_h1": -25.196998619360578
+        },
+        {
+          "harmonic": 14,
+          "frequency_hz": 2486.6014746660244,
+          "db_relative_h1": -26.27184064215038
+        },
+        {
+          "harmonic": 15,
+          "frequency_hz": 2664.2828721068117,
+          "db_relative_h1": -27.45643345576728
+        },
+        {
+          "harmonic": 16,
+          "frequency_hz": 2841.938689717572,
+          "db_relative_h1": -26.758430955504245
+        }
+      ]
+    },
+    {
+      "start_seconds": 0.8,
+      "end_seconds": 1.0,
+      "f0_hz": 177.7626518741769,
+      "midi_float": 53.309384645563455,
+      "harmonics": [
+        {
+          "harmonic": 1,
+          "frequency_hz": 177.7626518741769,
+          "db_relative_h1": 0.0
+        },
+        {
+          "harmonic": 2,
+          "frequency_hz": 355.2899892716129,
+          "db_relative_h1": -27.107220375353805
+        },
+        {
+          "harmonic": 3,
+          "frequency_hz": 532.9395990978137,
+          "db_relative_h1": -10.644590980820055
+        },
+        {
+          "harmonic": 4,
+          "frequency_hz": 710.5593070480653,
+          "db_relative_h1": -26.649643401378714
+        },
+        {
+          "harmonic": 5,
+          "frequency_hz": 888.1809926884499,
+          "db_relative_h1": -15.280357454533277
+        },
+        {
+          "harmonic": 6,
+          "frequency_hz": 1065.8886720108678,
+          "db_relative_h1": -26.744663387814803
+        },
+        {
+          "harmonic": 7,
+          "frequency_hz": 1243.5280811466773,
+          "db_relative_h1": -18.38984191236705
+        },
+        {
+          "harmonic": 8,
+          "frequency_hz": 1421.1175291973598,
+          "db_relative_h1": -26.464240323237355
+        },
+        {
+          "harmonic": 9,
+          "frequency_hz": 1598.6906063046563,
+          "db_relative_h1": -21.31716644842048
+        },
+        {
+          "harmonic": 10,
+          "frequency_hz": 1776.3600771597646,
+          "db_relative_h1": -26.719792816023183
+        },
+        {
+          "harmonic": 11,
+          "frequency_hz": 1954.0866059136288,
+          "db_relative_h1": -23.595211062617366
+        },
+        {
+          "harmonic": 12,
+          "frequency_hz": 2131.7000257155923,
+          "db_relative_h1": -27.178815127138986
+        },
+        {
+          "harmonic": 13,
+          "frequency_hz": 2309.321846600851,
+          "db_relative_h1": -25.868939960007076
+        },
+        {
+          "harmonic": 14,
+          "frequency_hz": 2486.9796576118,
+          "db_relative_h1": -26.950321344000578
+        },
+        {
+          "harmonic": 15,
+          "frequency_hz": 2664.669044714483,
+          "db_relative_h1": -28.30801153746096
+        },
+        {
+          "harmonic": 16,
+          "frequency_hz": 2842.2488643148827,
+          "db_relative_h1": -27.617044186640975
+        }
+      ]
+    },
+    {
+      "start_seconds": 1.2,
+      "end_seconds": 1.4,
+      "f0_hz": 177.53347179388717,
+      "midi_float": 53.287050351043305,
+      "harmonics": [
+        {
+          "harmonic": 1,
+          "frequency_hz": 177.53347179388717,
+          "db_relative_h1": 0.0
+        },
+        {
+          "harmonic": 2,
+          "frequency_hz": 355.1382818012499,
+          "db_relative_h1": -27.334908046299937
+        },
+        {
+          "harmonic": 3,
+          "frequency_hz": 532.81737804301,
+          "db_relative_h1": -12.317777034714757
+        },
+        {
+          "harmonic": 4,
+          "frequency_hz": 710.4623038001743,
+          "db_relative_h1": -28.19864099661767
+        },
+        {
+          "harmonic": 5,
+          "frequency_hz": 888.0326798284706,
+          "db_relative_h1": -17.06502153402346
+        },
+        {
+          "harmonic": 6,
+          "frequency_hz": 1065.7536504134146,
+          "db_relative_h1": -28.308016048425042
+        },
+        {
+          "harmonic": 7,
+          "frequency_hz": 1243.298145878071,
+          "db_relative_h1": -20.42367345391694
+        },
+        {
+          "harmonic": 8,
+          "frequency_hz": 1420.8528394927594,
+          "db_relative_h1": -28.316750219158465
+        },
+        {
+          "harmonic": 9,
+          "frequency_hz": 1598.4644244250874,
+          "db_relative_h1": -23.172146361959864
+        },
+        {
+          "harmonic": 10,
+          "frequency_hz": 1776.0495921897189,
+          "db_relative_h1": -28.793161558943527
+        },
+        {
+          "harmonic": 11,
+          "frequency_hz": 1953.7528188169858,
+          "db_relative_h1": -25.629018008263053
+        },
+        {
+          "harmonic": 12,
+          "frequency_hz": 2131.318204965606,
+          "db_relative_h1": -28.408217716626687
+        },
+        {
+          "harmonic": 13,
+          "frequency_hz": 2308.913232082821,
+          "db_relative_h1": -27.77837701961505
+        },
+        {
+          "harmonic": 14,
+          "frequency_hz": 2486.520578524075,
+          "db_relative_h1": -29.201273823050723
+        },
+        {
+          "harmonic": 15,
+          "frequency_hz": 2664.156791421196,
+          "db_relative_h1": -30.158943615027383
+        },
+        {
+          "harmonic": 16,
+          "frequency_hz": 2841.736355473424,
+          "db_relative_h1": -29.64437701278061
+        }
+      ]
+    },
+    {
+      "start_seconds": 2.0,
+      "end_seconds": 2.2,
+      "f0_hz": 177.53626335661053,
+      "midi_float": 53.28732257072065,
+      "harmonics": [
+        {
+          "harmonic": 1,
+          "frequency_hz": 177.53626335661053,
+          "db_relative_h1": 0.0
+        },
+        {
+          "harmonic": 2,
+          "frequency_hz": 355.32088930716947,
+          "db_relative_h1": -26.12117581666019
+        },
+        {
+          "harmonic": 3,
+          "frequency_hz": 532.8804782675112,
+          "db_relative_h1": -10.503895104905459
+        },
+        {
+          "harmonic": 4,
+          "frequency_hz": 710.5107199734526,
+          "db_relative_h1": -26.069703162902677
+        },
+        {
+          "harmonic": 5,
+          "frequency_hz": 888.1138971977404,
+          "db_relative_h1": -15.200948361527129
+        },
+        {
+          "harmonic": 6,
+          "frequency_hz": 1065.8207634831394,
+          "db_relative_h1": -26.28638193095974
+        },
+        {
+          "harmonic": 7,
+          "frequency_hz": 1243.502294257345,
+          "db_relative_h1": -18.257079325074415
+        },
+        {
+          "harmonic": 8,
+          "frequency_hz": 1420.9899130765523,
+          "db_relative_h1": -26.349877646792965
+        },
+        {
+          "harmonic": 9,
+          "frequency_hz": 1598.7418726462354,
+          "db_relative_h1": -21.039000672766917
+        },
+        {
+          "harmonic": 10,
+          "frequency_hz": 1776.2130812779988,
+          "db_relative_h1": -27.036379701495115
+        },
+        {
+          "harmonic": 11,
+          "frequency_hz": 1953.9464236069766,
+          "db_relative_h1": -23.53350008269362
+        },
+        {
+          "harmonic": 12,
+          "frequency_hz": 2131.7308061296376,
+          "db_relative_h1": -27.037969404808166
+        },
+        {
+          "harmonic": 13,
+          "frequency_hz": 2309.3386479790374,
+          "db_relative_h1": -25.914106439628625
+        },
+        {
+          "harmonic": 14,
+          "frequency_hz": 2486.9126717442896,
+          "db_relative_h1": -26.954666758888916
+        },
+        {
+          "harmonic": 15,
+          "frequency_hz": 2664.53906769069,
+          "db_relative_h1": -28.105687936443005
+        },
+        {
+          "harmonic": 16,
+          "frequency_hz": 2842.208711886961,
+          "db_relative_h1": -27.663790894449622
+        }
+      ]
+    }
+  ]
+}

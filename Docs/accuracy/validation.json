@@ -1,0 +1,38 @@
+{
+  "status": "pass",
+  "baseline_commit": "10e17fd9ecdc0a5a0354bad4c5a53780885a5503",
+  "candidate_commit": "f99a47c967ec478da89c394506575d263bee0c8a",
+  "input_and_audio_checks": {
+    "status": "pass",
+    "plan_sha256": "3482bca5ed0305c2a384125d05da73d19c17ed3c7f699e8cde262c045151071a",
+    "frozen_inputs_and_audio_checked": 71,
+    "MIDI_schedules_checked": 8
+  },
+  "byte_identical_final_cases": 8,
+  "original_MIDI_available": false,
+  "independent_known_settings_holdout": false,
+  "hardware_accuracy_improvement_established": false,
+  "native_calls_this_battery": 24,
+  "explanation": "8baseline+8pre-trim+8final; pre-trim completed before neutral trim API addition and was preserved explicitly. Final matches baseline exactly.",
+  "verified_file_sha256": {
+    "Tools/accuracy/metrics.py": "34cba33ccf34b62be818518cc34a5d4d48ece032366b1b238a5075f94b9935cd",
+    "Tools/accuracy/run_battery.py": "19153bec22f120d0cd4d643dd87c37dee096d5c6d24adc9aa6368a18538b71ea",
+    "Tools/accuracy/screen_active_sources.py": "af06780de9a7c7e3c3a3d09ac3b793b39a69962ceeab9cca44b1c73aaaf31db9",
+    "Tools/accuracy/verify.py": "4a25c5244b61f93e24a757b5329e0d6ba2de8cf72ed9164d41cbbf3d00af7ffa",
+    "Tools/accuracy/origins.json": "bf5525099d6c85ced0c71a9e9555811dab55e1b53cda3be6ce7d2662d68c4fa6",
+    "Docs/accuracy/README.md": "38abfd062f79d6ab016642b3f95c13031f1e9a09398b4a8469600558421d424c",
+    "Docs/accuracy/ACTIVE-SOURCES.md": "12043e5a7e7d31325e993ef35260c692df39906670700bc9ebbf2f7cedba6660",
+    "Docs/accuracy/plan.json": "3482bca5ed0305c2a384125d05da73d19c17ed3c7f699e8cde262c045151071a",
+    "Docs/accuracy/metadata-errata.json": "4ec474f7dcfe2d01ee1239144ef15edbadb283b06a2fbfb9b67c6befaea9348c",
+    "Docs/accuracy/identity-relocations.json": "79cd0b87ceb40cc0d11418e7f899c7e97fe6d63732a3472e884b0f886a146a86",
+    "Docs/accuracy/baseline-build.json": "6abd80bfabdb2ce901f8af3dbd8e838bb707e343474579d26949dba7049f4f76",
+    "Docs/accuracy/runs/baseline/report.json": "92dcf2e7728ad382f37a73167aacd00e3db0afe63169e7c942ed370b90d81f79",
+    "Docs/accuracy/runs/soundpath/report.json": "b2cbc8a9184f738e5ff153009090d4af603b8ee537f36e323a5b7fa2b5f2e809",
+    "Docs/accuracy/runs/soundpath-final/report.json": "8eeb41595e7d9eec0900cbe999350327ec8bd475b94a21636a41f355428f9596",
+    "Docs/accuracy/comparison-soundpath-final.json": "06a9452d8a7641b0cb34a9e86f85ca1570049d940fd8bdf3fdcb44e79016b3de",
+    "Docs/accuracy/verification.json": "cdc34577c14e827b7eebc7f9f1b4c54ee012131733b2289e8930e0801249326e",
+    "Docs/accuracy/active-source-plan.json": "707eea93a0cf868b4c337143369c2984509481724f86e5866018116e06d3dba8",
+    "Docs/accuracy/active-source-screen.json": "b69cbd58bab45b2e004c161a4fc1f9d6279821acc1d9e7a106976b0fe524a4f3",
+    "Docs/accuracy/active-source-visual.json": "648e73a736ce51752bd6a38af9b3b51f76798d5eb256fafc8929726bff80d5a2"
+  }
+}

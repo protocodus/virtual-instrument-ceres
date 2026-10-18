@@ -1,0 +1,218 @@
+{
+  "status": "declared160ms_supplement_before_new_measurement",
+  "supplement_reason": "Frozen128ms44.588Hz guard excludes allA3/C4 because their fundamentals are only about41.76Hz apart. 160ms reduces the same guard to38.338Hz, with80ms half-window blur. No source/native fit or threshold relaxation.",
+  "prior128_no_eligible_error_note": "Zero initialized worst error with zero eligible frames in prior128ms report is not validated zero error; treat as null.",
+  "input_sha256": {
+    "tools/analyze_brass1_release_spectra_160.py": "dd77e4bea006165559c9eecbb6089d4e6bbad5664f198575ec147fe8e496c178",
+    "tools/brass1_partials.py": "d9323798eafb060cc1fa25f060f20a0c5138dba01f7ac361815ea5d6f20eff2d",
+    "tools/analyze_whitmore_brass1.py": "c0ffd078c6d7457207a89ba70859b6786dc8752daeb4d9bcceb740b7d83ce100",
+    "tools/check_brass1_modulation.py": "e496c62e27d97c0da46d9b0145b86765591a576e65d03ce589398a4ea056fe44",
+    "research/brass1-modulation-crosscheck.json": "1e4dc121d9baa9f1ae98e41dd01ce902c3f69612b92d1ca4b443fa1f9fec4d0c",
+    "research/brass1-tail-cycles.json": "7c93df3fb8f271db3a0d0a4c012e7875471c35a0d5c02a1d65f09ca1d48fd971",
+    "calibration/whitmore-brass1-source.json": "a9fd8a939dfdbee6dedec98a44c7c326a30b1a10579c2fb0629da476fc464ecf",
+    "calibration/whitmore-brass1-shared-modulation.json": "461499977541137bbfccbfb278e51b457f7bbdb3ad0f95af7370af12610bcd34",
+    "calibration/whitmore-brass1-modulation/analytic-amplitudes.npz": "ec07f6a35ed0e81f03e9a0a93653b0a0a0732dea287fb414f807c82a5f4bdf3b",
+    "references/whitmore-brass1-context.wav": "af1498002748e094af1cd95b6bc52c1e8919e9dce953a02ba03b8309fd5012dc",
+    "tools/brass1_release_harmonics.py": "93048a6142746fb12c19634346801e90c64ad86be6ceb5002d683dc2d5383865",
+    "research/brass1-release-spectra-plan.json": "59cc51721e8efeb215d12b6eee2b88cd8c7b808017a8289f1995f20724687487",
+    "research/brass1-release-spectra.json": "c6c956faba30a6d6bb36de40647548753dfe7ab523d7c3b5cc93aae8ed42f85e",
+    "tools/analyze_brass1_release_spectra.py": "4f3ddaf03f71c6454617066a6cb7e120e021e76b467336f08df860f3312d2732"
+  },
+  "source_seconds": [
+    136.86,
+    137.56
+  ],
+  "centers_seconds": [
+    136.86,
+    136.88000000000002,
+    136.9,
+    136.92000000000002,
+    136.94000000000003,
+    136.96,
+    136.98000000000002,
+    137.0,
+    137.02,
+    137.04000000000002,
+    137.06,
+    137.08,
+    137.10000000000002,
+    137.12,
+    137.14000000000001,
+    137.16000000000003,
+    137.18,
+    137.20000000000002,
+    137.22000000000003,
+    137.24,
+    137.26000000000002,
+    137.28,
+    137.3,
+    137.32000000000002,
+    137.34,
+    137.36,
+    137.38000000000002,
+    137.4,
+    137.42000000000002,
+    137.44000000000003,
+    137.46,
+    137.48000000000002,
+    137.5,
+    137.52,
+    137.54000000000002,
+    137.56
+  ],
+  "background_centers_seconds": [
+    137.76,
+    137.78,
+    137.79999999999998,
+    137.82,
+    137.84,
+    137.85999999999999,
+    137.88,
+    137.89999999999998
+  ],
+  "early_anchor_seconds": [
+    136.86,
+    137.08
+  ],
+  "descriptive_windows_seconds": {
+    "early": [
+      136.86,
+      137.08
+    ],
+    "upper_lobe_1": [
+      137.16,
+      137.23
+    ],
+    "upper_lobe_2": [
+      137.31,
+      137.38
+    ],
+    "upper_lobe_3": [
+      137.46,
+      137.53
+    ]
+  },
+  "pairs": [
+    [
+      57,
+      2
+    ],
+    [
+      57,
+      4
+    ],
+    [
+      57,
+      5
+    ],
+    [
+      57,
+      8
+    ],
+    [
+      60,
+      2
+    ],
+    [
+      60,
+      3
+    ],
+    [
+      60,
+      4
+    ],
+    [
+      60,
+      7
+    ],
+    [
+      60,
+      8
+    ],
+    [
+      64,
+      3
+    ],
+    [
+      64,
+      5
+    ]
+  ],
+  "frame_seconds": 0.16,
+  "hop_seconds": 0.02,
+  "method": "Existing160ms Hann periodogram band power, frequency-adaptive H1 and harmonics; Hh/H1 from same frame. No source separation.",
+  "collision_guard_Hz": 38.33843576942772,
+  "collision_rule": "Minimum of per-frame and frozen-early-median other-ladder H1..H12 separations; no relaxation after another note disappears.",
+  "strength_rule": {
+    "own_early_median_below_db": 30,
+    "background_above_db": 10,
+    "absolute_minimum_band_power_dbFS": -75
+  },
+  "coverage_rule": "At least95% of each160ms frame H1 analytic amplitude above own early-median minus40dB floor. This censors observable loss of support, not key-off times.",
+  "synthetic_acceptance": "Per pair, maximum full-mixture minus exact fixed ratio error<=0.75dB across all synthetic frames passing observable masks and lying fully before known closure. Known-closure-straddling frames are reported separately, never used to identify source gates.",
+  "source_mask": "Frozen observable masks AND synthetic per-pair acceptance. Independent of all native outputs.",
+  "synthetic": {
+    "duration_seconds": 1.6,
+    "base_amplitudes": [
+      0.02,
+      0.03,
+      0.025
+    ],
+    "harmonic_amplitude_ratios_H1_H12": [
+      1,
+      1.6,
+      0.9,
+      0.75,
+      0.5,
+      0.35,
+      0.25,
+      0.18,
+      0.13,
+      0.1,
+      0.08,
+      0.06
+    ],
+    "phase_law_radians": ".19*note_index+.37*harmonic",
+    "pitch": "Interpolate prior source F0 only where prior H1 remains within30dB of its early level; hold nearest reliable endpoint. Same paths in known controls.",
+    "AM": {
+      "rate_Hz": 6.66921788471386,
+      "m": 0.7109245361481505,
+      "phase_radians_at_136_96": -0.4848223278487288
+    },
+    "controls": [
+      "constant_ratio_held_AM",
+      "constant_ratio_common_RC_AM",
+      "constant_ratio_staggered_RC_AM",
+      "constant_ratio_staggered_clamped_RC_AM"
+    ],
+    "common_RC": {
+      "gate_seconds": 137.08,
+      "tau_seconds": 0.12
+    },
+    "staggered": {
+      "gate_seconds_A_C_E": [
+        137.16,
+        137.3,
+        137.04
+      ],
+      "tau_seconds_A_C_E": [
+        0.1,
+        0.09,
+        0.065
+      ],
+      "clamped_bias": 0.15
+    },
+    "purpose": "Illustrative known truth, not source envelope or gate calibration. Isolated-note counterparts separate window error from cross-note leakage."
+  },
+  "native_policy": "All source-valid frames retained; raw ratio residual and separate30dB weak-native flag penalty/count, no composite score or native-dependent mask.",
+  "native_renders": 0,
+  "hardware_parameter_fits": 0,
+  "original_MIDI_known": false,
+  "strict_eligible": false,
+  "limits": [
+    "Same reused development recording, no blind validation.",
+    "160ms windows temporally blur release and shared AM; no instantaneous spectral trajectory or gate claim.",
+    "Band ratios can reflect filter movement, phase cancellation, different voices or capture processing; VCF is not uniquely identified.",
+    "Known synthetic controls do not bound every possible source spectrum, phase or modulation history."
+  ]
+}

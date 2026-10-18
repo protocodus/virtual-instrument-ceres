@@ -1,0 +1,11 @@
+# Local analysis evidence and build products, never synthesis assets.
+*.wav
+*.webm
+*.mp4
+baseline-source/
+baseline-build/
+inputs/references/whitmore-original.info.json
+active-source/
+pre-trim-source/
+active-source-acquisition.log
+active-source-sub-acquisition.log

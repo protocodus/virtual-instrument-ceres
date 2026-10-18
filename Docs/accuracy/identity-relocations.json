@@ -1,0 +1,10 @@
+{
+  "reason": "Initial candidate completed before neutral output-trim API addition. Preserve compiled identity without binding mutable worktree.",
+  "reports": {
+    "Docs/accuracy/runs/soundpath/report.json": {
+      "report_sha256": "b2cbc8a9184f738e5ff153009090d4af603b8ee537f36e323a5b7fa2b5f2e809",
+      "binary": "Docs/accuracy/pre-trim-source/ceres_render",
+      "source_root": "Docs/accuracy/pre-trim-source"
+    }
+  }
+}

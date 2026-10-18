@@ -1,0 +1,7 @@
+# Fixed transpose diagnostic; no audio parameter fit.
+lp_cutoff=217.04307358325738
+lp_resonance=0.99999999992817634
+amp_decay=22.252743487499998
+amp_sustain=0.76551578668195741
+octave=-1
+hp_cutoff=33.211749623231363
