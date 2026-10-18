@@ -26,7 +26,7 @@ NOTICES = (
         "version": "8.0.14",
         "license": "JUCE Framework licence (AGPLv3/commercial dual licence notice)",
         "source": "LICENSE.md",
-        "scope": "All JUCE modules linked by Septum",
+        "scope": "All JUCE modules linked by Ceres",
     },
     {
         "name": "AudioUnitSDK",
@@ -103,15 +103,15 @@ NOTICES = (
 
 def build_notice(juce_root: Path) -> bytes:
     lines = [
-        "Septum — JUCE dependency notices",
+        "Ceres — JUCE dependency notices",
         "=================================",
         "",
         f"Pinned JUCE version: {JUCE_VERSION}",
         f"Pinned JUCE commit: {JUCE_COMMIT}",
         "",
-        "This file is intended to accompany distributed Septum plug-ins and",
+        "This file is intended to accompany distributed Ceres plug-ins and",
         "standalone applications. It contains the JUCE licence notice and the",
-        "licence texts for bundled third-party components used by Septum's",
+        "licence texts for bundled third-party components used by Ceres's",
         "configured JUCE targets.",
         "",
         "The licence payload between each BEGIN/END pair is copied byte-for-byte",
