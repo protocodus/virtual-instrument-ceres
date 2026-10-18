@@ -7,6 +7,9 @@
 #include <type_traits>
 
 namespace {
+template<class T,class=void> struct HasResearchPitchRoute : std::false_type {};
+template<class T> struct HasResearchPitchRoute<T,
+    std::void_t<decltype(&T::setResearchPitchRoute)>> : std::true_type {};
 bool watch=false;
 std::size_t allocations=0;
 void* allocate(std::size_t size) {
@@ -26,6 +29,8 @@ void operator delete(void* p,std::size_t) noexcept {std::free(p);}
 void operator delete[](void* p,std::size_t) noexcept {std::free(p);}
 
 int main() {
+    static_assert(!HasResearchPitchRoute<ceres::Synth>::value,
+        "Offline research routing must not enter the embedded interface");
     static_assert(std::is_trivially_copyable<ceres::Patch>::value,"Embedded Patch is numeric realtime state");
     ceres::Synth synth(48000,50);
     ceres::Patch patch;

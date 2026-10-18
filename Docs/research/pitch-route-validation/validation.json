@@ -1,0 +1,77 @@
+{
+  "status": "pass",
+  "kind": "isolated-native-research-pitch-route-implementation-validation",
+  "date_utc": "2026-10-18T23:38:55.399929+00:00",
+  "baseline_commit": "ff2dd42e71f545bd52e621bac896d1e46c132d53",
+  "worktree": "/private/tmp/ceres-pitch-route-20261019",
+  "branch": "codex/ceres-pitch-route-20261019",
+  "no_commit_yet": true,
+  "no_hardware_recording_render_or_fit": true,
+  "compiled_sources": {
+    "Source/DSP/ceres.hpp": "dac1311689d81dfc62b7d2e3bf7e67e7c8a1c85c93dd91a8facaf17db2562990",
+    "Source/DSP/ceres.cpp": "7b0bfc9b9ff2377390ca43ebc4491bf804d53e83ebcff273dfa20cbcfd780306",
+    "Tools/render_main.cpp": "46cbb7e66c4bb96fb01269dfeaadd489405081624a73af465e58b23bfaf2597b",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "a8c09de8c6d62f0fa75293d92a0c35887cdff929a3e878492803b30410b32896"
+  },
+  "binaries": {
+    "build/ceres_render": "29d8351c5d652a464e3efcb8062b2ef2d66ffc740afe80f8e2e9f52b3bd5ffda",
+    "build/libceres.a": "c268ad785ef1689014b9b2fa003e9ae139a0631a4ebd55a090cf127a79fe3f95",
+    "build/ceres_pitch_route_tests": "207cd75a2055e8a3c0477169383bb525af92e977eebfa96683912d8d184ad4a0",
+    "build/ceres_pitch_route_parity": "865331cf0b1998c8165edb4dd761c0387c1c0fb67ea00aa22a1f38be4dc5e331",
+    "build-sanitize/ceres_pitch_route_tests": "a275cd9e7592171f185374606b82cc66595fcb2cdbcffe69f267843a30a431f5",
+    "build-sanitize/ceres_render": "bf52428fccbf9baa63a8d43cc12443f1bea78b368fce57b8e0a60e8edc75fcb2",
+    "build-sanitize/ceres_embedded_contract": "cdcfc56bd3386a2b6cfa367ca44d80224ecc771fa4baab2824a5fe70a004c7e3"
+  },
+  "checks": {
+    "release_ctest_passed": 11,
+    "release_ctest_total": 11,
+    "targeted_asan_ubsan_passed": 3,
+    "targeted_asan_ubsan_total": 3,
+    "sanitizer_environment": {
+      "ASAN_OPTIONS": "detect_leaks=0:halt_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "parent_default_shared_audio_byte_exact": true,
+    "parent_comparison_samples_per_variant": 96000,
+    "oscillator_frequency_line_literal_unchanged": true,
+    "event_parser_dispatch_prefix_literal_unchanged": true,
+    "embedded_parameter_keys": 57,
+    "native_interface_excluded_from_embedded_compile": true,
+    "diff_check": "pass"
+  },
+  "commands": [
+    "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+    "cmake --build build -j4",
+    "ctest --test-dir build --output-on-failure",
+    "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3 Tools/check_pitch_route_shared_parity.py --report Docs/research/pitch-route-validation/shared-parent-parity.json",
+    "cmake -S . -B build-sanitize -DCMAKE_BUILD_TYPE=Debug -DCERES_SANITIZE=ON -DPython3_EXECUTABLE=/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+    "cmake --build build-sanitize --target ceres_pitch_route_tests ceres_render ceres_embedded_contract -j4",
+    "ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build-sanitize --output-on-failure -R 'research_pitch_route_contracts|research_pitch_route_cli|embedded_allocation_contract'"
+  ],
+  "input_sha256": {
+    "Source/DSP/ceres.hpp": "dac1311689d81dfc62b7d2e3bf7e67e7c8a1c85c93dd91a8facaf17db2562990",
+    "Source/DSP/ceres.cpp": "7b0bfc9b9ff2377390ca43ebc4491bf804d53e83ebcff273dfa20cbcfd780306",
+    "Tools/render_main.cpp": "46cbb7e66c4bb96fb01269dfeaadd489405081624a73af465e58b23bfaf2597b",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "a8c09de8c6d62f0fa75293d92a0c35887cdff929a3e878492803b30410b32896",
+    "Tests/PitchRouteTests.cpp": "6beda0f2f55cc5f1e595df0be43cf34598d34cbe0516aa66e2cb2122a8e0930f",
+    "Tests/PitchRouteParityDriver.cpp": "5ba3f505d447c019cb36ff54f57f145acbf8be779c87e09aa68ca872c1600f17",
+    "Tests/check_pitch_route_cli.py": "5a528ce657e4fb366c2810aa3991a923847c83ea46b165e34307a23988303b19",
+    "Tools/check_pitch_route_shared_parity.py": "a3fd0f4f26a6b0ce86a1bdc86add390cb7f91a99cdcbc9c63054f4719270b592",
+    "Docs/research/pitch-route.md": "52fac11768f142011bb96989057c62bc623817e102ef0026e2d0267cafb46be1",
+    "Tests/EmbeddedContract.cpp": "c52ba1fc98d5e9e959816140c53e07a3a6a2f679880d54fb5f17f9fec0a94b15",
+    "Docs/research/pitch-route-validation/release.log": "c79b48734ea4c434a5193837a9eb02e143f5fe64dfff40f9f6f00b2497367c6a",
+    "Docs/research/pitch-route-validation/sanitize.log": "e493e99f1d618a262a8ff1660421a625e412f51a3dce632180ad3bc3051b6416",
+    "Docs/research/pitch-route-validation/shared-parent-parity.json": "611695c694eadb88695abc757c620bc6c62431cc9b8777bbf69c7dade9ff6827",
+    "Docs/research/pitch-route-validation/shared-parent-parity.log": "611695c694eadb88695abc757c620bc6c62431cc9b8777bbf69c7dade9ff6827",
+    "Docs/research/pitch-route-validation/source.patch": "bce16cb79b3c02e61bfdfdfac6f744169684a48bf61477cc1329bebf8beab738"
+  },
+  "limits": [
+    "No source-recording MIDI or audio used; no fidelity improvement inferred.",
+    "Default byte equality is measured for the bound synthetic scenes on this compiler/math-library.",
+    "Temporary parent binary and raw sample streams were deleted by the reproducible checker; sources, driver, commands and fingerprints persist.",
+    "The CLI accepts explicit static-master with omitted offset as zero; direct API zero-offset null is tested.",
+    "No realtime-performance claim for the native-only intervention."
+  ]
+}

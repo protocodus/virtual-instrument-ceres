@@ -1,0 +1,59 @@
+{
+  "status": "pass",
+  "baseline_commit": "ff2dd42e71f545bd52e621bac896d1e46c132d53",
+  "baseline_sources": {
+    "ceres.hpp": "1cd4c0b3cca96873fe7cdb67146b812984f6e62e33222b035797d16a49ffa7c0",
+    "ceres.cpp": "f31fe5359c182cda58deda9ee5ca46a3fc78df2ef0fdca7811fa24f2eff6e3f2"
+  },
+  "baseline_compile_command": [
+    "c++",
+    "-std=c++17",
+    "-O3",
+    "-DNDEBUG",
+    "-I",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-pitch-shared-er23fmrh/source",
+    "/private/tmp/ceres-pitch-route-20261019/Tests/PitchRouteParityDriver.cpp",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-pitch-shared-er23fmrh/source/ceres.cpp",
+    "-o",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-pitch-shared-er23fmrh/parent"
+  ],
+  "samples_per_variant": 96000,
+  "rates": [
+    44100,
+    48000,
+    96000,
+    192000
+  ],
+  "calibration_network_modes": [
+    0,
+    1,
+    2
+  ],
+  "frames_per_scene": 8000,
+  "byte_exact": true,
+  "variants": {
+    "parent-default": {
+      "binary_sha256": "7cdd8081a25de4b0c6127ee8bda737717d5b92dfc9b64d20cbfd8c62c42ca6ad",
+      "audio_sha256": "a87e9e0df1a6d6224797927463c8fa4f2d7bdeb7ef771fe33debc152eb613be4",
+      "bytes": 384000
+    },
+    "candidate-default": {
+      "binary_sha256": "865331cf0b1998c8165edb4dd761c0387c1c0fb67ea00aa22a1f38be4dc5e331",
+      "audio_sha256": "a87e9e0df1a6d6224797927463c8fa4f2d7bdeb7ef771fe33debc152eb613be4",
+      "bytes": 384000
+    },
+    "candidate-explicit-shared": {
+      "binary_sha256": "865331cf0b1998c8165edb4dd761c0387c1c0fb67ea00aa22a1f38be4dc5e331",
+      "audio_sha256": "a87e9e0df1a6d6224797927463c8fa4f2d7bdeb7ef771fe33debc152eb613be4",
+      "bytes": 384000
+    }
+  },
+  "scope": "Synthetic active-control scene, moving bend/pressure, mixed voices, pedal/steal/release/panic/reset; no recording inputs",
+  "input_sha256": {
+    "Source/DSP/ceres.cpp": "7b0bfc9b9ff2377390ca43ebc4491bf804d53e83ebcff273dfa20cbcfd780306",
+    "Source/DSP/ceres.hpp": "dac1311689d81dfc62b7d2e3bf7e67e7c8a1c85c93dd91a8facaf17db2562990",
+    "CMakeLists.txt": "a8c09de8c6d62f0fa75293d92a0c35887cdff929a3e878492803b30410b32896",
+    "Tests/PitchRouteParityDriver.cpp": "5ba3f505d447c019cb36ff54f57f145acbf8be779c87e09aa68ca872c1600f17",
+    "Tools/check_pitch_route_shared_parity.py": "a3fd0f4f26a6b0ce86a1bdc86add390cb7f91a99cdcbc9c63054f4719270b592"
+  }
+}

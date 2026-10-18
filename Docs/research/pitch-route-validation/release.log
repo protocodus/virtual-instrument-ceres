@@ -1,0 +1,27 @@
+Test project /private/tmp/ceres-pitch-route-20261019/build
+      Start  1: native_dsp_contracts
+ 1/11 Test  #1: native_dsp_contracts .................   Passed    7.50 sec
+      Start  2: sound_path_circuit_contracts
+ 2/11 Test  #2: sound_path_circuit_contracts .........   Passed    0.98 sec
+      Start  3: voice_expression_contracts
+ 3/11 Test  #3: voice_expression_contracts ...........   Passed    0.48 sec
+      Start  4: research_calibration_contracts
+ 4/11 Test  #4: research_calibration_contracts .......   Passed    0.54 sec
+      Start  5: research_pitch_route_contracts
+ 5/11 Test  #5: research_pitch_route_contracts .......   Passed    0.99 sec
+      Start  6: embedded_allocation_contract
+ 6/11 Test  #6: embedded_allocation_contract .........   Passed    0.58 sec
+      Start  7: research_pitch_route_cli
+ 7/11 Test  #7: research_pitch_route_cli .............   Passed    0.51 sec
+      Start  8: research_calibration_python_oracle
+ 8/11 Test  #8: research_calibration_python_oracle ...   Passed    0.27 sec
+      Start  9: native_embedded_audio_parity
+ 9/11 Test  #9: native_embedded_audio_parity .........   Passed    3.86 sec
+      Start 10: active_sound_path_audio_parity
+10/11 Test #10: active_sound_path_audio_parity .......   Passed    2.83 sec
+      Start 11: expression_audio_parity
+11/11 Test #11: expression_audio_parity ..............   Passed    2.82 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Total Test time (real) =  21.38 sec

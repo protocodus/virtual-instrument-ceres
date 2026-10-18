@@ -76,6 +76,9 @@ void dispatch(ceres::Synth& synth,const Event& e) {
 int main(int argc,char** argv) {
  try {
     std::string eventPath,outputPath,patchPath,preset="brass_1";
+    std::string researchRouteName="shared";
+    ceres::ResearchPitchRoute researchRoute=ceres::ResearchPitchRoute::Shared;
+    double researchMaster=0; bool hasResearchMaster=false;
     uint64_t frames=0,seed=50; unsigned rate=48000;
     for(int i=1;i<argc;++i) {
         std::string option=argv[i];
@@ -90,13 +93,29 @@ int main(int argc,char** argv) {
         else if(option=="--rate") { auto n=uintArgument(value); if(n<8000||n>192000) throw std::runtime_error("sample rate must be 8000..192000"); rate=unsigned(n); }
         else if(option=="--frames") frames=uintArgument(value);
         else if(option=="--seed") seed=uintArgument(value);
+        else if(option=="--research-pitch-route") {
+            researchRouteName=value;
+            if(value=="shared") researchRoute=ceres::ResearchPitchRoute::Shared;
+            else if(value=="vco-only") researchRoute=ceres::ResearchPitchRoute::OscillatorOnly;
+            else if(value=="static-master") researchRoute=ceres::ResearchPitchRoute::StaticMaster;
+            else throw std::runtime_error("unknown research pitch route: "+value);
+        }
+        else if(option=="--research-master-semitones") {
+            size_t end=0;researchMaster=std::stod(value,&end);hasResearchMaster=true;
+            if(end!=value.size() || !std::isfinite(researchMaster) ||
+               researchMaster < -48 || researchMaster > 48)
+                throw std::runtime_error("research master semitones must be finite and within -48..48");
+        }
         else throw std::runtime_error("unknown option: "+option);
     }
+    if(hasResearchMaster && researchRoute!=ceres::ResearchPitchRoute::StaticMaster)
+        throw std::runtime_error("--research-master-semitones requires --research-pitch-route static-master");
     if(eventPath.empty()||outputPath.empty()||frames==0||frames>(std::numeric_limits<uint32_t>::max()-48)/4)
-        throw std::runtime_error("usage: ceres_render --events events.tsv --output output.wav --frames N [--preset NAME --patch file.patch --rate 48000 --seed 50]");
+        throw std::runtime_error("usage: ceres_render --events events.tsv --output output.wav --frames N [--preset NAME --patch file.patch --rate 48000 --seed 50 --research-pitch-route shared|vco-only|static-master --research-master-semitones N]");
     auto patch=ceres::preset(preset); if(!patchPath.empty()) loadPatch(patch,patchPath);
     auto events=loadEvents(eventPath,frames);
     ceres::Synth synth(rate,seed); synth.setPatch(patch);
+    synth.setResearchPitchRoute(researchRoute,researchMaster);
     std::ofstream out(outputPath,std::ios::binary); if(!out) throw std::runtime_error("cannot write WAV");
     // IEEE 32-bit float, mono; fixed gain and no clip normalization.
     out.write("RIFF",4); u32(out,uint32_t(48+frames*4)); out.write("WAVEfmt ",8);
@@ -116,6 +135,7 @@ int main(int argc,char** argv) {
     std::cout<<std::setprecision(12)<<"{\"sample_rate\":"<<rate<<",\"frames\":"<<frames<<",\"channels\":1,\"sample_format\":\"float32\",\"seed\":"<<seed
        <<",\"preset\":\""<<preset<<"\",\"peak\":"<<peak<<",\"rms\":"<<std::sqrt(energy/frames)<<",\"samples_above_unity\":"<<above
        <<",\"render_seconds\":"<<elapsed<<",\"audio_seconds\":"<<double(frames)/rate<<",\"realtime_factor\":"<<(double(frames)/rate)/elapsed
+       <<",\"research_pitch_route\":\""<<researchRouteName<<"\",\"research_master_semitones\":"<<researchMaster
        <<",\"normalization\":\"none\",\"timing_scope\":\"native offline DSP plus WAV I/O; not host deadline performance\"}\n";
     return 0;
  } catch(const std::exception& e) { std::cerr<<"ceres_render: "<<e.what()<<'\n'; return 1; }

@@ -580,6 +580,8 @@ struct Synth::Impl {
     std::array<Voice,4> voices;
 #if !defined(CERES_EMBEDDED_TARGET)
     CalibrationNetworkState calibration;
+    ResearchPitchRoute researchPitchRoute=ResearchPitchRoute::Shared;
+    double researchMasterSemitones=0;
 #endif
     Decimator decimator;
     double lfoPhase = 0, pwmPhase = 0, pressureTarget = 0, pressureValue = 0, bend = 0;
@@ -767,7 +769,17 @@ struct Synth::Impl {
             // -5..+7 semitones. It remains a shared master offset even when
             // the engineering-only keyTrack slope is changed. TRANSPOSE FT,
             // VIB15 and the modeled oscillator drift/spread remain VCO-only.
-            const double keyOctaves=(v.keyNote-60+bend)*patch.keyTrack/12+patch.tuneCents/1200;
+            double keyOctaves=(v.keyNote-60+bend)*patch.keyTrack/12+patch.tuneCents/1200;
+#if !defined(CERES_EMBEDDED_TARGET)
+            // Research intervention only: never alter the oscillator formula
+            // or infer an offset from the MIDI stream. Shared retains the
+            // original expression/order above, including keyTrack on bend.
+            if(researchPitchRoute!=ResearchPitchRoute::Shared) {
+                keyOctaves=(v.keyNote-60)*patch.keyTrack/12+patch.tuneCents/1200;
+                if(researchPitchRoute==ResearchPitchRoute::StaticMaster)
+                    keyOctaves+=researchMasterSemitones/12;
+            }
+#endif
             double hpFrequency,lpFrequency,source;
 #if !defined(CERES_EMBEDDED_TARGET)
             if(patch.calibrationNetwork!=0) {
@@ -943,6 +955,16 @@ float Synth::process() {
 }
 
 #if !defined(CERES_EMBEDDED_TARGET)
+void Synth::setResearchPitchRoute(ResearchPitchRoute route,double master) {
+    if((route!=ResearchPitchRoute::Shared &&
+        route!=ResearchPitchRoute::OscillatorOnly &&
+        route!=ResearchPitchRoute::StaticMaster) ||
+        !std::isfinite(master) || master < -48 || master > 48 ||
+        (route!=ResearchPitchRoute::StaticMaster && master!=0))
+        throw std::invalid_argument("Invalid research pitch route/master offset");
+    impl_->researchPitchRoute=route;
+    impl_->researchMasterSemitones=master;
+}
 std::array<Synth::VoiceState,Synth::voiceCount> Synth::voiceState() const {
     std::array<VoiceState,voiceCount> result{};
     for (unsigned i=0;i<voiceCount;++i) {

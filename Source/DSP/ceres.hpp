@@ -139,6 +139,11 @@ struct Patch {
 };
 
 #if !defined(CERES_EMBEDDED_TARGET)
+// Offline intervention on the FILTER contribution of the full MIDI bend.
+// The oscillator keeps its original bend, tuning, phase and modulation path.
+// This does not identify the original instrument's VIB control law.
+enum class ResearchPitchRoute { Shared, OscillatorOnly, StaticMaster };
+
 struct CalibrationStageState {
     double busVoltage = 0, kappa = 0, conductance = 0;
     std::array<double,4> pinVoltage{}, exponent{}, referenceFrequency{};
@@ -201,6 +206,13 @@ public:
     // decimator's final-of-four sampling phase affects event alignment.
     static constexpr unsigned outputLatency = 31;
 #if !defined(CERES_EMBEDDED_TARGET)
+    // Native-only, outside Patch/serialization and the embedded parameter ABI.
+    // StaticMaster adds a fixed semitone offset outside keyTrack; other modes
+    // require a zero offset. Invalid enums/nonfinite/outside +/-48 throw.
+    // Configuration survives setPatch(), reset() and allSoundOff(). Changing
+    // it preserves all state; the next sample uses the new filter key factor.
+    void setResearchPitchRoute(ResearchPitchRoute,
+        double staticMasterSemitones = 0.0);
     // Read-only native diagnostics; excluded from the embedded ABI. Values
     // expose modeled capacitor/CV state, not calibrated hardware voltages.
     struct VoiceState {
