@@ -151,7 +151,7 @@ jobs:
           cmake -S . -B build-plugin -G Ninja -DCMAKE_BUILD_TYPE=Release \
             -DCERES_BUILD_PLUGIN=ON -DBUILD_TESTING=ON
           cmake --build build-plugin --parallel
-          ctest --test-dir build-plugin -L '^unit$' --no-tests=error --output-on-failure
+          xvfb-run -a ctest --test-dir build-plugin -L '^unit$' --no-tests=error --output-on-failure
 
       - name: Validate the VST3 with pluginval
         working-directory: build-plugin

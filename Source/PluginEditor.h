@@ -14,7 +14,8 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    static juce::String getBuildIdentity() { return CERES_BUILD_IDENTITY; }
+    // Defined in the .cpp: CERES_BUILD_IDENTITY is private to the plug-in target.
+    static juce::String getBuildIdentity();
 
 private:
     juce::Label title;

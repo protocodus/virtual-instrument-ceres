@@ -25,3 +25,8 @@ void CeresAudioProcessorEditor::resized()
 {
     title.setBounds (12, 8, 200, 28);
 }
+
+juce::String CeresAudioProcessorEditor::getBuildIdentity()
+{
+    return CERES_BUILD_IDENTITY;
+}
