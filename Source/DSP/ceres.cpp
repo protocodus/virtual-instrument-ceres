@@ -630,10 +630,12 @@ struct Synth::Impl {
         effectiveHpResonance=clamp(patch.hpResonance-qVoltageOffset*.1,0,1);
         effectiveLpResonance=clamp(patch.lpResonance-qVoltageOffset*.1,0,1);
         // R7 LC sums LEVEL(270k) and SUB(120k) currents before common VCA2.
-        // Retain the existing tremolo depth/DC calibration at level1, but
-        // add its contribution to LEVEL rather than multiplying both gains.
-        // This normalization is not a recovered physical pot-to-current law.
-        commonVcaGain=std::max(0.0,patch.ampLevel-patch.tremolo*(.5+.5*lfo));
+        // PN3 VCF/VCA depth pots share SUO and ground; their passive R7
+        // paths do not invert. Positive LI raises VCA gain (Guide pp.40–41),
+        // so positive SUB must raise both cutoff and common gain. Retain the
+        // existing tremolo mean/depth and closure normalization; those are
+        // still engineering choices, not a recovered pot-to-current law.
+        commonVcaGain=std::max(0.0,patch.ampLevel-patch.tremolo*(.5-.5*lfo));
         const double pwm = std::sin(2*pi*(pwmPhase+patch.pwmPhase));
         lfoPhase = wrap(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrap(pwmPhase + patch.pwmRate*dt);
