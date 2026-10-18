@@ -36,7 +36,8 @@ int main() {
         "amp_sustain","amp_release","global_release","filter_level","volume","octave","tune_cents",
         "voice_spread_cents","drift_cents","lfo_rate","vibrato_cents","tremolo","filter_lfo","pressure_volume",
         "pressure_filter","pressure_vibrato","velocity_sensitivity","drive","reset_microseconds",
-        "ring_mix","ring_rate","ring_depth","ring_attack","ring_decay","lfo_waveform","sustain_mode"};
+        "ring_mix","ring_rate","ring_depth","ring_attack","ring_decay","lfo_waveform","sustain_mode",
+        "brilliance","resonance_offset","amp_level","output_trim_db"};
     synth.setPatch(patch);
     watch=true;
     require(!ceres::setParameter(patch,nullptr,1),"null key rejected");
@@ -61,5 +62,5 @@ int main() {
     for(double rate:{0.,std::numeric_limits<double>::quiet_NaN(),400000.}) {
         ceres::Synth invalid(rate,1);require(invalid.sampleRate()==48000,"invalid target rate safely defaults");
     }
-    std::printf("PASS embedded: no exceptions, numeric Patch, 512x64 frames, 52 control keys, zero post-construction new/new[] allocations\n");
+    std::printf("PASS embedded: no exceptions, numeric Patch, 512x64 frames, 56 control keys, zero post-construction new/new[] allocations\n");
 }

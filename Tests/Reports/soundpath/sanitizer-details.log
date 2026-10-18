@@ -1,0 +1,143 @@
+Start testing: Oct 18 16:04 CEST
+----------------------------------------------------------
+1/5 Testing: native_dsp_contracts
+1/5 Test: native_dsp_contracts
+Command: "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build-sanitize/ceres_tests"
+Directory: /Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build-sanitize
+"native_dsp_contracts" start time: Oct 18 16:04 CEST
+Output:
+----------------------------------------------------------
+PASS ring/SUB/Sustain mode ranges and validation
+PASS SUB shapes, sourced noise pole, destinations and separate PWM
+PASS ring RC timing, key ledger, legato/retrigger, bounds and panic
+PASS global ring sidebands, dry bypass, free carrier and reset
+PASS Sustain I/II live key CV, shared VCO/filters, state continuity and MIDI pedal adaptation
+PASS parameter ranges and constructor validation
+PASS physical source/Q capacitor transfer, four source loads, DC rejection, Q and slope
+PASS production cascade physical voltages, passive mixer, fixed Q current and VCA calibration
+PASS keyboard/envelope gm scaling with fixed feed conductance
+PASS shared master PITCH, independent oscillator routes, fixed feed floor and nominal range
+PASS deterministic seed and reset
+PASS four output coupling RC transfers, decay and diagnostic validation
+PASS output capacitor allocation/idle/panic lifecycle and dry-line polarity
+PASS four voices, stealing, repeated notes and release tails
+PASS sustain, CC123 behavior and controller-preserving panic
+PASS shared global release bounds, independent RC trajectories and held-note invariance
+PASS global release production equivalence and live capacitor-state continuity
+PASS global release versus MIDI pedal, panic and reset lifecycle
+PASS hardware velocity behavior and sample-rate pitch invariance
+PASS WSC saw/pulse polarity and folded-sine phase
+PASS RC attack curvature, fixed duration, linear limit and retrigger charge
+PASS optional saturating-current attack ODE, exact solution, limits and retrigger
+PASS factory five-RC envelope trajectories and engineering T60 compatibility
+PASS factory HP/LP envelope resistor ratios and engineering-patch compatibility
+PASS fixed PWM reset edge, duty, phase offset and sourced speed calibration
+PASS extreme finite output and all factory presets
+<end of output>
+Test time =  49.95 sec
+----------------------------------------------------------
+Test Passed.
+"native_dsp_contracts" end time: Oct 18 16:05 CEST
+"native_dsp_contracts" time elapsed: 00:00:49
+----------------------------------------------------------
+
+2/5 Testing: sound_path_circuit_contracts
+2/5 Test: sound_path_circuit_contracts
+Command: "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build-sanitize/ceres_sound_path_tests"
+Directory: /Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build-sanitize
+"sound_path_circuit_contracts" start time: Oct 18 16:05 CEST
+Output:
+----------------------------------------------------------
+PASS new control ranges/neutral/invalid-input contract
+PASS BR/SUB nodal ratios, shared key modulation, fixed-gm floor and audio equivalence
+PASS eight-node Q capacitor KCL, exact RC dynamics, lifecycle and audio routing
+PASS additive common VCA, sine path, downstream bus/ring state and factory LEVEL
+PASS post-FIR utility trim linearity, neutral bypass and state/latency independence
+<end of output>
+Test time =   4.74 sec
+----------------------------------------------------------
+Test Passed.
+"sound_path_circuit_contracts" end time: Oct 18 16:05 CEST
+"sound_path_circuit_contracts" time elapsed: 00:00:04
+----------------------------------------------------------
+
+3/5 Testing: embedded_allocation_contract
+3/5 Test: embedded_allocation_contract
+Command: "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build-sanitize/ceres_embedded_contract"
+Directory: /Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build-sanitize
+"embedded_allocation_contract" start time: Oct 18 16:05 CEST
+Output:
+----------------------------------------------------------
+PASS embedded: no exceptions, numeric Patch, 512x64 frames, 56 control keys, zero post-construction new/new[] allocations
+<end of output>
+Test time =   1.31 sec
+----------------------------------------------------------
+Test Passed.
+"embedded_allocation_contract" end time: Oct 18 16:05 CEST
+"embedded_allocation_contract" time elapsed: 00:00:01
+----------------------------------------------------------
+
+4/5 Testing: native_embedded_audio_parity
+4/5 Test: native_embedded_audio_parity
+Command: "/opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14" "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/check_embedded.py" "--build-dir" "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build-sanitize"
+Directory: /Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build-sanitize
+"native_embedded_audio_parity" start time: Oct 18 16:05 CEST
+Output:
+----------------------------------------------------------
+{
+  "status": "pass",
+  "comparison": "byte-exact float32 stream on this compiler/math-library build",
+  "rates": [
+    44100,
+    48000,
+    96000,
+    192000
+  ],
+  "scenes_per_rate": 8,
+  "frames_per_scene": 12000,
+  "samples_per_variant": 384000,
+  "variants": {
+    "native": {
+      "audio_sha256": "ea7c39b3ff849d7b7997012204f756366a4c255211457c449d7645e9fac6a516",
+      "bytes": 1536000,
+      "binary_sha256": "d6c25c8323f186fd6f2d629cf88d13dddaee2b80fff792fe0d6e6c97ad90e2c6"
+    },
+    "embedded": {
+      "audio_sha256": "ea7c39b3ff849d7b7997012204f756366a4c255211457c449d7645e9fac6a516",
+      "bytes": 1536000,
+      "binary_sha256": "63ddb646925d461fb0cc73cc29ff4235fc043d5bb82afd268c2bccadaae3aa4d"
+    }
+  },
+  "input_sha256": {
+    "Source/DSP/ceres.hpp": "42ca7aa529968edde3726a61713e9d4da59cd884db1a9e620db6c80b9fc86e36",
+    "Source/DSP/ceres.cpp": "05e3ecfd53e9ccaa5901952cbdadf04d8b167ffe66df8064e13088da86913e4e",
+    "Tests/ParityDriver.cpp": "085267a0089522251a4fddbcf964c6692a9328d9022ee4bc46a63423bde86224",
+    "Tools/check_embedded.py": "4fccbbcd4b79e10ee02f72b866b0789abd8fd9f3199e15c3f92c18c24d3a8da5",
+    "Docs/EXPERIMENT_IMPORT.json": "23fab3632d93660191ae2eb5ab1edabad20f67d7d1c7a659a742983f58c56bab"
+  }
+}
+<end of output>
+Test time =  19.52 sec
+----------------------------------------------------------
+Test Passed.
+"native_embedded_audio_parity" end time: Oct 18 16:05 CEST
+"native_embedded_audio_parity" time elapsed: 00:00:19
+----------------------------------------------------------
+
+5/5 Testing: active_sound_path_audio_parity
+5/5 Test: active_sound_path_audio_parity
+Command: "/opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14" "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tests/check_sound_path_parity.py" "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build-sanitize"
+Directory: /Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build-sanitize
+"active_sound_path_audio_parity" start time: Oct 18 16:05 CEST
+Output:
+----------------------------------------------------------
+PASS active sound-path parity: 384000 float32 samples, 4 rates, 8 scenes; SHA256 aee69374b917cc881109fbc94e1ded52b0cc7af94fe7cb1974c1c8b0f81812ba
+<end of output>
+Test time =  18.57 sec
+----------------------------------------------------------
+Test Passed.
+"active_sound_path_audio_parity" end time: Oct 18 16:05 CEST
+"active_sound_path_audio_parity" time elapsed: 00:00:18
+----------------------------------------------------------
+
+End testing: Oct 18 16:05 CEST

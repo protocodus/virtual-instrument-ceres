@@ -1,6 +1,7 @@
 #include "ceres.hpp"
 #include <cmath>
 #include <cstdio>
+#include <cstring>
 #include <fstream>
 
 // Identical harness for the original experiment, current native and embedded
@@ -8,6 +9,7 @@
 int main(int argc,char** argv) {
     if(argc<2 || argc>3)return 2;
     const bool panelControls=argc==3;
+    const bool soundPathControls=argc==3 && std::strcmp(argv[2],"soundpath")==0;
     std::ofstream output(argv[1],std::ios::binary);
     if(!output)return 3;
     for(double rate:{44100.,48000.,96000.,192000.})for(unsigned scene=0;scene<8;++scene) {
@@ -31,6 +33,9 @@ int main(int argc,char** argv) {
         patch.ampAttackSaturation=scene==6 ? .001 : 0;
         patch.globalRelease=scene==7 ? .4 : 0;
         patch.lfoRate=6.669;patch.vibratoCents=13;patch.tremolo=.71;patch.filterLfo=.2;
+        // With the intentionally corrected unequal SUB->VCF route inactive,
+        // the new controls' neutral defaults must preserve the old engine.
+        if(argc==3 && std::strcmp(argv[2],"neutral")==0)patch.filterLfo=0;
         patch.pressureVolume=.2;patch.pressureFilter=.3;patch.pressureVibrato=4;
         patch.voiceSpreadCents=2;patch.driftCents=3;patch.velocitySensitivity=.4;
         patch.octave=scene==2 ? -1 : 0;patch.tuneCents=31.793;patch.drive=scene==3 ? .05 : 1;
@@ -44,6 +49,12 @@ int main(int argc,char** argv) {
                !ceres::setParameter(patch,"ring_decay",.08+scene*.05) ||
                !ceres::setParameter(patch,"lfo_waveform",scene%5) ||
                !ceres::setParameter(patch,"sustain_mode",1+scene%2))return 6;
+        }
+        if(soundPathControls) {
+            if(!ceres::setParameter(patch,"brilliance",-15+scene*30./7) ||
+               !ceres::setParameter(patch,"resonance_offset",-10+scene*20./7) ||
+               !ceres::setParameter(patch,"amp_level",scene/7.) ||
+               !ceres::setParameter(patch,"output_trim_db",-24+scene*48./7))return 7;
         }
         ceres::Synth synth(rate,50+scene);synth.setPatch(patch);
         for(unsigned frame=0;frame<12000;++frame) {
@@ -59,6 +70,10 @@ int main(int argc,char** argv) {
             if(frame==3000)synth.sustain(false);
             if(frame==3600)synth.allNotesOff();
             if(frame==4001){patch.globalRelease=.63;synth.setPatch(patch);}
+            if(soundPathControls && frame==4501) {
+                ceres::setParameter(patch,"resonance_offset",0);
+                ceres::setParameter(patch,"amp_level",.73);synth.setPatch(patch);
+            }
             if(frame==6000)synth.allSoundOff();
             if(frame==6111)synth.noteOn(48,.9);
             if(frame==8192){synth.reset();synth.noteOn(76,.6);}

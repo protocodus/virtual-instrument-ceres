@@ -1,0 +1,70 @@
+{
+  "status": "pass",
+  "cutoff_ratio_cases": 36,
+  "q_network_cases": 18,
+  "max_cutoff_ratio_error": 2.220446049250313e-16,
+  "max_absolute_KCL_residual": 2.168404344971009e-19,
+  "max_Q_steady_derivative_error_V_per_s": 4.658681209898652e-16,
+  "max_Q_difference_mode_error_V_per_s": 8.881784197001252e-16,
+  "stiff_manual_octave_per_control_V": {
+    "brilliance_HP": 0.04014705882352941,
+    "brilliance_LP": 0.11522727272727273,
+    "SUB_HP": 0.18199999999999997,
+    "SUB_LP": 0.5393617021276597,
+    "SUB_HP_per_LP_octave": 0.3374358974358974
+  },
+  "conditional_Q_examples": [
+    {
+      "name": "stiff manual",
+      "Rth_ohms": [
+        0.0,
+        0.0
+      ],
+      "delta_pin7_V_per_stiff_RES_V": [
+        0.5,
+        0.5
+      ],
+      "common_tau_seconds": [
+        1.1,
+        1.1
+      ]
+    },
+    {
+      "name": "Flute",
+      "Rth_ohms": [
+        6428.571428571428,
+        7674.418604651163
+      ],
+      "delta_pin7_V_per_stiff_RES_V": [
+        0.5276073619631901,
+        0.5326086956521738
+      ],
+      "common_tau_seconds": [
+        1.1607361963190184,
+        1.1717391304347826
+      ]
+    },
+    {
+      "name": "Brass I LP; HP stiff-source reference",
+      "Rth_ohms": [
+        0.0,
+        4285.714285714285
+      ],
+      "delta_pin7_V_per_stiff_RES_V": [
+        0.5,
+        0.51875
+      ],
+      "common_tau_seconds": [
+        1.1,
+        1.14125
+      ]
+    }
+  ],
+  "limits": [
+    "All voltages are incremental about fixed baseline/source impedances.",
+    "Zero/nonnegative linear input conductance cases do not identify IC input laws.",
+    ".7/.65 octave slopes and .18 damping/V are existing provisional calibration choices.",
+    "Changing passive pot source resistance requires baseline DC backfeed terms.",
+    "No audio, rendering, fitting or hardware-calibration evidence is produced."
+  ]
+}

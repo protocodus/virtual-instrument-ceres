@@ -15,6 +15,13 @@ namespace {
 constexpr double pi = 3.141592653589793238462643383279502884;
 constexpr double filterCapacitance = 1.5e-9, filterFeedResistance = 4.7e6;
 constexpr double filterFrequencyFloor = 1/(2*pi*filterCapacitance*filterFeedResistance);
+// Direct R7 matrix, CS-50 service1 PDF8/printed14. These ratios are known;
+// .7/.65 oct/V manual slopes remain the existing provisional calibration.
+// Interpret BR as actual loaded voltage with stiff preset/source nodes,
+// not raw preset-divider CV or a finite-impedance pot position.
+constexpr double hpBrillianceScale=.7*39/680, lpBrillianceScale=.65*39/220;
+constexpr double hpSubRelativeScale=(.7/.65)*(47./150.);
+constexpr double qControlTau=10e-6*(220e3/2);
 // The patch specifies TOTAL integrator Hz at middle C. Only variable gm
 // responds to exponential control; the parallel 4.7Mohm path stays fixed.
 double modulatedFilterFrequency(double referenceHz, double factor) {
@@ -32,6 +39,8 @@ const Parameter parameters[] = {
     {"pwm_phase", &Patch::pwmPhase, 0, 1},
     {"hp_cutoff", &Patch::hpCutoff, 5, 20000}, {"lp_cutoff", &Patch::lpCutoff, 5, 20000},
     {"hp_resonance", &Patch::hpResonance, 0, 1}, {"lp_resonance", &Patch::lpResonance, 0, 1},
+    {"brilliance", &Patch::brilliance, -15, 15},
+    {"resonance_offset", &Patch::resonanceOffset, -10, 10},
     {"key_track", &Patch::keyTrack, 0, 1},
     {"hp_envelope_scale", &Patch::hpEnvelopeScale, 0, 4},
     {"lp_envelope_scale", &Patch::lpEnvelopeScale, 0, 4},
@@ -49,7 +58,9 @@ const Parameter parameters[] = {
     {"amp_release", &Patch::ampRelease, .0001, 30},
     {"global_release", &Patch::globalRelease, 0, 30},
     {"sustain_mode", &Patch::sustainMode, 1, 2},
-    {"filter_level", &Patch::filterLevel, 0, 1}, {"volume", &Patch::volume, 0, 1},
+    {"filter_level", &Patch::filterLevel, 0, 1}, {"amp_level", &Patch::ampLevel, 0, 1},
+    {"volume", &Patch::volume, 0, 1},
+    {"output_trim_db", &Patch::outputTrimDb, -24, 24},
     {"octave", &Patch::octave, -2, 1}, {"tune_cents", &Patch::tuneCents, -500, 700},
     {"voice_spread_cents", &Patch::voiceSpreadCents, 0, 30},
     {"drift_cents", &Patch::driftCents, 0, 20},
@@ -497,6 +508,12 @@ struct Synth::Impl {
     double pressureCoefficient = 0, driftCoefficient = 0;
     std::array<double,4> ampCoefficients{}, filterCoefficients{};
     double hpSourceBranches = 3, lastSub = 0;
+    // Eight equal pin7 networks reduce exactly to one common delta state
+    // for this stiff-source/zero-input-current limit and equal initial delta.
+    // Existing per-stage effective Q anchors are NOT raw chip voltages.
+    double qVoltageOffset=0, qControlCoefficient=0;
+    double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
+    double outputTrimGain=1;
     // Guide printed32: SUB-N uses22k/.1uF, independent of audio NO level.
     // This is the documented single low-pass (called pink in the prose),
     // not an invented ideal1/f filter. Normalize its unknown limiter level
@@ -525,12 +542,14 @@ struct Synth::Impl {
         }
         pressureCoefficient = 1-std::exp(-1/(internalFs*.005));
         driftCoefficient = 1-std::exp(-1/(internalFs*.3));
+        qControlCoefficient=-std::expm1(-1/(internalFs*qControlTau));
         subNoiseG=1/(2*internalFs*22e3*.1e-6);
         subNoiseGain=.25*std::sqrt(3*(1+subNoiseG)/subNoiseG);
         updateCoefficients();
         reset();
     }
     void updateCoefficients() {
+        outputTrimGain=std::pow(10,patch.outputTrimDb/20);
         // M-board mixer: fixed 150k ground, 150k noise input, and one 150k
         // branch per enabled waveform gate. Ideal low-Z WSC/noise outputs,
         // negligible enabled-FET resistance; disabled gates are open.
@@ -580,6 +599,9 @@ struct Synth::Impl {
         physicalKeys.fill(0); physicalKeyPresses=0; lastAssignedKey=60;
         subNoiseMemory=0; ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={};
+        qVoltageOffset=0;
+        effectiveHpResonance=patch.hpResonance; effectiveLpResonance=patch.lpResonance;
+        commonVcaGain=patch.ampLevel;
         decimator.clear();
         for (auto& voice : voices) {
             voice.osc.phase = random.unit();
@@ -597,6 +619,19 @@ struct Synth::Impl {
         const double lfo = subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
             patch.lfoWaveform==4 ? std::tanh(subNoise*subNoiseGain):0.);
         lastSub=lfo;
+        // Exact zero-order-held RC update. Never bypass while offset returns
+        // to zero: capacitor charge survives note allocation, patch edits,
+        // and audio panic. reset() is the explicit electrical-state reset.
+        qVoltageOffset+=(patch.resonanceOffset*.5-qVoltageOffset)*qControlCoefficient;
+        // Direct chip endpoints Vq0:Q5,Vq10:Q.5 only. The intermediate
+        // d=2-1.8*r law is provisional; delta d=.18*deltaVq retains that law.
+        effectiveHpResonance=clamp(patch.hpResonance-qVoltageOffset*.1,0,1);
+        effectiveLpResonance=clamp(patch.lpResonance-qVoltageOffset*.1,0,1);
+        // R7 LC sums LEVEL(270k) and SUB(120k) currents before common VCA2.
+        // Retain the existing tremolo depth/DC calibration at level1, but
+        // add its contribution to LEVEL rather than multiplying both gains.
+        // This normalization is not a recovered physical pot-to-current law.
+        commonVcaGain=std::max(0.0,patch.ampLevel-patch.tremolo*(.5+.5*lfo));
         const double pwm = std::sin(2*pi*(pwmPhase+patch.pwmPhase));
         lfoPhase = wrap(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrap(pwmPhase + patch.pwmRate*dt);
@@ -631,10 +666,13 @@ struct Synth::Impl {
             // VIB15 and the modeled oscillator drift/spread remain VCO-only.
             const double keyOctaves=(v.keyNote-60+bend)*patch.keyTrack/12+patch.tuneCents/1200;
             const double hpFactor=std::exp2(keyOctaves+filterEnvelope*patch.hpEnvelopeScale
-                + pressureValue*patch.pressureFilter+lfo*patch.filterLfo);
-            const double lpFactor=patch.lpEnvelopeScale==patch.hpEnvelopeScale ? hpFactor
+                + pressureValue*patch.pressureFilter+lfo*(patch.filterLfo*hpSubRelativeScale)
+                + patch.brilliance*hpBrillianceScale);
+            const double lpFactor=patch.lpEnvelopeScale==patch.hpEnvelopeScale &&
+                patch.filterLfo==0 && patch.brilliance==0 ? hpFactor
                 : std::exp2(keyOctaves+filterEnvelope*patch.lpEnvelopeScale
-                    + pressureValue*patch.pressureFilter+lfo*patch.filterLfo);
+                    + pressureValue*patch.pressureFilter+lfo*patch.filterLfo
+                    + patch.brilliance*lpBrillianceScale);
             const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*noise;
             const double hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor);
             const double lpFrequency=modulatedFilterFrequency(patch.lpCutoff,lpFactor);
@@ -642,7 +680,7 @@ struct Synth::Impl {
             v.oscillatorFrequency=frequency; v.hpFrequency=hpFrequency; v.lpFrequency=lpFrequency;
 #endif
             const double low=v.filters.process(source,hpSourceBranches,hpFrequency,lpFrequency,
-                patch.hpResonance,patch.lpResonance,patch.drive,internalFs);
+                effectiveHpResonance,effectiveLpResonance,patch.drive,internalFs);
             // CP3 coupling precedes filtered level; CP4 coupling acts on
             // the filtered/sine sum before common level and envelope VCAs.
             const double filtered=v.filteredCoupling.process(low,outputCouplingTau[0],internalFs);
@@ -652,8 +690,7 @@ struct Synth::Impl {
             // optional velocity term is zero in factory-derived presets.
             const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocity);
             const double pressureGain = 1-patch.pressureVolume*(1-pressureValue);
-            const double tremoloGain = 1-patch.tremolo*(.5+.5*lfo);
-            mixed += beforeVca * ampEnvelope * velocityGain * pressureGain * tremoloGain;
+            mixed += beforeVca * ampEnvelope * velocityGain * pressureGain * commonVcaGain;
         }
         // Output rail saturation is a deliberately mild, uncalibrated op-amp
         // approximation; no hidden peak normalization or dynamics processor.
@@ -778,7 +815,10 @@ std::size_t Synth::activeVoices() const {
 double Synth::sampleRate() const { return impl_->fs; }
 float Synth::process() {
     for (unsigned i = 0; i < oversampling; ++i) impl_->decimator.push(impl_->sample());
-    return static_cast<float>(impl_->decimator.output());
+    const double output=impl_->decimator.output();
+    // Post-circuit/post-FIR utility gain: no change to analog state, timing,
+    // nonlinear operating level or default sound. No output limiter is added.
+    return static_cast<float>(impl_->patch.outputTrimDb==0 ? output : output*impl_->outputTrimGain);
 }
 
 #if !defined(CERES_EMBEDDED_TARGET)
@@ -794,6 +834,10 @@ std::array<Synth::VoiceState,Synth::voiceCount> Synth::voiceState() const {
 Synth::ModulationState Synth::modulationState() const {
     return {impl_->lastSub,impl_->ringEnvelope.voltage,impl_->ringFrequency,
         impl_->ringCarrier,impl_->physicalKeyPresses};
+}
+Synth::SoundPathState Synth::soundPathState() const {
+    return {impl_->qVoltageOffset,impl_->effectiveHpResonance,
+        impl_->effectiveLpResonance,impl_->commonVcaGain};
 }
 // Individual normalized section, using the same RC class/constants as voices.
 std::vector<double> outputCouplingImpulse(unsigned stage,double fs,std::size_t frames) {
@@ -983,7 +1027,9 @@ Patch preset(const std::string& name) {
         p.filterAttack=attackTime(cv[12]); p.filterDecay=decayTime(cv[13]); p.filterRelease=decayTime(cv[14]);
         p.filterLevel=cv[15]/10; p.sine=cv[16]/10;
         p.ampAttack=attackTime(cv[17]); p.ampDecay=decayTime(cv[18]); p.ampSustain=cv[19]/10;
-        p.ampRelease=decayTime(cv[20]); p.volume=.55*cv[21]/10;
+        // The final preset column drives common M-board VCA LEVEL, before
+        // the amp EG/bus/ring. PN2 master VOLUME is a separate later control.
+        p.ampRelease=decayTime(cv[20]); p.ampLevel=cv[21]/10; p.volume=.55;
         return p;
     }
     throw std::invalid_argument("Unknown Ceres preset: " + name);

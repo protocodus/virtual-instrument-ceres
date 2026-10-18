@@ -31,6 +31,18 @@ struct Patch {
     // fixed floor. Values at/below the floor mean zero variable gm.
     double hpCutoff = 30.0, lpCutoff = 6000.0;
     double hpResonance = 0.0, lpResonance = 0.0, keyTrack = 1.0;
+    // Actual loaded BR-bus voltage relative to the calibrated neutral, V.
+    // The 39k/(680k HP,220k LP) network uses provisional .7/.65 oct/V
+    // manual slopes; it is not the position/taper of the passive panel pot.
+    double brilliance = 0.0; // [-15,15]
+    // Change of loaded RES-bus voltage around the existing effective Q
+    // calibration, V. Positive lowers Q. The signed [-10,10] engineering
+    // offset does not imply every value is reachable from an unknown real
+    // 0..10V wiper baseline. Stiff preset/source, zero chip input-current
+    // limit: each pin7 has 220k to each source and 10uF to ground, giving
+    // deltaVq -> offset/2 with tau1.1s. Only this incremental control is
+    // smoothed; existing effective hp/lp_resonance edits remain immediate.
+    double resonanceOffset = 0.0;
     // Separate envelope coupling in octaves per EG unit. Defaults retain
     // direct octave-valued engineering patches. Factory EG units are volts;
     // its scales use documented resistor ratios and provisional manual slopes.
@@ -65,7 +77,15 @@ struct Patch {
     // Entering II immediately adopts the last assigned key on free boards.
     // MIDI-pedal-held boards remain protected (software damper adaptation).
     double sustainMode = 1.0;
-    double filterLevel = 1.0, volume = 0.55;
+    // VCF LEVEL affects the filtered branch. VCA LEVEL affects the common
+    // filtered+sine signal before amp EG/bus/ring; volume is final master.
+    // SUB AM subtracts an additive normalized control current from ampLevel,
+    // with gain closure at zero; the inherited AM/DC scale is uncalibrated.
+    double filterLevel = 1.0, ampLevel = 1.0, volume = 0.55;
+    // Utility calibration gain AFTER the complete circuit and FIR. This is
+    // not an original Yamaha control and cannot change internal drive/state.
+    // Zero bypasses the gain exactly; [-24,+24] dB, with no limiter/AGC.
+    double outputTrimDb = 0.0;
     // TRANSPOSE changes the oscillator FT path, not filter keyboard voltage.
     double octave = 0.0;
     // Master PITCH: nominal -500..+700 cents. Changes VCO pitch and the
@@ -74,6 +94,8 @@ struct Patch {
     double tuneCents = 0.0;
     // These modeled oscillator variations, like vibrato below, are VCO-only.
     double voiceSpreadCents = 0.0, driftCents = 0.0;
+    // filterLfo is LP octave depth. HP gets .3374358974 times that depth:
+    // (.7/.65)*(47k/150k), independent of user-editable EG coupling scales.
     double lfoRate = 5.0, vibratoCents = 0.0, tremolo = 0.0, filterLfo = 0.0;
     // Shared SUB source: 0 sine, 1 down saw, 2 up saw, 3 square, 4 noise.
     // Noise uses the sourced22k/.1uF low-pass; level is uncalibrated and
@@ -126,7 +148,8 @@ public:
     // from globalRelease and the CS-50 SUSTAIN I/II key-CV modes.
     void sustain(bool down);
     void allNotesOff();
-    // Clears voices, output-coupling capacitors and FIR history; preserves controllers.
+    // Clears voices, output-coupling capacitors and FIR history; preserves
+    // controllers and the continuously connected global Q-control capacitor.
     void allSoundOff();
     // Restores seeded oscillator phases, controller state and all capacitors.
     void reset();
@@ -153,8 +176,13 @@ public:
         double sub, ringEnvelope, ringFrequency, ringCarrier;
         std::size_t physicalKeyPresses;
     };
+    struct SoundPathState {
+        double resonanceVoltageOffset, hpResonance, lpResonance;
+        double commonVcaGain;
+    };
     std::array<VoiceState,voiceCount> voiceState() const;
     ModulationState modulationState() const;
+    SoundPathState soundPathState() const;
 #endif
 private:
     struct Impl;
