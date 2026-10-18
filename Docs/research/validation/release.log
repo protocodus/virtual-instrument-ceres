@@ -1,0 +1,23 @@
+Test project /tmp/ceres-joint-calibration-20261018/build
+    Start 1: native_dsp_contracts
+1/9 Test #1: native_dsp_contracts .................   Passed    7.72 sec
+    Start 2: sound_path_circuit_contracts
+2/9 Test #2: sound_path_circuit_contracts .........   Passed    1.48 sec
+    Start 3: voice_expression_contracts
+3/9 Test #3: voice_expression_contracts ...........   Passed    1.02 sec
+    Start 4: research_calibration_contracts
+4/9 Test #4: research_calibration_contracts .......   Passed    1.05 sec
+    Start 5: embedded_allocation_contract
+5/9 Test #5: embedded_allocation_contract .........   Passed    0.90 sec
+    Start 6: research_calibration_python_oracle
+6/9 Test #6: research_calibration_python_oracle ...   Passed    0.42 sec
+    Start 7: native_embedded_audio_parity
+7/9 Test #7: native_embedded_audio_parity .........   Passed    4.48 sec
+    Start 8: active_sound_path_audio_parity
+8/9 Test #8: active_sound_path_audio_parity .......   Passed    2.69 sec
+    Start 9: expression_audio_parity
+9/9 Test #9: expression_audio_parity ..............   Passed    2.69 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Total Test time (real) =  22.46 sec

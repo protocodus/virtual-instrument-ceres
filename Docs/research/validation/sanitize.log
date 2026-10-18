@@ -1,0 +1,9 @@
+Test project /tmp/ceres-joint-calibration-20261018/build-sanitize
+    Start 4: research_calibration_contracts
+1/2 Test #4: research_calibration_contracts .......   Passed    1.05 sec
+    Start 6: research_calibration_python_oracle
+2/2 Test #6: research_calibration_python_oracle ...   Passed    0.30 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   1.35 sec

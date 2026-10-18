@@ -78,6 +78,12 @@ const Parameter parameters[] = {
     {"velocity_sensitivity", &Patch::velocitySensitivity, 0, 1},
     {"drive", &Patch::drive, .05, 8},
     {"reset_microseconds", &Patch::resetMicroseconds, .1, 50}
+#if !defined(CERES_EMBEDDED_TARGET)
+    ,{"calibration_network", &Patch::calibrationNetwork, 0, 2}
+    ,{"calibration_hp_bias", &Patch::calibrationHpBias, -15, 15}
+    ,{"calibration_lp_bias", &Patch::calibrationLpBias, -15, 15}
+    ,{"calibration_alpha", &Patch::calibrationAlpha, .01, 8}
+#endif
 };
 
 double parameterValue(const Parameter& parameter, double value) {
@@ -88,6 +94,9 @@ double parameterValue(const Parameter& parameter, double value) {
     if (parameter.member==&Patch::lfoWaveform || parameter.member==&Patch::sustainMode ||
         parameter.member==&Patch::expressionSource)
         value=std::round(value);
+#if !defined(CERES_EMBEDDED_TARGET)
+    if (parameter.member==&Patch::calibrationNetwork) value=std::round(value);
+#endif
     return value;
 }
 
@@ -101,6 +110,71 @@ Patch validatePatch(const Patch& patch) {
     }
     return validated;
 }
+
+#if !defined(CERES_EMBEDDED_TARGET)
+// Research-only instantaneous DC control network, copied algebraically from
+// Docs/accuracy/preset-dc-loading/network.py. Rank B, Vd=.6V, fixed355k bias
+// source, zero chip-input currents. BR/SUB/other sources are stiff. The two
+// other modulation branches remain zero-valued shunts. No new time law.
+CalibrationStageState solveCalibrationStage(const Patch& p, bool hp,
+        const std::array<double,4>& eg, double subVoltage) {
+    constexpr double gp=1/39000., g0=1/10000., biasResistance=355000.;
+    const double rs=p.calibrationNetwork==1 ? (hp ? 75000. : 9100.)
+                                          : (hp ? 0. : 7500.);
+    const double gs=rs==0 ? 0 : 1/rs;
+    const double rank=hp ? 2200. : 2400.;
+    const double rbr=hp ? 680000. : 220000.;
+    const double rmod=hp ? 150000. : 47000.;
+    const double reg=hp ? 220000. : 47000.;
+    const double bias=hp ? p.calibrationHpBias : p.calibrationLpBias;
+    CalibrationStageState out;
+    out.conductance=gp+1/rank+1/rbr+3/rmod+1/reg+1/biasResistance;
+    out.kappa=(hp ? .7 : .65)*out.conductance/gp;
+    std::array<double,4> rhs{};
+    double sumRhs=0;
+    for(unsigned i=0;i<4;++i) {
+        rhs[i]=p.brilliance/rbr+eg[i]/reg+bias/biasResistance+subVoltage/rmod;
+        sumRhs+=rhs[i];
+    }
+    const double busDiagonal=gs+g0+4*gp;
+    out.busVoltage=(gs*9.4+gp/out.conductance*sumRhs)
+        /(busDiagonal-4*gp*gp/out.conductance);
+    double busResidual=busDiagonal*out.busVoltage-gs*9.4;
+    double worstResidual=0, maxVoltage=std::max(1.,std::abs(out.busVoltage));
+    double maxRhs=gs*9.4;
+    for(unsigned i=0;i<4;++i) {
+        out.pinVoltage[i]=(gp*out.busVoltage+rhs[i])/out.conductance;
+        out.exponent[i]=p.calibrationAlpha*out.kappa*out.pinVoltage[i];
+        out.referenceFrequency[i]=filterFrequencyFloor+(hp ? 12. : 180.)*std::exp2(out.exponent[i]);
+        busResidual-=gp*out.pinVoltage[i];
+        worstResidual=std::max(worstResidual,std::abs(out.conductance*out.pinVoltage[i]
+            -gp*out.busVoltage-rhs[i]));
+        maxVoltage=std::max(maxVoltage,std::abs(out.pinVoltage[i]));
+        maxRhs=std::max(maxRhs,std::abs(rhs[i]));
+    }
+    const double normalization=std::max({std::max(busDiagonal,out.conductance)*maxVoltage,maxRhs,1e-20});
+    out.normalizedKclResidual=std::max(worstResidual,std::abs(busResidual))/normalization;
+    out.selectedPresent=rs!=0;
+    out.selectedCurrent=rs==0 ? 0 : (9.4-out.busVoltage)/rs;
+    out.manualOffMargin=out.busVoltage+.6;
+    out.diodeStatesValid=out.manualOffMargin>=0 && (!out.selectedPresent || out.selectedCurrent>=0);
+    return out;
+}
+
+CalibrationNetworkState solveCalibrationNetwork(const Patch& p,
+        const std::array<double,4>& eg, double sub) {
+    CalibrationNetworkState out;
+    if(p.calibrationNetwork==0) return out;
+    out.enabled=true;out.envelope=eg;
+    // Existing filter_lfo is LP octave depth in the stiff-source reference.
+    // Re-express it as one shared physical modulation voltage; alpha and
+    // actual shared-preset loading subsequently act on its complete current.
+    out.subVoltage=p.filterLfo*sub/(.65*39000/47000);
+    out.hp=solveCalibrationStage(p,true,eg,out.subVoltage);
+    out.lp=solveCalibrationStage(p,false,eg,out.subVoltage);
+    return out;
+}
+#endif
 
 double logSinh(double x) {
     constexpr double ln2=.693147180559945309417232121458176568;
@@ -504,6 +578,9 @@ struct Synth::Impl {
     Random random;
     Patch patch;
     std::array<Voice,4> voices;
+#if !defined(CERES_EMBEDDED_TARGET)
+    CalibrationNetworkState calibration;
+#endif
     Decimator decimator;
     double lfoPhase = 0, pwmPhase = 0, pressureTarget = 0, pressureValue = 0, bend = 0;
     OutputCoupling busCoupling, lineCoupling;
@@ -604,6 +681,9 @@ struct Synth::Impl {
         qVoltageOffset=0;
         effectiveHpResonance=patch.hpResonance; effectiveLpResonance=patch.lpResonance;
         commonVcaGain=patch.ampLevel;
+#if !defined(CERES_EMBEDDED_TARGET)
+        calibration={};
+#endif
         decimator.clear();
         for (auto& voice : voices) {
             voice.osc.phase = random.unit();
@@ -637,6 +717,18 @@ struct Synth::Impl {
         const double pwm = std::sin(2*pi*(pwmPhase+patch.pwmPhase));
         lfoPhase = wrap(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrap(pwmPhase + patch.pwmRate*dt);
+#if !defined(CERES_EMBEDDED_TARGET)
+        if(patch.calibrationNetwork!=0) {
+            std::array<double,4> eg{};
+            for(unsigned i=0;i<voices.size();++i)
+                eg[i]=voices[i].filter.advance(patch.filterInitial,patch.filterPeak,0,
+                    patch.filterAttackHeadroom,patch.filterAttackSaturation,filterCoefficients[0],
+                    filterCoefficients[3],filterCoefficients[1],filterCoefficients[2]);
+            calibration=solveCalibrationNetwork(patch,eg,lfo);
+            if(!calibration.hp.diodeStatesValid || !calibration.lp.diodeStatesValid)
+                throw std::domain_error("Research network left its declared diode-conduction region");
+        } else calibration={};
+#endif
         double mixed = 0;
         for (unsigned i = 0; i < voices.size(); ++i) {
             auto& v = voices[i];
@@ -655,7 +747,11 @@ struct Synth::Impl {
             const double frequency = 440 * std::exp2((v.keyNote-69 + bend + 12*patch.octave + cents*.01)/12);
             const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
                                             patch.resetMicroseconds*1e-6,internalFs);
-            const double filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
+            const double filterEnvelope =
+#if !defined(CERES_EMBEDDED_TARGET)
+                patch.calibrationNetwork!=0 ? calibration.envelope[i] :
+#endif
+                v.filter.advance(patch.filterInitial,patch.filterPeak,0,
                 patch.filterAttackHeadroom,patch.filterAttackSaturation,filterCoefficients[0],
                 filterCoefficients[3],filterCoefficients[1],filterCoefficients[2]);
             const double ampEnvelope = v.amp.advance(0,1,patch.ampSustain,
@@ -672,6 +768,19 @@ struct Synth::Impl {
             // the engineering-only keyTrack slope is changed. TRANSPOSE FT,
             // VIB15 and the modeled oscillator drift/spread remain VCO-only.
             const double keyOctaves=(v.keyNote-60+bend)*patch.keyTrack/12+patch.tuneCents/1200;
+            double hpFrequency,lpFrequency,source;
+#if !defined(CERES_EMBEDDED_TARGET)
+            if(patch.calibrationNetwork!=0) {
+                // Node exponent already includes preset, bias, all EGs, BR
+                // and SUB. Do not reapply old cutoffs/own-EG/depths here.
+                // Keyboard/master KV and the passive feed floor stay outside
+                // alpha; the original waveform/timing/Q/audio chain follows.
+                hpFrequency=filterFrequencyFloor+12*std::exp2(keyOctaves+calibration.hp.exponent[i]);
+                lpFrequency=filterFrequencyFloor+180*std::exp2(keyOctaves+calibration.lp.exponent[i]);
+                source=patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*noise;
+            } else
+#endif
+            {
             const double hpFactor=std::exp2(keyOctaves+filterEnvelope*patch.hpEnvelopeScale
                 + expression*patch.pressureFilter+lfo*(patch.filterLfo*hpSubRelativeScale)
                 + patch.brilliance*hpBrillianceScale);
@@ -680,9 +789,10 @@ struct Synth::Impl {
                 : std::exp2(keyOctaves+filterEnvelope*patch.lpEnvelopeScale
                     + expression*patch.pressureFilter+lfo*patch.filterLfo
                     + patch.brilliance*lpBrillianceScale);
-            const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*noise;
-            const double hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor);
-            const double lpFrequency=modulatedFilterFrequency(patch.lpCutoff,lpFactor);
+            source=patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*noise;
+            hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor);
+            lpFrequency=modulatedFilterFrequency(patch.lpCutoff,lpFactor);
+            }
 #if !defined(CERES_EMBEDDED_TARGET)
             v.oscillatorFrequency=frequency; v.hpFrequency=hpFrequency; v.lpFrequency=lpFrequency;
 #endif
@@ -730,6 +840,10 @@ Synth::Synth(Synth&&) noexcept = default;
 Synth& Synth::operator=(Synth&&) noexcept = default;
 void Synth::setPatch(const Patch& patch) {
     const Patch validated = validatePatch(patch);
+#if !defined(CERES_EMBEDDED_TARGET)
+    if(validated.calibrationNetwork!=0 && validated.pressureFilter!=0)
+        throw std::invalid_argument("Research calibration network requires pressure_filter=0");
+#endif
     const bool openingKeyHold=impl_->patch.sustainMode!=2 && validated.sustainMode==2;
     impl_->patch = validated;
     impl_->updateCoefficients();
@@ -845,6 +959,16 @@ Synth::ModulationState Synth::modulationState() const {
 Synth::SoundPathState Synth::soundPathState() const {
     return {impl_->qVoltageOffset,impl_->effectiveHpResonance,
         impl_->effectiveLpResonance,impl_->commonVcaGain};
+}
+CalibrationNetworkState Synth::calibrationState() const { return impl_->calibration; }
+CalibrationNetworkState calibrationNetworkState(const Patch& patch,
+        const std::array<double,4>& envelope, double sub) {
+    const auto p=validatePatch(patch);
+    if(!std::isfinite(sub) || (p.calibrationNetwork!=0 && p.pressureFilter!=0))
+        throw std::invalid_argument("Research network requires finite SUB and pressure_filter=0");
+    for(double value:envelope)
+        if(!std::isfinite(value)) throw std::invalid_argument("Nonfinite research EG voltage");
+    return solveCalibrationNetwork(p,envelope,sub);
 }
 // Individual normalized section, using the same RC class/constants as voices.
 std::vector<double> outputCouplingImpulse(unsigned stage,double fs,std::size_t frames) {

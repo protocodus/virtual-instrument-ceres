@@ -126,7 +126,36 @@ struct Patch {
     // Effective differential-pair input scaling, uncalibrated. 1 is restrained.
     double drive = 1.0;
     double resetMicroseconds = 6.0;
+#if !defined(CERES_EMBEDDED_TARGET)
+    // RESEARCH ONLY: 0 preserves the complete legacy path; 1=Flute resistor
+    // matrix, 2=Brass I. Replaces both static cutoff references AND own-EG
+    // scales with the instantaneous four-board rank-B control-node solve.
+    // Biases are unloaded wiper volts through fixed355k; alpha multiplies
+    // the whole non-key exponent. This is not a calibrated panel model.
+    double calibrationNetwork = 0.0;
+    double calibrationHpBias = 0.0, calibrationLpBias = 0.0;
+    double calibrationAlpha = 1.0;
+#endif
 };
+
+#if !defined(CERES_EMBEDDED_TARGET)
+struct CalibrationStageState {
+    double busVoltage = 0, kappa = 0, conductance = 0;
+    std::array<double,4> pinVoltage{}, exponent{}, referenceFrequency{};
+    double selectedCurrent = 0, manualOffMargin = 0, normalizedKclResidual = 0;
+    bool selectedPresent = false, diodeStatesValid = false;
+};
+struct CalibrationNetworkState {
+    bool enabled = false;
+    std::array<double,4> envelope{};
+    double subVoltage = 0;
+    CalibrationStageState hp, lp;
+};
+// Stateless control-node probe using the identical research circuit as the
+// voices. EG voltages include every physical board, including idle/releasing.
+CalibrationNetworkState calibrationNetworkState(const Patch&,
+    const std::array<double,4>& envelope, double subWaveformValue = 0);
+#endif
 
 // Keys use snake_case (e.g. lp_cutoff, filter_initial, amp_attack). Finite values
 // are range-limited; false means an unknown key or a nonfinite input.
@@ -191,6 +220,7 @@ public:
     std::array<VoiceState,voiceCount> voiceState() const;
     ModulationState modulationState() const;
     SoundPathState soundPathState() const;
+    CalibrationNetworkState calibrationState() const;
 #endif
 private:
     struct Impl;

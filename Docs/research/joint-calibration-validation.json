@@ -1,0 +1,122 @@
+{
+  "status": "pass",
+  "date": "2026-10-18",
+  "parent_commit": "55869df8ba728e25a6b5792aa07dfd55f134439c",
+  "branch": "codex/ceres-joint-calibration-20261018",
+  "scope": "native/offline instantaneous rank-B cutoff calibration research only; old SUB phase isolated; no public-recording-linked render or fit",
+  "new_native_keys": {
+    "calibration_network": [
+      0,
+      2,
+      0
+    ],
+    "calibration_hp_bias": [
+      -15,
+      15,
+      0
+    ],
+    "calibration_lp_bias": [
+      -15,
+      15,
+      0
+    ],
+    "calibration_alpha": [
+      0.01,
+      8,
+      1
+    ]
+  },
+  "bias_coordinate": "shared voltage source through fixed355k, not additive octave intercept",
+  "compiled_source_identity": {
+    "Source/DSP/ceres.hpp": "1cd4c0b3cca96873fe7cdb67146b812984f6e62e33222b035797d16a49ffa7c0",
+    "Source/DSP/ceres.cpp": "f31fe5359c182cda58deda9ee5ca46a3fc78df2ef0fdca7811fa24f2eff6e3f2",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "14c0131bba1a3cdf83322d705136ffad589d5a5819adf8f4a6ffe70a1fd53784"
+  },
+  "binary": "build/ceres_render",
+  "binary_sha256": "182dfc2a15768df074aa9c6481fe3ca86e5c9fc432bfb1a07aff81e6fe4815c5",
+  "validation": {
+    "release_ctest": {
+      "passed": 9,
+      "total": 9
+    },
+    "targeted_asan_ubsan_ctest": {
+      "passed": 2,
+      "total": 2,
+      "detect_leaks": false
+    },
+    "node_oracle": {
+      "status": "pass",
+      "cases": 328,
+      "stage_solves": 656,
+      "maximum_node_error_V": 1.3322676295501878e-15,
+      "maximum_frequency_error_Hz": 2.2351741790771484e-07,
+      "maximum_independent_normalized_KCL_residual": 2.201156189071216e-16,
+      "minimum_manual_off_margin_V": 0.46688483421801974,
+      "minimum_selected_current_A": 0.00011577720160230465,
+      "oracle_sha256": "b03cdb48f68c73cc70312cb2c8061d69a1d81fea1f6e0330464f8e052f631297"
+    },
+    "disabled_audio_parity": {
+      "status": "pass",
+      "baseline_commit": "55869df8ba728e25a6b5792aa07dfd55f134439c",
+      "mode": "expression; research disabled/default",
+      "samples": 384000,
+      "rates": [
+        44100,
+        48000,
+        96000,
+        192000
+      ],
+      "scenes_per_rate": 8,
+      "byte_exact": true,
+      "audio_sha256": "c3a7b248b1823d8254efef20968c2127054e1508deb7ca65e83047f76bfee480",
+      "baseline_sources": {
+        "ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+        "ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa"
+      },
+      "compile_command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-I",
+        "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-joint-disabled-96wagiwh/source",
+        "/private/tmp/ceres-joint-calibration-20261018/Tests/ParityDriver.cpp",
+        "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-joint-disabled-96wagiwh/source/ceres.cpp",
+        "-o",
+        "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-joint-disabled-96wagiwh/baseline"
+      ],
+      "candidate_binary_sha256": "abe39ab22c7a3e62c0001eefb55eb62122324ccca3151d0ab3de8bbab32a6e94",
+      "input_sha256": {
+        "Source/DSP/ceres.cpp": "f31fe5359c182cda58deda9ee5ca46a3fc78df2ef0fdca7811fa24f2eff6e3f2",
+        "Source/DSP/ceres.hpp": "1cd4c0b3cca96873fe7cdb67146b812984f6e62e33222b035797d16a49ffa7c0",
+        "Tests/ParityDriver.cpp": "ab9016cc0eadb561ff7b8e97fa7fc10bc83e261704f44fccabeae5d79d6775ea",
+        "Tools/check_joint_disabled_parity.py": "4a774c47e7a81fa4a23488a0f15eb70d0ef3703e5610eaedd24c852a9b199607"
+      }
+    }
+  },
+  "limitations": [
+    "RankB/Vd.6/fixed355k/stiffBR+SUB/zero chip currents conditional circuit, not identified internal I-V.",
+    "Instantaneous cutoff network; original audio-filter upper clamp retained and diagnostic frequencies are unclamped.",
+    "Native mode rejects nonzero pressure_filter and invalid diode-conduction states; not a general PANEL model.",
+    "Legacy hp/lp cutoff and own-EG scale controls intentionally ignored in enabled mode; no double application.",
+    "No source clock/timing/Q/waveform/gain fit and no hardware-accuracy claim."
+  ],
+  "verified_file_sha256": {
+    "Source/DSP/ceres.cpp": "f31fe5359c182cda58deda9ee5ca46a3fc78df2ef0fdca7811fa24f2eff6e3f2",
+    "Source/DSP/ceres.hpp": "1cd4c0b3cca96873fe7cdb67146b812984f6e62e33222b035797d16a49ffa7c0",
+    "CMakeLists.txt": "14c0131bba1a3cdf83322d705136ffad589d5a5819adf8f4a6ffe70a1fd53784",
+    "Tests/JointCalibrationTests.cpp": "85072c1598b49a855e3bb883c0fdf8e9fb81c2dbde2b896e78ef2105ac7c843f",
+    "Tests/check_joint_calibration.py": "db100ffd3f8d6358e6be6506a5ace821469672e51a4195021a7d62d5829d60dd",
+    "Tests/oracles/preset_dc_network.py": "b03cdb48f68c73cc70312cb2c8061d69a1d81fea1f6e0330464f8e052f631297",
+    "Tools/check_joint_disabled_parity.py": "4a774c47e7a81fa4a23488a0f15eb70d0ef3703e5610eaedd24c852a9b199607",
+    "Docs/research/joint-calibration.md": "58c70d0251823568560ef932d931dd0f84dbcd73e78690720f54f81e010fbfc5",
+    "Docs/research/validation/disabled-parity.json": "9da2884bb8e93a60715bfb2367b808aa9143d40956e4e41ca06a85ceb5821a40",
+    "Docs/research/validation/initial-environment-failure.log": "aa26be41fa059fe7394ab4ac94eebca01d182eca5620ab5803295781095e6080",
+    "Docs/research/validation/node-oracle.json": "797ea3888820c4d567042748e0ddf29eade998dca2be4afc62682db1d4e02f36",
+    "Docs/research/validation/release.log": "1d2ed7e7edef77489dcdf40f4958d0636ef6691b8fa9365b68bd5042dda680d2",
+    "Docs/research/validation/sanitize.log": "e79d2c3cb18f6a28e990248f610dd31dc5d47051152d958bfa7278379c2aa35d",
+    "Docs/research/validation/source.patch": "b1ef29f1ca3a5644d9fc4e42158066367da27dd8230d2bdd4e4c70d94c696e84"
+  }
+}

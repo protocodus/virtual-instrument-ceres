@@ -50,6 +50,9 @@ if(BUILD_TESTING)
   add_executable(ceres_expression_tests Tests/ExpressionTests.cpp)
   target_link_libraries(ceres_expression_tests PRIVATE ceres)
   add_test(NAME voice_expression_contracts COMMAND ceres_expression_tests)
+  add_executable(ceres_calibration_tests Tests/JointCalibrationTests.cpp)
+  target_link_libraries(ceres_calibration_tests PRIVATE ceres)
+  add_test(NAME research_calibration_contracts COMMAND ceres_calibration_tests)
   add_executable(ceres_embedded_contract Tests/EmbeddedContract.cpp)
   target_link_libraries(ceres_embedded_contract PRIVATE ceres_embedded)
   if(NOT MSVC)
@@ -62,6 +65,8 @@ if(BUILD_TESTING)
   target_link_libraries(ceres_embedded_parity PRIVATE ceres_embedded)
   find_package(Python3 COMPONENTS Interpreter)
   if(Python3_Interpreter_FOUND)
+    add_test(NAME research_calibration_python_oracle COMMAND "${Python3_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_joint_calibration.py" "${CMAKE_CURRENT_BINARY_DIR}")
     add_test(NAME native_embedded_audio_parity COMMAND "${Python3_EXECUTABLE}"
       "${CMAKE_CURRENT_SOURCE_DIR}/Tools/check_embedded.py" --build-dir "${CMAKE_CURRENT_BINARY_DIR}")
     add_test(NAME active_sound_path_audio_parity COMMAND "${Python3_EXECUTABLE}"

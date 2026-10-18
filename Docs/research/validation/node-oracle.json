@@ -1,0 +1,11 @@
+{
+  "status": "pass",
+  "cases": 328,
+  "stage_solves": 656,
+  "maximum_node_error_V": 1.3322676295501878e-15,
+  "maximum_frequency_error_Hz": 2.2351741790771484e-07,
+  "maximum_independent_normalized_KCL_residual": 2.201156189071216e-16,
+  "minimum_manual_off_margin_V": 0.46688483421801974,
+  "minimum_selected_current_A": 0.00011577720160230465,
+  "oracle_sha256": "b03cdb48f68c73cc70312cb2c8061d69a1d81fea1f6e0330464f8e052f631297"
+}

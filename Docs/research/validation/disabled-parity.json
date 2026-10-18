@@ -1,0 +1,38 @@
+{
+  "status": "pass",
+  "baseline_commit": "55869df8ba728e25a6b5792aa07dfd55f134439c",
+  "mode": "expression; research disabled/default",
+  "samples": 384000,
+  "rates": [
+    44100,
+    48000,
+    96000,
+    192000
+  ],
+  "scenes_per_rate": 8,
+  "byte_exact": true,
+  "audio_sha256": "c3a7b248b1823d8254efef20968c2127054e1508deb7ca65e83047f76bfee480",
+  "baseline_sources": {
+    "ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+    "ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa"
+  },
+  "compile_command": [
+    "c++",
+    "-std=c++17",
+    "-O3",
+    "-DNDEBUG",
+    "-I",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-joint-disabled-96wagiwh/source",
+    "/private/tmp/ceres-joint-calibration-20261018/Tests/ParityDriver.cpp",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-joint-disabled-96wagiwh/source/ceres.cpp",
+    "-o",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-joint-disabled-96wagiwh/baseline"
+  ],
+  "candidate_binary_sha256": "abe39ab22c7a3e62c0001eefb55eb62122324ccca3151d0ab3de8bbab32a6e94",
+  "input_sha256": {
+    "Source/DSP/ceres.cpp": "f31fe5359c182cda58deda9ee5ca46a3fc78df2ef0fdca7811fa24f2eff6e3f2",
+    "Source/DSP/ceres.hpp": "1cd4c0b3cca96873fe7cdb67146b812984f6e62e33222b035797d16a49ffa7c0",
+    "Tests/ParityDriver.cpp": "ab9016cc0eadb561ff7b8e97fa7fc10bc83e261704f44fccabeae5d79d6775ea",
+    "Tools/check_joint_disabled_parity.py": "4a774c47e7a81fa4a23488a0f15eb70d0ef3703e5610eaedd24c852a9b199607"
+  }
+}
