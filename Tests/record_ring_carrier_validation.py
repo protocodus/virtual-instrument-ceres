@@ -23,7 +23,7 @@ def main():
     keys=re.findall(r'\{"([a-z_]+)",',table(parent));assert len(keys)==57
     code=['CMakeLists.txt','Source/DSP/ceres.cpp','Source/DSP/ceres.hpp','Tests/RingCarrierTests.cpp',
           'Tests/ParityDriver.cpp','Tests/check_ring_bypass_parent.py','Tests/record_ring_carrier_validation.py']
-    diff=subprocess.check_output(['git','diff','--cached','--binary','--unified=0','--',*code],cwd=ROOT);assert diff
+    diff=subprocess.check_output(['git','diff',PARENT,'--binary','--unified=0','--',*code],cwd=ROOT);assert diff
     (OUT/'source.patch').write_bytes(diff)
     audit=Path('/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring')
     assert sha(audit/'evidence.json')=='afa33dd2d74d3352167a00d28d00d1134ab173cfcba52f738cf647a146f3286f'
