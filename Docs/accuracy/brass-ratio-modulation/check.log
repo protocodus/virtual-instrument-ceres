@@ -1,0 +1,10 @@
+Estimated offset +0 Hz, window 40 ms; 61 signals × 81 frames
+Estimated offset +0 Hz, window 60 ms; 61 signals × 81 frames
+Estimated offset +0 Hz, window 80 ms; 61 signals × 81 frames
+Estimated offset -2 Hz, window 40 ms; 61 signals × 81 frames
+Estimated offset -2 Hz, window 60 ms; 61 signals × 81 frames
+Estimated offset -2 Hz, window 80 ms; 61 signals × 81 frames
+Estimated offset +2 Hz, window 40 ms; 61 signals × 81 frames
+Estimated offset +2 Hz, window 60 ms; 61 signals × 81 frames
+Estimated offset +2 Hz, window 80 ms; 61 signals × 81 frames
+{"status": "pass", "bindings": 16, "cases": 61, "frames_per_window": 81, "carrier_offsets": 3, "full_recompute": true, "maximum_array_difference": 0.0}

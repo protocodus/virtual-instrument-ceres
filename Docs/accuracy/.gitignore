@@ -9,3 +9,26 @@ active-source/
 pre-trim-source/
 active-source-acquisition.log
 active-source-sub-acquisition.log
+soundpath-final-source/
+run-identities/
+# Copyrighted on-service source screenshots, retained locally and hash-bound.
+preset-video-visual-audit/*/frames/
+preset-video-visual-audit/*/contact.png
+filter-video-inspection/frames/
+filter-video-inspection/contact.png
+joint-calibration/identity/
+joint-calibration/**/*.f64
+joint-calibration/**/control_trace
+pitch-route/identity/
+# Public research publication: retain third-party source documents locally.
+audible-osc-ring/evidence/*.png
+filter-video-inspection/panel1-filter-bottom.png
+filter-video-inspection/pra-filter-buffers.png
+ring-carrier-nonlinearity-20261019/ElectronicSynth.pdf
+ring-carrier-nonlinearity-20261019/ElectronicSynth.txt
+ring-carrier-nonlinearity-20261019/datasheetarchive-UA796HC.html
+ring-carrier-nonlinearity-20261019/fairchild-*.png
+ring-carrier-nonlinearity-20261019/yamaha-pwm-49.png
+# Rebuildable local demo executables and machine-specific input link.
+audible-circuits-20261019/*-run-*/*-demo
+audible-circuits-20261019/public-frozen/inputs

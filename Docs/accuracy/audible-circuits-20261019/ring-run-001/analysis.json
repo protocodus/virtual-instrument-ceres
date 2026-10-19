@@ -1,0 +1,86 @@
+{
+  "manifest_sha256": "86e9ef0174cac404d35fa2313d8d38628e483fcc00bf64a9017320157ea848f9",
+  "analysis_script_sha256": "5891f14b9c132824391ef64940a81c339283d822f6dbbaf037e55402588e17c4",
+  "passive_oracle_sha256": "e94cc5d976540dbee545dc4bc3ab86ba0a926e157fd010d85c540cb762bb1a74",
+  "rows": [
+    {
+      "rate": 1,
+      "seconds": [
+        2.5,
+        4.5
+      ],
+      "output_rms_ratio": 0.04768165886312171,
+      "sideband_ratios": [
+        {
+          "frequency": 439,
+          "magnitude": 0.04768166006830094,
+          "phase_degrees": -72.37643013129596
+        },
+        {
+          "frequency": 441,
+          "magnitude": 0.04768166011240255,
+          "phase_degrees": 72.37643017079752
+        }
+      ],
+      "passive_differential_carrier_prediction": {
+        "magnitude": 0.04765937072794399,
+        "db": -26.4370339234613,
+        "phase_degrees": 72.37643441387884,
+        "kcl_max_abs_amp_per_source_volt": 8.243750062963789e-19
+      }
+    },
+    {
+      "rate": 30,
+      "seconds": [
+        2.5,
+        4.5
+      ],
+      "output_rms_ratio": 0.6708269438824076,
+      "sideband_ratios": [
+        {
+          "frequency": 410,
+          "magnitude": 0.6708269580632326,
+          "phase_degrees": -44.955685171810806
+        },
+        {
+          "frequency": 470,
+          "magnitude": 0.6708269572433713,
+          "phase_degrees": 44.95568526865975
+        }
+      ],
+      "passive_differential_carrier_prediction": {
+        "magnitude": 0.6706540533440276,
+        "db": -3.4700289250037146,
+        "phase_degrees": 44.95568741308318,
+        "kcl_max_abs_amp_per_source_volt": 1.9368821089499895e-18
+      }
+    },
+    {
+      "rate": 220,
+      "seconds": [
+        2.5,
+        4.5
+      ],
+      "output_rms_ratio": 0.988623976179514,
+      "sideband_ratios": [
+        {
+          "frequency": 220,
+          "magnitude": 0.9886094380593135,
+          "phase_degrees": -8.239338510979639
+        },
+        {
+          "frequency": 660,
+          "magnitude": 0.9886385065639902,
+          "phase_degrees": 8.236552873499582
+        }
+      ],
+      "passive_differential_carrier_prediction": {
+        "magnitude": 0.9886426879005678,
+        "db": -0.09921282754710005,
+        "phase_degrees": 8.235149310706122,
+        "kcl_max_abs_amp_per_source_volt": 3.6591823321385775e-18
+      }
+    }
+  ],
+  "limit": "This evaluates the new passive network inside an ideal normalized multiplier. It is not calibrated physical hardware wet attenuation or a switching-core model."
+}

@@ -1,0 +1,500 @@
+{
+  "source": "https://www.youtube.com/watch?v=HupZtUPiJLU",
+  "method": "On-service seeked paused HTML video; standard 1080p quality chosen in visible player. Browser screenshots; no audio/video downloaded.",
+  "observations": [
+    {
+      "t": 180,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 180,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 778.701,\n  \"paused\": true,\n  \"error\": null\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=180;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,error:v.error?{code:v.error.code,message:v.error.message}:null}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-180.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-180.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-180.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 240,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 240,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 778.701,\n  \"paused\": true,\n  \"error\": null\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=240;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,error:v.error?{code:v.error.code,message:v.error.message}:null}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 22 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L36-L38"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-240.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-240.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-240.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 300,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 300,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 778.701,\n  \"paused\": true,\n  \"error\": null\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=300;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,error:v.error?{code:v.error.code,message:v.error.message}:null}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-300.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-300.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-300.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 360,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 360,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 778.701,\n  \"paused\": true,\n  \"error\": null\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=360;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,error:v.error?{code:v.error.code,message:v.error.message}:null}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 25 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L39-L41"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-360.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-360.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-360.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 420,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 420,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 778.701,\n  \"paused\": true,\n  \"error\": null\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=420;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,error:v.error?{code:v.error.code,message:v.error.message}:null}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 28 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L42-L44"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-420.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-420.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-420.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 480,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 480,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 778.701,\n  \"paused\": true,\n  \"error\": null\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=480;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,error:v.error?{code:v.error.code,message:v.error.message}:null}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 31 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L45-L47"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-480.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-480.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-480.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 540,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 540,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 778.701,\n  \"paused\": true,\n  \"error\": null\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=540;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,error:v.error?{code:v.error.code,message:v.error.message}:null}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 34 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L48-L50"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-540.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-540.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-540.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 600,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 600,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 778.701,\n  \"paused\": true,\n  \"error\": null\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=600;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,error:v.error?{code:v.error.code,message:v.error.message}:null}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 37 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L51-L53"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-600.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-600.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-600.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 660,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 660,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 778.701,\n  \"paused\": true,\n  \"error\": null\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=660;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,error:v.error?{code:v.error.code,message:v.error.message}:null}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 40 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L54-L56"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-660.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-660.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-660.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 720,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 720,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 778.701,\n  \"paused\": true,\n  \"error\": null\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=720;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,error:v.error?{code:v.error.code,message:v.error.message}:null}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 43 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L57-L59"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-720.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-720.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-720.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 770,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 770,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 778.701,\n  \"paused\": true,\n  \"error\": null\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=770;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,error:v.error?{code:v.error.code,message:v.error.message}:null}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-770.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-770.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-770.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 73,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 73,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=73;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 61 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L75-L77"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-073.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-073.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-073.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 76,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 76,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=76;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-076.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-076.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-076.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 79,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 79,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=79;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-079.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-079.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-079.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 107,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 107,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=107;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-107.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-107.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-107.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 156,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 156,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=156;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 64 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L78-L80"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-156.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-156.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-156.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 165,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 165,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=165;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-165.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-165.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-165.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 198,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 198,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=198;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 67 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L81-L83"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-198.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-198.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-198.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 208,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 208,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=208;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-208.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-208.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-208.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 264,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 264,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=264;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-264.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-264.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-264.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 274,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 274,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=274;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-274.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-274.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-274.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 323,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 323,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=323;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 70 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L84-L86"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-323.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-323.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-323.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 365,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 365,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=365;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-365.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-365.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-365.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 381,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 381,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=381;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=HupZtUPiJLU\n- Page Title: The Yamaha CS-50- Presets - YouTube\n- Console: 13 errors, 73 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-14-03-578Z.log#L87-L89"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-381.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-381.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-381.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 391,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 391,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=391;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-391.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-391.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-391.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 415,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 415,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"paused\": true\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');v.pause();v.muted=true;v.currentTime=415;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,paused:v.paused}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-automaticgainsay-415.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-automaticgainsay-415.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-automaticgainsay-415.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    }
+  ]
+}

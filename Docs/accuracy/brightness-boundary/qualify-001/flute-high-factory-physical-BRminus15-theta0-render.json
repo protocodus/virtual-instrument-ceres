@@ -1,0 +1,82 @@
+{
+  "audio_sha256": "b02d8eab8e9a9c6744d31ded78fd31729def469d09bdff25514db7579852d244",
+  "case": {
+    "active_network": true,
+    "audio": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/brightness-boundary/qualify-001/flute-high-factory-physical-BRminus15-theta0.wav",
+    "command": [
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/identity/ceres_render",
+      "--preset",
+      "flute",
+      "--patch",
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/brightness-boundary/qualify-001/flute-high-factory-physical-BRminus15-theta0.patch",
+      "--events",
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.events.tsv",
+      "--output",
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/brightness-boundary/qualify-001/flute-high-factory-physical-BRminus15-theta0.wav",
+      "--rate",
+      "48000",
+      "--frames",
+      "154800",
+      "--seed",
+      "50"
+    ],
+    "id": "flute-high-factory-physical-BRminus15-theta0",
+    "original_case": {
+      "creator": "Andy Whitmore",
+      "duration": 1.9,
+      "events": "Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.events.tsv",
+      "expected_f0": 670.0,
+      "family": "flute",
+      "frames": 154800,
+      "historical_audio": "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-high-factory-physical.wav",
+      "id": "flute-high-factory-physical",
+      "midi": "Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.mid",
+      "midi_status": "Source-pitch following synthetic fresh held gate; physical notes 88/84, octave -1. Bends also affect filter key tracking.",
+      "midi_validation": {
+        "event_count": 194,
+        "original_hardware_MIDI": false,
+        "sample_exact_schedule": true,
+        "warnings": []
+      },
+      "offset_seconds": 0.225,
+      "patch": "Docs/accuracy/inputs/calibration/whitmore-transpose/whitmore-transpose-high-factory-physical.patch",
+      "preset": "flute",
+      "rate": 48000,
+      "recording_gain": 2.2187598696129043,
+      "reference": "Docs/accuracy/inputs/calibration/whitmore-flute-high-source.wav",
+      "seed": 50,
+      "settings_status": "Named factory Flute and physical note/transpose visually supported; unknown globals, pressure, exact gates and voice count. Effective family is a prior high-window fit, not hardware settings.",
+      "source_seconds": [
+        205.75,
+        207.65
+      ],
+      "source_url": "https://www.youtube.com/watch?v=Fj21t8MIS_o",
+      "strict_eligible": false
+    },
+    "patch": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/brightness-boundary/qualify-001/flute-high-factory-physical-BRminus15-theta0.patch",
+    "patch_sha256": "0ed136d8c802bf8b1ec7fedbb962223a26303b2ccf25f822df1c97463f603978",
+    "theta": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  "log_sha256": "30be3d3d508da3d39e4981f1e849334b40e211ffc23cb9b1ab2efbb6ee04f526",
+  "peak": 0.10876237601041794,
+  "statistics": {
+    "audio_seconds": 3.225,
+    "channels": 1,
+    "frames": 154800,
+    "normalization": "none",
+    "peak": 0.10876237601,
+    "preset": "flute",
+    "realtime_factor": 5.22134383101,
+    "render_seconds": 0.617657083,
+    "rms": 0.0367892112343,
+    "sample_format": "float32",
+    "sample_rate": 48000,
+    "samples_above_unity": 0,
+    "seed": 50,
+    "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+  }
+}

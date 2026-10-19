@@ -1,0 +1,9 @@
+# Predeclared release isolation; same preset, MIDI and other controls.
+octave=-1
+hp_cutoff=27.727086977293183
+lp_cutoff=442.85422297489009
+lfo_rate=6.6692178847138601
+tremolo=0.83104137105739762
+global_release=0
+amp_release=0.43688480401270802
+filter_release=0.043688480401270803

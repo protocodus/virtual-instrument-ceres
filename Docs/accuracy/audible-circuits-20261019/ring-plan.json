@@ -1,0 +1,34 @@
+{
+  "schema": "ceres.audible-ring-scenes.v1",
+  "declared_before_render": true,
+  "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "candidate": "ring-only branch, source/binary identities frozen before render",
+  "driver_sha256": "7a7eb95569f973fa925270ef625a33171d33f6bd7869fb522f9f9b5c63c0ad2c",
+  "rate": 48000,
+  "seed": 1,
+  "channels": 1,
+  "format": "float32",
+  "seconds": 5,
+  "carrier_rates": [
+    1,
+    30,
+    220
+  ],
+  "note": 69,
+  "note_on_seconds": 0,
+  "note_off_seconds": 4.5,
+  "ring_mix": 1,
+  "ring_depth": 0,
+  "oscillator": "sine with explicit6us reset on both isolated branches",
+  "gain": "fixedvolume.25, drive.05, no normalization or wetgain compensation",
+  "measurement_window_seconds": [
+    2.5,
+    4.5
+  ],
+  "listening_window_seconds": [
+    2,
+    4
+  ],
+  "hypothesis": "Added passive network shapes differential carrier before existing normalized ideal product. Exact hardware wet level remains uncalibrated because multiplier switching, source volts and gain trim are unknown.",
+  "all_other_parameters": "Exact defaults and values in bound driver; no parameter, gate, phase or gain fitting."
+}

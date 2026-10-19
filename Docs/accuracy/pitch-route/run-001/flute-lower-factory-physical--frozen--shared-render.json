@@ -1,0 +1,52 @@
+{
+  "audio": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-lower-factory-physical--frozen--shared.wav",
+  "audio_sha256": "7497eeb7b4a268532d2279e3ac085abbd7a18886f4d48032ecedaba0c1bc29ec",
+  "byte_exact_pass": true,
+  "byte_exact_reference": {
+    "audio": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/runs/expression-55869df8/flute-lower-factory-physical.wav",
+    "origin": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/runs/expression-55869df8/report.json",
+    "original_id": "flute-lower-factory-physical",
+    "sha256": "7497eeb7b4a268532d2279e3ac085abbd7a18886f4d48032ecedaba0c1bc29ec"
+  },
+  "command": [
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/identity/ceres_render",
+    "--preset",
+    "flute",
+    "--patch",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/whitmore-transpose/whitmore-transpose-lower-factory-physical.patch",
+    "--events",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/whitmore-transpose/lower-physical.events.tsv",
+    "--output",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-lower-factory-physical--frozen--shared.wav",
+    "--rate",
+    "48000",
+    "--frames",
+    "119000",
+    "--seed",
+    "50",
+    "--research-pitch-route",
+    "shared"
+  ],
+  "id": "flute-lower-factory-physical--frozen--shared",
+  "log": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-lower-factory-physical--frozen--shared.log",
+  "log_sha256": "6af11f4c535ef88fbbad0658f761b5d534ca5c00f3d5031b7c4fd70e4b2c7c75",
+  "peak": 0.144936665892601,
+  "statistics": {
+    "audio_seconds": 2.47916666667,
+    "channels": 1,
+    "frames": 119000,
+    "normalization": "none",
+    "peak": 0.144936665893,
+    "preset": "flute",
+    "realtime_factor": 5.38060111144,
+    "render_seconds": 0.460760167,
+    "research_master_semitones": 0,
+    "research_pitch_route": "shared",
+    "rms": 0.0323366464528,
+    "sample_format": "float32",
+    "sample_rate": 48000,
+    "samples_above_unity": 0,
+    "seed": 50,
+    "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+  }
+}

@@ -1,0 +1,245 @@
+{
+  "channels": 1,
+  "common_playback_gain": 1.0,
+  "duration_seconds": 42.95,
+  "effects": false,
+  "fades": false,
+  "frames": 2061600,
+  "gap_count": 23,
+  "manifest_sha256": "5a676f9bf5bac2d4c82919f6b037c41924e75f9857b7b4026ef347c13dd41501",
+  "native_rerenders": 0,
+  "original_native_render_count_unchanged": 24,
+  "output": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/listening-002/comparison.wav",
+  "output_sha256": "210f2ca29541d47c8c3ec12e8f67c82ae6ca0ced985dcd8f1b6fecf61035cf3e",
+  "peak": 0.3173559606075287,
+  "peak_dbfs": -9.969066806326278,
+  "per_segment_normalization": false,
+  "rights": "Public recordings remain local analysis material. This artifact does not imply permission to redistribute creator audio.",
+  "runtime": {
+    "numpy": "1.26.4",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.11.0 (v3.11.0:deaf509e8f, Oct 24 2022, 14:43:23) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "scipy": "1.14.1"
+  },
+  "sample_format": "float32",
+  "sample_rate": 48000,
+  "segments": [
+    {
+      "RMS": 0.08833854253219275,
+      "float32_sample_bytes_sha256": "9628f2d4de8a5a4d308b4b69dd64f984ffec1b42f6b00681061aa17e5c87f79e",
+      "frames": 91200,
+      "index": 1,
+      "input_dtype": "float32",
+      "label": "flute-high-factory-physical / frozen / source",
+      "peak": 0.16930054128170013
+    },
+    {
+      "RMS": 0.08714713680756288,
+      "float32_sample_bytes_sha256": "c880214f3c980e19f41dbd7a320cc5160657eeef8ca36e4db43557fcd4b36b6b",
+      "frames": 91200,
+      "index": 2,
+      "input_dtype": "float32",
+      "label": "flute-high-factory-physical / frozen / shared",
+      "peak": 0.3087562024593353
+    },
+    {
+      "RMS": 0.08716793354463184,
+      "float32_sample_bytes_sha256": "a116e2443c0957fabc5017ae05e36c5ec53b1d6c9d5c64be9f7cfca7aed4909b",
+      "frames": 91200,
+      "index": 3,
+      "input_dtype": "float32",
+      "label": "flute-high-factory-physical / frozen / vco-only",
+      "peak": 0.3079128563404083
+    },
+    {
+      "RMS": 0.08714134765592586,
+      "float32_sample_bytes_sha256": "e602b3a423ea8fb145af60291dc46dea1e6f4ae863e15971244a7acaf61995bc",
+      "frames": 91200,
+      "index": 4,
+      "input_dtype": "float32",
+      "label": "flute-high-factory-physical / frozen / static-master",
+      "peak": 0.3087562024593353
+    },
+    {
+      "RMS": 0.08833854253219275,
+      "float32_sample_bytes_sha256": "9628f2d4de8a5a4d308b4b69dd64f984ffec1b42f6b00681061aa17e5c87f79e",
+      "frames": 91200,
+      "index": 5,
+      "input_dtype": "float32",
+      "label": "flute-high-factory-physical / network-br0 / source",
+      "peak": 0.16930054128170013
+    },
+    {
+      "RMS": 0.09025871455728277,
+      "float32_sample_bytes_sha256": "e5aa3f855b478e0b4884a5ec79f9fb651cdb2ef99d30f5d7f2ab2368229a373d",
+      "frames": 91200,
+      "index": 6,
+      "input_dtype": "float32",
+      "label": "flute-high-factory-physical / network-br0 / shared",
+      "peak": 0.2935370206832886
+    },
+    {
+      "RMS": 0.0903265665707915,
+      "float32_sample_bytes_sha256": "7b2179eef189cfa5d7a44bb81799901414ad335a7c8f274fb057587c227a2715",
+      "frames": 91200,
+      "index": 7,
+      "input_dtype": "float32",
+      "label": "flute-high-factory-physical / network-br0 / vco-only",
+      "peak": 0.2927476167678833
+    },
+    {
+      "RMS": 0.09023908323373483,
+      "float32_sample_bytes_sha256": "ebda5dbb736b303715a115a892ca39b99a48fd2161bdb673addf855951ddced9",
+      "frames": 91200,
+      "index": 8,
+      "input_dtype": "float32",
+      "label": "flute-high-factory-physical / network-br0 / static-master",
+      "peak": 0.2935370206832886
+    },
+    {
+      "RMS": 0.08833854253219275,
+      "float32_sample_bytes_sha256": "9628f2d4de8a5a4d308b4b69dd64f984ffec1b42f6b00681061aa17e5c87f79e",
+      "frames": 91200,
+      "index": 9,
+      "input_dtype": "float32",
+      "label": "flute-high-factory-physical / network-brminus15 / source",
+      "peak": 0.16930054128170013
+    },
+    {
+      "RMS": 0.09746512311543853,
+      "float32_sample_bytes_sha256": "c20aeca0f0e939bda0a36952580658dd685e0bdc2d5f9edaced874a4faff4230",
+      "frames": 91200,
+      "index": 10,
+      "input_dtype": "float32",
+      "label": "flute-high-factory-physical / network-brminus15 / shared",
+      "peak": 0.23346149921417236
+    },
+    {
+      "RMS": 0.09729020357700702,
+      "float32_sample_bytes_sha256": "bf111ffb9d5ebbd7d9015e2a480368f6cca33ebea615311f9ab181cd5e6b7b28",
+      "frames": 91200,
+      "index": 11,
+      "input_dtype": "float32",
+      "label": "flute-high-factory-physical / network-brminus15 / vco-only",
+      "peak": 0.23079174757003784
+    },
+    {
+      "RMS": 0.09751975233754427,
+      "float32_sample_bytes_sha256": "a0017ea15a13c65cd0bfe5e8c1f743985f3a7a67761d571cab8ee5bcb840897f",
+      "frames": 91200,
+      "index": 12,
+      "input_dtype": "float32",
+      "label": "flute-high-factory-physical / network-brminus15 / static-master",
+      "peak": 0.23346149921417236
+    },
+    {
+      "RMS": 0.0914691535782506,
+      "float32_sample_bytes_sha256": "b8a59167ff8e9d795250d28aeebb10881d4c9d23db3b5fc7c28083ff6407ccae",
+      "frames": 57600,
+      "index": 13,
+      "input_dtype": "float32",
+      "label": "flute-lower-factory-physical / frozen / source",
+      "peak": 0.18873220682144165
+    },
+    {
+      "RMS": 0.09308211943607847,
+      "float32_sample_bytes_sha256": "5f8dcfd08e987fe4542251ae1e7833e2e64c8971b3696f64daf6fafc19417f13",
+      "frames": 57600,
+      "index": 14,
+      "input_dtype": "float32",
+      "label": "flute-lower-factory-physical / frozen / shared",
+      "peak": 0.3170134127140045
+    },
+    {
+      "RMS": 0.09309241028645864,
+      "float32_sample_bytes_sha256": "59dd4511c92187fa3c73f5f7f5da0627ec5e54ac8b4b13dcc35c4f5b2fd92aa2",
+      "frames": 57600,
+      "index": 15,
+      "input_dtype": "float32",
+      "label": "flute-lower-factory-physical / frozen / vco-only",
+      "peak": 0.3168751299381256
+    },
+    {
+      "RMS": 0.09307556043305658,
+      "float32_sample_bytes_sha256": "a109886e0d761ece1fc32c5dcf11ca4ade3ce35acb2c92d97604a3e6ed1d7929",
+      "frames": 57600,
+      "index": 16,
+      "input_dtype": "float32",
+      "label": "flute-lower-factory-physical / frozen / static-master",
+      "peak": 0.3173559606075287
+    },
+    {
+      "RMS": 0.0914691535782506,
+      "float32_sample_bytes_sha256": "b8a59167ff8e9d795250d28aeebb10881d4c9d23db3b5fc7c28083ff6407ccae",
+      "frames": 57600,
+      "index": 17,
+      "input_dtype": "float32",
+      "label": "flute-lower-factory-physical / network-br0 / source",
+      "peak": 0.18873220682144165
+    },
+    {
+      "RMS": 0.0960921081215941,
+      "float32_sample_bytes_sha256": "1ee432d6ca5dfa47ceba8a56bd01d612480fc5176ace6e6a0a97764e89c69437",
+      "frames": 57600,
+      "index": 18,
+      "input_dtype": "float32",
+      "label": "flute-lower-factory-physical / network-br0 / shared",
+      "peak": 0.29869601130485535
+    },
+    {
+      "RMS": 0.09614116146495873,
+      "float32_sample_bytes_sha256": "0cdd4da25df0d5c80b23b1f408e4871006df93ebd2c0c82023285b2f9dfc22d8",
+      "frames": 57600,
+      "index": 19,
+      "input_dtype": "float32",
+      "label": "flute-lower-factory-physical / network-br0 / vco-only",
+      "peak": 0.29861146211624146
+    },
+    {
+      "RMS": 0.0960566087132514,
+      "float32_sample_bytes_sha256": "a669e0e42225d1b4e9b11a73a4ae0a79c0d85ff2628c59ff32df2346c8f26dd7",
+      "frames": 57600,
+      "index": 20,
+      "input_dtype": "float32",
+      "label": "flute-lower-factory-physical / network-br0 / static-master",
+      "peak": 0.29958006739616394
+    },
+    {
+      "RMS": 0.0914691535782506,
+      "float32_sample_bytes_sha256": "b8a59167ff8e9d795250d28aeebb10881d4c9d23db3b5fc7c28083ff6407ccae",
+      "frames": 57600,
+      "index": 21,
+      "input_dtype": "float32",
+      "label": "flute-lower-factory-physical / network-brminus15 / source",
+      "peak": 0.18873220682144165
+    },
+    {
+      "RMS": 0.10403185576011904,
+      "float32_sample_bytes_sha256": "44f4cb4590a3a2656c04fb5f701f25c7ddb29fa9ddc262fe0a086dc1c6c5d178",
+      "frames": 57600,
+      "index": 22,
+      "input_dtype": "float32",
+      "label": "flute-lower-factory-physical / network-brminus15 / shared",
+      "peak": 0.2375887930393219
+    },
+    {
+      "RMS": 0.1038898154801924,
+      "float32_sample_bytes_sha256": "2adb19990f8d11184abc032b1b22a917f93e9903c07fe3131c154bdadc9bbe29",
+      "frames": 57600,
+      "index": 23,
+      "input_dtype": "float32",
+      "label": "flute-lower-factory-physical / network-brminus15 / vco-only",
+      "peak": 0.23704509437084198
+    },
+    {
+      "RMS": 0.10412344748052853,
+      "float32_sample_bytes_sha256": "4dba7030f8e4da72add59491fc5a2c387dd76fed90b4d2224c7aa2f082ec75c5",
+      "frames": 57600,
+      "index": 24,
+      "input_dtype": "float32",
+      "label": "flute-lower-factory-physical / network-brminus15 / static-master",
+      "peak": 0.2394162267446518
+    }
+  ],
+  "status": "pass"
+}

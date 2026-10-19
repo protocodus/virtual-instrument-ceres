@@ -1,0 +1,33 @@
+{
+  "audio_source_or_transfer_metrics_read": false,
+  "candidate_at_alpha_lower_bound": true,
+  "column_norms": [
+    0.01145498739503382,
+    0.3907321987361551,
+    9.31781387695529
+  ],
+  "dynamic_scalar_statistics_recomputed": 50,
+  "dynamic_statistic_max_difference": 0,
+  "every_logged_evaluation_in_bounds": true,
+  "final_residual_dot_product": 89.3962241337443,
+  "hp_fixed_at_zero_consistent": true,
+  "initial_residual_dot_product": 178.6195667335221,
+  "input_sha256": {
+    "Docs/accuracy/joint-calibration/dynamic-qualification-001/report.json": "7bf8fd9b3bfaa9503d8eb0c22b6ddce043d158f779bb790d8bdd98bf1edeef8b",
+    "Docs/accuracy/joint-calibration/fit-001/candidate.json": "0d77a1fe3e27119869e1be4f2fef2f5bfab779b3dcd5dc0d61edda8aac021245",
+    "Docs/accuracy/joint-calibration/fit-replay-001/report.json": "61583571f31be2b95bd1b860558e2e54d6b80397842c88be6a72bd85d74c5587",
+    "Docs/accuracy/joint-calibration/jacobian-001/report.json": "8223ccf87d6e434336698ea79cbc6141c9881c572594053f4a365740e9b801b2"
+  },
+  "jacobian_shape": [
+    628,
+    3
+  ],
+  "last_evaluation_matches_frozen_candidate": true,
+  "logged_evaluations": 11,
+  "model_or_optimizer_rerun": false,
+  "native_validation_required": true,
+  "normalized_LP_alpha_singular_ratio": 0.17307064893407714,
+  "replay_difference_arrays_all_zero": true,
+  "reviewer": "/root/hardware_research",
+  "status": "independent_stored_evidence_review_pass"
+}

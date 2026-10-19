@@ -1,0 +1,26 @@
+{
+  "id": "brass-history10-disabled",
+  "kind": "disabled",
+  "original_id": "brass-history10",
+  "audio": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/brass-history10-disabled.wav",
+  "audio_sha256": "5bb646f7ccfad9feda3bd6d27a4ba26a2222f3fe5c1a05f1570af75f776669f0",
+  "statistics": {
+    "sample_rate": 48000,
+    "frames": 96800,
+    "channels": 1,
+    "sample_format": "float32",
+    "seed": 50,
+    "preset": "brass1",
+    "peak": 0.196948692203,
+    "rms": 0.0204251122518,
+    "samples_above_unity": 0,
+    "render_seconds": 0.368123375,
+    "audio_seconds": 2.01666666667,
+    "realtime_factor": 5.47823584054,
+    "normalization": "none",
+    "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+  },
+  "peak": 0.19694869220256805,
+  "log_sha256": "99a4d431393d28de21917fa26439c120a537061775791e19296cf53966acad23",
+  "byte_exact_to_frozen": true
+}

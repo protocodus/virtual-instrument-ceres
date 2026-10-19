@@ -1,0 +1,59 @@
+{
+  "error_sign": "native minus frozen surrogate prediction",
+  "input_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/candidate-prediction-check-001/check_predictions.py": "5fb4deb65848eb09f15916f1233cdcad887f57fbc523c2b6952ca772f466b190",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/fit-001/candidate.json": "0d77a1fe3e27119869e1be4f2fef2f5bfab779b3dcd5dc0d61edda8aac021245",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/fit-plan.json": "0f096e6270700c568dba9a04e5548f497cf0cabb46f7149fb2644f50afaee3b1",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/fit-replay-001/declaration.json": "46bde32fe6b561e42499fdf7aefd8a9f2e86e6d2e953c67dce3cd5715584d5ff",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/fit-replay-001/replay.py": "ba3136d863a796946cb71d25b0b2fe70fe6b5fa980ffabae7ae00d1de7dfe7d2",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/fit-replay-001/report.json": "61583571f31be2b95bd1b860558e2e54d6b80397842c88be6a72bd85d74c5587",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-validation-001/brass-history20-render.json": "786fe68396834becc4498b98d6f6bb9e51e74a82cc5955d5ea5ca3b128848b07",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-validation-001/brass-history20.patch": "469bd58e7031bf0d848b4756d7ded7617ff1099b7ece7e8876fcf3a589c6cebb",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-validation-001/brass-history20.wav": "148dacf3697ea510d6b353a7f420794eb151f9b530f3721ba0611e588e1d6467",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-validation-001/flute-high-factory-physical-render.json": "bedd3f9fed47d2ce79c75240d8e7f9cce972012437de3926947b163857eab4c6",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-validation-001/flute-high-factory-physical.patch": "6dae5fd6d1073fe5e7b7a9d3a9d9a3d8daf12893f0fe684c61767f76b42a13de",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-validation-001/flute-high-factory-physical.wav": "a78aaab32cedfbd514c7bac421ba80a8971e60f9d21277f5c24141ee1456079d",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-validation-001/plan.json": "3297574e3c04a8204c0885812a2ed7f79619d1940b1fcb189128050ec4fec49a",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-validation-001/report.json": "1ab95a9882a87021f843cd5c61f40bd66546daf5753cc0b854df336577f376a0",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/network.py": "b03cdb48f68c73cc70312cb2c8061d69a1d81fea1f6e0330464f8e052f631297",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/joint_calibration.py": "5c4b5aabafc28cc5d8dcaf502a2956e03899f0dd8977d8f7d94410a4a06d7114",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/joint_fit.py": "f563762e55ab2b0c41ff4c4ba34cac103c936dc55115b5683a8a2364f330dab6",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/metrics.py": "34cba33ccf34b62be818518cc34a5d4d48ece032366b1b238a5075f94b9935cd"
+  },
+  "model_evaluations": 0,
+  "new_audio_renders": 0,
+  "numeric_reproduction_tolerance_db": 1e-10,
+  "optimizer_calls": 0,
+  "runtime": {
+    "numpy": "1.26.4",
+    "numpy_configuration": "Build Dependencies:\n  blas:\n    detection method: pkgconfig\n    found: true\n    include directory: /opt/arm64-builds/include\n    lib directory: /opt/arm64-builds/lib\n    name: openblas64\n    openblas configuration: USE_64BITINT=1 DYNAMIC_ARCH=1 DYNAMIC_OLDER= NO_CBLAS=\n      NO_LAPACK= NO_LAPACKE= NO_AFFINITY=1 USE_OPENMP= SANDYBRIDGE MAX_THREADS=3\n    pc file directory: /usr/local/lib/pkgconfig\n    version: 0.3.23.dev\n  lapack:\n    detection method: internal\n    found: true\n    include directory: unknown\n    lib directory: unknown\n    name: dep4350285776\n    openblas configuration: unknown\n    pc file directory: unknown\n    version: 1.26.4\nCompilers:\n  c:\n    args: -fno-strict-aliasing, -DBLAS_SYMBOL_SUFFIX=64_, -DHAVE_BLAS_ILP64\n    commands: cc\n    linker: ld64\n    linker args: -fno-strict-aliasing, -DBLAS_SYMBOL_SUFFIX=64_, -DHAVE_BLAS_ILP64\n    name: clang\n    version: 14.0.0\n  c++:\n    args: -DBLAS_SYMBOL_SUFFIX=64_, -DHAVE_BLAS_ILP64\n    commands: c++\n    linker: ld64\n    linker args: -DBLAS_SYMBOL_SUFFIX=64_, -DHAVE_BLAS_ILP64\n    name: clang\n    version: 14.0.0\n  cython:\n    commands: cython\n    linker: cython\n    name: cython\n    version: 3.0.8\nMachine Information:\n  build:\n    cpu: aarch64\n    endian: little\n    family: aarch64\n    system: darwin\n  host:\n    cpu: aarch64\n    endian: little\n    family: aarch64\n    system: darwin\nPython Information:\n  path: /private/var/folders/76/zy5ktkns50v6gt5g8r0sf6sc0000gn/T/cibw-run-iyy0yn4s/cp311-macosx_arm64/build/venv/bin/python\n  version: '3.11'\nSIMD Extensions:\n  baseline:\n  - NEON\n  - NEON_FP16\n  - NEON_VFPV4\n  - ASIMD\n  found:\n  - ASIMDHP\n  not found:\n  - ASIMDFHM\n\n",
+    "python": "3.11.0 (v3.11.0:deaf509e8f, Oct 24 2022, 14:43:23) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "scipy": "1.14.1",
+    "thread_environment": {
+      "MKL_DYNAMIC": null,
+      "MKL_NUM_THREADS": null,
+      "OMP_DYNAMIC": null,
+      "OMP_NUM_THREADS": null,
+      "OPENBLAS_NUM_THREADS": null,
+      "VECLIB_MAXIMUM_THREADS": null
+    },
+    "threadpools": [
+      {
+        "architecture": "armv8",
+        "filepath": "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/numpy/.dylibs/libopenblas64_.0.dylib",
+        "internal_api": "openblas",
+        "num_threads": 10,
+        "prefix": "libopenblas",
+        "threading_layer": "pthreads",
+        "user_api": "blas",
+        "version": "0.3.23.dev"
+      }
+    ]
+  },
+  "source_target_files_read": false,
+  "training_ids": [
+    "flute-high-factory-physical",
+    "brass-history20"
+  ],
+  "transfer_audio_or_metrics_read": false
+}

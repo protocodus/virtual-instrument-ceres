@@ -1,0 +1,10 @@
+Command: python3 Tools/accuracy/joint_calibration.py check --attempt attempt-001
+Session: 11711
+Exit code: 1
+Traceback (most recent call last):
+  File "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/joint_calibration.py", line 514, in <module>
+    else: check(args.attempt)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/joint_calibration.py", line 503, in check
+    assert actual==saved,'Preserve differing result; do not overwrite evidence'
+AssertionError: Preserve differing result; do not overwrite evidence

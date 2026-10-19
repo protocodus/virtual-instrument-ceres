@@ -1,0 +1,51 @@
+{
+  "completion_proven": false,
+  "consecutive_blocked_goal_turns": 0,
+  "default_route": "Shared",
+  "derived_listening_WAVs": 1,
+  "derived_listening_duration_seconds": 42.95,
+  "failed_listening_attempts_preserved": [
+    "listening-001"
+  ],
+  "frozen_original_plan_sha256": "3482bca5ed0305c2a384125d05da73d19c17ed3c7f699e8cde262c045151071a",
+  "gain_fits": 0,
+  "goal_status": "active",
+  "independently_reviewed_bound_files": 180,
+  "known_byte_exact_controls": 11,
+  "metric_replay_exact_difference_count": 0,
+  "native_only_interface": true,
+  "new_native_reference_WAVs": 24,
+  "next_safe_action": "Inspect the retained key/voice/onset evidence around both Flute excerpts and the202.60\u2013202.88presettransition, reading prior event/EG-loading/Q-memory audits first. Determine which capacitor/gate-history constraints are actually source-supported before declaring another experiment. The pitch-route effect is small/mixed and does not authorize a new calibration fit or production MIDI change.",
+  "no_GUI_changes": true,
+  "no_samples_in_synthesis": true,
+  "open_requirements": [
+    "Raw factory filter calibration remains inaccurate.",
+    "Flute level trajectories and Brass envelope/tail errors remain unresolved.",
+    "No independent known-settings/original-MIDI holdout; original controls, gates, pressure and trims partly inferred."
+  ],
+  "parameter_fits": 0,
+  "previous_goal_turn_classification": "progress",
+  "prior_fit_validation_permission": false,
+  "prior_stopped_fit_remains_stopped": true,
+  "production_mapping_changed": false,
+  "recorded_utc": "2026-10-19T00:00:52.347010+00:00",
+  "report_sha256": {
+    "RESULT.md": "7be3ce5ba285526fce5e884c3801a156cf5b988fca319d28333f636c72afcd0f",
+    "code-review.md": "83eb09c9f57966d2ddae9ed6a9ac6590036f82b6ac925621752819cb713b321a",
+    "listening-002/report.json": "9aaad3d8ab62145d54d42352ad62a3e335ca6fe00d3991381c3ea33724314f7d",
+    "listening-002/verification.json": "5eeb90a994fa7d231136f32db0a45394175cc9c8676f34f0157b401d7dc761c4",
+    "method-review.md": "19b25153ab335654f8b2f5579f87a053cfd09f0d13ee05d6ce41e628788eae18",
+    "plan.json": "ed455b13daf60509851c856c973d9d2029c80b481c61161975a34ae28bb0d2d7",
+    "review-001/report.json": "cda86da84db5571d81583962d82326d0d34f3d58f892476c7775ac556e9d7b50",
+    "run-001/check-001/report.json": "bb60e958f9d537909b6d4cd9d6c2adcec3cfbf7d887ca97738c6e176212a1844",
+    "run-001/report.json": "edf435a7ece847beb3f052c7ad2d658c7e87e49d31983cf57f1766b97db112eb",
+    "runner-review.md": "a0f8af553b9f30828a58070292e601da7818a67cc749dc092168e6f49b9f3d07",
+    "source-review.md": "02565bfb5eff66f7d1d6d486a8c72b2233337501be604457a48f559932e3b261"
+  },
+  "research_commit": "7e82a5ba212ebe5bf9cbf41967839a4aa3fbaf7d",
+  "research_worktree": "/tmp/ceres-pitch-route-20261019",
+  "retained_corrected_SUB_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "source_events_or_MIDI_changed": false,
+  "tested_compiled_sources_match_committed_blobs": true,
+  "this_goal_turn_classification": "progress"
+}

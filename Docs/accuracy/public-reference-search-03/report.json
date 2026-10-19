@@ -1,0 +1,117 @@
+{
+  "schema": "ceres-cs50-public-reference-qualification-v3",
+  "date": "2026-10-18",
+  "query_count": 8,
+  "queries": [
+    "Yamaha CS-50 factory presets SynthMania demonstration",
+    "Yamaha CS-50 AnalogAudio1 presets demo",
+    "Yamaha CS-50 Gattobus midi demo presets",
+    "Yamaha CS-50 held note factory presets recording MIDI",
+    "\"CS-50\" \"SynthMania\"",
+    "\"CS-50\" \"AnalogAudio1\"",
+    "\"CS50\" \"Gattobus\"",
+    "\"CS-50\" \"presets\" -site:reddit.com -CS1x -CS6x -CP5 -reface -software -Behringer"
+  ],
+  "result": "No new strict reference qualified",
+  "new_strict_references": 0,
+  "source_acquisition_scope": "Text metadata only; no video/audio download, viewing or measurements in this pass",
+  "prior_source_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ACTIVE-SOURCES.md": "12043e5a7e7d31325e993ef35260c692df39906670700bc9ebbf2f7cedba6660",
+    "/private/tmp/ceres-cs50-1x8LGd/references/reference_candidates.json": "d539cc86fa0fa49541868f7ebaaf0f910c7d33dd2b8b762bf92347e1cf93aa4c",
+    "/private/tmp/ceres-cs50-1x8LGd/research/public-reference-search-02.md": "a894714f13822eb89a7cd72699d65cfe166e003a9515422a9192a75e8ac548bf",
+    "/private/tmp/ceres-cs50-1x8LGd/research/public-reference-extension.md": "d72a97ad2a884cb646121e1648091b5cf9d331c5f44790cd0e5ec693b29bfe40"
+  },
+  "candidates": [
+    {
+      "id": "thomas_faurby",
+      "status": "newly_screened_unqualified",
+      "effects_evidence": "unknown",
+      "creator_claims_factory_presets": false,
+      "complete_control_settings_known": false,
+      "original_hardware_MIDI_available": false,
+      "measured_gate_timing_available": false,
+      "video_visually_inspected_this_pass": false,
+      "strict_eligible": false,
+      "url": "https://www.youtube.com/watch?v=-wExnI0y008",
+      "creator": "Thomas Faurby",
+      "published": "2011-12-06T02:15:26-08:00"
+    },
+    {
+      "id": "syntheticmachines_multitrack",
+      "status": "newly_screened_rejected",
+      "effects_evidence": "explicit_multitrack_external_effects",
+      "creator_claims_factory_presets": false,
+      "complete_control_settings_known": false,
+      "original_hardware_MIDI_available": false,
+      "measured_gate_timing_available": false,
+      "video_visually_inspected_this_pass": false,
+      "strict_eligible": false,
+      "url": "https://www.youtube.com/watch?v=22A7arAclog",
+      "creator": "SyntheticMachines",
+      "published": "2010-05-20T08:21:08-07:00"
+    },
+    {
+      "id": "synth4ever_overview",
+      "status": "known_rechecked",
+      "effects_evidence": "explicit_stereo_chorus",
+      "creator_claims_factory_presets": false,
+      "complete_control_settings_known": false,
+      "original_hardware_MIDI_available": false,
+      "measured_gate_timing_available": false,
+      "video_visually_inspected_this_pass": false,
+      "strict_eligible": false,
+      "url": "https://www.youtube.com/watch?v=j1kM0EpneNc",
+      "creator": "synth4ever",
+      "published": "2021-08-11T06:00:17-07:00"
+    },
+    {
+      "id": "automaticgainsay_presets",
+      "status": "known_rechecked",
+      "effects_evidence": "unknown",
+      "creator_claims_factory_presets": true,
+      "complete_control_settings_known": false,
+      "original_hardware_MIDI_available": false,
+      "measured_gate_timing_available": false,
+      "video_visually_inspected_this_pass": false,
+      "strict_eligible": false,
+      "url": "https://www.youtube.com/watch?v=HupZtUPiJLU",
+      "creator": "AutomaticGainsay",
+      "published": "2013-02-19T02:12:57-08:00"
+    },
+    {
+      "id": "doctor_mix_presets",
+      "status": "known_rechecked",
+      "effects_evidence": "unknown",
+      "creator_claims_factory_presets": true,
+      "complete_control_settings_known": false,
+      "original_hardware_MIDI_available": false,
+      "measured_gate_timing_available": false,
+      "video_visually_inspected_this_pass": false,
+      "strict_eligible": false,
+      "url": "https://www.youtube.com/watch?v=nl19OnD8SrY",
+      "creator": "Doctor Mix",
+      "published": "2018-08-17T08:00:05-07:00"
+    }
+  ],
+  "site_screen": [
+    {
+      "url": "https://synthmania.com/?s=CS-50",
+      "result": "Site search returned no results; not exhaustive archive absence"
+    },
+    {
+      "url": "https://www.vintagesynth.com/yamaha/cs-50",
+      "result": "Located creator links22A7arAclog and-wExnI0y008; technical claims not used"
+    },
+    {
+      "url": "https://www.reddit.com/r/synthesizers/comments/p2grzu/the_yamaha_cs50/",
+      "result": "Primary author synth4ever links own CS50 review; no performance/settings dataset supplied"
+    }
+  ],
+  "next_step": "A separate on-service visual qualification of the already-known AutomaticGainsay preset demonstration, before acquiring or fitting any passage. Do not rebrand this existing lead as new independent calibration.",
+  "native_render_calls": 0,
+  "DSP_changes": false,
+  "GUI_changes": false,
+  "purchases": false,
+  "creator_messages_sent": false,
+  "creator_metadata_sha256": "2c3d5991c4d4c868b8f00656b0f2f590bb808a4a8f43e9ad7f71e096a064cfca"
+}

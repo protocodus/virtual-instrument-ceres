@@ -1,0 +1,25 @@
+{
+  "id": "flute-high-factory-physical-unfitted",
+  "kind": "unfitted",
+  "original_id": "flute-high-factory-physical",
+  "audio": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/flute-high-factory-physical-unfitted.wav",
+  "audio_sha256": "01b41a0f5067565eaff0f496e08f264c8b35eb315d4eb16a01750927be3de070",
+  "statistics": {
+    "sample_rate": 48000,
+    "frames": 154800,
+    "channels": 1,
+    "sample_format": "float32",
+    "seed": 50,
+    "preset": "flute",
+    "peak": 0.135921895504,
+    "rms": 0.0340300851142,
+    "samples_above_unity": 0,
+    "render_seconds": 0.683214416,
+    "audio_seconds": 3.225,
+    "realtime_factor": 4.72033365291,
+    "normalization": "none",
+    "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+  },
+  "peak": 0.1359218955039978,
+  "log_sha256": "925e8e5a1dcfbc377cffc1d20d47b577b2bfea7db6bb9ba4d3d2cd22b7745efd"
+}

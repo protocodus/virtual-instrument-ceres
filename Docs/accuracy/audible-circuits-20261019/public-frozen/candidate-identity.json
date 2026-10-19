@@ -1,0 +1,15 @@
+{
+  "binary": "/private/tmp/ceres-audible-integrated-20261019/build/ceres_render",
+  "source_root": "/private/tmp/ceres-audible-integrated-20261019",
+  "binary_sha256": "59964a09832bb14772976e5dd53e2b61f5f65de6278d46767948800669dc3a3a",
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "e90e883a9a41a61ce596d5fc316e3cca3f0f2fa03422ea4744e61d70faa17952",
+    "Source/DSP/ceres.cpp": "3fe87405e051b6bfade6b37324789eb1567f83e61cd8a493d4c5a1e0a6c6fa31",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "3d922bcfbe24bf253e6338ab32a9348830cb0ef21cd8f74607c8ed06c5151b6d"
+  },
+  "source_commit": "28ddadca6b546f2f81b18adc2d060449214c4da3",
+  "declaration_sha256": "34bd7b5e340a5b999002fe95cc5154db9f171931c29f83560cdcc94300c6ff57",
+  "root_final_ready_confirmed": true
+}

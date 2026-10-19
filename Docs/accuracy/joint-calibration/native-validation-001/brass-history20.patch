@@ -1,0 +1,10 @@
+# Single shared candidate, fixed before transfer scoring.
+octave=-1
+lfo_rate=6.6692178847138601
+tremolo=0.83104137105739762
+global_release=0.43688480401270802
+calibration_network=2
+calibration_hp_bias=0
+calibration_lp_bias=-10.423952819965173
+calibration_alpha=0.50000000000000011
+brilliance=-15

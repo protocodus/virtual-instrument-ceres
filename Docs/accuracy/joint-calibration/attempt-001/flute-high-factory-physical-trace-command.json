@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/attempt-001/control_trace",
+    "flute",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/flute-high-factory-physical-frozen.patch",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.events.tsv",
+    "154800",
+    "50",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/attempt-001/flute-high-factory-physical.f64"
+  ],
+  "returncode": 0,
+  "stderr": "",
+  "stdout": "{\"records\":51600,\"columns\":45,\"rate\":16000,\"frames\":154800,\"audio_exported\":false,\"parameters\":{\"saw\":1,\"pulse\":0,\"sine\":0,\"noise\":0,\"pwmDepth\":0,\"pwmRate\":0.20000000000000001,\"pulseWidth\":0.5,\"hpCutoff\":43.848330013569772,\"lpCutoff\":1930.5852737779917,\"hpResonance\":0.64300000000000002,\"lpResonance\":0.76700000000000002,\"hpEnvelopeScale\":0.12409090909090907,\"lpEnvelopeScale\":0.53936170212765966,\"keyTrack\":1,\"brilliance\":0,\"filterLevel\":1,\"ampLevel\":1,\"volume\":0.55000000000000004,\"outputTrimDb\":0,\"octave\":-1,\"tuneCents\":0,\"voiceSpreadCents\":0,\"driftCents\":0,\"vibratoCents\":0,\"filterLfo\":0,\"lfoRate\":5,\"lfoWaveform\":0,\"tremolo\":0,\"ringMix\":0,\"pressureFilter\":0,\"pressureVolume\":0,\"pressureVibrato\":0,\"velocitySensitivity\":0,\"resetMicroseconds\":6,\"drive\":1}}\n"
+}

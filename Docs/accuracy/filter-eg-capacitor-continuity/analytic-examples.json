@@ -1,0 +1,72 @@
+{
+  "idle_eg": {
+    "assumption": "existing normalized release law retained while idle",
+    "difference_volts": 3.5397289219206893,
+    "elapsed_seconds": 0.05,
+    "existing_hp_gm_octave_difference": 0.43924817985652187,
+    "existing_lp_gm_octave_difference": 1.9091942163976485,
+    "existing_lp_gm_ratio": 3.7559925890112886,
+    "fixed_filter_floor_is_additive": true,
+    "new_il_volts": -5.0,
+    "old_il_volts": 0.0,
+    "release_t60_seconds": 1.0,
+    "release_tau_seconds": 0.14476482730108395,
+    "retained_voltage": -1.4602710780793107,
+    "snap_voltage": -5.0
+  },
+  "inputs": {
+    "/tmp/ceres-cs50-1x8LGd/research/cs-servicing-guide.pdf": "2738f7ddc46f0bedbab38dcad8e2c112c41b3e6ca34670d471d0cb8c0dbde633",
+    "/tmp/ceres-cs50-1x8LGd/research/cs-servicing-guide.txt": "602674a552fb6ca2c45b3fa6f90af37878e60720b098b93c36aca75011b3f478",
+    "/tmp/ceres-cs50-1x8LGd/research/envelope-audit-crop.png": "83e9b64111247f63488042505e2a3dd914f565ce00fd56561e09c5d1419e1b95",
+    "/tmp/ceres-cs50-1x8LGd/research/envelope-timing-audit.md": "83cd46a34692545ee6f55ad488e7b9b1a64caa737cc0f311f8dc2b5ba1130a82",
+    "/tmp/ceres-cs50-1x8LGd/research/envelopes.png": "4eaa85ee2bf5c5899aca1e6f53065eaef9af64a247c0ed8cb4cd8444e20976c2",
+    "/tmp/ceres-cs50-1x8LGd/research/filter-envelope-derivation.md": "153727f5c9cc909fd45105821eb802cb9fa0ddbf689ecabf1061244d686b8a2a",
+    "/tmp/ceres-cs50-1x8LGd/research/global-resonance-loading.md": "34d14e4c46e4527b65f83deb58af2220053850e254c4965010ff99e86891e41f",
+    "/tmp/ceres-cs50-1x8LGd/research/ic-guide-033.png": "9e72b5a45d9a1fb3c3ca9f17cb31aea8c5bda1bf28602b9e863533050d200c3d",
+    "/tmp/ceres-cs50-1x8LGd/research/input-coupling-review.md": "a294a49d94c8d904b7eab79c959160e2e2c4c62f999f41045536b7dc43884a53",
+    "/tmp/ceres-cs50-1x8LGd/research/output-coupling-integration-review.md": "fc55eea9f631faad9168c76aa09669418b283d8d37ca6bf69af115c1ceefdaea",
+    "/tmp/ceres-cs50-1x8LGd/research/q-control-loading-followup.md": "1ab19f61e46faead883cb37612703a5f80e93dfb57d29d74850f1743239b0bb9",
+    "/tmp/ceres-cs50-1x8LGd/research/q-feedback-derivation.md": "06f710e2e7cac5fcfffce9dea53eb5a75be32c1b5ebd75eb8b92778a24edaad3",
+    "/tmp/ceres-cs50-1x8LGd/research/q-m-filter-full.png": "027b5dad4c0c126b36f94911c0f517f40136fc6636e7ff37334842cc4f2570dc",
+    "/tmp/ceres-cs50-1x8LGd/research/resonance-control-dynamics.md": "6f73f0a769bc5268af1b9228751338204e84d158e9e7deedbb8e16be55479911",
+    "/tmp/ceres-cs50-1x8LGd/research/service1.pdf": "c3a4b0d4e27e9af90c88258d03a1c09c5d080ea162e562d9bf267fc8ffbbadc1",
+    "/tmp/ceres-cs50-1x8LGd/research/service2.pdf": "1102e55b949378e7776555bca1a4d73105ca2d76d6fcf3aa4c2b103566201cfc",
+    "/tmp/ceres-cs50-1x8LGd/research/yamaha-ic-guide.pdf": "d728bfa1b5dc4575414f8d2bca4a13aef95008f7f2ae21b6e2e9cc28f8c2ee09",
+    "/tmp/ceres-pitch-route-20261019/Source/DSP/ceres.cpp": "7b0bfc9b9ff2377390ca43ebc4491bf804d53e83ebcff273dfa20cbcfd780306",
+    "/tmp/ceres-pitch-route-20261019/Source/DSP/ceres.hpp": "dac1311689d81dfc62b7d2e3bf7e67e7c8a1c85c93dd91a8facaf17db2562990"
+  },
+  "producer": {
+    "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/filter-eg-capacitor-continuity/analytic_examples.py",
+    "sha256": "10cdab0a3c819daed27e00388db0a74d6ac4d18cbd275c89086a2236099f5822"
+  },
+  "q": {
+    "assumption": "stiff source voltages and zero incremental pin-7 current",
+    "bare_integrator_hz": 1000.0,
+    "final_resonance": 0.8,
+    "initial_resonance": 0.2,
+    "rows": [
+      {
+        "lp_1khz_gain_vs_instant_final_db": -9.289593022578268,
+        "resonance": 0.19999999999999996,
+        "time_seconds": 0
+      },
+      {
+        "lp_1khz_gain_vs_instant_final_db": -9.031974724745309,
+        "resonance": 0.22666217823902945,
+        "time_seconds": 0.05
+      },
+      {
+        "lp_1khz_gain_vs_instant_final_db": -5.827623783475914,
+        "resonance": 0.5,
+        "time_seconds": 0.7624618986159398
+      },
+      {
+        "lp_1khz_gain_vs_instant_final_db": -1.5171742362637264,
+        "resonance": 0.74,
+        "time_seconds": 2.532843602293451
+      }
+    ],
+    "tau_seconds": 1.1
+  },
+  "scope": "Constant-only conditional examples. No model/audio execution or hardware calibration."
+}

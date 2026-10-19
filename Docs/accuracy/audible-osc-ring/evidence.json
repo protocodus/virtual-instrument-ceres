@@ -1,0 +1,162 @@
+{
+  "date": "2026-10-19",
+  "fairchild_primary_access": {
+    "attempts": [
+      {
+        "method": "web.open and ordinary curl -L --fail",
+        "result": "403 Forbidden",
+        "url": "https://www.bitsavers.org/components/fairchild/_dataBooks/1971_Fairchild_Linear_Integrated_Circuits_Data_Catalog.pdf"
+      },
+      {
+        "method": "ordinary curl -L --fail",
+        "result": "403 Forbidden",
+        "url": "https://bitsavers.trailing-edge.com/components/fairchild/_dataBooks/1971_Fairchild_Linear_Integrated_Circuits_Data_Catalog.pdf"
+      },
+      {
+        "method": "ordinary curl -L --fail --max-time90",
+        "result": "connection timeout after75.134s; no PDF acquired",
+        "url": "https://archive.decromancer.ca/bitsavers.org/components/fairchild/_dataBooks/1971_Fairchild_Linear_Integrated_Circuits_Data_Catalog.pdf"
+      },
+      {
+        "method": "ordinary curl -L --fail",
+        "result": "403 Forbidden",
+        "url": "http://bitsavers.org/components/fairchild/_dataBooks/1971_Fairchild_Linear_Integrated_Circuits_Data_Catalog.pdf"
+      }
+    ],
+    "indexed_primary_text_only": "Search returned printed192 data-table snippet: signal-port resistance200k under specified test conditions; input bias current for both ports12uAtyp. Not visually verified. No carrier resistance or transistor parameters adopted.",
+    "requested_url": "https://www.bitsavers.org/components/fairchild/_dataBooks/1971_Fairchild_Linear_Integrated_Circuits_Data_Catalog.pdf",
+    "transistor_diagram_visually_verified": false
+  },
+  "input_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/evidence/guide-ring-61.png": "6b3900f64b2bb8a98470d0a988f7aa4da371b520d212bfd5342f9f82deaca64a",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/evidence/guide-ring-carrier-62.png": "03608a61e96300d15a3880c450cc4c5c19cfe914fd6b801ca2ea1b4e4fa0d46c",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/evidence/pra-ring-carrier-bias.png": "be383c7758f7aa1038ed40f134f5e9b72fc9736e31600831309e3892048175a7",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/passive-carrier-result.json": "18208b88e75a2f3dd5fbbcdfd02b95557ba3a3eb8e05bb2b3d1c5ad2cdb392a2",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/passive_carrier.py": "e94cc5d976540dbee545dc4bc3ab86ba0a926e157fd010d85c540cb762bb1a74",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/source-review.md": "ebc209139290d3e25690248e842907cc3442f781c432d541c95c66dafff80002",
+    "/tmp/ceres-cs50-1x8LGd/experiments/vco-conditioning-01/benchmark-qa.json": "8a6703720c410cbdbcc559de520f5cc30f7198ef5e7ac31a43ba521d5013d7cd",
+    "/tmp/ceres-cs50-1x8LGd/experiments/vco-conditioning-01/benchmark.json": "4250084944f0f5f9eb05305eb8e727a9a84724fc98c3dc4a35bd8c55fb5efeda",
+    "/tmp/ceres-cs50-1x8LGd/experiments/vco-conditioning-01/conditioned-saw-59/source.diff": "34d7e0649d086a72b227722c69515c318c3f84de7719291b6b9c5bb38ddfbb7f",
+    "/tmp/ceres-cs50-1x8LGd/research/brass1-ring-routing.json": "8a69dd587bd4ff2a2797ec99352d2daa40369baa3124065d493973e0f5631395",
+    "/tmp/ceres-cs50-1x8LGd/research/brass1-ring-routing.md": "f15e7828781fffe4dec98ba2cd34a7ff890c6b4016dc3d868186c1571e140ce1",
+    "/tmp/ceres-cs50-1x8LGd/research/cs-servicing-guide.pdf": "2738f7ddc46f0bedbab38dcad8e2c112c41b3e6ca34670d471d0cb8c0dbde633",
+    "/tmp/ceres-cs50-1x8LGd/research/service2.pdf": "1102e55b949378e7776555bca1a4d73105ca2d76d6fcf3aa4c2b103566201cfc",
+    "/tmp/ceres-cs50-1x8LGd/research/vco-conditioning-37.png": "46b5114a45a7738ae1ba893eccd867bfa3a18fced594cea2cc72eacced053f19",
+    "/tmp/ceres-cs50-1x8LGd/research/vco-conditioning-followup.md": "a6365c02f7cf6a2b95063a126de7cebf3dc3cc5133695dd39e69697e8407ed93",
+    "/tmp/ceres-cs50-1x8LGd/research/vco-followup-guide-38.png": "7c4ea0cb75873fb1e09d1730bb6f81a41bd9843bb78d758f2191fdf9c8ea4f4b",
+    "/tmp/ceres-cs50-1x8LGd/research/vco-followup-guide-39.png": "83455fd632e89f1f3b2ab39abb6c0cda8505dc2db5a10bbdf0a982b6c475209c",
+    "/tmp/ceres-cs50-1x8LGd/research/vco-followup-m-components.png": "f962facc02a0e686decff87a877937668a2e8369aeaa2b26b760140b1f7826a2",
+    "/tmp/ceres-cs50-1x8LGd/research/waveform-audit.md": "6d297a5e97c7197f717cf16aafad532b22ecc925fb340b5067c8cb011b764ed6",
+    "/tmp/ceres-cs50-1x8LGd/research/wsc-guide-audit.png": "581e8092c8ab59d502b2c1e589c44bbb7f294f6fb89129a663e5dd41679afbb8",
+    "/tmp/ceres-output-pra.png": "a7c2c221357d1131596097edc39ac555ab8513f869cb509db1ed14b9b724dfe2",
+    "/tmp/ceres-pitch-route-20261019/Source/DSP/ceres.cpp": "7b0bfc9b9ff2377390ca43ebc4491bf804d53e83ebcff273dfa20cbcfd780306",
+    "/tmp/ceres-sub-polarity-20261018/Source/DSP/ceres.cpp": "cc2ee3cdcf7dfab7ebc60071627a2557520f6cdbadd2a590796629a9aad8fd10"
+  },
+  "native_render_count": 0,
+  "no_audio_or_fitting": true,
+  "oscillator": {
+    "flat_plateau_is_assumption": true,
+    "nominal_tau_guard_frequency_hz": 5859.84,
+    "previous_conditioner_experiment_executed": true,
+    "previous_experiment_improved_recording_MAE": false,
+    "pulse_unchanged_sufficient_condition": "recharge_fraction < duty; not guaranteed throughout PWM engineering range",
+    "r_guard": 0.35,
+    "same_ramp_WSC_nonlinear_shape_is_ideal": true,
+    "tau_at_41k_seconds": 5.827179831431341e-05,
+    "tau_nominal_seconds": 5.9728593272171246e-05
+  },
+  "primary_sources": [
+    {
+      "local": "/tmp/ceres-cs50-1x8LGd/research/service2.pdf",
+      "pages_one_based": [
+        12,
+        16
+      ],
+      "printed_pages": [
+        16,
+        22
+      ],
+      "url": "https://bama.edebris.com/download/yamaha/cs-50/Yamaha%20CS-50%20Service%20Manual%202%20of%202%20%28%2011%20x%2017%20-%20Double%20Sided%20%29.pdf"
+    },
+    {
+      "local": "/tmp/ceres-cs50-1x8LGd/research/cs-servicing-guide.pdf",
+      "pages_one_based": [
+        37,
+        38,
+        39,
+        40,
+        61,
+        62
+      ],
+      "printed_pages": [
+        28,
+        29,
+        30,
+        31,
+        52,
+        53
+      ],
+      "url": "https://rcarchives.com/m/YamahaCSSeriesSynthesizerServicingGuidePOSTED.pdf"
+    }
+  ],
+  "production_edits": false,
+  "ring": {
+    "B": [
+      -0.01003030303030303,
+      0.01,
+      0,
+      0
+    ],
+    "assumptions": [
+      "Ideal carrier voltage source; source output impedance not identified",
+      "Incremental IC input, bias and collector currents zero",
+      "AC coordinates around fixed equilibrium, stiff external rail",
+      "Direct CS50 carrier100uF and wet-output10uF values selected; guide differs",
+      "No frequency-dependent output normalization",
+      "Four-node reduction omits the additional audio bias branches; expanded seven-node comparison retained"
+    ],
+    "caps_f": [
+      0.0001,
+      0.0001,
+      0.0001,
+      0.0001
+    ],
+    "declared_frequency_count": 8,
+    "differential_output": "x-b",
+    "equation": "C*qdot + G*q = B*u; output=u+q0-q1",
+    "expanded_cases_per_frequency": 6,
+    "max_expanded_vs_four_node_db": 0.02507688522602436,
+    "max_independent_scalar_magnitude_error": 2.220446049250313e-16,
+    "max_kcl_residual": 2.791670920238629e-17,
+    "nodes": [
+      "pin7 x",
+      "pin8 b",
+      "audio_bias a",
+      "local_supply s"
+    ],
+    "resistors_ohms": {
+      "a_ground": 1000,
+      "b_a": 820,
+      "b_s": 1200,
+      "s_supply": 390,
+      "x_b": 100,
+      "x_ground": 33000
+    },
+    "source_coupling_cap_to_x": true,
+    "state": "q=(x-u,b,a,s)"
+  },
+  "schema": 1,
+  "scope": "Primary cached OSC/RING source audit plus passive complex-frequency nodal solve; no native rendering, public audio reading or fitting.",
+  "visual_inspection": {
+    "crop": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/evidence/pra-ring-carrier-bias.png",
+    "crop_xyxy": [
+      1100,
+      450,
+      2050,
+      1270
+    ],
+    "direct_PRA": "/tmp/ceres-output-pra.png",
+    "guide_renders": "pdftoppm -f PAGE -l PAGE -scale-to 2200 -singlefile -png cs-servicing-guide.pdf OUTPUT; PAGE61 and62",
+    "source_images_independently_reviewed": true
+  }
+}

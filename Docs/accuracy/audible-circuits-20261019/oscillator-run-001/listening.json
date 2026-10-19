@@ -1,0 +1,31 @@
+{
+  "wav_sha256": "7556ddd3599d172720fd8a81ed33a3d8f54a38960c28f41a09a6376b62692f90",
+  "gain": 1,
+  "fades": false,
+  "segments": [
+    {
+      "wave": "saw",
+      "variant": "parent",
+      "start_seconds": 0.0,
+      "end_seconds": 4.0
+    },
+    {
+      "wave": "saw",
+      "variant": "oscillator",
+      "start_seconds": 4.25,
+      "end_seconds": 8.25
+    },
+    {
+      "wave": "sine",
+      "variant": "parent",
+      "start_seconds": 8.5,
+      "end_seconds": 12.5
+    },
+    {
+      "wave": "sine",
+      "variant": "oscillator",
+      "start_seconds": 12.75,
+      "end_seconds": 16.75
+    }
+  ]
+}

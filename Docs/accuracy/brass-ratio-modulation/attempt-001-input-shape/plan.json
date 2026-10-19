@@ -1,0 +1,193 @@
+{
+  "schema": "ceres-brass-ratio-modulation-plan-v1",
+  "status": "declared_before_source_estimates_reviewed",
+  "source_context_seconds": [
+    136.4,
+    138.0
+  ],
+  "analysis_seconds": [
+    136.88,
+    137.2
+  ],
+  "hop_seconds": 0.004,
+  "centers_count": 81,
+  "windows_seconds": [
+    0.04,
+    0.06,
+    0.08
+  ],
+  "source_rate_Hz": 48000,
+  "analysis_rate_Hz": 12000,
+  "resampling": "scipy.signal.resample_poly up1/down4, default Kaiser5 window; same chain for source and synthetic controls",
+  "notes_sounding_MIDI": [
+    57,
+    60,
+    64
+  ],
+  "model_harmonics": [
+    1,
+    12
+  ],
+  "synthetic_harmonics": [
+    1,
+    16
+  ],
+  "pitch_frames_relative_context_seconds": [
+    0.44,
+    0.84
+  ],
+  "phase_model": "Interpolate existing per-note F0 frames; hold nearest endpoint outside .44..84. Integrate on48k grid with trapezoid, subsample phase to12k. No new pitch estimator.",
+  "carrier_offset_sensitivity_Hz": [
+    0.0,
+    -2.0,
+    2.0
+  ],
+  "carrier_offset_scope": "Add same constant Hz to each tracked fundamental before harmonic multiplication; explicit sensitivity, not an identified bound on source pitch error.",
+  "local_estimator": "One joint real LS per frame: cos/sin of all36 tracked harmonics +DC +scaled local time slope. Multiply data and design by Hann (Hann-squared objective). Normalize every design column by its L2 norm, solve via SVD rcond1e-12; never merge/drop colliding carriers adaptively.",
+  "conditioning": [
+    "rank and scaled-design condition",
+    "all singular values",
+    "target cos/sin VIF from normalized Gram pseudoinverse",
+    "target estimator row L2 sensitivity to additive waveform noise",
+    "weighted residual RMS, source and every control"
+  ],
+  "targets": [
+    [
+      60,
+      3,
+      2
+    ],
+    [
+      60,
+      4,
+      2
+    ]
+  ],
+  "ratio_fit": {
+    "model": "All81 values jointly regressed against [1,x,x*x,sin(omega*(t-136.96)),cos(omega*(t-136.96))]; x=(t-137.04)/.16. Never detrend y alone.",
+    "frequency_Hz": 6.6692178847,
+    "time_origin_seconds": 136.96,
+    "outputs": [
+      "sin/cos coefficients dB",
+      "peak sinusoid amplitude dB",
+      "phase atan2(cos_coefficient,sin_coefficient)",
+      "full residual RMS",
+      "polynomial-only residual RMS",
+      "design condition"
+    ],
+    "interpretation": "Descriptive approximately2.134cycle projection; no independent-sample significance test."
+  },
+  "source_weakness": "Record all81 complex target amplitudes/powers, old frozen per-partial power thresholds and nearest original160ms mask flag. Local power=A\u00b2/2 is a sinusoidal coefficient proxy, not identical to old band integration. No row is removed; weak target frames can prevent interpretation.",
+  "synthetic": {
+    "base_amplitudes": [
+      0.02,
+      0.03,
+      0.025
+    ],
+    "harmonic_amplitudes_H1_H12": [
+      1,
+      1.6,
+      0.9,
+      0.75,
+      0.5,
+      0.35,
+      0.25,
+      0.18,
+      0.13,
+      0.1,
+      0.08,
+      0.06
+    ],
+    "H13_H16_rule": ".06*12/h",
+    "phase_variants": [
+      0.0,
+      0.31,
+      0.79,
+      1.37
+    ],
+    "phase_law": ".19*note_index+.37*h+variant*(.73*note_index+.11*h*h)",
+    "common_AM": "1-m*cos(2pi*fixed_rate*(t_context-.56)+phi); m=.7109245361481505, phi=-.4848223278487288, inherited prior source-only fit; no rate/phase/depth re-fit",
+    "nulls_per_phase": [
+      "constant static harmonic color",
+      "same static color with common AM",
+      "same common AM with per-note smooth exp(-[1.2,2,3]*(t-.44)) envelope after.44; ratios unchanged",
+      "same common AM plus fixed seeded Gaussian noise RMS1e-4 at48k"
+    ],
+    "noise_seed_base": 508031,
+    "positive_controls_per_phase": [
+      "C4 H3 and H4 each multiply10**(3*sin(omega*(t-136.96))/20), with common AM",
+      "same3dB cosine modulation, with common AM"
+    ],
+    "positive_purpose": "Known ratio modulation checks bias, phase and smoothing; these are not physical filter models.",
+    "static_color_controls": {
+      "HP_middle_C_Hz": 40.0,
+      "LP_middle_C_Hz": [
+        400.0,
+        800.0,
+        1600.0,
+        529.9645811343039,
+        794.9468717014558,
+        1059.9291622686078
+      ],
+      "HP_Q": 0.5,
+      "LP_Q": [
+        0.5,
+        2.0,
+        5.0
+      ],
+      "per_note_cutoff": "middle_C_cutoff*2**((note-60)/12), constant during entire signal; source-tracked pitch continues moving",
+      "model": "Per-voice fixed analog2pole HP then LP, prewarped bilinear SOS at48k, zero initial state atcontext0 (first analysis begins.44s later).",
+      "phase_variant": 0.0,
+      "AM_orders": [
+        "AM before static filters",
+        "AM after static filters"
+      ],
+      "purpose": "Illustrative36member fixed-color/FM/AM null family. It is not an exhaustive bound on all static filters or a Ceres calibration.",
+      "added_cutoff_source": {
+        "path": "/tmp/ceres-cs50-1x8LGd/research/brass1-release-spectra-160.json",
+        "field": "source.early_median_F0_Hz[1]",
+        "value_Hz": 264.98229056715195,
+        "harmonic_multipliers": [
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    "expected_control_count": 60
+  },
+  "interpretation_gates": {
+    "geometry": "Full rank74, scaled condition<=1e6, target VIF<=10 for allnominal frames; otherwise estimator inconclusive.",
+    "weakness": "Any target weak frame is retained and prevents a clean target-level coloration conclusion.",
+    "common_AM_recovery": "Across phase variants, peak fixed-rate ratio component of each common-AM null <=.5dB; known positives each have raw recovered3dB-component gain.5..1.5 and phase error<=20degrees. Failure means estimator inconclusive, never relaxed.",
+    "coloration_candidate": "For both predeclared targets and all3windows atnominal following, source fixed-rate amplitude must exceed max(1dB,2*maximum common-AM/noise null amplitude,2*maximum static-color null amplitude). Source phase spread across windows<=30degrees, and source amplitude after division by matched positive-control RMS gain has max/min<=1.5.",
+    "carrier_sensitivity": "Report\u00b12Hz results and whether qualitative conclusion changes; do not claim those cases bound unknown actual F0 error.",
+    "negative_result": "No detection does not exclude modulation; filters can act approximately as commongain over observed partials.",
+    "positive_result": "At most stable ratio modulation beyond the tested null family; does not identify LPvsHP, VCFvsrecording coloration, ringvsVCA, or physicalcontrol settings."
+  },
+  "native_render_calls": 0,
+  "DSP_parameter_fits": 0,
+  "original_hardware_MIDI": false,
+  "strict_eligible": false,
+  "input_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/references/whitmore-brass1-context.wav": "af1498002748e094af1cd95b6bc52c1e8919e9dce953a02ba03b8309fd5012dc",
+    "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-brass1-source.json": "a9fd8a939dfdbee6dedec98a44c7c326a30b1a10579c2fb0629da476fc464ecf",
+    "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-brass1-shared-modulation.json": "461499977541137bbfccbfb278e51b457f7bbdb3ad0f95af7370af12610bcd34",
+    "/tmp/ceres-cs50-1x8LGd/research/brass1-release-spectra-160.json": "c352cba0c40f1b227c6d8999a1d8084062d36acfa3f236659e212d69105d296f",
+    "/tmp/ceres-cs50-1x8LGd/research/brass1-modulation-crosscheck.json": "1e4dc121d9baa9f1ae98e41dd01ce902c3f69612b92d1ca4b443fa1f9fec4d0c",
+    "/tmp/ceres-cs50-1x8LGd/research/whitmore-brass1-modulation-visual.json": "88a38aa59f5c72f3321f0ed917c012225feb535abf2c18d49f0ea11e114470c4",
+    "/tmp/ceres-cs50-1x8LGd/research/brass1-ring-routing.md": "f15e7828781fffe4dec98ba2cd34a7ff890c6b4016dc3d868186c1571e140ce1",
+    "/tmp/ceres-cs50-1x8LGd/research/pitch-modulation-routing.md": "362dac857bb5227366b8869259dbc34aeb545731241b5da57361896f41b6e655"
+  },
+  "limitations": [
+    "Allsource intervals reused development evidence.",
+    "Only about2modulationcycles and overlappingwindows; no IID p-values.",
+    "Unknown originalgates,voiceassignment,globalcontrols,capturechain and actualpitcherror remain.",
+    "Ideal same-note ratios cannot separate HP fromLP cutoffmotion: HP/LP differ by a fixed harmonicfactor atmatched fc,Q.",
+    "PhysicalSUB-to-VCF/VCA relative sign is underseparateaudit; this diagnostic assumes no nativephase sign."
+  ],
+  "amendment": {
+    "initial_proposal_sha256": "3e1e393feb4d8f6e929ff910426d05e5c141c1ab2843329599fbe813661bcb8a",
+    "reason": "Parent review requested resonant static controls at2/3/4 times existing early-median C4 F0 before any estimates; no other method/threshold change."
+  }
+}

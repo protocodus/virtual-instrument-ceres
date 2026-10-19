@@ -1,0 +1,70 @@
+{
+  "id": "flute-high-factory-physical-frozen",
+  "kind": "frozen",
+  "audio": "Docs/accuracy/preset-dc-loading/flute-high-factory-physical-frozen.wav",
+  "audio_sha256": "0672f265c4fdbf9f8050fcff18a6447bc5c362d9e521c97d6440084504b55f9b",
+  "command": [
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/identity/ceres_render",
+    "--preset",
+    "flute",
+    "--patch",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/flute-high-factory-physical-frozen.patch",
+    "--events",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.events.tsv",
+    "--output",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/flute-high-factory-physical-frozen.wav",
+    "--rate",
+    "48000",
+    "--frames",
+    "154800",
+    "--seed",
+    "50"
+  ],
+  "statistics": {
+    "sample_rate": 48000,
+    "frames": 154800,
+    "channels": 1,
+    "sample_format": "float32",
+    "seed": 50,
+    "preset": "flute",
+    "peak": 0.142635241151,
+    "rms": 0.0328604647545,
+    "samples_above_unity": 0,
+    "render_seconds": 0.575601166,
+    "audio_seconds": 3.225,
+    "realtime_factor": 5.6028378511,
+    "normalization": "none",
+    "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+  },
+  "log": "Docs/accuracy/preset-dc-loading/flute-high-factory-physical-frozen.log",
+  "log_sha256": "5308983cc4e1d94da29d7b32068f8f36cfa7be03a571ffdc508f0729e92156cb",
+  "metrics": {
+    "frame_count": 45,
+    "harmonics": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "median_harmonic_MAE_db": 21.840789995040122,
+    "trajectory_ratio_MAE_db": 21.771714936721967,
+    "trajectory_ratio_MSE_db2": 579.3764262098371,
+    "held_gain_RMS_error_db": 0.6675532026014503,
+    "source_RMS_slope_db_per_s": -0.2890567467391627,
+    "native_RMS_slope_db_per_s": -1.5126547352609683,
+    "source_median_f0": 670.3014452315061,
+    "native_median_f0": 670.474929592898,
+    "median_pitch_error_cents": 0.12125115160240742
+  },
+  "signal": {
+    "finite": true,
+    "peak": 0.14263524115085602,
+    "rms": 0.03286046475452211,
+    "energy": 167.15461027311775,
+    "samples_above_unity": 0
+  },
+  "baseline_bytes_identical": true,
+  "max_sample_difference": 0.0
+}

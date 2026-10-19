@@ -1,0 +1,18 @@
+{
+  "artifact_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/check-001/actual.json": "d84c44d69cec821a0ef31a8c7cb9c405e6861d1c325e86fc3077e3b433c41b98",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/check-001/exact-differences.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/check-001/runtime.json": "99a37a1353c8c27813ce09677d8d8976618f03b10437fdea2244b36c91a23829"
+  },
+  "bitwise_equal": true,
+  "exact_difference_count": 0,
+  "new_WAV_count": 0,
+  "numeric_replay_pass": true,
+  "numeric_replay_tolerance": 1e-10,
+  "old_failures_or_reports_rewritten": false,
+  "plan_sha256": "ed455b13daf60509851c856c973d9d2029c80b481c61161975a34ae28bb0d2d7",
+  "report_sha256": "edf435a7ece847beb3f052c7ad2d658c7e87e49d31983cf57f1766b97db112eb",
+  "runtime_exactly_matches_original": true,
+  "status": "pass",
+  "tolerance_units": "Absolute scalar roundoff allowance in each reported native metric unit; hashes, types, non-floats and booleans remain exact."
+}

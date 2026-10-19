@@ -1,0 +1,92 @@
+{
+  "conditional_constants": {
+    "carrier_dc_volts": -0.023489437180096218,
+    "source_peak_volts": 1.5,
+    "temperature_kelvin": 298.15,
+    "two_vt_volts": 0.0513851582421717,
+    "zero_ac_switching_factor": -0.4277380604918782
+  },
+  "important_limits": [
+    "Matched forward-active upperquad; basecurrents/Earlyeffect/mismatch/saturationomitted.",
+    "IdealIG00150sourceandnominal3Vpp; loadedringamplitudenotmeasured.",
+    "ExternalDCsolvezeroALLICcurrents,includingbiasandcollectorloads; notcompletepopulatedDCoperatingpoint.",
+    "CenteredVR5meansidealsignaloffset0; carrierDCremainsnonzero.",
+    "Existingaudio/productgainretained; audioportnonlinearityandabsolutewetgainnotcalibrated.",
+    "NoACmean/peaknormalizationorparameterfit."
+  ],
+  "manufacturer": "Fairchild, August1970, originaluA796equivalentcircuit; noMC1496substitution",
+  "new_primary_visuals": [
+    {
+      "file": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/fairchild-12.png",
+      "original_date": "August1970",
+      "pdf": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/ElectronicSynth.pdf",
+      "pdf_page_one_based": 12
+    },
+    {
+      "file": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/yamaha-pwm-49.png",
+      "pdf": "/tmp/ceres-cs50-1x8LGd/research/cs-servicing-guide.pdf",
+      "pdf_page_one_based": 58,
+      "printed_page": 49
+    }
+  ],
+  "public_retrieval_attempts": [
+    {
+      "method": "web search",
+      "number": 1,
+      "query": "Fairchild uA796 balanced modulator datasheet schematic PDF 796HC",
+      "result": "Found Vasulka original-sheet scan and DatasheetArchive listings."
+    },
+    {
+      "method": "ordinary curl -L --fail --max-time40",
+      "number": 2,
+      "result": "Success; 2188313byte35pagePDF. OriginalFairchildAugust1970sheetatPDF12 visuallyinspected.",
+      "url": "https://vasulka.org/archive/Artists6/Siegel%2CEric/ElectronicSynth.pdf"
+    },
+    {
+      "method": "web open",
+      "number": 3,
+      "result": "Success; OriginalUA796HC5page156.08KB listing located.",
+      "url": "https://www.datasheetarchive.com/?q=ua796"
+    },
+    {
+      "method": "web click originalUA796HC PDF link",
+      "number": 4,
+      "result": "Webtool500: redirectedtargetnotaccessibleviathistool; noPDF.",
+      "url": "https://www.datasheetarchive.com/datasheet/UA796HC/Fairchild-Semiconductor?term=ua796&version=1"
+    },
+    {
+      "method": "ordinary curl -L --fail --max-time35",
+      "number": 5,
+      "result": "Success HTML; retainedactualiframePDF URL inHTML.",
+      "url": "https://www.datasheetarchive.com/datasheet/UA796HC/Fairchild-Semiconductor?term=ua796&version=1"
+    },
+    {
+      "method": "Pythonurllib withdefaultverifiedTLS timeout35 toobservediframefileURL",
+      "number": 6,
+      "result": "Failed beforeHTTP body: localSSL CERTIFICATE_VERIFY_FAILED unabletogetlocalissuercertificate. FullURLandexceptionretainedinretrieval-06.log. NoTLSbypass/retry."
+    }
+  ],
+  "retrieval_count": 6,
+  "retrieval_limit": 6,
+  "scope": "Bounded primary research and constant-only nominal DC/thermal-law calculation; no DSP/audio/recording measurements or fit. Prior source report preserved.",
+  "verified_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/evidence.json": "afa33dd2d74d3352167a00d28d00d1134ab173cfcba52f738cf647a146f3286f",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/evidence/pra-ring-carrier-bias.png": "be383c7758f7aa1038ed40f134f5e9b72fc9736e31600831309e3892048175a7",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/passive-carrier-result.json": "18208b88e75a2f3dd5fbbcdfd02b95557ba3a3eb8e05bb2b3d1c5ad2cdb392a2",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/passive_carrier.py": "e94cc5d976540dbee545dc4bc3ab86ba0a926e157fd010d85c540cb762bb1a74",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/source-review.md": "ebc209139290d3e25690248e842907cc3442f781c432d541c95c66dafff80002",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/ElectronicSynth.pdf": "16e8eead814ba8553f70b4fceb6c1080179abfad1962207a943957bf90cdb0fc",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/ElectronicSynth.txt": "db617216dc8973684f46020847406a75c7c9e0de1d883207e690ae6d6a282e94",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/datasheetarchive-UA796HC.html": "7f7e1d2e2e89391e6b6d46812268051113f40b4245fd5ecdeb1b25f9a9299877",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/dc-nominal.json": "a15a96d9f6ee252129ccd21202c8278e8797b4fffa61b8f6985aa0ca39ab3ed4",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/dc_nominal.py": "bb8eb3b5fd503518f3fd71c6abcf05fc3b6ee151f7d5d632b5ce0504aebaeff7",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/fairchild-12.png": "a53bf01769e3283fbef46eb552cdc7a8461147f10753ede0e985c55ddcb5a325",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/retrieval-02.log": "fde4582a1d1124cdf0550585c5877aa41a91d8e3dfe5c429853a83f4b775408f",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/retrieval-05.log": "65d0bf8c6bc67164d560a452257afad27b23aed23875a111f869dd6ce0578c5b",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/retrieval-06.log": "10fd37cbb52b86244f7243d38221e84e2add13d08b64e76e5d0479e1a5f8c97c",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/source-audit.md": "81ee1895440b7b504b374b397a0b88aaaa72baed242aedecff514b09553d7eaa",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/yamaha-pwm-49.png": "fa9b257538082ee5879aff1f6377d9533e253f580f3723ff8f50121b122ef6f9",
+    "/tmp/ceres-cs50-1x8LGd/research/cs-servicing-guide.pdf": "2738f7ddc46f0bedbab38dcad8e2c112c41b3e6ca34670d471d0cb8c0dbde633",
+    "/tmp/ceres-cs50-1x8LGd/research/service2.pdf": "1102e55b949378e7776555bca1a4d73105ca2d76d6fcf3aa4c2b103566201cfc"
+  }
+}

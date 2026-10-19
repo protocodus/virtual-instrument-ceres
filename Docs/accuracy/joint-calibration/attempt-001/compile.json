@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/usr/bin/clang++",
+    "-std=c++17",
+    "-O2",
+    "-fno-fast-math",
+    "-I",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/identity/Source/DSP",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/control_trace.cpp",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/identity/Source/DSP/ceres.cpp",
+    "-o",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/attempt-001/control_trace"
+  ],
+  "returncode": 0,
+  "stderr": "",
+  "stdout": ""
+}

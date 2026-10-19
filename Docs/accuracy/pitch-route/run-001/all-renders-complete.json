@@ -1,0 +1,31 @@
+{
+  "hardware_scores_computed": false,
+  "known_byte_exact_pass_count": 11,
+  "receipts_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/compat--brass-history10-render.json": "8a9137ebee475983bebf776c989a8af30e6986998a2f50577c790a5d79e28a74",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/compat--brass-history20-render.json": "9ccd099c1d7d52c55905f35651c48fe35c057c40fd6078b27ebbb6dd94681505",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/compat--dry-sawtooth-render.json": "15380a610dd4cca1bfdc93f3415ef7397954a82d5974bc4e11e9d887266f1add",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/compat--dry-square-render.json": "080dfe992e945fc627061078626f6fd92b4900a7bba13d619d2adb7c47efea77",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/compat--flute-high-effective-compensated-render.json": "773d3b2b6005155f02c91100281542b79f77189b8ea88223f1973e8d943c61f5",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/compat--flute-lower-effective-compensated-render.json": "461e94d5a7914746dfaa25efa4b078f460fe676cb2f853ca57ad089f41b07d95",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-high-factory-physical--frozen--shared-render.json": "e902e4f62af9ac00b92dd7b4bed85e56dae9b845072694ca37b92f07a84c99e0",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-high-factory-physical--frozen--static-master-render.json": "4ac8c22a4e58df2f9b94faa49014fd95d7a4425b4d0975fb20d766b81f9770a8",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-high-factory-physical--frozen--vco-only-render.json": "4cbaeb9e313debc68f0f9e631ac9aaeb39bc046a47b2686998a3a04fe95eb874",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-high-factory-physical--network-br0--shared-render.json": "9880dcc7e77e79e3062236632c19d6d2269b257b40b3b4465f49faa1ecd0237b",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-high-factory-physical--network-br0--static-master-render.json": "34633273b7e59b8a7bb478aee4cb7c2bdf6b05cd32bb3b2e12971e6dcbd29d6a",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-high-factory-physical--network-br0--vco-only-render.json": "2822ccb4e4142efa360751797daf71879fab76a81008978f4ecd3b7edf551856",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-high-factory-physical--network-brminus15--shared-render.json": "577870e800700933bee3084f16bcf9561b997aef9e0034817092394f502ba9cc",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-high-factory-physical--network-brminus15--static-master-render.json": "9a45923b9c65c4b6d3df69943e74775eac0751ee27c252d40ef78cfb933a8ed2",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-high-factory-physical--network-brminus15--vco-only-render.json": "0cedcd8a85ea7f7b09ee32871ade968da8ced0d036db9eec8de64ab8580dcea1",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-lower-factory-physical--frozen--shared-render.json": "e9ea14aee8c296676fc96c96fe5efa2924f7bff08136e10630a3eae27174b478",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-lower-factory-physical--frozen--static-master-render.json": "06aee3865d221bcf19bce16a921640e5a1480e4f4953f23edb43947f07c612da",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-lower-factory-physical--frozen--vco-only-render.json": "87f8060ea1b942b7d58ef2c17571a85d48b3e7e2516e4d9631a1d4e2e397024a",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-lower-factory-physical--network-br0--shared-render.json": "7b3b1678f436db64f25729397feaf824a2182b9ac7e7d5cf7e8cf43ff5fe348d",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-lower-factory-physical--network-br0--static-master-render.json": "4a2d0c6ad0cc5de86e1c585598c0c049ef0fd4c6570020e2a57a417e29c9e293",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-lower-factory-physical--network-br0--vco-only-render.json": "508517c89896a28e9c8c8fae43833ac98b908e43a1f62bc903602b27bbc4cf89",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-lower-factory-physical--network-brminus15--shared-render.json": "b1f56bb789c102ffaa77ff71526c3d722103012d49d2436bcb2fe8c07c22e055",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-lower-factory-physical--network-brminus15--static-master-render.json": "4785e0dcf1c9269a2e438250559a2de3b02df3f3a5ffc9d3e870144b1f89e1b4",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/flute-lower-factory-physical--network-brminus15--vco-only-render.json": "99194e1ca4a237b77bc43f295c6c46186dbc7903c2c6cc0aed0787568a303cde"
+  },
+  "render_count": 24
+}

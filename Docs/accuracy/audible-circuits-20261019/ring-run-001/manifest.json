@@ -1,0 +1,144 @@
+{
+  "plan_sha256": "ecb1e576a53e05f19de90a9f5dec0cef6731819ab1513967cb75a3495251d8ff",
+  "driver_sha256": "7a7eb95569f973fa925270ef625a33171d33f6bd7869fb522f9f9b5c63c0ad2c",
+  "variants": {
+    "parent": {
+      "source": "/tmp/ceres-sub-polarity-20261018",
+      "commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+      "compiled_source_sha256": {
+        "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+        "Source/DSP/ceres.cpp": "cc2ee3cdcf7dfab7ebc60071627a2557520f6cdbadd2a590796629a9aad8fd10",
+        "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+        "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+        "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d"
+      },
+      "library_sha256": "7cacbc62517def782ea5076cb0ccb69c1f753a5ec5f6ad97d395d6d0b70ff9bd",
+      "binary_sha256": "333247dd4f3969c30d62ce9e12a1941b1360f7d9e4a8eadec71961c0c1fe64ad",
+      "compile": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-I/tmp/ceres-sub-polarity-20261018/Source/DSP",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring_demo.cpp",
+        "/tmp/ceres-sub-polarity-20261018/build/libceres.a",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/parent-demo"
+      ]
+    },
+    "ring": {
+      "source": "/tmp/ceres-ring-carrier-20261019",
+      "commit": "57eaba2313eb6758835d8e3683da52da82cdc83c",
+      "compiled_source_sha256": {
+        "Source/DSP/ceres.hpp": "bd785967fea79ed0df68bc0fb70f6c063c44439eac975c96357eb71bcdcaa10f",
+        "Source/DSP/ceres.cpp": "3472f2667c232409a9fe824580c273f9a1e3ddc46d49f26b05ef1d351996605a",
+        "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+        "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+        "CMakeLists.txt": "3f169300a4e9fa8e103f2cdafba2f6dd5bb2c1f3b37aa3c040918e84c0bbdfd5"
+      },
+      "library_sha256": "502c06a119ff761b5bf3a2deff182854ceedd417ec6b7d9c910a7a605eb9a966",
+      "binary_sha256": "7723aa4caf761be01c3010adb91deaa4cd85295fe9373c60b62f1eb6efcfe282",
+      "compile": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-I/tmp/ceres-ring-carrier-20261019/Source/DSP",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring_demo.cpp",
+        "/tmp/ceres-ring-carrier-20261019/build/libceres.a",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/ring-demo"
+      ]
+    }
+  },
+  "renders": {
+    "parent-1": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/parent-demo",
+        "1",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/parent-1.wav"
+      ],
+      "wav_sha256": "414a4e4a5792f552b148bfa01dcdb019f5eaddd5b46bf8a54575c87006356282",
+      "stats": {
+        "rate": 1,
+        "frames": 240000,
+        "peak": 0.0449602,
+        "rms": 0.0213353,
+        "normalization": "none"
+      }
+    },
+    "parent-30": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/parent-demo",
+        "30",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/parent-30.wav"
+      ],
+      "wav_sha256": "35198aefb053a22296f02087c8f69a9adaec420e8f166210f3c64896e264364e",
+      "stats": {
+        "rate": 30,
+        "frames": 240000,
+        "peak": 0.0449887,
+        "rms": 0.0213471,
+        "normalization": "none"
+      }
+    },
+    "parent-220": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/parent-demo",
+        "220",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/parent-220.wav"
+      ],
+      "wav_sha256": "8968b61eb2e43166a23e01b050fdc5a48a9be35b93d5e03a8befcad8b383b11a",
+      "stats": {
+        "rate": 220,
+        "frames": 240000,
+        "peak": 0.0441122,
+        "rms": 0.0213431,
+        "normalization": "none"
+      }
+    },
+    "ring-1": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/ring-demo",
+        "1",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/ring-1.wav"
+      ],
+      "wav_sha256": "589783c4dfc7dd8c854045bc0200b6168a341f80839c4f4ca34335d4adc88193",
+      "stats": {
+        "rate": 1,
+        "frames": 240000,
+        "peak": 0.00217314,
+        "rms": 0.00100792,
+        "normalization": "none"
+      }
+    },
+    "ring-30": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/ring-demo",
+        "30",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/ring-30.wav"
+      ],
+      "wav_sha256": "22f456a3613f56d028562b184ee84af5fe75720416d74bad2c83920cf4db334c",
+      "stats": {
+        "rate": 30,
+        "frames": 240000,
+        "peak": 0.0304983,
+        "rms": 0.0143133,
+        "normalization": "none"
+      }
+    },
+    "ring-220": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/ring-demo",
+        "220",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/ring-220.wav"
+      ],
+      "wav_sha256": "a5b91c301174dc154948f7262ce2ef33872c114175660a740787c50b47f05da8",
+      "stats": {
+        "rate": 220,
+        "frames": 240000,
+        "peak": 0.0447894,
+        "rms": 0.0211004,
+        "normalization": "none"
+      }
+    }
+  }
+}

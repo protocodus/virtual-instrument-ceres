@@ -1,0 +1,70 @@
+{
+  "attack_tau_seconds": 0.02301600777888872,
+  "cases": [
+    {
+      "duration_seconds": 1.9,
+      "endpoint_secant_flattening_db_per_s": 0.05549271309367598,
+      "fresh_endpoint_secant_db_per_s": -1.5241529606008926,
+      "fresh_instant_log_slope_at_start_db_per_s": -2.0078005444033016,
+      "fresh_state_at_start": 0.9745449606253493,
+      "gate_age_seconds": 0.225,
+      "id": "flute-high-factory-physical",
+      "interval_seconds_after_gate": [
+        0.225,
+        2.125
+      ],
+      "largest_envelope_level_difference_db": -0.22748912323535625,
+      "maximum_flattening_at_seconds_after_gate": 0.225,
+      "maximum_possible_instant_log_slope_flattening_db_per_s": 0.061966888364547446,
+      "maximum_residual_endpoint_secant_db_per_s": -1.4686602475072166,
+      "maximum_residual_instant_log_slope_at_start_db_per_s": -1.9458336560387541,
+      "maximum_residual_state_at_start": 0.9493523372236534,
+      "secant_is_not_128ms_windowed_RMS_regression": true
+    },
+    {
+      "duration_seconds": 1.2,
+      "endpoint_secant_flattening_db_per_s": 0.05894472127146022,
+      "fresh_endpoint_secant_db_per_s": -1.71687580779593,
+      "fresh_instant_log_slope_at_start_db_per_s": -2.03256094365536,
+      "fresh_state_at_start": 0.9849891654050535,
+      "gate_age_seconds": 0.17916666666666667,
+      "id": "flute-lower-factory-physical",
+      "interval_seconds_after_gate": [
+        0.17916666666666667,
+        1.3791666666666667
+      ],
+      "largest_envelope_level_difference_db": -0.23033206801938264,
+      "maximum_flattening_at_seconds_after_gate": 0.17916666666666667,
+      "maximum_possible_instant_log_slope_flattening_db_per_s": 0.06208622740932901,
+      "maximum_residual_endpoint_secant_db_per_s": -1.6579310865244699,
+      "maximum_residual_instant_log_slope_at_start_db_per_s": -1.9704747162460312,
+      "maximum_residual_state_at_start": 0.959212544975891,
+      "secant_is_not_128ms_windowed_RMS_regression": true
+    }
+  ],
+  "complete_native_audio_accuracy_claim": false,
+  "conservative_one_internal_step_timing_allowance_seconds": 5.208333333333333e-06,
+  "continuous_attack_endpoint_oracle_max_error": 1.6864915168908754e-16,
+  "continuous_peak_advance_upper_seconds": 0.1150800388944436,
+  "native_render_count": 0,
+  "optimizer_calls": 0,
+  "optional_zero_global_release_quarter_second_state_upper": 1.6113346762488754e-08,
+  "parameters": {
+    "attack_seconds": 0.1150800388944436,
+    "decay_T60_seconds": 13.815510557964274,
+    "decay_tau_seconds": 2.0,
+    "headroom": 0.006783654906304231,
+    "initial_residual_interval": [
+      0.0,
+      1.0
+    ],
+    "internal_sample_rate": 192000,
+    "release_tau_seconds": 0.013932530282215373,
+    "sustain": 0.524
+  },
+  "release_bound_assumption": "u_off<=1, actual release engaged throughout .25s, frozen global_release=0; physical controls/gate timing not established.",
+  "residual_states_fitted": 0,
+  "scope": "Continuous normalized amp coordinate with factory h, D and S; current discrete comparator adds sample quantization. Not a bound on filtered audio, scalar-RMS regression, multiple voices, physical chip calibration or different closure laws.",
+  "synth_imports": 0,
+  "target_audio_read": false
+}

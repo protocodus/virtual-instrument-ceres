@@ -1,0 +1,20 @@
+{
+  "all_brass_fields_exact": true,
+  "audio_source_or_transfer_reads": false,
+  "differing_float_leaves": 989,
+  "every_diff_path_value_and_absolute_difference_verified": true,
+  "exact_equality_check_remains_failed": true,
+  "input_sha256": {
+    "Docs/accuracy/joint-calibration/attempt-001/report.json": "5ae567e7dbdbce2ac63569f367c74e2867b0f432186313391cb3e740b80ae176",
+    "Docs/accuracy/joint-calibration/recompute-diagnostic-001/actual.json": "ab33fdcfff5f20054dd4a282cbb744f017c32b879f781fa592942c626a69dee1",
+    "Docs/accuracy/joint-calibration/recompute-diagnostic-001/exact-diff.json": "a70cbdf352d3b3d42de3b15e34b317053214424e4d1a45f2e75dc4c3c148bf89",
+    "Docs/accuracy/joint-calibration/recompute-diagnostic-001/localization.json": "2da7aac0488d75b2f110783d676654b1374051355628bae996bbca0e88a61a6d"
+  },
+  "localization_counts_match": true,
+  "low_level_kernel_cause_established": false,
+  "masks_thresholds_flags_exact": true,
+  "maximum_absolute_difference_db": 1.4210854715202004e-14,
+  "native_measurements_and_deltas_exact": true,
+  "reviewer": "/root/hardware_research",
+  "status": "independent_exact_diff_audit_pass"
+}

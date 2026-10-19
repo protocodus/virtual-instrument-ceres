@@ -1,0 +1,39 @@
+{
+  "recorded_utc": "2026-10-18T22:51:44.450552+00:00",
+  "goal_status": "active",
+  "completion_proven": false,
+  "previous_goal_turn_classification": "progress",
+  "this_goal_turn_classification": "progress",
+  "consecutive_blocked_goal_turns": 0,
+  "research_worktree": "/tmp/ceres-joint-calibration-20261018",
+  "research_commit": "ff2dd42e71f545bd52e621bac896d1e46c132d53",
+  "research_core_is_default_disabled": true,
+  "retained_corrected_SUB_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "candidate_rejected": true,
+  "new_native_WAVs": 20,
+  "source_screenshots_retained": 116,
+  "no_GUI_changes": true,
+  "no_samples_in_synthesis": true,
+  "production_mapping_changed": false,
+  "strict_old_qualification_replay": "failed and preserved; max1.42e-14dB analytical last-bit differences, decisions unchanged",
+  "next_safe_action": "Inspect retained Whitmore BR/RES evidence at Flute205.75\u2013207.65s and Brass136.4\u2013138s. Read prior modulation-controls erratum first; do not repeat a resolved claim. Establish visible relative lever states before a new nuisance-input hypothesis. Do not silently retune or expand rejected bounds.",
+  "open_requirements": [
+    "Factory cutoff calibration and raw-to-loaded control mapping remain unproven.",
+    "Envelope timing, pressure and gates remain partly inferred.",
+    "No independent known-settings reference holdout."
+  ],
+  "report_sha256": {
+    "plan.json": "9a13c10f5c6a65d65cf20cd061e133c1d4a88a6eb5532895bf2279c5a06a54ca",
+    "fit-plan.json": "0f096e6270700c568dba9a04e5548f497cf0cabb46f7149fb2644f50afaee3b1",
+    "attempt-001/report.json": "5ae567e7dbdbce2ac63569f367c74e2867b0f432186313391cb3e740b80ae176",
+    "dynamic-qualification-001/report.json": "7bf8fd9b3bfaa9503d8eb0c22b6ddce043d158f779bb790d8bdd98bf1edeef8b",
+    "jacobian-001/report.json": "8223ccf87d6e434336698ea79cbc6141c9881c572594053f4a365740e9b801b2",
+    "fit-001/candidate.json": "0d77a1fe3e27119869e1be4f2fef2f5bfab779b3dcd5dc0d61edda8aac021245",
+    "fit-replay-001/report.json": "61583571f31be2b95bd1b860558e2e54d6b80397842c88be6a72bd85d74c5587",
+    "native-controls-001/report.json": "5be734d37c275908764805dd837f7ff9accddc209e705f47664748aa57db2371",
+    "native-validation-001/plan.json": "3297574e3c04a8204c0885812a2ed7f79619d1940b1fcb189128050ec4fec49a",
+    "native-validation-001/report.json": "1ab95a9882a87021f843cd5c61f40bd66546daf5753cc0b854df336577f376a0",
+    "candidate-prediction-check-001/report.json": "705ed7314556e9faf39a90106c956d45fa8ef940c01921afe457780002ce2999",
+    "RESULT.md": "2f7514405ccb5cd2dc5f10b8110f47ae191cbfb8db2a75bc240c5386e3813641"
+  }
+}

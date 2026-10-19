@@ -1,0 +1,26 @@
+{
+  "operation": "Repeated analytic decimator vector on identical12001frequency points; no audio input",
+  "rows": [
+    {
+      "repeat": 1,
+      "complex_differing": 0,
+      "magnitude_differing": 0,
+      "max_complex_difference": 0.0,
+      "max_magnitude_difference": 0.0
+    },
+    {
+      "repeat": 2,
+      "complex_differing": 0,
+      "magnitude_differing": 0,
+      "max_complex_difference": 0.0,
+      "max_magnitude_difference": 0.0
+    },
+    {
+      "repeat": 3,
+      "complex_differing": 0,
+      "magnitude_differing": 0,
+      "max_complex_difference": 0.0,
+      "max_magnitude_difference": 0.0
+    }
+  ]
+}

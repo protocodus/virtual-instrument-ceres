@@ -1,0 +1,481 @@
+{
+  "source": "https://www.youtube.com/watch?v=AtoWZaNemxk",
+  "method": "On-service paused seeked video; advertisements excluded. Player original video353.781 seconds; automatic dubbing advertised by platform, no audio acquired.",
+  "observations": [
+    {
+      "t": 10,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 10,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=10;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-010.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-010.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-010.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 30,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 30,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=30;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-030.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-030.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-030.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 60,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 60,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"just on its own without modulation that\\nI want to show\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=60;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-060.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-060.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-060.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 90,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 90,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"from the oscillator and the filter from\\nthe signal chain.\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=90;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-090.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-090.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-090.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 120,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 120,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"Now, it's cool\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=120;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-120.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-120.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-120.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 150,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 150,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=150;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-150.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-150.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-150.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 180,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 180,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=180;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=AtoWZaNemxk\n- Page Title: The Yamaha CS-50 Part 4- The Amplifier - YouTube\n- Console: 8 errors, 61 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-41-31-518Z.log#L70-L72"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-180.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-180.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-180.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 210,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 210,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"course, if you're not taking the low end\\nout, too.\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=210;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-210.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-210.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-210.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 240,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 240,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"be being thin or reedy that they've\\ngiven you a heck of\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=240;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-240.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-240.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-240.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 270,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 270,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"sine wave possibility really broadens\\nout\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=270;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=AtoWZaNemxk\n- Page Title: The Yamaha CS-50 Part 4- The Amplifier - YouTube\n- Console: 8 errors, 64 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-41-31-518Z.log#L73-L75"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-270.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-270.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-270.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 300,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 300,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=300;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=AtoWZaNemxk\n- Page Title: The Yamaha CS-50 Part 4- The Amplifier - YouTube\n- Console: 8 errors, 67 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-41-31-518Z.log#L76-L78"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-300.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-300.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-300.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 330,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 330,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=330;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-330.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-330.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-330.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 45,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 45,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"haven't even touched the voltage\\ncontrolled amplifier.\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=45;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-045.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-045.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-045.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 75,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 75,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"the VCF's effect\\noff of the oscillator signal.\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=75;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-075.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-075.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-075.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 280,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 280,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"Then of course we have\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=280;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-280.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-280.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-280.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 285,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 285,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=285;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-285.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-285.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-285.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 290,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 290,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=290;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-290.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-290.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-290.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 295,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 295,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=295;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-295.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-295.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-295.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 305,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 305,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=305;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-305.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-305.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-305.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 310,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 310,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"When you have the\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=310;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-310.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-310.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-310.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 315,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 315,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"oscillators robbing notes from each\\nother.\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=315;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-315.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-315.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-315.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 320,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 320,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"Which is actually kind of a cool effect,\\nbut you only have four oscillators,\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=320;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-320.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-320.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-320.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 325,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 325,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\",\n  \"caption\": \"your polyphony is limited.\\nLastly, we\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=325;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-325.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-325.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-325.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 335,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 335,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=335;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-335.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-335.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-335.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 340,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 340,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 353.781,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"AtoWZaNemxk\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=340;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-amplifier-340.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-amplifier-340.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-amplifier-340.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    }
+  ]
+}

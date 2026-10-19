@@ -1,0 +1,7 @@
+# Single shared candidate, fixed before transfer scoring.
+octave=-1
+calibration_network=1
+calibration_hp_bias=0
+calibration_lp_bias=-10.423952819965173
+calibration_alpha=0.50000000000000011
+brilliance=0

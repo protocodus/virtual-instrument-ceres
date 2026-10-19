@@ -1,0 +1,196 @@
+{
+  "source": "https://www.youtube.com/watch?v=nl19OnD8SrY",
+  "method": "Detailed initial String passage, seeked paused on-service video; no gates measured yet.",
+  "observations": [
+    {
+      "t": 54,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 54,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 286.541,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"nl19OnD8SrY\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=54;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-doctormix-054.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-doctormix-054.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-doctormix-054.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 58,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 58,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 286.541,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"nl19OnD8SrY\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=58;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-doctormix-058.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-doctormix-058.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-doctormix-058.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 60,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 60,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 286.541,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"nl19OnD8SrY\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=60;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-doctormix-060.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-doctormix-060.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-doctormix-060.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 62,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 62,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 286.541,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"nl19OnD8SrY\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=62;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-doctormix-062.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-doctormix-062.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-doctormix-062.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 64,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 64,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 286.541,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"nl19OnD8SrY\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=64;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-doctormix-064.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-doctormix-064.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-doctormix-064.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 66,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 66,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 286.541,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"nl19OnD8SrY\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=66;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-doctormix-066.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-doctormix-066.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-doctormix-066.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 68,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 68,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 286.541,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"nl19OnD8SrY\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=68;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-doctormix-068.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-doctormix-068.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-doctormix-068.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 70,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 70,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 286.541,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"nl19OnD8SrY\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=70;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-doctormix-070.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-doctormix-070.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-doctormix-070.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 72,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 72,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 286.541,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"nl19OnD8SrY\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=72;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-doctormix-072.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-doctormix-072.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-doctormix-072.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 74,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 74,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 286.541,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"nl19OnD8SrY\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=74;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=nl19OnD8SrY\n- Page Title: Yamaha CS50: Famous Presets - YouTube\n- Console: 15 errors, 55 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T18-23-11-094Z.log#L71-L73"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-doctormix-074.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-doctormix-074.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-doctormix-074.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    }
+  ]
+}

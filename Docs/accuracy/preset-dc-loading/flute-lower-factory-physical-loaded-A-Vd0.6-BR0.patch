@@ -1,0 +1,4 @@
+# DC-intercept-only comparison: only HP/LP reference frequencies change.
+octave=-1
+hp_cutoff=38.612069575081506
+lp_cutoff=843.76080134578626

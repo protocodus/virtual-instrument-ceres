@@ -1,0 +1,27 @@
+{
+  "actual_result_preserved": false,
+  "command": [
+    "python3",
+    "Tools/accuracy/joint_calibration.py",
+    "check",
+    "--attempt",
+    "attempt-001"
+  ],
+  "failure": "AssertionError: Preserve differing result; do not overwrite evidence",
+  "fits": 0,
+  "location": "Tools/accuracy/joint_calibration.py:503, assert actual==saved",
+  "new_audio_renders": 0,
+  "prior_assertions_passed": [
+    "snapshot helper/driver hashes",
+    "declaration hash",
+    "artifact hashes",
+    "producer binary hashes",
+    "frozen declaration",
+    "input bindings"
+  ],
+  "reason_actual_not_preserved": "Frozen check implementation recomputes in memory and asserts equality; it does not serialize a differing actual result. No pinned helper changes or rerun performed.",
+  "report_sha256": "5ae567e7dbdbce2ac63569f367c74e2867b0f432186313391cb3e740b80ae176",
+  "returncode": 1,
+  "session_id": 11711,
+  "status": "exact_recomputation_failed"
+}

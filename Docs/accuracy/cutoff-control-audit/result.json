@@ -1,0 +1,105 @@
+{
+  "components": {
+    "pin4_C_F": 1e-08,
+    "rank_ohms": {
+      "HP": [
+        2700.0,
+        2200.0,
+        1800.0
+      ],
+      "LP": [
+        3000.0,
+        2400.0,
+        2000.0
+      ]
+    }
+  },
+  "factory_attack_comparison": {
+    "brass1": {
+      "30us_as_fraction_of_attack": 7.836484063197619e-05,
+      "current_attack_seconds": 0.3828247433168227
+    },
+    "flute": {
+      "30us_as_fraction_of_attack": 0.00035328179205624215,
+      "current_attack_seconds": 0.0849180475036314
+    }
+  },
+  "general_bound": {
+    "assumptions": [
+      "Only stored states are eight 10nF pin4 capacitors",
+      "Every pin4 retains its documented grounded rank shunt",
+      "All eliminated added networks have nonnegative incremental conductance, with fixed-source perturbations zero",
+      "Nominal values; no component tolerance or active negative impedance included"
+    ],
+    "largest_tau_s": 2.924211298457085e-05,
+    "maximum_tau_s": 3e-05,
+    "minimum_eigenvalue_added_network_S": 1.162097771111797e-07,
+    "minimum_pole_Hz": 5305.164769729845,
+    "proof": "G_reduced = diag(1/Rrank) + Schur_complement(G_passive) >= (1/3000)*I; C=10nF*I implies slowest natural tau <=30us",
+    "random_passive_mesh_cases": 2000
+  },
+  "rows": [
+    {
+      "rank": "A",
+      "rank_ohms": 2700.0,
+      "rank_only_tau_ceiling_s": 2.7e-05,
+      "stage": "HP",
+      "stiff_other_sources_BrassI_tau_common_s": 2.428000424983051e-05,
+      "stiff_other_sources_BrassI_tau_difference_s": 2.3538032765785183e-05
+    },
+    {
+      "rank": "B",
+      "rank_ohms": 2200.0,
+      "rank_only_tau_ceiling_s": 2.2e-05,
+      "stage": "HP",
+      "stiff_other_sources_BrassI_tau_common_s": 2.015980164386444e-05,
+      "stiff_other_sources_BrassI_tau_difference_s": 1.964561570958743e-05
+    },
+    {
+      "rank": "C",
+      "rank_ohms": 1800.0,
+      "rank_only_tau_ceiling_s": 1.8e-05,
+      "stage": "HP",
+      "stiff_other_sources_BrassI_tau_common_s": 1.6749107796499464e-05,
+      "stiff_other_sources_BrassI_tau_difference_s": 1.6392649181490084e-05
+    },
+    {
+      "rank": "A",
+      "rank_ohms": 3000.0,
+      "rank_only_tau_ceiling_s": 3e-05,
+      "stage": "LP",
+      "stiff_other_sources_BrassI_tau_common_s": 2.2542131277705996e-05,
+      "stiff_other_sources_BrassI_tau_difference_s": 2.2151185933205554e-05
+    },
+    {
+      "rank": "B",
+      "rank_ohms": 2400.0,
+      "rank_only_tau_ceiling_s": 2.4e-05,
+      "stage": "LP",
+      "stiff_other_sources_BrassI_tau_common_s": 1.8977236618236236e-05,
+      "stiff_other_sources_BrassI_tau_difference_s": 1.8699402995017445e-05
+    },
+    {
+      "rank": "C",
+      "rank_ohms": 2000.0,
+      "rank_only_tau_ceiling_s": 2e-05,
+      "stage": "LP",
+      "stiff_other_sources_BrassI_tau_common_s": 1.638590930141959e-05,
+      "stiff_other_sources_BrassI_tau_difference_s": 1.6178356293881836e-05
+    }
+  ],
+  "scope": "Nominal component bound; no hardware calibration or audio improvement claim",
+  "source_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/cutoff-control-audit/check_cutoff_capacitor.py": "fa796c80861f84f52325b26d7b8c203a20557acd43ae2513fcdc74a381b8fcc2",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Source/DSP/ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+    "/tmp/ceres-cs50-1x8LGd/research/cutoff-m-eg-continuity.png": "13e8257f359e31faa35182a1c8b26aec0ac6ca9c4e0520b933548a581ae4a5cb",
+    "/tmp/ceres-cs50-1x8LGd/research/lp-bus-coupling-source.md": "b5f12526171f981b75d2f90911a3f4317b39555e3d3b9d79ccb8b0adb221e21c",
+    "/tmp/ceres-cs50-1x8LGd/research/q-m-rank-table.png": "7299af97b5a07bec425a1a6ddb3d33b95b8ad775181452e7fe6e8c464a76118c",
+    "/tmp/ceres-cs50-1x8LGd/research/service1.pdf": "c3a4b0d4e27e9af90c88258d03a1c09c5d080ea162e562d9bf267fc8ffbbadc1",
+    "/tmp/ceres-cs50-1x8LGd/research/service2.pdf": "1102e55b949378e7776555bca1a4d73105ca2d76d6fcf3aa4c2b103566201cfc"
+  },
+  "worst_single_pole_at_100Hz": {
+    "gain_dB": -0.0015427992362868456,
+    "phase_deg": -1.0798721171883547
+  }
+}

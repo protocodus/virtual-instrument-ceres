@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/attempt-001/control_trace",
+    "brass1",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/brass-history20-frozen.patch",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--96.events.tsv",
+    "96800",
+    "50",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/attempt-001/brass-history20.f64"
+  ],
+  "returncode": 0,
+  "stderr": "",
+  "stdout": "{\"records\":32266,\"columns\":45,\"rate\":16000,\"frames\":96800,\"audio_exported\":false,\"parameters\":{\"saw\":1,\"pulse\":0,\"sine\":0.042999999999999997,\"noise\":0,\"pwmDepth\":0,\"pwmRate\":0.20000000000000001,\"pulseWidth\":0.5,\"hpCutoff\":27.727086977293183,\"lpCutoff\":442.85422297489009,\"hpResonance\":0,\"lpResonance\":0.42900000000000005,\"hpEnvelopeScale\":0.12409090909090907,\"lpEnvelopeScale\":0.53936170212765966,\"keyTrack\":1,\"brilliance\":0,\"filterLevel\":1,\"ampLevel\":1,\"volume\":0.55000000000000004,\"outputTrimDb\":0,\"octave\":-1,\"tuneCents\":0,\"voiceSpreadCents\":0,\"driftCents\":0,\"vibratoCents\":0,\"filterLfo\":0,\"lfoRate\":6.6692178847138601,\"lfoWaveform\":0,\"tremolo\":0.83104137105739762,\"ringMix\":0,\"pressureFilter\":0,\"pressureVolume\":0,\"pressureVibrato\":0,\"velocitySensitivity\":0,\"resetMicroseconds\":6,\"drive\":1}}\n"
+}

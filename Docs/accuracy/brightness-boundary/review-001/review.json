@@ -1,0 +1,110 @@
+{
+  "status": "PASS_independent_stored_evidence_review",
+  "reviewed_utc": "2026-10-18T23:26:29.013399+00:00",
+  "reviewed_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/brightness-boundary/plan.json": "9c7c3a4b6ed44375ae1fa7c0952f4df78fd5e6e0bbb99a109ad96ab449cfd0c6",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/brightness-boundary/qualify-001/report.json": "821aed18d35d46353f557d6898a07a706cf2576bf2538a23cc468367a5d9730b",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/brightness-boundary/jacobian-001/report.json": "ec88bc75ef69312c0517308f454618a77a254e7694bf24db50f95a30f2c942b2",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/brightness-boundary/fit-001/candidate.json": "9f621d772bcfaafb1080de5b86fa0c8af0caf2ae92735e64f7837994ae4f530d"
+  },
+  "hash_verification": {
+    "unique_bound_files": 290,
+    "all_match": true,
+    "renderer_sha256": "182dfc2a15768df074aa9c6481fe3ca86e5c9fc432bfb1a07aff81e6fe4815c5",
+    "compiled_inputs": 5,
+    "audio_and_target_inputs_hashed_only": true
+  },
+  "arithmetic": {
+    "scalar_comparisons": 101426,
+    "maximum_difference": 1.4210854715202004e-14
+  },
+  "qualification": {
+    "passed": true,
+    "ratio_rms_db": 0.05639047331177708,
+    "level_rms_db": 0.007627888967741795,
+    "flags": {
+      "ratio_rms": true,
+      "ratio_p95": true,
+      "level_rms": true,
+      "level_p95": true,
+      "brass_cells": true,
+      "quadrature": true
+    },
+    "reused_brass_gate_exact": true,
+    "reported_quadrature_delta_max_db": 5.340004681997357e-06,
+    "quadrature_recomputed": false
+  },
+  "circuit_diagnostics": {
+    "reported_max_normalized_KCL_error": 3.148799926473858e-16,
+    "reported_max_schur_node_difference_V": 9.71445146547012e-17,
+    "reported_min_corner_manual_margin_V": 0.487955507255902,
+    "reported_conditions_all_pass": true,
+    "independent_node_solve_performed": false
+  },
+  "jacobian": {
+    "shape": [
+      628,
+      3
+    ],
+    "norms": [
+      0.010139523880138175,
+      0.6434572579589496,
+      6.474280904247903
+    ],
+    "hp_fixed_at_zero": true,
+    "active_parameters": [
+      1,
+      2
+    ],
+    "normalized_singular_values": [
+      1.3613887881988624,
+      0.38291065193649854
+    ],
+    "singular_ratio": 0.28126473146814657,
+    "reported_tiny_derivative_errors_pass": true,
+    "model_derivatives_recomputed": false
+  },
+  "fit": {
+    "status": "forward_budget_stopped_diagnostic_only",
+    "constraint_count": 13,
+    "record_counts": [
+      45,
+      48,
+      34,
+      60,
+      67,
+      24,
+      10,
+      12,
+      11,
+      12,
+      18,
+      12,
+      5
+    ],
+    "limits_reconstructed": true,
+    "logged_evaluations": 80,
+    "feasible_logged_points": 0,
+    "callbacks": 12,
+    "last_callback": [
+      0.0,
+      -2.408947723514567,
+      1.3298454744496089
+    ],
+    "maximum_final_constraint_violation": 4.853789184601229,
+    "candidate_is_solver_return": false,
+    "validation_permitted": false,
+    "budget_request_unevaluated": true,
+    "derivative_probes_counted": true,
+    "source_targets_read_by_review": false,
+    "transfer_data_or_metrics_read_by_review": false
+  },
+  "scope": {
+    "producer_imported": false,
+    "model_executed": false,
+    "optimizer_executed": false,
+    "audio_decoded_or_scored": false,
+    "frozen_files_changed": false
+  },
+  "conclusion": "Arithmetic and provenance are consistent. The 80-theta budget stop preserves an infeasible callback diagnostic and correctly forbids native candidate validation. It does not establish global infeasibility or hardware calibration."
+}

@@ -1,0 +1,108 @@
+diff --git a/Source/DSP/ceres.cpp b/Source/DSP/ceres.cpp
+index d89f83b..149c63b 100644
+--- a/Source/DSP/ceres.cpp
++++ b/Source/DSP/ceres.cpp
+@@ -630,10 +630,12 @@ struct Synth::Impl {
+         effectiveHpResonance=clamp(patch.hpResonance-qVoltageOffset*.1,0,1);
+         effectiveLpResonance=clamp(patch.lpResonance-qVoltageOffset*.1,0,1);
+         // R7 LC sums LEVEL(270k) and SUB(120k) currents before common VCA2.
+-        // Retain the existing tremolo depth/DC calibration at level1, but
+-        // add its contribution to LEVEL rather than multiplying both gains.
+-        // This normalization is not a recovered physical pot-to-current law.
+-        commonVcaGain=std::max(0.0,patch.ampLevel-patch.tremolo*(.5+.5*lfo));
++        // PN3 VCF/VCA depth pots share SUO and ground; their passive R7
++        // paths do not invert. Positive LI raises VCA gain (Guide pp.40–41),
++        // so positive SUB must raise both cutoff and common gain. Retain the
++        // existing tremolo mean/depth and closure normalization; those are
++        // still engineering choices, not a recovered pot-to-current law.
++        commonVcaGain=std::max(0.0,patch.ampLevel-patch.tremolo*(.5-.5*lfo));
+         const double pwm = std::sin(2*pi*(pwmPhase+patch.pwmPhase));
+         lfoPhase = wrap(lfoPhase + patch.lfoRate*dt);
+         pwmPhase = wrap(pwmPhase + patch.pwmRate*dt);
+diff --git a/Tests/SoundPathTests.cpp b/Tests/SoundPathTests.cpp
+index f8dfaf0..343eacb 100644
+--- a/Tests/SoundPathTests.cpp
++++ b/Tests/SoundPathTests.cpp
+@@ -138,10 +138,15 @@ void commonVcaPlacement() {
+     // LEVEL*tremolo product. Square SUB makes the two halves unambiguous.
+     p.ampLevel=.4;p.tremolo=.8;p.lfoWaveform=3;p.lfoRate=2;
+     ceres::Synth additive(8000,21);additive.setPatch(p);additive.noteOn(60);
+-    require(advance(additive,1800)==0,"Positive square SUB must close the additive common VCA");
+-    require(additive.soundPathState().commonVcaGain==0,"Clipped LC gain remains zero");
+-    require(advance(additive,1800)>1e-5,"Negative square half reopens common VCA without new gate");
++    require(advance(additive,1800)>1e-5,"Positive square SUB opens the additive common VCA");
+     near(additive.soundPathState().commonVcaGain,.4,1e-15,"Inherited AM scale, additive LEVEL value");
++    require(advance(additive,400)>0,"Closing the common VCA retains downstream capacitor tails");
++    require(additive.soundPathState().commonVcaGain==0,"Negative square half closes LC gain");
++    additive.allSoundOff();
++    require(advance(additive,1200)==0,"Panic clears audio tails while SUB stays in its closed half");
++    additive.noteOn(60);
++    require(advance(additive,1000)>1e-5,"Next positive half reopens common VCA without restarting SUB");
++    near(additive.soundPathState().commonVcaGain,.4,1e-15,"Positive SUB returns to the same open level");
+     // Dynamic LEVEL is upstream of the bus and global ring. Changing master
+     // volume at the same instant is not the same circuit state trajectory.
+     p.ampLevel=1;p.tremolo=0;p.ringMix=1;p.ringRate=47;
+@@ -160,6 +165,55 @@ void commonVcaPlacement() {
+         near(factory.volume,.55,0,"Factory LEVEL must not be folded into final master volume");
+     }
+ }
++void sharedSubPolarity() {
++    // PN3 gives both depth pots the same SUO/ground endpoints. R7's
++    // positive conductances and the positive LI-to-gain slope imply a
++    // positive gain/cutoff relation regardless of the unknown depth scale.
++    // Check all five real production sources, including filtered noise.
++    for(unsigned waveform=0;waveform<5;++waveform) {
++        ceres::Patch p;p.lfoWaveform=waveform;p.lfoRate=7;
++        p.ampLevel=.8;p.tremolo=.4;p.filterLfo=.4;
++        p.filterInitial=p.filterPeak=0;p.keyTrack=0;
++        p.hpCutoff=100;p.lpCutoff=1200;
++        ceres::Synth active(8000,91),clock(8000,91);
++        active.setPatch(p);clock.setPatch(p);
++        unsigned positive=0,negative=0;
++        for(unsigned n=0;n<4000;++n) {
++            if(n==0)active.noteOn(60);
++            if(n==113)active.noteOn(64);
++            if(n==277)active.noteOff(60);
++            if(n==401)active.sustain(true);
++            if(n==503)active.noteOff(64);
++            if(n==607)active.sustain(false);
++            if(n==809)active.allNotesOff();
++            if(n==997)active.allSoundOff();
++            if(n==1201)active.noteOn(67);
++            active.process();clock.process();
++            const double source=active.modulationState().sub;
++            require(source==clock.modulationState().sub,"Notes, pedal and panic cannot reset the shared SUB source");
++            const double gain=active.soundPathState().commonVcaGain;
++            const auto v=active.voiceState()[0];
++            const double hpOct=std::log2((v.hpFrequency-floorHz)/(p.hpCutoff-floorHz));
++            const double lpOct=std::log2((v.lpFrequency-floorHz)/(p.lpCutoff-floorHz));
++            near(gain,.6+.2*source,2e-16,"Common gain has declared unchanged mean/depth with positive SUB slope");
++            near(lpOct,.4*source,2e-14,"Selected SUB feeds actual LP variable-gm control");
++            near(hpOct,.4*source*(.7/.65)*(47./150.),2e-14,"Selected SUB feeds actual HP variable-gm control");
++            if(source>.05) {
++                ++positive;require(gain>.6 && hpOct>0 && lpOct>0,"Positive shared SUB raises gain and both cutoffs");
++            }
++            if(source<-.05) {
++                ++negative;require(gain<.6 && hpOct<0 && lpOct<0,"Negative shared SUB lowers gain and both cutoffs");
++            }
++        }
++        require(positive>100 && negative>100,"Both SUB polarities were exercised for every waveform");
++        active.reset();ceres::Synth fresh(8000,91);fresh.setPatch(p);
++        active.noteOn(60);fresh.noteOn(60);
++        for(unsigned n=0;n<120;++n) {
++            require(active.process()==fresh.process(),"Explicit reset reproduces fresh circuit/audio state");
++            require(active.modulationState().sub==fresh.modulationState().sub,"Explicit reset initializes every SUB waveform deterministically");
++        }
++    }
++}
+ void postCircuitOutputTrim() {
+     for(double db:{-24.,-6.020599913279624,0.,6.020599913279624,24.}) {
+         ceres::Patch p;p.sine=.3;p.drive=2;p.ringMix=.73;p.ringRate=53;
+@@ -192,6 +246,7 @@ int main() {
+         brillianceAndSubKcl();std::cout<<"PASS BR/SUB nodal ratios, shared key modulation, fixed-gm floor and audio equivalence\n";
+         resonanceControlCircuit();std::cout<<"PASS eight-node Q capacitor KCL, exact RC dynamics, lifecycle and audio routing\n";
+         commonVcaPlacement();std::cout<<"PASS additive common VCA, sine path, downstream bus/ring state and factory LEVEL\n";
++        sharedSubPolarity();std::cout<<"PASS all five shared SUB polarities, continuous clock, lifecycle and reset\n";
+         postCircuitOutputTrim();std::cout<<"PASS post-FIR utility trim linearity, neutral bypass and state/latency independence\n";
+     } catch(const std::exception& e) {std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+ }

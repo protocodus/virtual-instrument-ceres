@@ -1,0 +1,454 @@
+Estimated offset +0 Hz, window 40 ms; 61 signals × 81 frames
+Estimated offset +0 Hz, window 60 ms; 61 signals × 81 frames
+Estimated offset +0 Hz, window 80 ms; 61 signals × 81 frames
+Estimated offset -2 Hz, window 40 ms; 61 signals × 81 frames
+Estimated offset -2 Hz, window 60 ms; 61 signals × 81 frames
+Estimated offset -2 Hz, window 80 ms; 61 signals × 81 frames
+Estimated offset +2 Hz, window 40 ms; 61 signals × 81 frames
+Estimated offset +2 Hz, window 60 ms; 61 signals × 81 frames
+Estimated offset +2 Hz, window 80 ms; 61 signals × 81 frames
+{
+  "seconds": 4.533001625037286,
+  "report_sha256": "acfe7c2a203afcb2b1d9a46d03379644ade3771b25d41302f716c5ec8f634d99",
+  "decision": {
+    "geometry_pass": true,
+    "targets": [
+      {
+        "target": "C4_H3_H2",
+        "windows": [
+          {
+            "window_seconds": 0.04,
+            "source_peak_amplitude_dB": 0.20537279760638374,
+            "source_phase_degrees": -140.56647047948505,
+            "max_flat_ratio_null_dB": 0.003976732407404652,
+            "max_static_filter_null_dB": 0.8231036165409535,
+            "decision_threshold_dB": 1.646207233081907,
+            "weak_source_frame_count": 0,
+            "positive_gain_range": [
+              0.9667026916046803,
+              0.9774220406752484
+            ],
+            "positive_phase_error_max_degrees": 0.5428546232780604,
+            "positive_RMS_gain": 0.9720796785974929,
+            "source_gain_adjusted_amplitude_dB": 0.2112715676791985,
+            "recovery_pass": true,
+            "flat_null_pass": true,
+            "amplitude_exceeds_declared_threshold": false
+          },
+          {
+            "window_seconds": 0.06,
+            "source_peak_amplitude_dB": 0.1882421459236629,
+            "source_phase_degrees": -147.46221041374937,
+            "max_flat_ratio_null_dB": 0.0035392576474516245,
+            "max_static_filter_null_dB": 0.7861699014379433,
+            "decision_threshold_dB": 1.5723398028758866,
+            "weak_source_frame_count": 0,
+            "positive_gain_range": [
+              0.9262813325262106,
+              0.9482531740504195
+            ],
+            "positive_phase_error_max_degrees": 1.037355675120267,
+            "positive_RMS_gain": 0.9373317264398057,
+            "source_gain_adjusted_amplitude_dB": 0.20082766923792117,
+            "recovery_pass": true,
+            "flat_null_pass": true,
+            "amplitude_exceeds_declared_threshold": false
+          },
+          {
+            "window_seconds": 0.08,
+            "source_peak_amplitude_dB": 0.16863831066322377,
+            "source_phase_degrees": -158.38577557998826,
+            "max_flat_ratio_null_dB": 0.0031211112794321838,
+            "max_static_filter_null_dB": 0.7385701565091419,
+            "decision_threshold_dB": 1.4771403130182839,
+            "weak_source_frame_count": 0,
+            "positive_gain_range": [
+              0.8724097689917879,
+              0.9066173112463404
+            ],
+            "positive_phase_error_max_degrees": 1.6257541219294183,
+            "positive_RMS_gain": 0.8896776304227079,
+            "source_gain_adjusted_amplitude_dB": 0.18954990537763608,
+            "recovery_pass": true,
+            "flat_null_pass": true,
+            "amplitude_exceeds_declared_threshold": false
+          }
+        ],
+        "source_phase_spread_degrees": 17.819305100503215,
+        "gain_adjusted_amplitude_max_over_min": 1.1145960070952652,
+        "passes_all_predeclared_gates": false,
+        "carrier_sensitivity": [
+          {
+            "offset_Hz": 0.0,
+            "source_by_window": [
+              {
+                "window_seconds": 0.04,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.668980344081243,
+                  0.2565288895424911,
+                  3.4131843546441143,
+                  -0.15862214400064614,
+                  -0.1304492293166615
+                ],
+                "peak_amplitude_dB": 0.20537279760638374,
+                "phase_degrees": -140.56647047948505,
+                "residual_RMS_dB": 0.1925018898324685,
+                "polynomial_only_residual_RMS_dB": 0.23589432596266846,
+                "design_condition": 4.055875530570233
+              },
+              {
+                "window_seconds": 0.06,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.648295160761708,
+                  0.28216753904007374,
+                  3.3386334561178623,
+                  -0.1586950723229035,
+                  -0.10124712105721334
+                ],
+                "peak_amplitude_dB": 0.1882421459236629,
+                "phase_degrees": -147.46221041374937,
+                "residual_RMS_dB": 0.17846163630346112,
+                "polynomial_only_residual_RMS_dB": 0.2176407461562468,
+                "design_condition": 4.055875530570233
+              },
+              {
+                "window_seconds": 0.08,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.619722161020897,
+                  0.3132516991075933,
+                  3.2427527328043335,
+                  -0.1567805189021163,
+                  -0.06211882738855527
+                ],
+                "peak_amplitude_dB": 0.16863831066322377,
+                "phase_degrees": -158.38577557998826,
+                "residual_RMS_dB": 0.20487861870483348,
+                "polynomial_only_residual_RMS_dB": 0.23303945388036748,
+                "design_condition": 4.055875530570233
+              }
+            ]
+          },
+          {
+            "offset_Hz": -2.0,
+            "source_by_window": [
+              {
+                "window_seconds": 0.04,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.769156076721354,
+                  0.34928800394759385,
+                  3.3744584364529304,
+                  -0.13061365483127535,
+                  -0.13331478880588726
+                ],
+                "peak_amplitude_dB": 0.18663536573420877,
+                "phase_degrees": -134.4136358649015,
+                "residual_RMS_dB": 0.20537828059707386,
+                "polynomial_only_residual_RMS_dB": 0.2400295153813045,
+                "design_condition": 4.055875530570233
+              },
+              {
+                "window_seconds": 0.06,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.8734395898768437,
+                  0.4871300947157171,
+                  3.2528588081026784,
+                  -0.09962064509578986,
+                  -0.11703105991292896
+                ],
+                "peak_amplitude_dB": 0.1536897586491855,
+                "phase_degrees": -130.405509443874,
+                "residual_RMS_dB": 0.22724339913038005,
+                "polynomial_only_residual_RMS_dB": 0.2492769499407603,
+                "design_condition": 4.055875530570233
+              },
+              {
+                "window_seconds": 0.08,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -3.0223780181902202,
+                  0.6635587077178022,
+                  3.1033815347236713,
+                  -0.06021292232080288,
+                  -0.11433914067784678
+                ],
+                "peak_amplitude_dB": 0.12922474648982477,
+                "phase_degrees": -117.77204832360603,
+                "residual_RMS_dB": 0.3073641530723617,
+                "polynomial_only_residual_RMS_dB": 0.31930326882899424,
+                "design_condition": 4.055875530570233
+              }
+            ]
+          },
+          {
+            "offset_Hz": 2.0,
+            "source_by_window": [
+              {
+                "window_seconds": 0.04,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.791764890978406,
+                  0.16683141772507515,
+                  3.4517605869697974,
+                  -0.1874069270204472,
+                  -0.14101479409358858
+                ],
+                "peak_amplitude_dB": 0.23453470627714015,
+                "phase_degrees": -143.04027996724395,
+                "residual_RMS_dB": 0.19743552175707535,
+                "polynomial_only_residual_RMS_dB": 0.25133558026403263,
+                "design_condition": 4.055875530570233
+              },
+              {
+                "window_seconds": 0.06,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.916475202565615,
+                  0.0760144561353906,
+                  3.433284823555314,
+                  -0.23370399485822277,
+                  -0.12184821481591146
+                ],
+                "peak_amplitude_dB": 0.2635612730780391,
+                "phase_degrees": -152.46343682941873,
+                "residual_RMS_dB": 0.17448275441636785,
+                "polynomial_only_residual_RMS_dB": 0.24642710474223925,
+                "design_condition": 4.055875530570233
+              },
+              {
+                "window_seconds": 0.08,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -3.092965422384029,
+                  -0.041100635615404446,
+                  3.403019534829373,
+                  -0.30040575940303305,
+                  -0.12294900522388827
+                ],
+                "peak_amplitude_dB": 0.32459217206836133,
+                "phase_degrees": -157.74186987157435,
+                "residual_RMS_dB": 0.19299731221029312,
+                "polynomial_only_residual_RMS_dB": 0.2880303661621962,
+                "design_condition": 4.055875530570233
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "target": "C4_H4_H2",
+        "windows": [
+          {
+            "window_seconds": 0.04,
+            "source_peak_amplitude_dB": 1.2928230177069224,
+            "source_phase_degrees": 101.16522087242146,
+            "max_flat_ratio_null_dB": 0.040744590282900485,
+            "max_static_filter_null_dB": 0.8530257461473455,
+            "decision_threshold_dB": 1.706051492294691,
+            "weak_source_frame_count": 0,
+            "positive_gain_range": [
+              0.9723237513490343,
+              0.9812053500812942
+            ],
+            "positive_phase_error_max_degrees": 0.03413028953875141,
+            "positive_RMS_gain": 0.9765925051474104,
+            "source_gain_adjusted_amplitude_dB": 1.323810095708014,
+            "recovery_pass": true,
+            "flat_null_pass": true,
+            "amplitude_exceeds_declared_threshold": false
+          },
+          {
+            "window_seconds": 0.06,
+            "source_peak_amplitude_dB": 1.2506338880279968,
+            "source_phase_degrees": 100.48315405394307,
+            "max_flat_ratio_null_dB": 0.0023789183336630462,
+            "max_static_filter_null_dB": 0.8159341062621741,
+            "decision_threshold_dB": 1.6318682125243482,
+            "weak_source_frame_count": 0,
+            "positive_gain_range": [
+              0.9262962797475301,
+              0.9481737071480486
+            ],
+            "positive_phase_error_max_degrees": 1.041818070734422,
+            "positive_RMS_gain": 0.9372966298652168,
+            "source_gain_adjusted_amplitude_dB": 1.3342989275527832,
+            "recovery_pass": true,
+            "flat_null_pass": true,
+            "amplitude_exceeds_declared_threshold": false
+          },
+          {
+            "window_seconds": 0.08,
+            "source_peak_amplitude_dB": 1.2443307795630616,
+            "source_phase_degrees": 99.25383838093255,
+            "max_flat_ratio_null_dB": 0.001964835532176933,
+            "max_static_filter_null_dB": 0.7662426045862054,
+            "decision_threshold_dB": 1.5324852091724108,
+            "weak_source_frame_count": 0,
+            "positive_gain_range": [
+              0.87253064946215,
+              0.9065986152508693
+            ],
+            "positive_phase_error_max_degrees": 1.6168719297783412,
+            "positive_RMS_gain": 0.889724533332849,
+            "source_gain_adjusted_amplitude_dB": 1.3985573432508163,
+            "recovery_pass": true,
+            "flat_null_pass": true,
+            "amplitude_exceeds_declared_threshold": false
+          }
+        ],
+        "source_phase_spread_degrees": 1.9113824914888937,
+        "gain_adjusted_amplitude_max_over_min": 1.05646372375097,
+        "passes_all_predeclared_gates": false,
+        "carrier_sensitivity": [
+          {
+            "offset_Hz": 0.0,
+            "source_by_window": [
+              {
+                "window_seconds": 0.04,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.38174838789643,
+                  0.3214892839588577,
+                  -0.4536154447883807,
+                  -0.25034078257292974,
+                  1.2683535972644249
+                ],
+                "peak_amplitude_dB": 1.2928230177069224,
+                "phase_degrees": 101.16522087242146,
+                "residual_RMS_dB": 1.4573026652703722,
+                "polynomial_only_residual_RMS_dB": 1.6939233483600233,
+                "design_condition": 4.055875530570233
+              },
+              {
+                "window_seconds": 0.06,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.399722101968961,
+                  0.2989123588806486,
+                  -0.5395944767233627,
+                  -0.22754836333577982,
+                  1.2297588642604826
+                ],
+                "peak_amplitude_dB": 1.2506338880279968,
+                "phase_degrees": 100.48315405394307,
+                "residual_RMS_dB": 1.35190656952957,
+                "polynomial_only_residual_RMS_dB": 1.5892562505052372,
+                "design_condition": 4.055875530570233
+              },
+              {
+                "window_seconds": 0.08,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.4113414228688757,
+                  0.26758856144361676,
+                  -0.6529334243360434,
+                  -0.20009919821298597,
+                  1.2281365558611699
+                ],
+                "peak_amplitude_dB": 1.2443307795630616,
+                "phase_degrees": 99.25383838093255,
+                "residual_RMS_dB": 1.2482753119458456,
+                "polynomial_only_residual_RMS_dB": 1.4999307288033483,
+                "design_condition": 4.055875530570233
+              }
+            ]
+          },
+          {
+            "offset_Hz": -2.0,
+            "source_by_window": [
+              {
+                "window_seconds": 0.04,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.6200407324986505,
+                  0.584349152589921,
+                  -0.5515484406759589,
+                  -0.03512574471411061,
+                  1.218672624609623
+                ],
+                "peak_amplitude_dB": 1.219178733375311,
+                "phase_degrees": 91.65097651520784,
+                "residual_RMS_dB": 1.6274923694995749,
+                "polynomial_only_residual_RMS_dB": 1.8207920145250513,
+                "design_condition": 4.055875530570233
+              },
+              {
+                "window_seconds": 0.06,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.9768739088290386,
+                  0.6973946607558267,
+                  -0.46337816305836577,
+                  0.09240643720909965,
+                  1.1005047397868468
+                ],
+                "peak_amplitude_dB": 1.1043774861572446,
+                "phase_degrees": 85.20028577785396,
+                "residual_RMS_dB": 1.3629425535094206,
+                "polynomial_only_residual_RMS_dB": 1.5510281125683023,
+                "design_condition": 4.055875530570233
+              },
+              {
+                "window_seconds": 0.08,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -3.4352186043913444,
+                  0.9774269568523559,
+                  -0.5132824598386313,
+                  0.29001564792464857,
+                  0.9680325782774901
+                ],
+                "peak_amplitude_dB": 1.0105425021480883,
+                "phase_degrees": 73.32215949328767,
+                "residual_RMS_dB": 1.2762577638074433,
+                "polynomial_only_residual_RMS_dB": 1.4449768489839179,
+                "design_condition": 4.055875530570233
+              }
+            ]
+          },
+          {
+            "offset_Hz": 2.0,
+            "source_by_window": [
+              {
+                "window_seconds": 0.04,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.7898842903028886,
+                  0.0762899184698031,
+                  -0.3281992119848822,
+                  -0.4214746744304255,
+                  1.319204766909525
+                ],
+                "peak_amplitude_dB": 1.384897872849492,
+                "phase_degrees": 107.71823771814542,
+                "residual_RMS_dB": 1.665055210670901,
+                "polynomial_only_residual_RMS_dB": 1.9036746959719717,
+                "design_condition": 4.055875530570233
+              },
+              {
+                "window_seconds": 0.06,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -2.9948858215206675,
+                  -0.08251182643259702,
+                  -0.6205358597912932,
+                  -0.6015338925887695,
+                  1.2831252472047312
+                ],
+                "peak_amplitude_dB": 1.4171285841260841,
+                "phase_degrees": 115.1173584196251,
+                "residual_RMS_dB": 1.4374298864742225,
+                "polynomial_only_residual_RMS_dB": 1.7182355739977373,
+                "design_condition": 4.055875530570233
+              },
+              {
+                "window_seconds": 0.08,
+                "coefficients_constant_linear_quadratic_sin_cos": [
+                  -3.4809201365177005,
+                  -0.4221066136607996,
+                  -0.7394740522364253,
+                  -0.8393239869063458,
+                  1.2487512544621704
+                ],
+                "peak_amplitude_dB": 1.504607739750533,
+                "phase_degrees": 123.90625718023233,
+                "residual_RMS_dB": 1.4075748577892566,
+                "polynomial_only_residual_RMS_dB": 1.724002065244245,
+                "design_condition": 4.055875530570233
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "both_targets_pass": false,
+    "interpretation": "The strict predeclared coloration criterion did not pass. Failures remain reported; no physical route is identified or excluded."
+  }
+}

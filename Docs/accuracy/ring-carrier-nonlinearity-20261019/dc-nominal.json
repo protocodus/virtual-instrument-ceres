@@ -1,0 +1,88 @@
+{
+  "inputs": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/ElectronicSynth.pdf": "16e8eead814ba8553f70b4fceb6c1080179abfad1962207a943957bf90cdb0fc",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/dc_nominal.py": "bb8eb3b5fd503518f3fd71c6abcf05fc3b6ee151f7d5d632b5ce0504aebaeff7",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/fairchild-12.png": "a53bf01769e3283fbef46eb552cdc7a8461147f10753ede0e985c55ddcb5a325",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/yamaha-pwm-49.png": "fa9b257538082ee5879aff1f6377d9533e253f580f3723ff8f50121b122ef6f9",
+    "/tmp/ceres-cs50-1x8LGd/research/cs-servicing-guide.pdf": "2738f7ddc46f0bedbab38dcad8e2c112c41b3e6ca34670d471d0cb8c0dbde633",
+    "/tmp/ceres-cs50-1x8LGd/research/service2.pdf": "1102e55b949378e7776555bca1a4d73105ca2d76d6fcf3aa4c2b103566201cfc"
+  },
+  "nodes": [
+    {
+      "balance_fraction": 0.0,
+      "carrier_dc_volts": -0.023485642228946446,
+      "max_independent_schur_difference_volts": 1.1546319456101628e-14,
+      "max_kcl_residual_amps": 1.5612511283791264e-17,
+      "signal_dc_volts": -0.006590292841585743,
+      "voltages": {
+        "audio_bias": 4.239583311844966,
+        "local_supply": 13.227522990776503,
+        "pin1": 4.219750484567499,
+        "pin4": 4.226340777409085,
+        "pin7": 7.750261935552182,
+        "pin8": 7.773747577781128
+      }
+    },
+    {
+      "balance_fraction": 0.5,
+      "carrier_dc_volts": -0.023489437180096218,
+      "max_independent_schur_difference_volts": 1.2434497875801753e-14,
+      "max_kcl_residual_amps": 6.938893903907228e-18,
+      "signal_dc_volts": 0.0,
+      "voltages": {
+        "audio_bias": 4.241518374144045,
+        "local_supply": 13.227831097848231,
+        "pin1": 4.225630005324026,
+        "pin4": 4.225630005324026,
+        "pin7": 7.751514269431915,
+        "pin8": 7.7750037066120115
+      }
+    },
+    {
+      "balance_fraction": 1.0,
+      "carrier_dc_volts": -0.023485642228946446,
+      "max_independent_schur_difference_volts": 1.3322676295501878e-14,
+      "max_kcl_residual_amps": 1.3877787807814457e-17,
+      "signal_dc_volts": 0.006590292841585743,
+      "voltages": {
+        "audio_bias": 4.239583311844967,
+        "local_supply": 13.227522990776503,
+        "pin1": 4.226340777409085,
+        "pin4": 4.219750484567499,
+        "pin7": 7.750261935552182,
+        "pin8": 7.773747577781128
+      }
+    }
+  ],
+  "nominal_carrier_dc_volts": -0.023489437180096218,
+  "nominal_source_peak_volts": 1.5,
+  "scope": "Conditional nominal ideal-source, zero-IC-current external DC limit plus matched forward-active carrier pair at25C. No hardware fit or complete operating-point calibration.",
+  "switch_ac_small_signal_slope_per_normalized_unit": 23.850471017994344,
+  "switch_at_zero_ac": -0.4277380604918782,
+  "switch_law": "tanh((nominal_carrier_dc_volts + 1.5 * passive_differential_carrier)/(2*VT))",
+  "temperature_kelvin": 298.15,
+  "test_voltages": [
+    {
+      "differential_volts": -0.2569257912108585,
+      "switching_factor": -0.9999092042625951
+    },
+    {
+      "differential_volts": -0.0513851582421717,
+      "switching_factor": -0.7615941559557649
+    },
+    {
+      "differential_volts": 0.0,
+      "switching_factor": 0.0
+    },
+    {
+      "differential_volts": 0.0513851582421717,
+      "switching_factor": 0.7615941559557649
+    },
+    {
+      "differential_volts": 0.2569257912108585,
+      "switching_factor": 0.9999092042625951
+    }
+  ],
+  "thermal_voltage_volts": 0.02569257912108585,
+  "two_thermal_voltages_volts": 0.0513851582421717
+}

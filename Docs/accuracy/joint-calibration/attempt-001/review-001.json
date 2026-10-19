@@ -1,0 +1,26 @@
+{
+  "brass_cells_checked": 96,
+  "brass_valid_partial_frames": 243,
+  "case_count": 32,
+  "cases_per_training_clip": 16,
+  "checks": [
+    "native minus analytical deltas",
+    "native baseline plus analytical delta anchors",
+    "RMS and p95 and signed means",
+    "all pass flags and frozen thresholds",
+    "unique case IDs against declaration"
+  ],
+  "flute_valid_partial_frames": 270,
+  "limitations": [
+    "No retained audio was read or remeasured.",
+    "Quadrature summary checked against threshold, not recomputed from fine traces.",
+    "Independent arithmetic PASS does not resolve the separate exact-recomputation failure."
+  ],
+  "loaded_cases": 24,
+  "maximum_statistic_difference": 0,
+  "report_sha256": "5ae567e7dbdbce2ac63569f367c74e2867b0f432186313391cb3e740b80ae176",
+  "reviewer": "/root/hardware_research",
+  "scalar_statistics_recomputed": 800,
+  "status": "independent_stored_report_arithmetic_pass",
+  "stiff_cases": 8
+}

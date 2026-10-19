@@ -1,0 +1,18 @@
+{
+  "commit": "57eaba2313eb6758835d8e3683da52da82cdc83c",
+  "files": {
+    "Docs/ring-carrier/validation.json": {
+      "archived_path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/implementation-evidence-57eaba2/validation.json",
+      "sha256": "93109a7916ee46d47797266f685699e1a0434503330f63e21204c83e092ab7fd"
+    },
+    "Docs/ring-carrier/source.patch": {
+      "archived_path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/implementation-evidence-57eaba2/source.patch",
+      "sha256": "9022e122d8f2d6d8d25b34e18e3705c3276c2e60fe4afd2b1c541fe202b434f1"
+    },
+    "Tests/record_ring_carrier_validation.py": {
+      "archived_path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/implementation-evidence-57eaba2/record_ring_carrier_validation.py",
+      "sha256": "2bc370b6c27772c3c67666c7b5a4c912a35897e67d96b4ac3e6150f32716b492"
+    }
+  },
+  "scope": "Exact git bytes preserved for immutable pre-recorder-fix independent review; no change to old review."
+}

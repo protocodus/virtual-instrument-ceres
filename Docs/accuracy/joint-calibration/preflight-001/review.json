@@ -1,0 +1,20 @@
+{
+  "control_trace_runs": 0,
+  "defect": "Filtered saw omitted native mixer /3. This does not cancel with the direct sine in Brass. Fix and independent broad-pass gain oracle required.",
+  "fits": 0,
+  "new_audio_renders": 0,
+  "prior_synthetic_oracles": {
+    "direct_sine_coefficient_error": 5.551115123125783e-17,
+    "normalized_KCL_max_error": 1.90582702009328e-16,
+    "scalar_AM_ratio_error_db": 0,
+    "transfer_max_relative_error": 8.849847239898367e-16,
+    "zero_change_error_db": 0
+  },
+  "qualification_executed": false,
+  "snapshot_sha256": {
+    "control_trace.cpp": "87272cf5bdf91f541a77d4332eba95a93cd13fa027f29082186dc94526de1937",
+    "joint_calibration.py": "720d094276be7f80c035f088327b967df1bcd88da7d254664c1c9cef3fb90512"
+  },
+  "status": "review_defect_before_qualification",
+  "threshold_clarification": "brass_cell_mean_abs_db previously meant abs(signed mean); rename explicitly before declaration."
+}

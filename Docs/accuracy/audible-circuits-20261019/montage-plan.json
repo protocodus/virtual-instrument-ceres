@@ -1,0 +1,132 @@
+{
+  "scope": "Presentation montage only; no metric windows or source WAVs changed. Each scene old then new; component-isolated models, not a whole final-patch demo.",
+  "declared_before_assembly": true,
+  "sample_rate": 48000,
+  "channels": 1,
+  "gain": 1,
+  "normalization": "none",
+  "fades": false,
+  "silence_between_segments_seconds": 0.25,
+  "segments": [
+    {
+      "label": "oscillator saw",
+      "variant": "parent",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/parent-saw.wav",
+      "source_seconds": [
+        0.9,
+        1.55
+      ],
+      "sha256": "4ca033e4f3e5a1d4656ba59afc97a65e46508f9f0df03e10064d3cd71a423670"
+    },
+    {
+      "label": "oscillator saw",
+      "variant": "new",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/oscillator-saw.wav",
+      "source_seconds": [
+        0.9,
+        1.55
+      ],
+      "sha256": "d9c808083232f44ae1e7e695e477eb81902a8177964f395377ba03524533ca34"
+    },
+    {
+      "label": "oscillator sine",
+      "variant": "parent",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/parent-sine.wav",
+      "source_seconds": [
+        1.8,
+        2.45
+      ],
+      "sha256": "69af9c4869b712038905455a3fb93b22fff6bae85a8d6dcdb345e0e049a57525"
+    },
+    {
+      "label": "oscillator sine",
+      "variant": "new",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/oscillator-sine.wav",
+      "source_seconds": [
+        1.8,
+        2.45
+      ],
+      "sha256": "ecfba22adc1905a3e12959902ffe4957b7fae6f59688c8b90d0bf254457b57c7"
+    },
+    {
+      "label": "LP resonance edit",
+      "variant": "parent",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-lp_q_step.wav",
+      "source_seconds": [
+        0.85,
+        2.85
+      ],
+      "sha256": "72dbe5913173ff43c155903d884fb2bde9b0e01bcf74150c7441e5490aed5e6b"
+    },
+    {
+      "label": "LP resonance edit",
+      "variant": "new",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-lp_q_step.wav",
+      "source_seconds": [
+        0.85,
+        2.85
+      ],
+      "sha256": "df83c5a1ef23b90e8f504f2f5148d73e6a4a6389eeef21332180156a533c46f1"
+    },
+    {
+      "label": "HP resonance edit",
+      "variant": "parent",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-hp_q_step.wav",
+      "source_seconds": [
+        0.85,
+        2.85
+      ],
+      "sha256": "c7fafebe81a1c5cfa870ea5441e1dd30d2cd59ecc7327be4b707234159d76c9c"
+    },
+    {
+      "label": "HP resonance edit",
+      "variant": "new",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-hp_q_step.wav",
+      "source_seconds": [
+        0.85,
+        2.85
+      ],
+      "sha256": "69e5054a9d3f0b2b25121ad9a0d7a46a47c034f2f91da2aaef070312c31f69e1"
+    },
+    {
+      "label": "idle filter IL edit",
+      "variant": "parent",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-idle_il.wav",
+      "source_seconds": [
+        0.5,
+        1.2
+      ],
+      "sha256": "499a8360fa6d1a278055273a1a21476c84224735a5e2a74066814612077613e1"
+    },
+    {
+      "label": "idle filter IL edit",
+      "variant": "new",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-idle_il.wav",
+      "source_seconds": [
+        0.5,
+        1.2
+      ],
+      "sha256": "618010f27a64a8beaa3f4d6686489908acf3a2ae3931b9c4d73cdaa612c2948f"
+    },
+    {
+      "label": "physical ring at30Hz",
+      "variant": "parent",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/parent-30.wav",
+      "source_seconds": [
+        2,
+        4
+      ],
+      "sha256": "35198aefb053a22296f02087c8f69a9adaec420e8f166210f3c64896e264364e"
+    },
+    {
+      "label": "physical ring at30Hz",
+      "variant": "new",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-switch-run-001/switching-30.wav",
+      "source_seconds": [
+        2,
+        4
+      ],
+      "sha256": "2495b83d2f6e5c5db06dc2029a2b18126380a21afa1b5a33237a7ecfc531dcac"
+    }
+  ]
+}

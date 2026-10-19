@@ -1,0 +1,704 @@
+{
+  "artifact_bindings": 76,
+  "audio_decodes": 0,
+  "compatibility_cases": 6,
+  "compiled_source_bindings": 5,
+  "evidence_scope": [
+    "Full-file/payload hashes and integer WAV headers only; no sample decoding or remeasurement.",
+    "Metric differences/decision flags recomputed solely from stored metrics. Metric estimates themselves not independently rerun.",
+    "Render-first ordering supported by pinned runner plus all-renders receipt and complete hashes, not by an independent process trace.",
+    "Native state tests are retained author evidence; reviewer verified bindings and code without rerunning.",
+    "No optimizer, aggregate winner selection, route identification, new holdout, or production promotion."
+  ],
+  "exact_reference_files_and_payloads": 11,
+  "input_bindings": 104,
+  "kind": "independent-stored-identity-arithmetic-review",
+  "matrix_cases": 18,
+  "maximum_scalar_arithmetic_difference": 0.0,
+  "maximum_stored_energy_identity_roundoff": 1.1368683772161603e-13,
+  "metric_difference_and_contrast_scalar_checks": 216,
+  "model_calls": 0,
+  "native_render_count": 24,
+  "native_state_evidence_bindings": 7,
+  "new_render_count": 0,
+  "numerical_replay_reviewed": false,
+  "optimizer_calls": 0,
+  "paired_contrasts": [
+    {
+      "case": "flute-high-factory-physical--frozen--vco-only",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-high-factory-physical--frozen--shared",
+      "no_regression": false,
+      "spectral_improves": false
+    },
+    {
+      "case": "flute-high-factory-physical--frozen--static-master",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-high-factory-physical--frozen--shared",
+      "no_regression": false,
+      "spectral_improves": true
+    },
+    {
+      "case": "flute-high-factory-physical--network-br0--vco-only",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-high-factory-physical--network-br0--shared",
+      "no_regression": false,
+      "spectral_improves": true
+    },
+    {
+      "case": "flute-high-factory-physical--network-br0--static-master",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-high-factory-physical--network-br0--shared",
+      "no_regression": false,
+      "spectral_improves": false
+    },
+    {
+      "case": "flute-high-factory-physical--network-brminus15--vco-only",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-high-factory-physical--network-brminus15--shared",
+      "no_regression": true,
+      "spectral_improves": true
+    },
+    {
+      "case": "flute-high-factory-physical--network-brminus15--static-master",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-high-factory-physical--network-brminus15--shared",
+      "no_regression": false,
+      "spectral_improves": false
+    },
+    {
+      "case": "flute-lower-factory-physical--frozen--vco-only",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-lower-factory-physical--frozen--shared",
+      "no_regression": false,
+      "spectral_improves": false
+    },
+    {
+      "case": "flute-lower-factory-physical--frozen--static-master",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-lower-factory-physical--frozen--shared",
+      "no_regression": false,
+      "spectral_improves": false
+    },
+    {
+      "case": "flute-lower-factory-physical--network-br0--vco-only",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-lower-factory-physical--network-br0--shared",
+      "no_regression": false,
+      "spectral_improves": true
+    },
+    {
+      "case": "flute-lower-factory-physical--network-br0--static-master",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-lower-factory-physical--network-br0--shared",
+      "no_regression": false,
+      "spectral_improves": false
+    },
+    {
+      "case": "flute-lower-factory-physical--network-brminus15--vco-only",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-lower-factory-physical--network-brminus15--shared",
+      "no_regression": true,
+      "spectral_improves": true
+    },
+    {
+      "case": "flute-lower-factory-physical--network-brminus15--static-master",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-lower-factory-physical--network-brminus15--shared",
+      "no_regression": false,
+      "spectral_improves": false
+    },
+    {
+      "case": "flute-high-factory-physical--frozen--static-master",
+      "category": "static_master_vs_vco_only",
+      "control": "flute-high-factory-physical--frozen--vco-only",
+      "no_regression": false,
+      "spectral_improves": true
+    },
+    {
+      "case": "flute-high-factory-physical--network-br0--static-master",
+      "category": "static_master_vs_vco_only",
+      "control": "flute-high-factory-physical--network-br0--vco-only",
+      "no_regression": false,
+      "spectral_improves": false
+    },
+    {
+      "case": "flute-high-factory-physical--network-brminus15--static-master",
+      "category": "static_master_vs_vco_only",
+      "control": "flute-high-factory-physical--network-brminus15--vco-only",
+      "no_regression": false,
+      "spectral_improves": false
+    },
+    {
+      "case": "flute-lower-factory-physical--frozen--static-master",
+      "category": "static_master_vs_vco_only",
+      "control": "flute-lower-factory-physical--frozen--vco-only",
+      "no_regression": true,
+      "spectral_improves": true
+    },
+    {
+      "case": "flute-lower-factory-physical--network-br0--static-master",
+      "category": "static_master_vs_vco_only",
+      "control": "flute-lower-factory-physical--network-br0--vco-only",
+      "no_regression": false,
+      "spectral_improves": false
+    },
+    {
+      "case": "flute-lower-factory-physical--network-brminus15--static-master",
+      "category": "static_master_vs_vco_only",
+      "control": "flute-lower-factory-physical--network-brminus15--vco-only",
+      "no_regression": false,
+      "spectral_improves": false
+    }
+  ],
+  "paired_metric_differences": [
+    {
+      "case": "flute-high-factory-physical--frozen--vco-only",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-high-factory-physical--frozen--shared",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": -0.0004982641891142503,
+        "median_harmonic_MAE_db": 0.02269577016456026,
+        "median_pitch_error_cents": 0.002497442228782523,
+        "native_RMS_slope_db_per_s": -0.00013315604701769068,
+        "native_median_f0": 0.0013864306672530802,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": 0.03550249858178489,
+        "trajectory_ratio_MSE_db2": 1.9725188250644123
+      }
+    },
+    {
+      "case": "flute-high-factory-physical--frozen--static-master",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-high-factory-physical--frozen--shared",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": 0.0003701747191137139,
+        "median_harmonic_MAE_db": -0.02390992110016299,
+        "median_pitch_error_cents": 0.0025361472099506704,
+        "native_RMS_slope_db_per_s": -0.00034006949188070124,
+        "native_median_f0": 0.0014071694479298458,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": -0.010978000983275393,
+        "trajectory_ratio_MSE_db2": -0.6093080448201817
+      }
+    },
+    {
+      "case": "flute-high-factory-physical--network-br0--vco-only",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-high-factory-physical--network-br0--shared",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": 0.0015931890095542967,
+        "median_harmonic_MAE_db": -0.03220484355339792,
+        "median_pitch_error_cents": 0.002755367053959193,
+        "native_RMS_slope_db_per_s": -0.0007161488720355269,
+        "native_median_f0": 0.0015453026315981333,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": -0.04852074452935895,
+        "trajectory_ratio_MSE_db2": -4.140882489256683
+      }
+    },
+    {
+      "case": "flute-high-factory-physical--network-br0--static-master",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-high-factory-physical--network-br0--shared",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": 0.00029228736818487366,
+        "median_harmonic_MAE_db": 0.031562812647553784,
+        "median_pitch_error_cents": 0.002823284256615738,
+        "native_RMS_slope_db_per_s": -0.0010662433288257667,
+        "native_median_f0": 0.0015671502732175213,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": 0.014500212858450823,
+        "trajectory_ratio_MSE_db2": 1.2550969910652157
+      }
+    },
+    {
+      "case": "flute-high-factory-physical--network-brminus15--vco-only",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-high-factory-physical--network-brminus15--shared",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": -0.013221135011377338,
+        "median_harmonic_MAE_db": -0.23310363826684188,
+        "median_pitch_error_cents": 0.008805749031998003,
+        "native_RMS_slope_db_per_s": 0.00500463598343992,
+        "native_median_f0": 0.0053436772391251,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": -0.3664401748658168,
+        "trajectory_ratio_MSE_db2": -4.916489809935541
+      }
+    },
+    {
+      "case": "flute-high-factory-physical--network-brminus15--static-master",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-high-factory-physical--network-brminus15--shared",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": 0.002953446920591851,
+        "median_harmonic_MAE_db": 0.2474116131836075,
+        "median_pitch_error_cents": 0.00950602809925978,
+        "native_RMS_slope_db_per_s": 0.0022864398478150694,
+        "native_median_f0": 0.00547370305628192,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": 0.11350179776793379,
+        "trajectory_ratio_MSE_db2": 1.5535782070619817
+      }
+    },
+    {
+      "case": "flute-lower-factory-physical--frozen--vco-only",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-lower-factory-physical--frozen--shared",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": 0.00042180100587663194,
+        "median_harmonic_MAE_db": 0.04118107152688566,
+        "median_pitch_error_cents": 0.0013361573893673623,
+        "native_RMS_slope_db_per_s": 3.498539147006596e-05,
+        "native_median_f0": -0.0013846936528807419,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": 0.024896907950811453,
+        "trajectory_ratio_MSE_db2": 1.353682848602034
+      }
+    },
+    {
+      "case": "flute-lower-factory-physical--frozen--static-master",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-lower-factory-physical--frozen--shared",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": -4.992058250974374e-05,
+        "median_harmonic_MAE_db": 0.0002237025491353961,
+        "median_pitch_error_cents": 0.001358145870494886,
+        "native_RMS_slope_db_per_s": -0.00040098093381457645,
+        "native_median_f0": -0.0014072287285671337,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": -0.015249223425598757,
+        "trajectory_ratio_MSE_db2": -0.818561561748254
+      }
+    },
+    {
+      "case": "flute-lower-factory-physical--network-br0--vco-only",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-lower-factory-physical--network-br0--shared",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": 0.0038595606448370567,
+        "median_harmonic_MAE_db": -0.05101466676208588,
+        "median_pitch_error_cents": 0.0014399960620498573,
+        "native_RMS_slope_db_per_s": -0.00030982253197309184,
+        "native_median_f0": -0.0015112734051854204,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": -0.031135880955819317,
+        "trajectory_ratio_MSE_db2": -2.610630427791193
+      }
+    },
+    {
+      "case": "flute-lower-factory-physical--network-br0--static-master",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-lower-factory-physical--network-br0--shared",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": -0.0018821007582835447,
+        "median_harmonic_MAE_db": -6.007964764975782e-05,
+        "median_pitch_error_cents": 0.0014994059517640691,
+        "native_RMS_slope_db_per_s": -0.0008714907032933983,
+        "native_median_f0": -0.0014881867945177873,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": 0.0161645141806126,
+        "trajectory_ratio_MSE_db2": 1.4283569478291156
+      }
+    },
+    {
+      "case": "flute-lower-factory-physical--network-brminus15--vco-only",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-lower-factory-physical--network-brminus15--shared",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": -0.01232402352167461,
+        "median_harmonic_MAE_db": -0.47510873543615695,
+        "median_pitch_error_cents": 0.00423351630744833,
+        "native_RMS_slope_db_per_s": -0.0004455834116880997,
+        "native_median_f0": -0.004986916983625633,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": -0.28689914472587486,
+        "trajectory_ratio_MSE_db2": -2.6539794836264257
+      }
+    },
+    {
+      "case": "flute-lower-factory-physical--network-brminus15--static-master",
+      "category": "altered_vs_matched_shared",
+      "control": "flute-lower-factory-physical--network-brminus15--shared",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": 0.0061749590609192495,
+        "median_harmonic_MAE_db": -0.0006551949744899588,
+        "median_pitch_error_cents": 0.004990072016972281,
+        "native_RMS_slope_db_per_s": 0.006899654938009592,
+        "native_median_f0": -0.004364177439583727,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": 0.1731315083492806,
+        "trajectory_ratio_MSE_db2": 1.6891139232721457
+      }
+    },
+    {
+      "case": "flute-high-factory-physical--frozen--static-master",
+      "category": "static_master_vs_vco_only",
+      "control": "flute-high-factory-physical--frozen--vco-only",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": 0.0008684389082279642,
+        "median_harmonic_MAE_db": -0.04660569126472325,
+        "median_pitch_error_cents": 3.8704981168147246e-05,
+        "native_RMS_slope_db_per_s": -0.00020691344486301055,
+        "native_median_f0": 2.07387806767656e-05,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": -0.046480499565060285,
+        "trajectory_ratio_MSE_db2": -2.581826869884594
+      }
+    },
+    {
+      "case": "flute-high-factory-physical--network-br0--static-master",
+      "category": "static_master_vs_vco_only",
+      "control": "flute-high-factory-physical--network-br0--vco-only",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": -0.001300901641369423,
+        "median_harmonic_MAE_db": 0.0637676562009517,
+        "median_pitch_error_cents": 6.7917202656545e-05,
+        "native_RMS_slope_db_per_s": -0.00035009445679023976,
+        "native_median_f0": 2.1847641619388014e-05,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": 0.06302095738780977,
+        "trajectory_ratio_MSE_db2": 5.395979480321898
+      }
+    },
+    {
+      "case": "flute-high-factory-physical--network-brminus15--static-master",
+      "category": "static_master_vs_vco_only",
+      "control": "flute-high-factory-physical--network-brminus15--vco-only",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": 0.01617458193196919,
+        "median_harmonic_MAE_db": 0.4805152514504494,
+        "median_pitch_error_cents": 0.0007002790672617776,
+        "native_RMS_slope_db_per_s": -0.0027181961356248507,
+        "native_median_f0": 0.00013002581715682027,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": 0.4799419726337506,
+        "trajectory_ratio_MSE_db2": 6.470068016997523
+      }
+    },
+    {
+      "case": "flute-lower-factory-physical--frozen--static-master",
+      "category": "static_master_vs_vco_only",
+      "control": "flute-lower-factory-physical--frozen--vco-only",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": -0.0004717215883863757,
+        "median_harmonic_MAE_db": -0.040957368977750264,
+        "median_pitch_error_cents": 2.19884811275238e-05,
+        "native_RMS_slope_db_per_s": -0.0004359663252846424,
+        "native_median_f0": -2.2535075686391792e-05,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": -0.04014613137641021,
+        "trajectory_ratio_MSE_db2": -2.172244410350288
+      }
+    },
+    {
+      "case": "flute-lower-factory-physical--network-br0--static-master",
+      "category": "static_master_vs_vco_only",
+      "control": "flute-lower-factory-physical--network-br0--vco-only",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": -0.0057416614031206015,
+        "median_harmonic_MAE_db": 0.05095458711443612,
+        "median_pitch_error_cents": 5.940988971421188e-05,
+        "native_RMS_slope_db_per_s": -0.0005616681713203064,
+        "native_median_f0": 2.3086610667633067e-05,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": 0.047300395136431916,
+        "trajectory_ratio_MSE_db2": 4.038987375620309
+      }
+    },
+    {
+      "case": "flute-lower-factory-physical--network-brminus15--static-master",
+      "category": "static_master_vs_vco_only",
+      "control": "flute-lower-factory-physical--network-brminus15--vco-only",
+      "metric_difference": {
+        "frame_count": 0,
+        "held_gain_RMS_error_db": 0.01849898258259386,
+        "median_harmonic_MAE_db": 0.474453540461667,
+        "median_pitch_error_cents": 0.0007565557095239508,
+        "native_RMS_slope_db_per_s": 0.007345238349697691,
+        "native_median_f0": 0.0006227395440419059,
+        "source_RMS_slope_db_per_s": 0.0,
+        "source_median_f0": 0.0,
+        "trajectory_ratio_MAE_db": 0.46003065307515545,
+        "trajectory_ratio_MSE_db2": 4.343093406898571
+      }
+    }
+  ],
+  "paired_passage_summary": [
+    {
+      "context": "frozen",
+      "no_regression_both_passages": false,
+      "route": "vco-only",
+      "spectral_both_passages": false
+    },
+    {
+      "context": "frozen",
+      "no_regression_both_passages": false,
+      "route": "static-master",
+      "spectral_both_passages": false
+    },
+    {
+      "context": "network-br0",
+      "no_regression_both_passages": false,
+      "route": "vco-only",
+      "spectral_both_passages": true
+    },
+    {
+      "context": "network-br0",
+      "no_regression_both_passages": false,
+      "route": "static-master",
+      "spectral_both_passages": false
+    },
+    {
+      "context": "network-brminus15",
+      "no_regression_both_passages": true,
+      "route": "vco-only",
+      "spectral_both_passages": true
+    },
+    {
+      "context": "network-brminus15",
+      "no_regression_both_passages": false,
+      "route": "static-master",
+      "spectral_both_passages": false
+    }
+  ],
+  "parameter_fits": 0,
+  "plan_sha256": "ed455b13daf60509851c856c973d9d2029c80b481c61161975a34ae28bb0d2d7",
+  "producer_modules_imported": false,
+  "producer_sha256": "7366f41aef3f932caa785fbd6e88100c8f33fd4e4a1a7917ccd40d2f722434e3",
+  "render_log_checks": 24,
+  "report_sha256": "edf435a7ece847beb3f052c7ad2d658c7e87e49d31983cf57f1766b97db112eb",
+  "source_event_MIDI_gain_changes": 0,
+  "source_target_measurements": 0,
+  "status": "pass",
+  "unique_verified_bound_files": 180,
+  "wav_container_and_payload_identities": {
+    "compat--brass-history10": {
+      "data_bytes": 387200,
+      "data_sha256": "cad1c9163ea1e1fc6b84de9010b9d4b21dbd59f3539a43d1ecb9b808e5f0bb61",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "5bb646f7ccfad9feda3bd6d27a4ba26a2222f3fe5c1a05f1570af75f776669f0",
+      "frames": 96800,
+      "rate": 48000
+    },
+    "compat--brass-history20": {
+      "data_bytes": 387200,
+      "data_sha256": "471c6dced12fa4c0c4aa2c51b975b743f8a7472baf4e06f30f9ee9d43f8825d3",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "cd4218382d4f09f37b7961e1294a9830aac5831e14c6ac7c8f2585af98e6e73b",
+      "frames": 96800,
+      "rate": 48000
+    },
+    "compat--dry-sawtooth": {
+      "data_bytes": 586816,
+      "data_sha256": "44108909ad35c88e4eced9006556544bc59572a911564cec70ae1949dd795201",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "8d0ec15f02c949e531601f7d931b7bd5ddc05af57e0ceb95ecc11413d1a2a6f9",
+      "frames": 146704,
+      "rate": 48000
+    },
+    "compat--dry-square": {
+      "data_bytes": 777404,
+      "data_sha256": "59d229bb5233836a2c5002dc565dba7e6b5f5d1aca0f2213472aa1c2b4de6191",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "9654d20841422ba9f016ea9e63794538a8d5b68b7af8ae31158ab77c0ed9fbe2",
+      "frames": 194351,
+      "rate": 48000
+    },
+    "compat--flute-high-effective-compensated": {
+      "data_bytes": 619200,
+      "data_sha256": "a8a8ae7083f7fe046c40aca259e89ec022cbd5350a1335f7313749ed9edd6d3c",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "cf5a3acb608b6f9e53ff0d5ec26f3f2fc14f7e3e242d1574ba2ff466caf202d9",
+      "frames": 154800,
+      "rate": 48000
+    },
+    "compat--flute-lower-effective-compensated": {
+      "data_bytes": 476000,
+      "data_sha256": "719d67055b76dc99e89393615389e787232c4149e7cb50ddae41af2c1875c1f6",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "117bb8264841fbe70aac3ac1059765594cdbf2877d7b450b01ac4608c67ea002",
+      "frames": 119000,
+      "rate": 48000
+    },
+    "flute-high-factory-physical--frozen--shared": {
+      "data_bytes": 619200,
+      "data_sha256": "133c5f4b947918d0458613bf5b408719fb51e4673cdf02999be60ae5e07afcf8",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "0672f265c4fdbf9f8050fcff18a6447bc5c362d9e521c97d6440084504b55f9b",
+      "frames": 154800,
+      "rate": 48000
+    },
+    "flute-high-factory-physical--frozen--static-master": {
+      "data_bytes": 619200,
+      "data_sha256": "eed985de7d1e7cef2ed67aceb896167546cb060c4d45a6acf371e8cf3d672489",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "df63690f2a24a804e91d70d44faa92654daabc959914d11a5388a98c5b709f03",
+      "frames": 154800,
+      "rate": 48000
+    },
+    "flute-high-factory-physical--frozen--vco-only": {
+      "data_bytes": 619200,
+      "data_sha256": "630bb539b9b26f870912c7ec73a804c06b54a1073666bb2890765323be3d490d",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "d84cf6f2c0692916cefc44ff3b697343b1c9b6d5dda8926dd7e4f32f75395f76",
+      "frames": 154800,
+      "rate": 48000
+    },
+    "flute-high-factory-physical--network-br0--shared": {
+      "data_bytes": 619200,
+      "data_sha256": "435066b774031bfd67eb3e3f00a9724a6d258372542ca1bcc3420522a1db7ddb",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "01b41a0f5067565eaff0f496e08f264c8b35eb315d4eb16a01750927be3de070",
+      "frames": 154800,
+      "rate": 48000
+    },
+    "flute-high-factory-physical--network-br0--static-master": {
+      "data_bytes": 619200,
+      "data_sha256": "143291476755d852ab21dc0d3a6b67c0d543621de950a868b7cdb33933d8abaf",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "6697d47c9b7dae81698602f303498c5c4b2710dc8ce20a056c78b40bcca424ab",
+      "frames": 154800,
+      "rate": 48000
+    },
+    "flute-high-factory-physical--network-br0--vco-only": {
+      "data_bytes": 619200,
+      "data_sha256": "9c346563484b58086a852ba0606861fd20532e93e82025ebdf9420b8fc04491b",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "f1cfd6756e4ae20c3a88b7b08444ccb0ffb8c47b9ab4149e295d6367b1a1bb72",
+      "frames": 154800,
+      "rate": 48000
+    },
+    "flute-high-factory-physical--network-brminus15--shared": {
+      "data_bytes": 619200,
+      "data_sha256": "0e2a96dcd217067ad545295d5a0d5242dc9a633df17ff35e343ec1dee6ef4932",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "b02d8eab8e9a9c6744d31ded78fd31729def469d09bdff25514db7579852d244",
+      "frames": 154800,
+      "rate": 48000
+    },
+    "flute-high-factory-physical--network-brminus15--static-master": {
+      "data_bytes": 619200,
+      "data_sha256": "6bf33a28716760a3cc1b18a680c49ae88d891c1f253444cf49a61407ae70ce43",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "6ede6c0e38c18e1de660c8c930869094f5daa6292597260c1bd74140bdf6bcae",
+      "frames": 154800,
+      "rate": 48000
+    },
+    "flute-high-factory-physical--network-brminus15--vco-only": {
+      "data_bytes": 619200,
+      "data_sha256": "ef6a886e67f3507e8a3555de4990def594347043f35e8e48a095a80affc15e41",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "d2ac6625db1aad7706d1797a5ea9af4726cb4d20f7dc080e7256015d6121e2a9",
+      "frames": 154800,
+      "rate": 48000
+    },
+    "flute-lower-factory-physical--frozen--shared": {
+      "data_bytes": 476000,
+      "data_sha256": "726b07ae65037968426b5adec185388136dbe75d27292c7da4af02c51fdc1bc5",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "7497eeb7b4a268532d2279e3ac085abbd7a18886f4d48032ecedaba0c1bc29ec",
+      "frames": 119000,
+      "rate": 48000
+    },
+    "flute-lower-factory-physical--frozen--static-master": {
+      "data_bytes": 476000,
+      "data_sha256": "e28bdd37d2770e6989776d994a8c0dd41cad77b657ecc250eca81d081a6eedd3",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "35060e8bf039997ceb9892ee213272ae415fcd7889737bcac237a75f958c2d6c",
+      "frames": 119000,
+      "rate": 48000
+    },
+    "flute-lower-factory-physical--frozen--vco-only": {
+      "data_bytes": 476000,
+      "data_sha256": "45156851e450acacd6ebee1747725981fbe42e3eaf1cf1a6d02ab36428da1b6a",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "80eff77cb48ee567a77d317db9e2b57c4f75f64dfdf38340b98fe536ddcf9f24",
+      "frames": 119000,
+      "rate": 48000
+    },
+    "flute-lower-factory-physical--network-br0--shared": {
+      "data_bytes": 476000,
+      "data_sha256": "9f980c6de3a3ed71b388592c2292b02057867b9d4bf3b1e40765ab616e0d31a7",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "2bba10aa71d6c475949995383213c4a401ca54926251405914867f82633a2411",
+      "frames": 119000,
+      "rate": 48000
+    },
+    "flute-lower-factory-physical--network-br0--static-master": {
+      "data_bytes": 476000,
+      "data_sha256": "730182e9ca94bd40c690e54884c95d25669d7737cc93743a5b231b841163b879",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "c0116da370a4d3077d71873849527de749f43e2c57b0ed8941701cad3e94e166",
+      "frames": 119000,
+      "rate": 48000
+    },
+    "flute-lower-factory-physical--network-br0--vco-only": {
+      "data_bytes": 476000,
+      "data_sha256": "b7cd761ef3d2b7d69e34e098245753df83747e29cbe82534460729d7932a3002",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "414531798a8bd37e33cabac46e76e0102d85bfb4f4eef64bc49c5d126f84ffac",
+      "frames": 119000,
+      "rate": 48000
+    },
+    "flute-lower-factory-physical--network-brminus15--shared": {
+      "data_bytes": 476000,
+      "data_sha256": "1ac411d0334d39ef2ba46d13c54fffdcaf75272d9d05e962b45c0657b5221c8f",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "870e49463af536323b600233d0bec99977bc7f63edbf6a34a6fd8cf95d03fa05",
+      "frames": 119000,
+      "rate": 48000
+    },
+    "flute-lower-factory-physical--network-brminus15--static-master": {
+      "data_bytes": 476000,
+      "data_sha256": "8a3e50bd95bc128aeae3412f60bb9c26a2854ee924db9c38d5c9e395efc43dd3",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "e5b0314df83701d442f63356e2e57a5c1838b4ba75c7bed0c9c2aea35368fb81",
+      "frames": 119000,
+      "rate": 48000
+    },
+    "flute-lower-factory-physical--network-brminus15--vco-only": {
+      "data_bytes": 476000,
+      "data_sha256": "749ce6e9def2d2c9dd113d644c5780c1b7fc985a80178b07a17a25babc7d6a32",
+      "encoding": "IEEE float32 mono; bytes hashed without decoding",
+      "file_sha256": "15a1c28e5956e5c5bab3ba3bc8e3a9ab6f7187db83e7d049d0cec97e11bba0b2",
+      "frames": 119000,
+      "rate": 48000
+    }
+  }
+}

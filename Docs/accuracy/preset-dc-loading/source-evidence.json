@@ -1,0 +1,3439 @@
+{
+  "analytic_stiff_nulls": [
+    {
+      "absolute_error_Hz": 0.0,
+      "brilliance": 0.0,
+      "core_formula_Hz": 43.84833001356977,
+      "preset": "flute",
+      "rank": "A",
+      "rounded_factory_voltage": 1.18,
+      "stage": "HP",
+      "stiff_nodal_Hz": 43.84833001356977
+    },
+    {
+      "absolute_error_Hz": 0.0,
+      "brilliance": -15.0,
+      "core_formula_Hz": 36.58877798867228,
+      "preset": "flute",
+      "rank": "A",
+      "rounded_factory_voltage": 1.18,
+      "stage": "HP",
+      "stiff_nodal_Hz": 36.58877798867228
+    },
+    {
+      "absolute_error_Hz": 0.0,
+      "brilliance": 0.0,
+      "core_formula_Hz": 43.84833001356977,
+      "preset": "flute",
+      "rank": "B",
+      "rounded_factory_voltage": 1.18,
+      "stage": "HP",
+      "stiff_nodal_Hz": 43.84833001356977
+    },
+    {
+      "absolute_error_Hz": 0.0,
+      "brilliance": -15.0,
+      "core_formula_Hz": 36.58877798867228,
+      "preset": "flute",
+      "rank": "B",
+      "rounded_factory_voltage": 1.18,
+      "stage": "HP",
+      "stiff_nodal_Hz": 36.58877798867228
+    },
+    {
+      "absolute_error_Hz": 7.105427357601002e-15,
+      "brilliance": 0.0,
+      "core_formula_Hz": 43.84833001356977,
+      "preset": "flute",
+      "rank": "C",
+      "rounded_factory_voltage": 1.18,
+      "stage": "HP",
+      "stiff_nodal_Hz": 43.848330013569765
+    },
+    {
+      "absolute_error_Hz": 0.0,
+      "brilliance": -15.0,
+      "core_formula_Hz": 36.58877798867228,
+      "preset": "flute",
+      "rank": "C",
+      "rounded_factory_voltage": 1.18,
+      "stage": "HP",
+      "stiff_nodal_Hz": 36.58877798867228
+    },
+    {
+      "absolute_error_Hz": 6.821210263296962e-13,
+      "brilliance": 0.0,
+      "core_formula_Hz": 1930.5852737779917,
+      "preset": "flute",
+      "rank": "A",
+      "rounded_factory_voltage": 5.24,
+      "stage": "LP",
+      "stiff_nodal_Hz": 1930.5852737779924
+    },
+    {
+      "absolute_error_Hz": 1.1368683772161603e-13,
+      "brilliance": -15.0,
+      "core_formula_Hz": 598.3831622454145,
+      "preset": "flute",
+      "rank": "A",
+      "rounded_factory_voltage": 5.24,
+      "stage": "LP",
+      "stiff_nodal_Hz": 598.3831622454146
+    },
+    {
+      "absolute_error_Hz": 6.821210263296962e-13,
+      "brilliance": 0.0,
+      "core_formula_Hz": 1930.5852737779917,
+      "preset": "flute",
+      "rank": "B",
+      "rounded_factory_voltage": 5.24,
+      "stage": "LP",
+      "stiff_nodal_Hz": 1930.5852737779924
+    },
+    {
+      "absolute_error_Hz": 1.1368683772161603e-13,
+      "brilliance": -15.0,
+      "core_formula_Hz": 598.3831622454145,
+      "preset": "flute",
+      "rank": "B",
+      "rounded_factory_voltage": 5.24,
+      "stage": "LP",
+      "stiff_nodal_Hz": 598.3831622454146
+    },
+    {
+      "absolute_error_Hz": 6.821210263296962e-13,
+      "brilliance": 0.0,
+      "core_formula_Hz": 1930.5852737779917,
+      "preset": "flute",
+      "rank": "C",
+      "rounded_factory_voltage": 5.24,
+      "stage": "LP",
+      "stiff_nodal_Hz": 1930.5852737779924
+    },
+    {
+      "absolute_error_Hz": 1.1368683772161603e-13,
+      "brilliance": -15.0,
+      "core_formula_Hz": 598.3831622454145,
+      "preset": "flute",
+      "rank": "C",
+      "rounded_factory_voltage": 5.24,
+      "stage": "LP",
+      "stiff_nodal_Hz": 598.3831622454146
+    },
+    {
+      "absolute_error_Hz": 0.0,
+      "brilliance": 0.0,
+      "core_formula_Hz": 34.57516923289296,
+      "preset": "brass1",
+      "rank": "A",
+      "rounded_factory_voltage": 0.0,
+      "stage": "HP",
+      "stiff_nodal_Hz": 34.57516923289296
+    },
+    {
+      "absolute_error_Hz": 3.552713678800501e-15,
+      "brilliance": -15.0,
+      "core_formula_Hz": 30.48012077268016,
+      "preset": "brass1",
+      "rank": "A",
+      "rounded_factory_voltage": 0.0,
+      "stage": "HP",
+      "stiff_nodal_Hz": 30.480120772680156
+    },
+    {
+      "absolute_error_Hz": 0.0,
+      "brilliance": 0.0,
+      "core_formula_Hz": 34.57516923289296,
+      "preset": "brass1",
+      "rank": "B",
+      "rounded_factory_voltage": 0.0,
+      "stage": "HP",
+      "stiff_nodal_Hz": 34.57516923289296
+    },
+    {
+      "absolute_error_Hz": 3.552713678800501e-15,
+      "brilliance": -15.0,
+      "core_formula_Hz": 30.48012077268016,
+      "preset": "brass1",
+      "rank": "B",
+      "rounded_factory_voltage": 0.0,
+      "stage": "HP",
+      "stiff_nodal_Hz": 30.480120772680156
+    },
+    {
+      "absolute_error_Hz": 0.0,
+      "brilliance": 0.0,
+      "core_formula_Hz": 34.57516923289296,
+      "preset": "brass1",
+      "rank": "C",
+      "rounded_factory_voltage": 0.0,
+      "stage": "HP",
+      "stiff_nodal_Hz": 34.57516923289296
+    },
+    {
+      "absolute_error_Hz": 0.0,
+      "brilliance": -15.0,
+      "core_formula_Hz": 30.48012077268016,
+      "preset": "brass1",
+      "rank": "C",
+      "rounded_factory_voltage": 0.0,
+      "stage": "HP",
+      "stiff_nodal_Hz": 30.48012077268016
+    },
+    {
+      "absolute_error_Hz": 1.3642420526593924e-12,
+      "brilliance": 0.0,
+      "core_formula_Hz": 2380.5834940277755,
+      "preset": "brass1",
+      "rank": "A",
+      "rounded_factory_voltage": 5.71,
+      "stage": "LP",
+      "stiff_nodal_Hz": 2380.583494027777
+    },
+    {
+      "absolute_error_Hz": 4.547473508864641e-13,
+      "brilliance": -15.0,
+      "core_formula_Hz": 734.1856778840888,
+      "preset": "brass1",
+      "rank": "A",
+      "rounded_factory_voltage": 5.71,
+      "stage": "LP",
+      "stiff_nodal_Hz": 734.1856778840893
+    },
+    {
+      "absolute_error_Hz": 1.3642420526593924e-12,
+      "brilliance": 0.0,
+      "core_formula_Hz": 2380.5834940277755,
+      "preset": "brass1",
+      "rank": "B",
+      "rounded_factory_voltage": 5.71,
+      "stage": "LP",
+      "stiff_nodal_Hz": 2380.583494027777
+    },
+    {
+      "absolute_error_Hz": 2.2737367544323206e-13,
+      "brilliance": -15.0,
+      "core_formula_Hz": 734.1856778840888,
+      "preset": "brass1",
+      "rank": "B",
+      "rounded_factory_voltage": 5.71,
+      "stage": "LP",
+      "stiff_nodal_Hz": 734.185677884089
+    },
+    {
+      "absolute_error_Hz": 9.094947017729282e-13,
+      "brilliance": 0.0,
+      "core_formula_Hz": 2380.5834940277755,
+      "preset": "brass1",
+      "rank": "C",
+      "rounded_factory_voltage": 5.71,
+      "stage": "LP",
+      "stiff_nodal_Hz": 2380.5834940277764
+    },
+    {
+      "absolute_error_Hz": 2.2737367544323206e-13,
+      "brilliance": -15.0,
+      "core_formula_Hz": 734.1856778840888,
+      "preset": "brass1",
+      "rank": "C",
+      "rounded_factory_voltage": 5.71,
+      "stage": "LP",
+      "stiff_nodal_Hz": 734.185677884089
+    }
+  ],
+  "checks": {
+    "EG_corner_solutions": 768,
+    "full_5node_vs_reduced_tolerance_V": 1e-14,
+    "maximum_analytic_null_error_Hz": 1.3642420526593924e-12,
+    "maximum_normalized_KCL_residual": 1.465768470110145e-16,
+    "minimum_manual_off_margin_V": 0.36760091221979907
+  },
+  "equations": [
+    "D=gp+Grank+gBR+3*gmod+gEG+gBias",
+    "kappa=s_actual*D/gp",
+    "(gs+g0+4*gp)*P-gp*sum(u_i)=gs*(10-Vd)",
+    "D*u_i-gp*P=gBR*BR+gEG*E_i+gBias*bias",
+    "f_ref_i=floor+anchor*2**(kappa*u_i(E_all_zero))"
+  ],
+  "excluded_zero_drop_diagnostic": [
+    {
+      "actual_BR_V": 0.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 0.6220970766358821,
+      "preset": "flute",
+      "rank": "A",
+      "stage": "HP"
+    },
+    {
+      "actual_BR_V": 0.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 3.542512719473534,
+      "preset": "flute",
+      "rank": "A",
+      "stage": "LP"
+    },
+    {
+      "actual_BR_V": -15.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 0.5967028864789129,
+      "preset": "flute",
+      "rank": "A",
+      "stage": "HP"
+    },
+    {
+      "actual_BR_V": -15.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 3.491994501533324,
+      "preset": "flute",
+      "rank": "A",
+      "stage": "LP"
+    },
+    {
+      "actual_BR_V": 0.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 0.6213313121034748,
+      "preset": "flute",
+      "rank": "B",
+      "stage": "HP"
+    },
+    {
+      "actual_BR_V": 0.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 3.5384733568026925,
+      "preset": "flute",
+      "rank": "B",
+      "stage": "LP"
+    },
+    {
+      "actual_BR_V": -15.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 0.6002394424421359,
+      "preset": "flute",
+      "rank": "B",
+      "stage": "HP"
+    },
+    {
+      "actual_BR_V": -15.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 3.4959531897005482,
+      "preset": "flute",
+      "rank": "B",
+      "stage": "LP"
+    },
+    {
+      "actual_BR_V": 0.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 0.6206970318120497,
+      "preset": "flute",
+      "rank": "C",
+      "stage": "HP"
+    },
+    {
+      "actual_BR_V": 0.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 3.535538200830922,
+      "preset": "flute",
+      "rank": "C",
+      "stage": "LP"
+    },
+    {
+      "actual_BR_V": -15.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 0.6031687603356404,
+      "preset": "flute",
+      "rank": "C",
+      "stage": "HP"
+    },
+    {
+      "actual_BR_V": -15.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 3.498829724481217,
+      "preset": "flute",
+      "rank": "C",
+      "stage": "LP"
+    },
+    {
+      "actual_BR_V": 0.0,
+      "assumed_inactive_manual_diode_remains_off": false,
+      "minimum_bus_V": -0.005280691373093171,
+      "preset": "brass1",
+      "rank": "A",
+      "stage": "HP"
+    },
+    {
+      "actual_BR_V": 0.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 4.025683168916354,
+      "preset": "brass1",
+      "rank": "A",
+      "stage": "LP"
+    },
+    {
+      "actual_BR_V": -15.0,
+      "assumed_inactive_manual_diode_remains_off": false,
+      "minimum_bus_V": -0.03239908778020095,
+      "preset": "brass1",
+      "rank": "A",
+      "stage": "HP"
+    },
+    {
+      "actual_BR_V": -15.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 3.978752985826056,
+      "preset": "brass1",
+      "rank": "A",
+      "stage": "LP"
+    },
+    {
+      "actual_BR_V": 0.0,
+      "assumed_inactive_manual_diode_remains_off": false,
+      "minimum_bus_V": -0.004384582866156938,
+      "preset": "brass1",
+      "rank": "B",
+      "stage": "HP"
+    },
+    {
+      "actual_BR_V": 0.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 4.016792725747224,
+      "preset": "brass1",
+      "rank": "B",
+      "stage": "LP"
+    },
+    {
+      "actual_BR_V": -15.0,
+      "assumed_inactive_manual_diode_remains_off": false,
+      "minimum_bus_V": -0.02690111485855952,
+      "preset": "brass1",
+      "rank": "B",
+      "stage": "HP"
+    },
+    {
+      "actual_BR_V": -15.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 3.9772842525656085,
+      "preset": "brass1",
+      "rank": "B",
+      "stage": "LP"
+    },
+    {
+      "actual_BR_V": 0.0,
+      "assumed_inactive_manual_diode_remains_off": false,
+      "minimum_bus_V": -0.0036427863907231278,
+      "preset": "brass1",
+      "rank": "C",
+      "stage": "HP"
+    },
+    {
+      "actual_BR_V": 0.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 4.010330249168407,
+      "preset": "brass1",
+      "rank": "C",
+      "stage": "LP"
+    },
+    {
+      "actual_BR_V": -15.0,
+      "assumed_inactive_manual_diode_remains_off": false,
+      "minimum_bus_V": -0.022349906044296618,
+      "preset": "brass1",
+      "rank": "C",
+      "stage": "HP"
+    },
+    {
+      "actual_BR_V": -15.0,
+      "assumed_inactive_manual_diode_remains_off": true,
+      "minimum_bus_V": 3.9762166281383884,
+      "preset": "brass1",
+      "rank": "C",
+      "stage": "LP"
+    }
+  ],
+  "grid": {
+    "actual_BR_V": [
+      0.0,
+      -15.0
+    ],
+    "diode_drop_V": [
+      0.4,
+      0.6
+    ],
+    "mapping_cases": 24,
+    "presets": [
+      "flute",
+      "brass1"
+    ],
+    "ranks": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "input_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/network.py": "b03cdb48f68c73cc70312cb2c8061d69a1d81fea1f6e0330464f8e052f631297",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Source/DSP/ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case10-LPx1-Qfactory.patch": "fbc0735460f73b6ca83fb4e22b4365a89e5e3ebf9b84e1f43d01e45f68470ac8",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case20-LPx1-Qfactory.patch": "19a8f7ea6bb45f3d007c8be05529a72fa646b37bf2941abe69e1a42c33edfab1",
+    "/tmp/ceres-cs50-1x8LGd/research/brilliance-shared-bus-check.md": "90baf174c023382eeffb2a1bfd621964b303746a3d089925983abbdae0cb20e4",
+    "/tmp/ceres-cs50-1x8LGd/research/cs-servicing-guide.pdf": "2738f7ddc46f0bedbab38dcad8e2c112c41b3e6ca34670d471d0cb8c0dbde633",
+    "/tmp/ceres-cs50-1x8LGd/research/cutoff-m-eg-continuity.png": "13e8257f359e31faa35182a1c8b26aec0ac6ca9c4e0520b933548a581ae4a5cb",
+    "/tmp/ceres-cs50-1x8LGd/research/cutoff-scale-t71-detail.png": "6cd8a59494e1dcafafe051899ed9089b7b3293252f31836c9d37fff06f9d5fd1",
+    "/tmp/ceres-cs50-1x8LGd/research/cutoff-voltage-scale.md": "aff170f4e18a7c00793f00c2321f216dd93a3c50a0ab8ba354104a1324e3cf1f",
+    "/tmp/ceres-cs50-1x8LGd/research/lp-bus-coupling-source.md": "b5f12526171f981b75d2f90911a3f4317b39555e3d3b9d79ccb8b0adb221e21c",
+    "/tmp/ceres-cs50-1x8LGd/research/pitch-modulation-global-controls.png": "c9cbb89014b0b6b27ae653c45d3b8feb40b08bc957d277ec348578cae5bcfcfb",
+    "/tmp/ceres-cs50-1x8LGd/research/presets-72.png": "5f7402c4c580f658468034e0fcd6f28392bcbacc24f9fe8203025f8c45c38363",
+    "/tmp/ceres-cs50-1x8LGd/research/q-m-rank-table.png": "7299af97b5a07bec425a1a6ddb3d33b95b8ad775181452e7fe6e8c464a76118c",
+    "/tmp/ceres-cs50-1x8LGd/research/service1-08.png": "07c59b3a2dd9d1d7f5bff25a0635491da2dace85f2791cfaaa8465858b586668",
+    "/tmp/ceres-cs50-1x8LGd/research/service1.pdf": "c3a4b0d4e27e9af90c88258d03a1c09c5d080ea162e562d9bf267fc8ffbbadc1",
+    "/tmp/ceres-cs50-1x8LGd/research/service2.pdf": "1102e55b949378e7776555bca1a4d73105ca2d76d6fcf3aa4c2b103566201cfc",
+    "/tmp/ceres-cs50-1x8LGd/tools/benchmark_whitmore_brilliance_endpoint.py": "258addcc274eb370a1fae2e112aefbc5dce22e33cba04eda25885f8dddd66923"
+  },
+  "kind": "conditional_DC_intercept_only_hypothesis_not_calibration",
+  "parameters": {
+    "bias_branch_ohms": 355000.0,
+    "bias_wiper_V": 0.0,
+    "fixed_floor_Hz": 22.575169232892957,
+    "preset_branch_ohms": 39000.0,
+    "preset_resistors_ohms_and_EG_bounds": {
+      "brass1": {
+        "AL": 1.785,
+        "HP": null,
+        "IL": -0.945,
+        "LP": 7500.0
+      },
+      "flute": {
+        "AL": 0.315,
+        "HP": 75000.0,
+        "IL": -2.62,
+        "LP": 9100.0
+      }
+    },
+    "rank_ohms": {
+      "A": {
+        "HP": 2700.0,
+        "LP": 3000.0
+      },
+      "B": {
+        "HP": 2200.0,
+        "LP": 2400.0
+      },
+      "C": {
+        "HP": 1800.0,
+        "LP": 2000.0
+      }
+    },
+    "shared_return_ohms": 10000.0,
+    "stage_parameters": {
+      "HP": {
+        "Rbr": 680000.0,
+        "Reg": 220000.0,
+        "Rmod": 150000.0,
+        "gm_anchor_Hz": 12.0,
+        "slope": 0.7
+      },
+      "LP": {
+        "Rbr": 220000.0,
+        "Reg": 47000.0,
+        "Rmod": 47000.0,
+        "gm_anchor_Hz": 180.0,
+        "slope": 0.65
+      }
+    }
+  },
+  "rows": [
+    {
+      "brilliance": 0.0,
+      "diode_drop": 0.4,
+      "id": "flute-rankA-Vd0.4-BR0",
+      "loaded": {
+        "hp_cutoff": 38.711321652302374,
+        "lp_cutoff": 870.71256228789
+      },
+      "preset": "flute",
+      "rank": "A",
+      "stiff": {
+        "hp_cutoff": 43.33252453103675,
+        "lp_cutoff": 1755.350391515974
+      }
+    },
+    {
+      "brilliance": -15.0,
+      "diode_drop": 0.4,
+      "id": "flute-rankA-Vd0.4-BR-15",
+      "loaded": {
+        "hp_cutoff": 33.07462683769341,
+        "lp_cutoff": 272.7700132428703
+      },
+      "preset": "flute",
+      "rank": "A",
+      "stiff": {
+        "hp_cutoff": 36.24899321005727,
+        "lp_cutoff": 545.4999801172283
+      }
+    },
+    {
+      "brilliance": 0.0,
+      "diode_drop": 0.6,
+      "id": "flute-rankA-Vd0.6-BR0",
+      "loaded": {
+        "hp_cutoff": 38.612069575081506,
+        "lp_cutoff": 843.7608013457863
+      },
+      "preset": "flute",
+      "rank": "A",
+      "stiff": {
+        "hp_cutoff": 43.09689491363298,
+        "lp_cutoff": 1675.5006574659174
+      }
+    },
+    {
+      "brilliance": -15.0,
+      "diode_drop": 0.6,
+      "id": "flute-rankA-Vd0.6-BR-15",
+      "loaded": {
+        "hp_cutoff": 33.01004558251665,
+        "lp_cutoff": 264.81942448222753
+      },
+      "preset": "flute",
+      "rank": "A",
+      "stiff": {
+        "hp_cutoff": 36.09377315114766,
+        "lp_cutoff": 521.4025631295397
+      }
+    },
+    {
+      "brilliance": 0.0,
+      "diode_drop": 0.4,
+      "id": "flute-rankB-Vd0.4-BR0",
+      "loaded": {
+        "hp_cutoff": 38.6881247802001,
+        "lp_cutoff": 866.8408213180697
+      },
+      "preset": "flute",
+      "rank": "B",
+      "stiff": {
+        "hp_cutoff": 43.33252453103675,
+        "lp_cutoff": 1755.350391515974
+      }
+    },
+    {
+      "brilliance": -15.0,
+      "diode_drop": 0.4,
+      "id": "flute-rankB-Vd0.4-BR-15",
+      "loaded": {
+        "hp_cutoff": 33.08144207499846,
+        "lp_cutoff": 272.52695277897277
+      },
+      "preset": "flute",
+      "rank": "B",
+      "stiff": {
+        "hp_cutoff": 36.24899321005727,
+        "lp_cutoff": 545.4999801172283
+      }
+    },
+    {
+      "brilliance": 0.0,
+      "diode_drop": 0.6,
+      "id": "flute-rankB-Vd0.6-BR0",
+      "loaded": {
+        "hp_cutoff": 38.58949534235751,
+        "lp_cutoff": 840.0900181997216
+      },
+      "preset": "flute",
+      "rank": "B",
+      "stiff": {
+        "hp_cutoff": 43.09689491363298,
+        "lp_cutoff": 1675.5006574659174
+      }
+    },
+    {
+      "brilliance": -15.0,
+      "diode_drop": 0.6,
+      "id": "flute-rankB-Vd0.6-BR-15",
+      "loaded": {
+        "hp_cutoff": 33.01713185076956,
+        "lp_cutoff": 264.6071577071171
+      },
+      "preset": "flute",
+      "rank": "B",
+      "stiff": {
+        "hp_cutoff": 36.09377315114766,
+        "lp_cutoff": 521.4025631295397
+      }
+    },
+    {
+      "brilliance": 0.0,
+      "diode_drop": 0.4,
+      "id": "flute-rankC-Vd0.4-BR0",
+      "loaded": {
+        "hp_cutoff": 38.668936137970675,
+        "lp_cutoff": 864.0385578905831
+      },
+      "preset": "flute",
+      "rank": "C",
+      "stiff": {
+        "hp_cutoff": 43.33252453103675,
+        "lp_cutoff": 1755.350391515974
+      }
+    },
+    {
+      "brilliance": -15.0,
+      "diode_drop": 0.4,
+      "id": "flute-rankC-Vd0.4-BR-15",
+      "loaded": {
+        "hp_cutoff": 33.08709046358137,
+        "lp_cutoff": 272.35048385786934
+      },
+      "preset": "flute",
+      "rank": "C",
+      "stiff": {
+        "hp_cutoff": 36.24899321005727,
+        "lp_cutoff": 545.4999801172283
+      }
+    },
+    {
+      "brilliance": 0.0,
+      "diode_drop": 0.6,
+      "id": "flute-rankC-Vd0.6-BR0",
+      "loaded": {
+        "hp_cutoff": 38.57082124086668,
+        "lp_cutoff": 837.43298402358
+      },
+      "preset": "flute",
+      "rank": "C",
+      "stiff": {
+        "hp_cutoff": 43.09689491363298,
+        "lp_cutoff": 1675.5006574659174
+      }
+    },
+    {
+      "brilliance": -15.0,
+      "diode_drop": 0.6,
+      "id": "flute-rankC-Vd0.6-BR-15",
+      "loaded": {
+        "hp_cutoff": 33.023005027524206,
+        "lp_cutoff": 264.4530332105994
+      },
+      "preset": "flute",
+      "rank": "C",
+      "stiff": {
+        "hp_cutoff": 36.09377315114766,
+        "lp_cutoff": 521.4025631295397
+      }
+    },
+    {
+      "brilliance": 0.0,
+      "diode_drop": 0.4,
+      "id": "brass1-rankA-Vd0.4-BR0",
+      "loaded": {
+        "hp_cutoff": 34.57516923289296,
+        "lp_cutoff": 1055.4968735858629
+      },
+      "preset": "brass1",
+      "rank": "A",
+      "stiff": {
+        "hp_cutoff": 34.57516923289296,
+        "lp_cutoff": 2153.9481750705063
+      }
+    },
+    {
+      "brilliance": -15.0,
+      "diode_drop": 0.4,
+      "id": "brass1-rankA-Vd0.4-BR-15",
+      "loaded": {
+        "hp_cutoff": 30.376789294312324,
+        "lp_cutoff": 327.77312242457367
+      },
+      "preset": "brass1",
+      "rank": "A",
+      "stiff": {
+        "hp_cutoff": 30.48012077268016,
+        "lp_cutoff": 665.7906374995146
+      }
+    },
+    {
+      "brilliance": 0.0,
+      "diode_drop": 0.6,
+      "id": "brass1-rankA-Vd0.6-BR0",
+      "loaded": {
+        "hp_cutoff": 34.57516923289296,
+        "lp_cutoff": 1018.5747970235038
+      },
+      "preset": "brass1",
+      "rank": "A",
+      "stiff": {
+        "hp_cutoff": 34.57516923289296,
+        "lp_cutoff": 2046.9793839620422
+      }
+    },
+    {
+      "brilliance": -15.0,
+      "diode_drop": 0.6,
+      "id": "brass1-rankA-Vd0.6-BR-15",
+      "loaded": {
+        "hp_cutoff": 30.376789294312324,
+        "lp_cutoff": 316.86373583028455
+      },
+      "preset": "brass1",
+      "rank": "A",
+      "stiff": {
+        "hp_cutoff": 30.48012077268016,
+        "lp_cutoff": 633.509107765255
+      }
+    },
+    {
+      "brilliance": 0.0,
+      "diode_drop": 0.4,
+      "id": "brass1-rankB-Vd0.4-BR0",
+      "loaded": {
+        "hp_cutoff": 34.57516923289296,
+        "lp_cutoff": 1050.5589979568513
+      },
+      "preset": "brass1",
+      "rank": "B",
+      "stiff": {
+        "hp_cutoff": 34.57516923289296,
+        "lp_cutoff": 2153.9481750705063
+      }
+    },
+    {
+      "brilliance": -15.0,
+      "diode_drop": 0.4,
+      "id": "brass1-rankB-Vd0.4-BR-15",
+      "loaded": {
+        "hp_cutoff": 30.394228514504288,
+        "lp_cutoff": 327.3314736865779
+      },
+      "preset": "brass1",
+      "rank": "B",
+      "stiff": {
+        "hp_cutoff": 30.48012077268016,
+        "lp_cutoff": 665.7906374995146
+      }
+    },
+    {
+      "brilliance": 0.0,
+      "diode_drop": 0.6,
+      "id": "brass1-rankB-Vd0.6-BR0",
+      "loaded": {
+        "hp_cutoff": 34.57516923289296,
+        "lp_cutoff": 1013.9123898121265
+      },
+      "preset": "brass1",
+      "rank": "B",
+      "stiff": {
+        "hp_cutoff": 34.57516923289296,
+        "lp_cutoff": 2046.9793839620422
+      }
+    },
+    {
+      "brilliance": -15.0,
+      "diode_drop": 0.6,
+      "id": "brass1-rankB-Vd0.6-BR-15",
+      "loaded": {
+        "hp_cutoff": 30.394228514504288,
+        "lp_cutoff": 316.4672124434688
+      },
+      "preset": "brass1",
+      "rank": "B",
+      "stiff": {
+        "hp_cutoff": 30.48012077268016,
+        "lp_cutoff": 633.509107765255
+      }
+    },
+    {
+      "brilliance": 0.0,
+      "diode_drop": 0.4,
+      "id": "brass1-rankC-Vd0.4-BR0",
+      "loaded": {
+        "hp_cutoff": 34.57516923289296,
+        "lp_cutoff": 1046.9844709869653
+      },
+      "preset": "brass1",
+      "rank": "C",
+      "stiff": {
+        "hp_cutoff": 34.57516923289296,
+        "lp_cutoff": 2153.9481750705063
+      }
+    },
+    {
+      "brilliance": -15.0,
+      "diode_drop": 0.4,
+      "id": "brass1-rankC-Vd0.4-BR-15",
+      "loaded": {
+        "hp_cutoff": 30.408694146565033,
+        "lp_cutoff": 327.0108397345247
+      },
+      "preset": "brass1",
+      "rank": "C",
+      "stiff": {
+        "hp_cutoff": 30.48012077268016,
+        "lp_cutoff": 665.7906374995146
+      }
+    },
+    {
+      "brilliance": 0.0,
+      "diode_drop": 0.6,
+      "id": "brass1-rankC-Vd0.6-BR0",
+      "loaded": {
+        "hp_cutoff": 34.57516923289296,
+        "lp_cutoff": 1010.5369833513308
+      },
+      "preset": "brass1",
+      "rank": "C",
+      "stiff": {
+        "hp_cutoff": 34.57516923289296,
+        "lp_cutoff": 2046.9793839620422
+      }
+    },
+    {
+      "brilliance": -15.0,
+      "diode_drop": 0.6,
+      "id": "brass1-rankC-Vd0.6-BR-15",
+      "loaded": {
+        "hp_cutoff": 30.408694146565033,
+        "lp_cutoff": 316.17931436917013
+      },
+      "preset": "brass1",
+      "rank": "C",
+      "stiff": {
+        "hp_cutoff": 30.48012077268016,
+        "lp_cutoff": 633.509107765255
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "actual_BR_V": 0.0,
+      "diode_drop_V": 0.4,
+      "id": "flute-rankA-Vd0.4-BR0",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "flute",
+      "rank": "A",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            0.5966648021864025,
+            0.6120229005849723
+          ],
+          "bus_V": 0.6103745867875109,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.1277538286408235,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0009157298874785942,
+            "own": 0.1250066389783877
+          },
+          "kappa_octaves_per_pin_V": 11.598250487476253,
+          "local_D_S": 0.00042484434020059536,
+          "log2_gm_shift": [
+            0.42726221075125753,
+            0.42726221075125753,
+            0.42726221075125753,
+            0.4272622107512575
+          ],
+          "manual_off_margin_V": 1.010374586787511,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.9966648021864025,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.00011983969465886704,
+          "nominal_unloaded_ideal_divider_V": 1.1764705882352942,
+          "normalized_KCL_residual": 9.79407411253713e-18,
+          "pin4_V": [
+            0.036838505187710306,
+            0.036838505187710306,
+            0.036838505187710306,
+            0.0368385051877103
+          ],
+          "reference_Hz": [
+            38.711321652302374,
+            38.711321652302374,
+            38.711321652302374,
+            38.711321652302374
+          ],
+          "selected_branch_current_A": 0.00011986167217616652
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.3991600858253315,
+            3.445429040894825
+          ],
+          "bus_V": 3.4404632075568733,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5496086598091487,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0025617394203723397,
+            "own": 0.5419234415480318
+          },
+          "kappa_octaves_per_pin_V": 11.444082531942136,
+          "local_D_S": 0.0004514430979069876,
+          "log2_gm_shift": [
+            2.236301084911967,
+            2.2363010849119673,
+            2.236301084911967,
+            2.2363010849119673
+          ],
+          "manual_off_margin_V": 3.840463207556873,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 3.7991600858253314,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0006763264790225467,
+          "nominal_unloaded_ideal_divider_V": 5.2356020942408374,
+          "normalized_KCL_residual": 1.3961122362338067e-16,
+          "pin4_V": [
+            0.19541112873575647,
+            0.19541112873575653,
+            0.1954111287357565,
+            0.19541112873575653
+          ],
+          "reference_Hz": [
+            870.71256228789,
+            870.7125622878901,
+            870.71256228789,
+            870.7125622878901
+          ],
+          "selected_branch_current_A": 0.0006768721749937502
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 1.1294117647058823,
+          "log2_gm_shift": 0.7905882352941176,
+          "reference_Hz": 43.33252453103675
+        },
+        "LP": {
+          "actual_bus_V": 5.026178010471204,
+          "log2_gm_shift": 3.2670157068062826,
+          "reference_Hz": 1755.350391515974
+        }
+      }
+    },
+    {
+      "actual_BR_V": -15.0,
+      "diode_drop_V": 0.4,
+      "id": "flute-rankA-Vd0.4-BR-15",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "flute",
+      "rank": "A",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            0.5712706120294333,
+            0.5866287104280027
+          ],
+          "bus_V": 0.5849803966305416,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.1277538286408235,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0009157298874785942,
+            "own": 0.1250066389783877
+          },
+          "kappa_octaves_per_pin_V": 11.598250487476253,
+          "local_D_S": 0.00042484434020059536,
+          "log2_gm_shift": [
+            -0.19271960471156227,
+            -0.19271960471156227,
+            -0.19271960471156227,
+            -0.19271960471156227
+          ],
+          "manual_off_margin_V": 0.9849803966305416,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.9712706120294333,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.00012017828386095997,
+          "nominal_unloaded_ideal_divider_V": 1.1764705882352942,
+          "normalized_KCL_residual": 6.37999656517482e-17,
+          "pin4_V": [
+            -0.016616265092710334,
+            -0.016616265092710334,
+            -0.016616265092710334,
+            -0.016616265092710334
+          ],
+          "reference_Hz": [
+            33.07462683769341,
+            33.07462683769341,
+            33.07462683769341,
+            33.07462683769341
+          ],
+          "selected_branch_current_A": 0.00012020026137825944
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.3486418678851213,
+            3.394910822954615
+          ],
+          "bus_V": 3.389944989616663,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5496086598091487,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0025617394203723397,
+            "own": 0.5419234415480318
+          },
+          "kappa_octaves_per_pin_V": 11.444082531942136,
+          "local_D_S": 0.0004514430979069876,
+          "log2_gm_shift": [
+            0.4750551523417397,
+            0.4750551523417396,
+            0.4750551523417397,
+            0.4750551523417397
+          ],
+          "manual_off_margin_V": 3.789944989616663,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 3.748641867885121,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0006818779315434488,
+          "nominal_unloaded_ideal_divider_V": 5.2356020942408374,
+          "normalized_KCL_residual": 1.4169176187503613e-16,
+          "pin4_V": [
+            0.04151098622504601,
+            0.041510986225046,
+            0.04151098622504601,
+            0.04151098622504601
+          ],
+          "reference_Hz": [
+            272.7700132428703,
+            272.7700132428703,
+            272.7700132428703,
+            272.7700132428703
+          ],
+          "selected_branch_current_A": 0.0006824236275146524
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 1.1294117647058823,
+          "log2_gm_shift": 0.18838235294117645,
+          "reference_Hz": 36.24899321005727
+        },
+        "LP": {
+          "actual_bus_V": 5.026178010471204,
+          "log2_gm_shift": 1.5386066158971916,
+          "reference_Hz": 545.4999801172283
+        }
+      }
+    },
+    {
+      "actual_BR_V": 0.0,
+      "diode_drop_V": 0.6,
+      "id": "flute-rankA-Vd0.6-BR0",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "flute",
+      "rank": "A",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            0.583948664961663,
+            0.5993067633602324
+          ],
+          "bus_V": 0.5976584495627708,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.1277538286408235,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0009157298874785942,
+            "own": 0.1250066389783877
+          },
+          "kappa_octaves_per_pin_V": 11.598250487476253,
+          "local_D_S": 0.00042484434020059536,
+          "log2_gm_shift": [
+            0.4183609146939396,
+            0.4183609146939397,
+            0.4183609146939397,
+            0.4183609146939397
+          ],
+          "manual_off_margin_V": 1.1976584495627707,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 1.183948664961663,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.00011734257648853024,
+          "nominal_unloaded_ideal_divider_V": 1.1764705882352942,
+          "normalized_KCL_residual": 6.37999656517482e-17,
+          "pin4_V": [
+            0.036071036329633,
+            0.03607103632963301,
+            0.03607103632963301,
+            0.03607103632963301
+          ],
+          "reference_Hz": [
+            38.612069575081506,
+            38.61206957508151,
+            38.61206957508151,
+            38.61206957508151
+          ],
+          "selected_branch_current_A": 0.00011736455400582973
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.3274837690012307,
+            3.3737527240707244
+          ],
+          "bus_V": 3.36878689073277,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5496086598091487,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0025617394203723397,
+            "own": 0.5419234415480318
+          },
+          "kappa_octaves_per_pin_V": 11.444082531942136,
+          "local_D_S": 0.0004514430979069876,
+          "log2_gm_shift": [
+            2.189711478976302,
+            2.189711478976301,
+            2.1897114789763017,
+            2.1897114789763017
+          ],
+          "manual_off_margin_V": 3.96878689073277,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 3.9274837690012308,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0006622249753768434,
+          "nominal_unloaded_ideal_divider_V": 5.2356020942408374,
+          "normalized_KCL_residual": 1.4258167518983564e-16,
+          "pin4_V": [
+            0.19134006355376165,
+            0.19134006355376157,
+            0.19134006355376162,
+            0.19134006355376162
+          ],
+          "reference_Hz": [
+            843.7608013457863,
+            843.7608013457855,
+            843.7608013457859,
+            843.7608013457859
+          ],
+          "selected_branch_current_A": 0.0006627706713480474
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 1.1058823529411765,
+          "log2_gm_shift": 0.7741176470588236,
+          "reference_Hz": 43.09689491363298
+        },
+        "LP": {
+          "actual_bus_V": 4.9214659685863875,
+          "log2_gm_shift": 3.198952879581152,
+          "reference_Hz": 1675.5006574659174
+        }
+      }
+    },
+    {
+      "actual_BR_V": -15.0,
+      "diode_drop_V": 0.6,
+      "id": "flute-rankA-Vd0.6-BR-15",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "flute",
+      "rank": "A",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            0.5585544748046934,
+            0.5739125732032632
+          ],
+          "bus_V": 0.5722642594058016,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.1277538286408235,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0009157298874785942,
+            "own": 0.1250066389783877
+          },
+          "kappa_octaves_per_pin_V": 11.598250487476253,
+          "local_D_S": 0.00042484434020059536,
+          "log2_gm_shift": [
+            -0.20162090076888015,
+            -0.20162090076888015,
+            -0.20162090076888015,
+            -0.20162090076888015
+          ],
+          "manual_off_margin_V": 1.1722642594058015,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 1.1585544748046934,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.00011768116569062317,
+          "nominal_unloaded_ideal_divider_V": 1.1764705882352942,
+          "normalized_KCL_residual": 0.0,
+          "pin4_V": [
+            -0.01738373395078763,
+            -0.01738373395078763,
+            -0.01738373395078763,
+            -0.01738373395078763
+          ],
+          "reference_Hz": [
+            33.01004558251665,
+            33.01004558251665,
+            33.01004558251665,
+            33.01004558251665
+          ],
+          "selected_branch_current_A": 0.00011770314320792265
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.276965551061021,
+            3.3232345061305146
+          ],
+          "bus_V": 3.3182686727925623,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5496086598091487,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0025617394203723397,
+            "own": 0.5419234415480318
+          },
+          "kappa_octaves_per_pin_V": 11.444082531942136,
+          "local_D_S": 0.0004514430979069876,
+          "log2_gm_shift": [
+            0.42846554640607415,
+            0.42846554640607404,
+            0.42846554640607415,
+            0.42846554640607415
+          ],
+          "manual_off_margin_V": 3.9182686727925624,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 3.876965551061021,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0006677764278977457,
+          "nominal_unloaded_ideal_divider_V": 5.2356020942408374,
+          "normalized_KCL_residual": 1.4475237709850843e-16,
+          "pin4_V": [
+            0.03743992104305112,
+            0.03743992104305111,
+            0.03743992104305112,
+            0.03743992104305112
+          ],
+          "reference_Hz": [
+            264.81942448222753,
+            264.8194244822275,
+            264.81942448222753,
+            264.81942448222753
+          ],
+          "selected_branch_current_A": 0.0006683221238689492
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 1.1058823529411765,
+          "log2_gm_shift": 0.17191176470588243,
+          "reference_Hz": 36.09377315114766
+        },
+        "LP": {
+          "actual_bus_V": 4.9214659685863875,
+          "log2_gm_shift": 1.4705437886720611,
+          "reference_Hz": 521.4025631295397
+        }
+      }
+    },
+    {
+      "actual_BR_V": 0.0,
+      "diode_drop_V": 0.4,
+      "id": "flute-rankB-Vd0.4-BR0",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "flute",
+      "rank": "B",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            0.596022577498261,
+            0.6087786846104127
+          ],
+          "bus_V": 0.6074096305251221,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12713325150266586,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0007605856029391866,
+            "own": 0.1248514946938483
+          },
+          "kappa_octaves_per_pin_V": 13.89623028545605,
+          "local_D_S": 0.0005090194243756795,
+          "log2_gm_shift": [
+            0.42518674136758555,
+            0.4251867413675855,
+            0.4251867413675855,
+            0.42518674136758555
+          ],
+          "manual_off_margin_V": 1.0074096305251221,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.9960225774982611,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.00011988295087186116,
+          "nominal_unloaded_ideal_divider_V": 1.1764705882352942,
+          "normalized_KCL_residual": 1.3312387020093777e-17,
+          "pin4_V": [
+            0.030597272255382148,
+            0.030597272255382144,
+            0.030597272255382144,
+            0.030597272255382148
+          ],
+          "reference_Hz": [
+            38.6881247802001,
+            38.6881247802001,
+            38.6881247802001,
+            38.6881247802001
+          ],
+          "selected_branch_current_A": 0.0001199012049263317
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.395543862285611,
+            3.4344875103676724
+          ],
+          "bus_V": 3.4303078684099724,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5479863601356125,
+            "differential": 0.5393617021276595,
+            "each_other": 0.002156164501988158,
+            "own": 0.541517866629648
+          },
+          "kappa_octaves_per_pin_V": 13.55658253194214,
+          "local_D_S": 0.0005347764312403211,
+          "log2_gm_shift": [
+            2.2297001144664823,
+            2.2297001144664823,
+            2.2297001144664828,
+            2.2297001144664828
+          ],
+          "manual_off_margin_V": 3.8303078684099723,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 3.795543862285611,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0006775288450145415,
+          "nominal_unloaded_ideal_divider_V": 5.2356020942408374,
+          "normalized_KCL_residual": 1.1820474504976313e-16,
+          "pin4_V": [
+            0.16447361340609576,
+            0.16447361340609576,
+            0.1644736134060958,
+            0.1644736134060958
+          ],
+          "reference_Hz": [
+            866.8408213180697,
+            866.8408213180697,
+            866.8408213180701,
+            866.8408213180701
+          ],
+          "selected_branch_current_A": 0.0006779881463285744
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 1.1294117647058823,
+          "log2_gm_shift": 0.7905882352941176,
+          "reference_Hz": 43.33252453103675
+        },
+        "LP": {
+          "actual_bus_V": 5.026178010471204,
+          "log2_gm_shift": 3.2670157068062826,
+          "reference_Hz": 1755.350391515974
+        }
+      }
+    },
+    {
+      "actual_BR_V": -15.0,
+      "diode_drop_V": 0.4,
+      "id": "flute-rankB-Vd0.4-BR-15",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "flute",
+      "rank": "B",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            0.5749307078369226,
+            0.5876868149490738
+          ],
+          "bus_V": 0.5863177608637832,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12713325150266586,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0007605856029391866,
+            "own": 0.1248514946938483
+          },
+          "kappa_octaves_per_pin_V": 13.89623028545605,
+          "local_D_S": 0.0005090194243756795,
+          "log2_gm_shift": [
+            -0.1917834497482929,
+            -0.1917834497482929,
+            -0.19178344974829292,
+            -0.19178344974829292
+          ],
+          "manual_off_margin_V": 0.9863177608637832,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.9749307078369226,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.00012016417580067902,
+          "nominal_unloaded_ideal_divider_V": 1.1764705882352942,
+          "normalized_KCL_residual": 5.324954808037511e-17,
+          "pin4_V": [
+            -0.013801113381736023,
+            -0.013801113381736023,
+            -0.013801113381736025,
+            -0.013801113381736025
+          ],
+          "reference_Hz": [
+            33.08144207499846,
+            33.08144207499846,
+            33.08144207499846,
+            33.08144207499846
+          ],
+          "selected_branch_current_A": 0.00012018242985514954
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.3530236951834667,
+            3.3919673432655277
+          ],
+          "bus_V": 3.387787701307828,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5479863601356125,
+            "differential": 0.5393617021276595,
+            "each_other": 0.002156164501988158,
+            "own": 0.541517866629648
+          },
+          "kappa_octaves_per_pin_V": 13.55658253194214,
+          "local_D_S": 0.0005347764312403211,
+          "log2_gm_shift": [
+            0.473652914940998,
+            0.47365291494099776,
+            0.47365291494099787,
+            0.47365291494099787
+          ],
+          "manual_off_margin_V": 3.787787701307828,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 3.7530236951834666,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.000682201390849942,
+          "nominal_unloaded_ideal_divider_V": 5.2356020942408374,
+          "normalized_KCL_residual": 1.196883343283481e-16,
+          "pin4_V": [
+            0.03493896148420686,
+            0.034938961484206846,
+            0.03493896148420685,
+            0.03493896148420685
+          ],
+          "reference_Hz": [
+            272.52695277897277,
+            272.52695277897277,
+            272.52695277897277,
+            272.52695277897277
+          ],
+          "selected_branch_current_A": 0.0006826606921639749
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 1.1294117647058823,
+          "log2_gm_shift": 0.18838235294117645,
+          "reference_Hz": 36.24899321005727
+        },
+        "LP": {
+          "actual_bus_V": 5.026178010471204,
+          "log2_gm_shift": 1.5386066158971916,
+          "reference_Hz": 545.4999801172283
+        }
+      }
+    },
+    {
+      "actual_BR_V": 0.0,
+      "diode_drop_V": 0.6,
+      "id": "flute-rankB-Vd0.6-BR0",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "flute",
+      "rank": "B",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            0.5833682101956547,
+            0.5961243173078059
+          ],
+          "bus_V": 0.5947552632225153,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12713325150266586,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0007605856029391866,
+            "own": 0.1248514946938483
+          },
+          "kappa_octaves_per_pin_V": 13.89623028545605,
+          "local_D_S": 0.0005090194243756795,
+          "log2_gm_shift": [
+            0.41632868425576086,
+            0.4163286842557608,
+            0.4163286842557608,
+            0.4163286842557608
+          ],
+          "manual_off_margin_V": 1.1947552632225151,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 1.1833682101956546,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.00011738500910256259,
+          "nominal_unloaded_ideal_divider_V": 1.1764705882352942,
+          "normalized_KCL_residual": 5.324954808037511e-17,
+          "pin4_V": [
+            0.02995982908339502,
+            0.029959829083395017,
+            0.029959829083395013,
+            0.029959829083395017
+          ],
+          "reference_Hz": [
+            38.58949534235751,
+            38.58949534235751,
+            38.58949534235751,
+            38.58949534235751
+          ],
+          "selected_branch_current_A": 0.00011740326315703314
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.3240791150270694,
+            3.3630227631091336
+          ],
+          "bus_V": 3.3588431211514336,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5479863601356125,
+            "differential": 0.5393617021276595,
+            "each_other": 0.002156164501988158,
+            "own": 0.541517866629648
+          },
+          "kappa_octaves_per_pin_V": 13.55658253194214,
+          "local_D_S": 0.0005347764312403211,
+          "log2_gm_shift": [
+            2.183248028748431,
+            2.183248028748431,
+            2.1832480287484315,
+            2.1832480287484315
+          ],
+          "manual_off_margin_V": 3.9588431211514337,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 3.9240791150270695,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0006634040919660292,
+          "nominal_unloaded_ideal_divider_V": 5.2356020942408374,
+          "normalized_KCL_residual": 1.2071973962528995e-16,
+          "pin4_V": [
+            0.1610470797934688,
+            0.1610470797934688,
+            0.16104707979346883,
+            0.16104707979346883
+          ],
+          "reference_Hz": [
+            840.0900181997216,
+            840.0900181997216,
+            840.0900181997217,
+            840.0900181997217
+          ],
+          "selected_branch_current_A": 0.0006638633932800623
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 1.1058823529411765,
+          "log2_gm_shift": 0.7741176470588236,
+          "reference_Hz": 43.09689491363298
+        },
+        "LP": {
+          "actual_bus_V": 4.9214659685863875,
+          "log2_gm_shift": 3.198952879581152,
+          "reference_Hz": 1675.5006574659174
+        }
+      }
+    },
+    {
+      "actual_BR_V": -15.0,
+      "diode_drop_V": 0.6,
+      "id": "flute-rankB-Vd0.6-BR-15",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "flute",
+      "rank": "B",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            0.5622763405343156,
+            0.5750324476464674
+          ],
+          "bus_V": 0.5736633935611768,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12713325150266586,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0007605856029391866,
+            "own": 0.1248514946938483
+          },
+          "kappa_octaves_per_pin_V": 13.89623028545605,
+          "local_D_S": 0.0005090194243756795,
+          "log2_gm_shift": [
+            -0.2006415068601176,
+            -0.20064150686011764,
+            -0.2006415068601176,
+            -0.20064150686011764
+          ],
+          "manual_off_margin_V": 1.1736633935611769,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 1.1622763405343157,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.00011766623403138044,
+          "nominal_unloaded_ideal_divider_V": 1.1764705882352942,
+          "normalized_KCL_residual": 5.324954808037511e-17,
+          "pin4_V": [
+            -0.014438556553723152,
+            -0.014438556553723154,
+            -0.014438556553723152,
+            -0.014438556553723154
+          ],
+          "reference_Hz": [
+            33.01713185076956,
+            33.01713185076956,
+            33.01713185076956,
+            33.01713185076956
+          ],
+          "selected_branch_current_A": 0.00011768448808585099
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.281558947924925,
+            3.3205025960069894
+          ],
+          "bus_V": 3.3163229540492893,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5479863601356125,
+            "differential": 0.5393617021276595,
+            "each_other": 0.002156164501988158,
+            "own": 0.541517866629648
+          },
+          "kappa_octaves_per_pin_V": 13.55658253194214,
+          "local_D_S": 0.0005347764312403211,
+          "log2_gm_shift": [
+            0.42720082922294655,
+            0.42720082922294655,
+            0.42720082922294667,
+            0.42720082922294667
+          ],
+          "manual_off_margin_V": 3.9163229540492894,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 3.8815589479249253,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0006680766378014298,
+          "nominal_unloaded_ideal_divider_V": 5.2356020942408374,
+          "normalized_KCL_residual": 1.2226754530420524e-16,
+          "pin4_V": [
+            0.03151242787157989,
+            0.03151242787157989,
+            0.031512427871579894,
+            0.031512427871579894
+          ],
+          "reference_Hz": [
+            264.6071577071171,
+            264.6071577071171,
+            264.6071577071171,
+            264.6071577071171
+          ],
+          "selected_branch_current_A": 0.0006685359391154627
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 1.1058823529411765,
+          "log2_gm_shift": 0.17191176470588243,
+          "reference_Hz": 36.09377315114766
+        },
+        "LP": {
+          "actual_bus_V": 4.9214659685863875,
+          "log2_gm_shift": 1.4705437886720611,
+          "reference_Hz": 521.4025631295397
+        }
+      }
+    },
+    {
+      "actual_BR_V": 0.0,
+      "diode_drop_V": 0.4,
+      "id": "flute-rankC-Vd0.4-BR0",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "flute",
+      "rank": "C",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            0.5954906248612358,
+            0.606091510986272
+          ],
+          "bus_V": 0.6049537668195305,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12661922946144574,
+            "differential": 0.12409090909090909,
+            "each_other": 0.000632080092634166,
+            "own": 0.12472298918354327
+          },
+          "kappa_octaves_per_pin_V": 16.65380604303181,
+          "local_D_S": 0.0006100295253857806,
+          "log2_gm_shift": [
+            0.4234676367736714,
+            0.4234676367736714,
+            0.42346763677367144,
+            0.4234676367736714
+          ],
+          "manual_off_margin_V": 1.0049537668195305,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.9954906248612359,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.00011991877985351639,
+          "nominal_unloaded_ideal_divider_V": 1.1764705882352942,
+          "normalized_KCL_residual": 4.4432364638410685e-17,
+          "pin4_V": [
+            0.02542767915511159,
+            0.02542767915511159,
+            0.025427679155111592,
+            0.02542767915511159
+          ],
+          "reference_Hz": [
+            38.668936137970675,
+            38.668936137970675,
+            38.668936137970675,
+            38.668936137970675
+          ],
+          "selected_branch_current_A": 0.00011993394977573959
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.3929161754491464,
+            3.4265369742846135
+          ],
+          "bus_V": 3.422928609162578,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.54680753491916,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0018614581978750658,
+            "own": 0.5412231603255347
+          },
+          "kappa_octaves_per_pin_V": 15.669082531942138,
+          "local_D_S": 0.0006181097645736543,
+          "log2_gm_shift": [
+            2.224903595955677,
+            2.224903595955677,
+            2.224903595955676,
+            2.2249035959556767
+          ],
+          "manual_off_margin_V": 3.822928609162578,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 3.7929161754491463,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0006784025302983941,
+          "nominal_unloaded_ideal_divider_V": 5.2356020942408374,
+          "normalized_KCL_residual": 1.0248889792277932e-16,
+          "pin4_V": [
+            0.14199322719885543,
+            0.14199322719885543,
+            0.14199322719885538,
+            0.1419932271988554
+          ],
+          "reference_Hz": [
+            864.0385578905831,
+            864.0385578905831,
+            864.0385578905825,
+            864.0385578905828
+          ],
+          "selected_branch_current_A": 0.0006787990539381783
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 1.1294117647058823,
+          "log2_gm_shift": 0.7905882352941176,
+          "reference_Hz": 43.33252453103675
+        },
+        "LP": {
+          "actual_bus_V": 5.026178010471204,
+          "log2_gm_shift": 3.2670157068062826,
+          "reference_Hz": 1755.350391515974
+        }
+      }
+    },
+    {
+      "actual_BR_V": -15.0,
+      "diode_drop_V": 0.4,
+      "id": "flute-rankC-Vd0.4-BR-15",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "flute",
+      "rank": "C",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            0.5779623533848265,
+            0.5885632395098622
+          ],
+          "bus_V": 0.5874254953431207,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12661922946144574,
+            "differential": 0.12409090909090909,
+            "each_other": 0.000632080092634166,
+            "own": 0.12472298918354327
+          },
+          "kappa_octaves_per_pin_V": 16.65380604303181,
+          "local_D_S": 0.0006100295253857806,
+          "log2_gm_shift": [
+            -0.19100803561275675,
+            -0.19100803561275675,
+            -0.19100803561275673,
+            -0.19100803561275673
+          ],
+          "manual_off_margin_V": 0.9874254953431207,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.9779623533848265,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.00012015249013986851,
+          "nominal_unloaded_ideal_divider_V": 1.1764705882352942,
+          "normalized_KCL_residual": 5.5540455798013356e-18,
+          "pin4_V": [
+            -0.011469332302730716,
+            -0.011469332302730716,
+            -0.011469332302730714,
+            -0.011469332302730714
+          ],
+          "reference_Hz": [
+            33.08709046358137,
+            33.08709046358137,
+            33.08709046358137,
+            33.08709046358137
+          ],
+          "selected_branch_current_A": 0.00012016766006209171
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.356207699099444,
+            3.3898284979349085
+          ],
+          "bus_V": 3.386220132812875,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.54680753491916,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0018614581978750658,
+            "own": 0.5412231603255347
+          },
+          "kappa_octaves_per_pin_V": 15.669082531942138,
+          "local_D_S": 0.0006181097645736543,
+          "log2_gm_shift": [
+            0.4726339954192776,
+            0.47263399541927764,
+            0.4726339954192776,
+            0.47263399541927753
+          ],
+          "manual_off_margin_V": 3.786220132812875,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 3.756207699099444,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0006824364287983616,
+          "nominal_unloaded_ideal_divider_V": 5.2356020942408374,
+          "normalized_KCL_residual": 1.0359993357254384e-16,
+          "pin4_V": [
+            0.030163476033506855,
+            0.03016347603350686,
+            0.030163476033506855,
+            0.03016347603350685
+          ],
+          "reference_Hz": [
+            272.35048385786934,
+            272.35048385786934,
+            272.35048385786934,
+            272.35048385786934
+          ],
+          "selected_branch_current_A": 0.0006828329524381456
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 1.1294117647058823,
+          "log2_gm_shift": 0.18838235294117645,
+          "reference_Hz": 36.24899321005727
+        },
+        "LP": {
+          "actual_bus_V": 5.026178010471204,
+          "log2_gm_shift": 1.5386066158971916,
+          "reference_Hz": 545.4999801172283
+        }
+      }
+    },
+    {
+      "actual_BR_V": 0.0,
+      "diode_drop_V": 0.6,
+      "id": "flute-rankC-Vd0.6-BR0",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "flute",
+      "rank": "C",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            0.5828874213858293,
+            0.5934883075108649
+          ],
+          "bus_V": 0.5923505633441234,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12661922946144574,
+            "differential": 0.12409090909090909,
+            "each_other": 0.000632080092634166,
+            "own": 0.12472298918354327
+          },
+          "kappa_octaves_per_pin_V": 16.65380604303181,
+          "local_D_S": 0.0006100295253857806,
+          "log2_gm_shift": [
+            0.41464539434088654,
+            0.41464539434088654,
+            0.41464539434088654,
+            0.4146453943408865
+          ],
+          "manual_off_margin_V": 1.1923505633441234,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 1.1828874213858294,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.00011742015589985513,
+          "nominal_unloaded_ideal_divider_V": 1.1764705882352942,
+          "normalized_KCL_residual": 9.62174388037346e-18,
+          "pin4_V": [
+            0.024897935839380096,
+            0.024897935839380096,
+            0.024897935839380096,
+            0.024897935839380093
+          ],
+          "reference_Hz": [
+            38.57082124086668,
+            38.57082124086668,
+            38.57082124086668,
+            38.57082124086668
+          ],
+          "selected_branch_current_A": 0.00011743532582207836
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.3216051627582606,
+            3.355225961593728
+          ],
+          "bus_V": 3.351617596471692,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.54680753491916,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0018614581978750658,
+            "own": 0.5412231603255347
+          },
+          "kappa_octaves_per_pin_V": 15.669082531942138,
+          "local_D_S": 0.0006181097645736543,
+          "log2_gm_shift": [
+            2.1785514377066,
+            2.1785514377066004,
+            2.1785514377066,
+            2.1785514377066
+          ],
+          "manual_off_margin_V": 3.951617596471692,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 3.9216051627582607,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0006642608833413486,
+          "nominal_unloaded_ideal_divider_V": 5.2356020942408374,
+          "normalized_KCL_residual": 1.333891789077745e-17,
+          "pin4_V": [
+            0.13903503496554592,
+            0.13903503496554595,
+            0.13903503496554592,
+            0.13903503496554592
+          ],
+          "reference_Hz": [
+            837.43298402358,
+            837.4329840235803,
+            837.43298402358,
+            837.43298402358
+          ],
+          "selected_branch_current_A": 0.0006646574069811327
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 1.1058823529411765,
+          "log2_gm_shift": 0.7741176470588236,
+          "reference_Hz": 43.09689491363298
+        },
+        "LP": {
+          "actual_bus_V": 4.9214659685863875,
+          "log2_gm_shift": 3.198952879581152,
+          "reference_Hz": 1675.5006574659174
+        }
+      }
+    },
+    {
+      "actual_BR_V": -15.0,
+      "diode_drop_V": 0.6,
+      "id": "flute-rankC-Vd0.6-BR-15",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "flute",
+      "rank": "C",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            0.5653591499094194,
+            0.5759600360344556
+          ],
+          "bus_V": 0.5748222918677142,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12661922946144574,
+            "differential": 0.12409090909090909,
+            "each_other": 0.000632080092634166,
+            "own": 0.12472298918354327
+          },
+          "kappa_octaves_per_pin_V": 16.65380604303181,
+          "local_D_S": 0.0006100295253857806,
+          "log2_gm_shift": [
+            -0.19983027804554152,
+            -0.19983027804554154,
+            -0.19983027804554154,
+            -0.19983027804554152
+          ],
+          "manual_off_margin_V": 1.1748222918677143,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 1.1653591499094194,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.00011765386618620727,
+          "nominal_unloaded_ideal_divider_V": 1.1764705882352942,
+          "normalized_KCL_residual": 4.4432364638410685e-17,
+          "pin4_V": [
+            -0.011999075618462205,
+            -0.011999075618462206,
+            -0.011999075618462206,
+            -0.011999075618462205
+          ],
+          "reference_Hz": [
+            33.023005027524206,
+            33.023005027524206,
+            33.023005027524206,
+            33.023005027524206
+          ],
+          "selected_branch_current_A": 0.0001176690361084305
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.2848966864085556,
+            3.3185174852440227
+          ],
+          "bus_V": 3.3149091201219867,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.54680753491916,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0018614581978750658,
+            "own": 0.5412231603255347
+          },
+          "kappa_octaves_per_pin_V": 15.669082531942138,
+          "local_D_S": 0.0006181097645736543,
+          "log2_gm_shift": [
+            0.4262818371702013,
+            0.4262818371702014,
+            0.42628183717020135,
+            0.4262818371702013
+          ],
+          "manual_off_margin_V": 3.9149091201219868,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 3.8848966864085557,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0006682947818413162,
+          "nominal_unloaded_ideal_divider_V": 5.2356020942408374,
+          "normalized_KCL_residual": 1.0582859683601664e-16,
+          "pin4_V": [
+            0.027205283800197388,
+            0.027205283800197395,
+            0.02720528380019739,
+            0.027205283800197388
+          ],
+          "reference_Hz": [
+            264.4530332105994,
+            264.4530332105995,
+            264.4530332105994,
+            264.4530332105994
+          ],
+          "selected_branch_current_A": 0.0006686913054811004
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 1.1058823529411765,
+          "log2_gm_shift": 0.17191176470588243,
+          "reference_Hz": 36.09377315114766
+        },
+        "LP": {
+          "actual_bus_V": 4.9214659685863875,
+          "log2_gm_shift": 1.4705437886720611,
+          "reference_Hz": 521.4025631295397
+        }
+      }
+    },
+    {
+      "actual_BR_V": 0.0,
+      "diode_drop_V": 0.4,
+      "id": "brass1-rankA-Vd0.4-BR0",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "brass1",
+      "rank": "A",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            -0.005280691373093171,
+            0.0099746392602871
+          ],
+          "bus_V": 0.0,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12800253233023734,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0009779058098320684,
+            "own": 0.12506881490074115
+          },
+          "kappa_octaves_per_pin_V": 11.598250487476253,
+          "local_D_S": 0.00042484434020059536,
+          "log2_gm_shift": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "manual_off_margin_V": 0.4,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.39471930862690685,
+          "minimum_selected_current_across_neutral_and_EG_box_A": null,
+          "nominal_unloaded_ideal_divider_V": 0.0,
+          "normalized_KCL_residual": 0.0,
+          "pin4_V": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "reference_Hz": [
+            34.57516923289296,
+            34.57516923289296,
+            34.57516923289296,
+            34.57516923289296
+          ],
+          "selected_branch_current_A": null
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.8641022657021393,
+            3.9040827876369373
+          ],
+          "bus_V": 3.8779416771411066,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5488808740168973,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0023797929723093874,
+            "own": 0.5417414950999692
+          },
+          "kappa_octaves_per_pin_V": 11.444082531942136,
+          "local_D_S": 0.0004514430979069876,
+          "log2_gm_shift": [
+            2.52066209014172,
+            2.5206620901417196,
+            2.5206620901417196,
+            2.5206620901417196
+          ],
+          "manual_off_margin_V": 4.277941677141107,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 4.26410226570214,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0007594556283150749,
+          "nominal_unloaded_ideal_divider_V": 5.714285714285714,
+          "normalized_KCL_residual": 1.238613981921313e-16,
+          "pin4_V": [
+            0.22025899263712728,
+            0.22025899263712725,
+            0.22025899263712725,
+            0.22025899263712725
+          ],
+          "reference_Hz": [
+            1055.4968735858629,
+            1055.4968735858624,
+            1055.4968735858624,
+            1055.4968735858624
+          ],
+          "selected_branch_current_A": 0.0007629411097145191
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 0.0,
+          "log2_gm_shift": 0.0,
+          "reference_Hz": 34.57516923289296
+        },
+        "LP": {
+          "actual_bus_V": 5.485714285714286,
+          "log2_gm_shift": 3.565714285714286,
+          "reference_Hz": 2153.9481750705063
+        }
+      }
+    },
+    {
+      "actual_BR_V": -15.0,
+      "diode_drop_V": 0.4,
+      "id": "brass1-rankA-Vd0.4-BR-15",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "brass1",
+      "rank": "A",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            -0.03239908778020095,
+            -0.01714375714682069
+          ],
+          "bus_V": -0.02711839640710779,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12800253233023734,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0009779058098320684,
+            "own": 0.12506881490074115
+          },
+          "kappa_octaves_per_pin_V": 11.598250487476253,
+          "local_D_S": 0.00042484434020059536,
+          "log2_gm_shift": [
+            -0.6211887598379167,
+            -0.6211887598379167,
+            -0.6211887598379167,
+            -0.6211887598379167
+          ],
+          "manual_off_margin_V": 0.37288160359289224,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.36760091221979907,
+          "minimum_selected_current_across_neutral_and_EG_box_A": null,
+          "nominal_unloaded_ideal_divider_V": 0.0,
+          "normalized_KCL_residual": 7.974995706468526e-18,
+          "pin4_V": [
+            -0.05355883290403789,
+            -0.053558832904037894,
+            -0.05355883290403789,
+            -0.05355883290403789
+          ],
+          "reference_Hz": [
+            30.376789294312324,
+            30.376789294312324,
+            30.376789294312324,
+            30.376789294312324
+          ],
+          "selected_branch_current_A": null
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.817172082611842,
+            3.85715260454664
+          ],
+          "bus_V": 3.8310114940508115,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5488808740168973,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0023797929723093874,
+            "own": 0.5417414950999692
+          },
+          "kappa_octaves_per_pin_V": 11.444082531942136,
+          "local_D_S": 0.0004514430979069876,
+          "log2_gm_shift": [
+            0.7617483802239359,
+            0.7617483802239357,
+            0.7617483802239357,
+            0.7617483802239357
+          ],
+          "manual_off_margin_V": 4.2310114940508115,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 4.217172082611842,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.000765712986060448,
+          "nominal_unloaded_ideal_divider_V": 5.714285714285714,
+          "normalized_KCL_residual": 1.2537870977002749e-16,
+          "pin4_V": [
+            0.06656264301640458,
+            0.06656264301640456,
+            0.06656264301640456,
+            0.06656264301640456
+          ],
+          "reference_Hz": [
+            327.77312242457367,
+            327.7731224245736,
+            327.7731224245736,
+            327.7731224245736
+          ],
+          "selected_branch_current_A": 0.0007691984674598918
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 0.0,
+          "log2_gm_shift": -0.6022058823529411,
+          "reference_Hz": 30.48012077268016
+        },
+        "LP": {
+          "actual_bus_V": 5.485714285714286,
+          "log2_gm_shift": 1.8373051948051948,
+          "reference_Hz": 665.7906374995146
+        }
+      }
+    },
+    {
+      "actual_BR_V": 0.0,
+      "diode_drop_V": 0.6,
+      "id": "brass1-rankA-Vd0.6-BR0",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "brass1",
+      "rank": "A",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            -0.005280691373093171,
+            0.0099746392602871
+          ],
+          "bus_V": 0.0,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12800253233023734,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0009779058098320684,
+            "own": 0.12506881490074115
+          },
+          "kappa_octaves_per_pin_V": 11.598250487476253,
+          "local_D_S": 0.00042484434020059536,
+          "log2_gm_shift": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "manual_off_margin_V": 0.6,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.5947193086269068,
+          "minimum_selected_current_across_neutral_and_EG_box_A": null,
+          "nominal_unloaded_ideal_divider_V": 0.0,
+          "normalized_KCL_residual": 0.0,
+          "pin4_V": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "reference_Hz": [
+            34.57516923289296,
+            34.57516923289296,
+            34.57516923289296,
+            34.57516923289296
+          ],
+          "selected_branch_current_A": null
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.7833118140950326,
+            3.8232923360298305
+          ],
+          "bus_V": 3.7971512255340025,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5488808740168973,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0023797929723093874,
+            "own": 0.5417414950999692
+          },
+          "kappa_octaves_per_pin_V": 11.444082531942136,
+          "local_D_S": 0.0004514430979069876,
+          "log2_gm_shift": [
+            2.468148296597101,
+            2.4681482965971013,
+            2.4681482965971013,
+            2.468148296597101
+          ],
+          "manual_off_margin_V": 4.397151225534002,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 4.383311814095032,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0007435610218626894,
+          "nominal_unloaded_ideal_divider_V": 5.714285714285714,
+          "normalized_KCL_residual": 1.2649674708983616e-16,
+          "pin4_V": [
+            0.2156702636238538,
+            0.21567026362385386,
+            0.21567026362385383,
+            0.2156702636238538
+          ],
+          "reference_Hz": [
+            1018.5747970235038,
+            1018.5747970235042,
+            1018.5747970235042,
+            1018.5747970235038
+          ],
+          "selected_branch_current_A": 0.000747046503262133
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 0.0,
+          "log2_gm_shift": 0.0,
+          "reference_Hz": 34.57516923289296
+        },
+        "LP": {
+          "actual_bus_V": 5.371428571428571,
+          "log2_gm_shift": 3.491428571428571,
+          "reference_Hz": 2046.9793839620422
+        }
+      }
+    },
+    {
+      "actual_BR_V": -15.0,
+      "diode_drop_V": 0.6,
+      "id": "brass1-rankA-Vd0.6-BR-15",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "brass1",
+      "rank": "A",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            -0.03239908778020095,
+            -0.01714375714682069
+          ],
+          "bus_V": -0.02711839640710779,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12800253233023734,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0009779058098320684,
+            "own": 0.12506881490074115
+          },
+          "kappa_octaves_per_pin_V": 11.598250487476253,
+          "local_D_S": 0.00042484434020059536,
+          "log2_gm_shift": [
+            -0.6211887598379167,
+            -0.6211887598379167,
+            -0.6211887598379167,
+            -0.6211887598379167
+          ],
+          "manual_off_margin_V": 0.5728816035928922,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.567600912219799,
+          "minimum_selected_current_across_neutral_and_EG_box_A": null,
+          "nominal_unloaded_ideal_divider_V": 0.0,
+          "normalized_KCL_residual": 7.974995706468526e-18,
+          "pin4_V": [
+            -0.05355883290403789,
+            -0.053558832904037894,
+            -0.05355883290403789,
+            -0.05355883290403789
+          ],
+          "reference_Hz": [
+            30.376789294312324,
+            30.376789294312324,
+            30.376789294312324,
+            30.376789294312324
+          ],
+          "selected_branch_current_A": null
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.7363816310047353,
+            3.7763621529395333
+          ],
+          "bus_V": 3.750221042443705,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5488808740168973,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0023797929723093874,
+            "own": 0.5417414950999692
+          },
+          "kappa_octaves_per_pin_V": 11.444082531942136,
+          "local_D_S": 0.0004514430979069876,
+          "log2_gm_shift": [
+            0.7092345866793167,
+            0.7092345866793167,
+            0.7092345866793168,
+            0.7092345866793167
+          ],
+          "manual_off_margin_V": 4.350221042443705,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 4.336381631004735,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0007498183796080622,
+          "nominal_unloaded_ideal_divider_V": 5.714285714285714,
+          "normalized_KCL_residual": 8.004982786382091e-18,
+          "pin4_V": [
+            0.0619739140031311,
+            0.0619739140031311,
+            0.061973914003131104,
+            0.06197391400313109
+          ],
+          "reference_Hz": [
+            316.86373583028455,
+            316.86373583028455,
+            316.8637358302846,
+            316.86373583028455
+          ],
+          "selected_branch_current_A": 0.000753303861007506
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 0.0,
+          "log2_gm_shift": -0.6022058823529411,
+          "reference_Hz": 30.48012077268016
+        },
+        "LP": {
+          "actual_bus_V": 5.371428571428571,
+          "log2_gm_shift": 1.76301948051948,
+          "reference_Hz": 633.509107765255
+        }
+      }
+    },
+    {
+      "actual_BR_V": 0.0,
+      "diode_drop_V": 0.4,
+      "id": "brass1-rankB-Vd0.4-BR0",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "brass1",
+      "rank": "B",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            -0.004384582866156938,
+            0.00828198985829644
+          ],
+          "bus_V": 0.0,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12733874825102537,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0008119597900290626,
+            "own": 0.12490286888093817
+          },
+          "kappa_octaves_per_pin_V": 13.89623028545605,
+          "local_D_S": 0.0005090194243756795,
+          "log2_gm_shift": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "manual_off_margin_V": 0.4,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.3956154171338431,
+          "minimum_selected_current_across_neutral_and_EG_box_A": null,
+          "nominal_unloaded_ideal_divider_V": 0.0,
+          "normalized_KCL_residual": 0.0,
+          "pin4_V": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "reference_Hz": [
+            34.57516923289296,
+            34.57516923289296,
+            34.57516923289296,
+            34.57516923289296
+          ],
+          "selected_branch_current_A": null
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.855654984854955,
+            3.8893128415824423
+          ],
+          "bus_V": 3.8673057814144687,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5473754775389661,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0020034438528266293,
+            "own": 0.5413651459804864
+          },
+          "kappa_octaves_per_pin_V": 13.55658253194214,
+          "local_D_S": 0.0005347764312403211,
+          "log2_gm_shift": [
+            2.513748757919404,
+            2.513748757919405,
+            2.5137487579194056,
+            2.5137487579194056
+          ],
+          "manual_off_margin_V": 4.267305781414469,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 4.255654984854955,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0007614249544556743,
+          "nominal_unloaded_ideal_divider_V": 5.714285714285714,
+          "normalized_KCL_residual": 1.3714994631481752e-17,
+          "pin4_V": [
+            0.18542643413238455,
+            0.1854264341323846,
+            0.18542643413238463,
+            0.18542643413238463
+          ],
+          "reference_Hz": [
+            1050.5589979568513,
+            1050.558997956852,
+            1050.5589979568522,
+            1050.5589979568522
+          ],
+          "selected_branch_current_A": 0.0007643592291447374
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 0.0,
+          "log2_gm_shift": 0.0,
+          "reference_Hz": 34.57516923289296
+        },
+        "LP": {
+          "actual_bus_V": 5.485714285714286,
+          "log2_gm_shift": 3.565714285714286,
+          "reference_Hz": 2153.9481750705063
+        }
+      }
+    },
+    {
+      "actual_BR_V": -15.0,
+      "diode_drop_V": 0.4,
+      "id": "brass1-rankB-Vd0.4-BR-15",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "brass1",
+      "rank": "B",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            -0.02690111485855952,
+            -0.014234542134106139
+          ],
+          "bus_V": -0.02251653199240258,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12733874825102537,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0008119597900290626,
+            "own": 0.12490286888093817
+          },
+          "kappa_octaves_per_pin_V": 13.89623028545605,
+          "local_D_S": 0.0005090194243756795,
+          "log2_gm_shift": [
+            -0.6179674547476229,
+            -0.6179674547476229,
+            -0.6179674547476232,
+            -0.6179674547476232
+          ],
+          "manual_off_margin_V": 0.37748346800759747,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.3730988851414405,
+          "minimum_selected_current_across_neutral_and_EG_box_A": null,
+          "nominal_unloaded_ideal_divider_V": 0.0,
+          "normalized_KCL_residual": 1.3312387020093777e-17,
+          "pin4_V": [
+            -0.044470150684995095,
+            -0.044470150684995095,
+            -0.04447015068499511,
+            -0.04447015068499511
+          ],
+          "reference_Hz": [
+            30.394228514504288,
+            30.394228514504288,
+            30.394228514504288,
+            30.394228514504288
+          ],
+          "selected_branch_current_A": null
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.816146511673339,
+            3.849804368400824
+          ],
+          "bus_V": 3.827797308232853,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5473754775389661,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0020034438528266293,
+            "own": 0.5413651459804864
+          },
+          "kappa_octaves_per_pin_V": 13.55658253194214,
+          "local_D_S": 0.0005347764312403211,
+          "log2_gm_shift": [
+            0.759659159442263,
+            0.7596591594422631,
+            0.7596591594422633,
+            0.7596591594422633
+          ],
+          "manual_off_margin_V": 4.227797308232853,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 4.216146511673339,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0007666927508798902,
+          "nominal_unloaded_ideal_divider_V": 5.714285714285714,
+          "normalized_KCL_residual": 6.620626602855429e-18,
+          "pin4_V": [
+            0.05603618446259205,
+            0.056036184462592065,
+            0.05603618446259207,
+            0.05603618446259207
+          ],
+          "reference_Hz": [
+            327.3314736865779,
+            327.3314736865779,
+            327.33147368657797,
+            327.33147368657797
+          ],
+          "selected_branch_current_A": 0.0007696270255689529
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 0.0,
+          "log2_gm_shift": -0.6022058823529411,
+          "reference_Hz": 30.48012077268016
+        },
+        "LP": {
+          "actual_bus_V": 5.485714285714286,
+          "log2_gm_shift": 1.8373051948051948,
+          "reference_Hz": 665.7906374995146
+        }
+      }
+    },
+    {
+      "actual_BR_V": 0.0,
+      "diode_drop_V": 0.6,
+      "id": "brass1-rankB-Vd0.6-BR0",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "brass1",
+      "rank": "B",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            -0.004384582866156938,
+            0.00828198985829644
+          ],
+          "bus_V": 0.0,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12733874825102537,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0008119597900290626,
+            "own": 0.12490286888093817
+          },
+          "kappa_octaves_per_pin_V": 13.89623028545605,
+          "local_D_S": 0.0005090194243756795,
+          "log2_gm_shift": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "manual_off_margin_V": 0.6,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.595615417133843,
+          "minimum_selected_current_across_neutral_and_EG_box_A": null,
+          "nominal_unloaded_ideal_divider_V": 0.0,
+          "normalized_KCL_residual": 0.0,
+          "pin4_V": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "reference_Hz": [
+            34.57516923289296,
+            34.57516923289296,
+            34.57516923289296,
+            34.57516923289296
+          ],
+          "selected_branch_current_A": null
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.7750861144088192,
+            3.8087439711363067
+          ],
+          "bus_V": 3.786736910968333,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5473754775389661,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0020034438528266293,
+            "own": 0.5413651459804864
+          },
+          "kappa_octaves_per_pin_V": 13.55658253194214,
+          "local_D_S": 0.0005347764312403211,
+          "log2_gm_shift": [
+            2.4613789921294167,
+            2.4613789921294176,
+            2.4613789921294176,
+            2.4613789921294176
+          ],
+          "manual_off_margin_V": 4.386736910968333,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 4.375086114408819,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0007455008038484924,
+          "nominal_unloaded_ideal_divider_V": 5.714285714285714,
+          "normalized_KCL_residual": 1.0707864754298693e-16,
+          "pin4_V": [
+            0.18156338342129322,
+            0.18156338342129327,
+            0.18156338342129327,
+            0.18156338342129327
+          ],
+          "reference_Hz": [
+            1013.9123898121265,
+            1013.9123898121272,
+            1013.9123898121272,
+            1013.9123898121272
+          ],
+          "selected_branch_current_A": 0.0007484350785375557
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 0.0,
+          "log2_gm_shift": 0.0,
+          "reference_Hz": 34.57516923289296
+        },
+        "LP": {
+          "actual_bus_V": 5.371428571428571,
+          "log2_gm_shift": 3.491428571428571,
+          "reference_Hz": 2046.9793839620422
+        }
+      }
+    },
+    {
+      "actual_BR_V": -15.0,
+      "diode_drop_V": 0.6,
+      "id": "brass1-rankB-Vd0.6-BR-15",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "brass1",
+      "rank": "B",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            -0.02690111485855952,
+            -0.014234542134106139
+          ],
+          "bus_V": -0.02251653199240258,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12733874825102537,
+            "differential": 0.12409090909090909,
+            "each_other": 0.0008119597900290626,
+            "own": 0.12490286888093817
+          },
+          "kappa_octaves_per_pin_V": 13.89623028545605,
+          "local_D_S": 0.0005090194243756795,
+          "log2_gm_shift": [
+            -0.6179674547476229,
+            -0.6179674547476229,
+            -0.6179674547476232,
+            -0.6179674547476232
+          ],
+          "manual_off_margin_V": 0.5774834680075974,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.5730988851414405,
+          "minimum_selected_current_across_neutral_and_EG_box_A": null,
+          "nominal_unloaded_ideal_divider_V": 0.0,
+          "normalized_KCL_residual": 1.3312387020093777e-17,
+          "pin4_V": [
+            -0.044470150684995095,
+            -0.044470150684995095,
+            -0.04447015068499511,
+            -0.04447015068499511
+          ],
+          "reference_Hz": [
+            30.394228514504288,
+            30.394228514504288,
+            30.394228514504288,
+            30.394228514504288
+          ],
+          "selected_branch_current_A": null
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.735577641227203,
+            3.769235497954691
+          ],
+          "bus_V": 3.7472284377867173,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5473754775389661,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0020034438528266293,
+            "own": 0.5413651459804864
+          },
+          "kappa_octaves_per_pin_V": 13.55658253194214,
+          "local_D_S": 0.0005347764312403211,
+          "log2_gm_shift": [
+            0.7072893936522757,
+            0.7072893936522756,
+            0.7072893936522757,
+            0.7072893936522757
+          ],
+          "manual_off_margin_V": 4.347228437786717,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 4.335577641227203,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0007507686002727079,
+          "nominal_unloaded_ideal_divider_V": 5.714285714285714,
+          "normalized_KCL_residual": 1.0820761898014717e-16,
+          "pin4_V": [
+            0.05217313375150073,
+            0.05217313375150072,
+            0.05217313375150073,
+            0.05217313375150073
+          ],
+          "reference_Hz": [
+            316.4672124434688,
+            316.4672124434688,
+            316.4672124434688,
+            316.4672124434688
+          ],
+          "selected_branch_current_A": 0.0007537028749617711
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 0.0,
+          "log2_gm_shift": -0.6022058823529411,
+          "reference_Hz": 30.48012077268016
+        },
+        "LP": {
+          "actual_bus_V": 5.371428571428571,
+          "log2_gm_shift": 1.76301948051948,
+          "reference_Hz": 633.509107765255
+        }
+      }
+    },
+    {
+      "actual_BR_V": 0.0,
+      "diode_drop_V": 0.4,
+      "id": "brass1-rankC-Vd0.4-BR0",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "brass1",
+      "rank": "C",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            -0.0036427863907231278,
+            0.006880818738032575
+          ],
+          "bus_V": 0.0,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12678926938033366,
+            "differential": 0.12409090909090909,
+            "each_other": 0.000674590072356135,
+            "own": 0.12476549916326528
+          },
+          "kappa_octaves_per_pin_V": 16.65380604303181,
+          "local_D_S": 0.0006100295253857806,
+          "log2_gm_shift": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "manual_off_margin_V": 0.4,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.3963572136092769,
+          "minimum_selected_current_across_neutral_and_EG_box_A": null,
+          "nominal_unloaded_ideal_divider_V": 0.0,
+          "normalized_KCL_residual": 0.0,
+          "pin4_V": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "reference_Hz": [
+            34.57516923289296,
+            34.57516923289296,
+            34.57516923289296,
+            34.57516923289296
+          ],
+          "selected_branch_current_A": null
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.8495146436378613,
+            3.878576545468543
+          ],
+          "bus_V": 3.8595745327330966,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5462812025635357,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0017298751089690975,
+            "own": 0.5410915772366286
+          },
+          "kappa_octaves_per_pin_V": 15.669082531942138,
+          "local_D_S": 0.0006181097645736543,
+          "log2_gm_shift": [
+            2.508723446276513,
+            2.508723446276513,
+            2.5087234462765124,
+            2.5087234462765124
+          ],
+          "manual_off_margin_V": 4.2595745327330965,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 4.249514643637862,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0007628564606041942,
+          "nominal_unloaded_ideal_divider_V": 5.714285714285714,
+          "normalized_KCL_residual": 9.089400343125446e-17,
+          "pin4_V": [
+            0.1601065947008937,
+            0.1601065947008937,
+            0.16010659470089367,
+            0.16010659470089367
+          ],
+          "reference_Hz": [
+            1046.9844709869653,
+            1046.9844709869653,
+            1046.9844709869649,
+            1046.9844709869649
+          ],
+          "selected_branch_current_A": 0.0007653900623022536
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 0.0,
+          "log2_gm_shift": 0.0,
+          "reference_Hz": 34.57516923289296
+        },
+        "LP": {
+          "actual_bus_V": 5.485714285714286,
+          "log2_gm_shift": 3.565714285714286,
+          "reference_Hz": 2153.9481750705063
+        }
+      }
+    },
+    {
+      "actual_BR_V": -15.0,
+      "diode_drop_V": 0.4,
+      "id": "brass1-rankC-Vd0.4-BR-15",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "brass1",
+      "rank": "C",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            -0.022349906044296618,
+            -0.011826300915540912
+          ],
+          "bus_V": -0.01870711965357349,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12678926938033366,
+            "differential": 0.12409090909090909,
+            "each_other": 0.000674590072356135,
+            "own": 0.12476549916326528
+          },
+          "kappa_octaves_per_pin_V": 16.65380604303181,
+          "local_D_S": 0.0006100295253857806,
+          "log2_gm_shift": [
+            -0.6153008661104428,
+            -0.6153008661104428,
+            -0.6153008661104427,
+            -0.6153008661104427
+          ],
+          "manual_off_margin_V": 0.38129288034642655,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.3776500939557034,
+          "minimum_selected_current_across_neutral_and_EG_box_A": null,
+          "nominal_unloaded_ideal_divider_V": 0.0,
+          "normalized_KCL_residual": 5.5540455798013356e-18,
+          "pin4_V": [
+            -0.036946561315807654,
+            -0.036946561315807654,
+            -0.03694656131580765,
+            -0.03694656131580765
+          ],
+          "reference_Hz": [
+            30.408694146565033,
+            30.408694146565033,
+            30.408694146565033,
+            30.408694146565033
+          ],
+          "selected_branch_current_A": null
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.815401022607843,
+            3.844462924438522
+          ],
+          "bus_V": 3.825460911703078,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5462812025635357,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0017298751089690975,
+            "own": 0.5410915772366286
+          },
+          "kappa_octaves_per_pin_V": 15.669082531942138,
+          "local_D_S": 0.0006181097645736543,
+          "log2_gm_shift": [
+            0.758140501697909,
+            0.7581405016979091,
+            0.7581405016979091,
+            0.7581405016979091
+          ],
+          "manual_off_margin_V": 4.225460911703078,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 4.2154010226078436,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.000767404943408197,
+          "nominal_unloaded_ideal_divider_V": 5.714285714285714,
+          "normalized_KCL_residual": 5.731534528104164e-18,
+          "pin4_V": [
+            0.048384485827578295,
+            0.0483844858275783,
+            0.0483844858275783,
+            0.0483844858275783
+          ],
+          "reference_Hz": [
+            327.0108397345247,
+            327.0108397345247,
+            327.0108397345247,
+            327.0108397345247
+          ],
+          "selected_branch_current_A": 0.0007699385451062562
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 0.0,
+          "log2_gm_shift": -0.6022058823529411,
+          "reference_Hz": 30.48012077268016
+        },
+        "LP": {
+          "actual_bus_V": 5.485714285714286,
+          "log2_gm_shift": 1.8373051948051948,
+          "reference_Hz": 665.7906374995146
+        }
+      }
+    },
+    {
+      "actual_BR_V": 0.0,
+      "diode_drop_V": 0.6,
+      "id": "brass1-rankC-Vd0.6-BR0",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "brass1",
+      "rank": "C",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            -0.0036427863907231278,
+            0.006880818738032575
+          ],
+          "bus_V": 0.0,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12678926938033366,
+            "differential": 0.12409090909090909,
+            "each_other": 0.000674590072356135,
+            "own": 0.12476549916326528
+          },
+          "kappa_octaves_per_pin_V": 16.65380604303181,
+          "local_D_S": 0.0006100295253857806,
+          "log2_gm_shift": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "manual_off_margin_V": 0.6,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.5963572136092768,
+          "minimum_selected_current_across_neutral_and_EG_box_A": null,
+          "nominal_unloaded_ideal_divider_V": 0.0,
+          "normalized_KCL_residual": 0.0,
+          "pin4_V": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "reference_Hz": [
+            34.57516923289296,
+            34.57516923289296,
+            34.57516923289296,
+            34.57516923289296
+          ],
+          "selected_branch_current_A": null
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.769106840872589,
+            3.7981687427032704
+          ],
+          "bus_V": 3.779166729967824,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5462812025635357,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0017298751089690975,
+            "own": 0.5410915772366286
+          },
+          "kappa_octaves_per_pin_V": 15.669082531942138,
+          "local_D_S": 0.0006181097645736543,
+          "log2_gm_shift": [
+            2.4564583744790864,
+            2.4564583744790855,
+            2.456458374479086,
+            2.4564583744790855
+          ],
+          "manual_off_margin_V": 4.379166729967824,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 4.369106840872589,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0007469108343062307,
+          "nominal_unloaded_ideal_divider_V": 5.714285714285714,
+          "normalized_KCL_residual": 9.282791839787689e-17,
+          "pin4_V": [
+            0.15677104064462513,
+            0.15677104064462508,
+            0.1567710406446251,
+            0.15677104064462508
+          ],
+          "reference_Hz": [
+            1010.5369833513308,
+            1010.5369833513304,
+            1010.5369833513307,
+            1010.5369833513304
+          ],
+          "selected_branch_current_A": 0.0007494444360042902
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 0.0,
+          "log2_gm_shift": 0.0,
+          "reference_Hz": 34.57516923289296
+        },
+        "LP": {
+          "actual_bus_V": 5.371428571428571,
+          "log2_gm_shift": 3.491428571428571,
+          "reference_Hz": 2046.9793839620422
+        }
+      }
+    },
+    {
+      "actual_BR_V": -15.0,
+      "diode_drop_V": 0.6,
+      "id": "brass1-rankC-Vd0.6-BR-15",
+      "neutral_EG_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "preset": "brass1",
+      "rank": "C",
+      "stages": {
+        "HP": {
+          "EG_box_bus_V_range": [
+            -0.022349906044296618,
+            -0.011826300915540912
+          ],
+          "bus_V": -0.01870711965357349,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.12678926938033366,
+            "differential": 0.12409090909090909,
+            "each_other": 0.000674590072356135,
+            "own": 0.12476549916326528
+          },
+          "kappa_octaves_per_pin_V": 16.65380604303181,
+          "local_D_S": 0.0006100295253857806,
+          "log2_gm_shift": [
+            -0.6153008661104428,
+            -0.6153008661104428,
+            -0.6153008661104427,
+            -0.6153008661104427
+          ],
+          "manual_off_margin_V": 0.5812928803464265,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 0.5776500939557033,
+          "minimum_selected_current_across_neutral_and_EG_box_A": null,
+          "nominal_unloaded_ideal_divider_V": 0.0,
+          "normalized_KCL_residual": 5.5540455798013356e-18,
+          "pin4_V": [
+            -0.036946561315807654,
+            -0.036946561315807654,
+            -0.03694656131580765,
+            -0.03694656131580765
+          ],
+          "reference_Hz": [
+            30.408694146565033,
+            30.408694146565033,
+            30.408694146565033,
+            30.408694146565033
+          ],
+          "selected_branch_current_A": null
+        },
+        "LP": {
+          "EG_box_bus_V_range": [
+            3.734993219842568,
+            3.764055121673249
+          ],
+          "bus_V": 3.7450531089378054,
+          "full_network_EG_octaves_per_V": {
+            "common": 0.5462812025635357,
+            "differential": 0.5393617021276595,
+            "each_other": 0.0017298751089690975,
+            "own": 0.5410915772366286
+          },
+          "kappa_octaves_per_pin_V": 15.669082531942138,
+          "local_D_S": 0.0006181097645736543,
+          "log2_gm_shift": [
+            0.7058754299004819,
+            0.7058754299004819,
+            0.7058754299004819,
+            0.7058754299004818
+          ],
+          "manual_off_margin_V": 4.3450531089378055,
+          "minimum_manual_off_margin_across_neutral_and_EG_box_V": 4.334993219842568,
+          "minimum_selected_current_across_neutral_and_EG_box_A": 0.0007514593171102335,
+          "nominal_unloaded_ideal_divider_V": 5.714285714285714,
+          "normalized_KCL_residual": 9.367348622752211e-17,
+          "pin4_V": [
+            0.0450489317713097,
+            0.04504893177130969,
+            0.04504893177130969,
+            0.04504893177130968
+          ],
+          "reference_Hz": [
+            316.17931436917013,
+            316.17931436917013,
+            316.17931436917013,
+            316.1793143691701
+          ],
+          "selected_branch_current_A": 0.0007539929188082927
+        }
+      },
+      "stiff_stages": {
+        "HP": {
+          "actual_bus_V": 0.0,
+          "log2_gm_shift": -0.6022058823529411,
+          "reference_Hz": 30.48012077268016
+        },
+        "LP": {
+          "actual_bus_V": 5.371428571428571,
+          "log2_gm_shift": 1.76301948051948,
+          "reference_Hz": 633.509107765255
+        }
+      }
+    }
+  ],
+  "schema": "ceres-preset-dc-loading-source-review-v1",
+  "source_model": {
+    "anchor": "12/180Hz variable gm at stiff actualFH/FL0, E0, BR0, other sources0 and centered bias",
+    "bias_reference": "direct M330k plus centered B100k pot Thevenin25k, zero wiper; not recovered calibration",
+    "chip_incremental_input_current": "zero",
+    "diode_law": "constant forward drop, zero reverse leakage; valid only while declared states pass",
+    "inactive_manual_wipers_V": 0.0,
+    "other_actual_sources_V": 0.0,
+    "scope": "All E0 gives DC intercept only. Audio experiment retains existing own-EG scales/times; computed own/cross Jacobian is diagnostic and is not secretly applied.",
+    "selected_rail_V": 10.0,
+    "unselected_preset_rails": "open, not grounded; ideal reverse blocking and no leakage"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "status": "declared_before_candidate_audio",
+  "declared_utc": "2026-10-19T08:02:15.361124+00:00",
+  "frozen_plan_sha256": "3482bca5ed0305c2a384125d05da73d19c17ed3c7f699e8cde262c045151071a",
+  "input_count": 45,
+  "helper_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/evaluate_public.py": "ef5ddcce1e3d644e8718228bd18cd7dc049150c747c3259e8ed95139f117d585",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/run_frozen.py": "364bbb7a1036b08d6dee853a3f9b67be889e7e6896772bc0ffdf500ce9870e41",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/run_battery.py": "19153bec22f120d0cd4d643dd87c37dee096d5c6d24adc9aa6368a18538b71ea",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/metrics.py": "34cba33ccf34b62be818518cc34a5d4d48ece032366b1b238a5075f94b9935cd"
+  },
+  "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "parent_report": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/runs/sub-polarity-phase0/report.json",
+  "parent_report_sha256": "eaff14756079317de2b4e2dbdf9766cfa107c373d0ec7d3dafdab6ddf515c95c",
+  "parent_binary_sha256": "42640ded137b2bf9c2a821db7ccf6db7cd7874cdfd75c26b9934d1c438d905c6",
+  "parent_compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+    "Source/DSP/ceres.cpp": "cc2ee3cdcf7dfab7ebc60071627a2557520f6cdbadd2a590796629a9aad8fd10",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d"
+  },
+  "parent_audio_sha256": {
+    "Docs/accuracy/runs/sub-polarity-phase0/flute-high-factory-physical.wav": "0672f265c4fdbf9f8050fcff18a6447bc5c362d9e521c97d6440084504b55f9b",
+    "Docs/accuracy/runs/sub-polarity-phase0/flute-high-effective-compensated.wav": "cf5a3acb608b6f9e53ff0d5ec26f3f2fc14f7e3e242d1574ba2ff466caf202d9",
+    "Docs/accuracy/runs/sub-polarity-phase0/flute-lower-factory-physical.wav": "7497eeb7b4a268532d2279e3ac085abbd7a18886f4d48032ecedaba0c1bc29ec",
+    "Docs/accuracy/runs/sub-polarity-phase0/flute-lower-effective-compensated.wav": "117bb8264841fbe70aac3ac1059765594cdbf2877d7b450b01ac4608c67ea002",
+    "Docs/accuracy/runs/sub-polarity-phase0/brass-history20.wav": "4a10b16c8c7a82dd2dbd38f49c611d51ae9e71022b8b8be98f487f94dfa4e1a5",
+    "Docs/accuracy/runs/sub-polarity-phase0/brass-history10.wav": "b54968b0705ead350d4fe7b7d5e351984bca06f0eb013c619af5caae7a907107",
+    "Docs/accuracy/runs/sub-polarity-phase0/dry-sawtooth.wav": "8d0ec15f02c949e531601f7d931b7bd5ddc05af57e0ceb95ecc11413d1a2a6f9",
+    "Docs/accuracy/runs/sub-polarity-phase0/dry-square.wav": "9654d20841422ba9f016ea9e63794538a8d5b68b7af8ae31158ab77c0ed9fbe2"
+  },
+  "parent_all_metrics_recomputed": true,
+  "candidate_identity": "must be explicitly bound before rendering",
+  "validation_tolerances": {
+    "recomputed_metrics_relative": 1e-12,
+    "recomputed_metrics_absolute": 1e-12,
+    "renderer_12_digit_stdout_relative": 5e-12,
+    "renderer_12_digit_stdout_absolute": 5e-12
+  },
+  "runner": "unchanged run_frozen.run; run_battery.BASE relocated only; ROOT canonical",
+  "destination": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen",
+  "label": "audible-final",
+  "renders": 8,
+  "parameter_fits": 0,
+  "gain_fits": 0,
+  "parameter_gate_gain_mask_eligibility_changes": false,
+  "case_order": [
+    "flute-high-factory-physical",
+    "flute-high-effective-compensated",
+    "flute-lower-factory-physical",
+    "flute-lower-effective-compensated",
+    "brass-history20",
+    "brass-history10",
+    "dry-sawtooth",
+    "dry-square"
+  ],
+  "case_classes": {
+    "flute-high-factory-physical": "raw_factory_physical_flute",
+    "flute-high-effective-compensated": "previously_fitted_effective_flute",
+    "flute-lower-factory-physical": "raw_factory_physical_flute",
+    "flute-lower-effective-compensated": "previously_fitted_effective_flute",
+    "brass-history20": "conditional_effective_brass",
+    "brass-history10": "conditional_effective_brass",
+    "dry-sawtooth": "previously_fitted_dry_waveform",
+    "dry-square": "previously_fitted_dry_waveform"
+  },
+  "comparisons": "Full per-case metric trees and predeclared spectral/level/tail/pitch summaries. No pooled accuracy percentage or success threshold.",
+  "direction": "For nonnegative error metrics lower is better; deltas are candidate minus actual d5e0 parent. Signed pitch/slope values are descriptive.",
+  "listening": {
+    "order": [
+      "hardware",
+      "d5e0_parent",
+      "candidate"
+    ],
+    "recording_gains": "exact frozen per-case gains",
+    "silence_frames": 12000,
+    "sample_rate": 48000,
+    "common_gain": "min(1,0.95/max(abs(all segments)))",
+    "individual_normalization": false
+  },
+  "limits": [
+    "All recordings and windows are reused development evidence, no untouched known-settings holdout.",
+    "Audio references are offline analysis/listening only; synthesis uses no sample assets.",
+    "No controls, gain, gate, source eligibility, or masking may be fitted by this battery.",
+    "Neutral global controls and filter_lfo=0 do not verify newly added control paths.",
+    "Public creator audio copyright remains with the creator; local analysis excerpts are not a redistribution license.",
+    "The two raw factory Flute cases are separate from six previously fitted or conditional effective cases.",
+    "Raw factory means unmodified named Flute preset plus declared octave correction; globals, touch, exact gate and voice allocation are unknown.",
+    "All eight cases use inferred MIDI and reused development recordings; none is a known-settings independent hardware holdout.",
+    "All eight cases have ring mix zero. This battery cannot validate the new audible ring-switching path.",
+    "Executable success means protocol/integrity completion, not proof of hardware accuracy or an improvement verdict.",
+    "Listening artifact is local analysis material, not a source-audio redistribution license."
+  ]
+}

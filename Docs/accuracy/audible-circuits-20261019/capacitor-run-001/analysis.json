@@ -1,0 +1,263 @@
+{
+  "manifest_sha256": "575b7a02895b17fc26a9169a2fce79f4eba0b0a5699ff2d61d567b58022097e1",
+  "plan_sha256": "4e34a2725b5f7ef9d3bfae93545803f712bd8d67edb666233fb58aba031bbe01",
+  "analysis_script_sha256": "f8d4f94f12cf8feb8d110f75a06658526442ba7c21ecf46688a25545d6162471",
+  "scenes": {
+    "lp_q_step": {
+      "byte_identical": false,
+      "sample_count": 360000,
+      "max_sample_difference": 0.06872539967298508,
+      "windows": [
+        {
+          "seconds": [
+            0.95,
+            1
+          ],
+          "parent_rms": 0.039777150365015515,
+          "candidate_rms": 0.039777150365015515,
+          "candidate_parent_db": 0.0,
+          "difference_rms": 0.0,
+          "difference_to_parent_db": null
+        },
+        {
+          "seconds": [
+            1.02,
+            1.12
+          ],
+          "parent_rms": 0.050996494711767225,
+          "candidate_rms": 0.040119582715347726,
+          "candidate_parent_db": -2.083678365018887,
+          "difference_rms": 0.021674800002960855,
+          "difference_to_parent_db": -7.431704533164785
+        },
+        {
+          "seconds": [
+            1.5,
+            1.7
+          ],
+          "parent_rms": 0.051330073535119085,
+          "candidate_rms": 0.043325642981951296,
+          "candidate_parent_db": -1.4725373953975813,
+          "difference_rms": 0.016328611273361847,
+          "difference_to_parent_db": -9.948452725769721
+        },
+        {
+          "seconds": [
+            5.8,
+            6.2
+          ],
+          "parent_rms": 0.051195313862463815,
+          "candidate_rms": 0.05096527604098175,
+          "candidate_parent_db": -0.039116581233879094,
+          "difference_rms": 0.0004906654022247591,
+          "difference_to_parent_db": -40.36889547514573
+        }
+      ]
+    },
+    "lp_q_static": {
+      "byte_identical": true,
+      "sample_count": 360000,
+      "max_sample_difference": 0.0,
+      "windows": [
+        {
+          "seconds": [
+            0.95,
+            1
+          ],
+          "parent_rms": 0.05115668086740884,
+          "candidate_rms": 0.05115668086740884,
+          "candidate_parent_db": 0.0,
+          "difference_rms": 0.0,
+          "difference_to_parent_db": null
+        },
+        {
+          "seconds": [
+            1.02,
+            1.12
+          ],
+          "parent_rms": 0.05099719652997464,
+          "candidate_rms": 0.05099719652997464,
+          "candidate_parent_db": 0.0,
+          "difference_rms": 0.0,
+          "difference_to_parent_db": null
+        },
+        {
+          "seconds": [
+            1.5,
+            1.7
+          ],
+          "parent_rms": 0.05133007139754372,
+          "candidate_rms": 0.05133007139754372,
+          "candidate_parent_db": 0.0,
+          "difference_rms": 0.0,
+          "difference_to_parent_db": null
+        },
+        {
+          "seconds": [
+            5.8,
+            6.2
+          ],
+          "parent_rms": 0.05119531387423056,
+          "candidate_rms": 0.05119531387423056,
+          "candidate_parent_db": 0.0,
+          "difference_rms": 0.0,
+          "difference_to_parent_db": null
+        }
+      ]
+    },
+    "hp_q_step": {
+      "byte_identical": false,
+      "sample_count": 360000,
+      "max_sample_difference": 0.07015686854720116,
+      "windows": [
+        {
+          "seconds": [
+            0.95,
+            1
+          ],
+          "parent_rms": 0.03350708997794413,
+          "candidate_rms": 0.03350708997794413,
+          "candidate_parent_db": 0.0,
+          "difference_rms": 0.0,
+          "difference_to_parent_db": null
+        },
+        {
+          "seconds": [
+            1.02,
+            1.12
+          ],
+          "parent_rms": 0.07031335234101191,
+          "candidate_rms": 0.034171657681810706,
+          "candidate_parent_db": -6.267435144699451,
+          "difference_rms": 0.04247251603639275,
+          "difference_to_parent_db": -4.378596307231367
+        },
+        {
+          "seconds": [
+            1.5,
+            1.7
+          ],
+          "parent_rms": 0.07051953712100785,
+          "candidate_rms": 0.040875747653999886,
+          "candidate_parent_db": -4.736874872425442,
+          "difference_rms": 0.03449430066153098,
+          "difference_to_parent_db": -6.2112421704841765
+        },
+        {
+          "seconds": [
+            5.8,
+            6.2
+          ],
+          "parent_rms": 0.07040722206334296,
+          "candidate_rms": 0.06923832234897447,
+          "candidate_parent_db": -0.14541346221977963,
+          "difference_rms": 0.0013001145639219432,
+          "difference_to_parent_db": -34.672711722982875
+        }
+      ]
+    },
+    "idle_il": {
+      "byte_identical": false,
+      "sample_count": 96000,
+      "max_sample_difference": 0.0848518256098032,
+      "windows": [
+        {
+          "seconds": [
+            0.55,
+            0.6
+          ],
+          "parent_rms": 0.037556577780051906,
+          "candidate_rms": 0.04126990001256419,
+          "candidate_parent_db": 0.81894809892961,
+          "difference_rms": 0.018337758399563506,
+          "difference_to_parent_db": -6.2267953029329925
+        },
+        {
+          "seconds": [
+            0.6,
+            0.7
+          ],
+          "parent_rms": 0.04246324663827794,
+          "candidate_rms": 0.043089086350659236,
+          "candidate_parent_db": 0.12708178612738585,
+          "difference_rms": 0.004963202848120397,
+          "difference_to_parent_db": -18.645023417290588
+        },
+        {
+          "seconds": [
+            0.7,
+            0.8
+          ],
+          "parent_rms": 0.04322731919157033,
+          "candidate_rms": 0.043296104543920064,
+          "candidate_parent_db": 0.013810412933247241,
+          "difference_rms": 0.0006736036491801429,
+          "difference_to_parent_db": -36.147077433727276
+        },
+        {
+          "seconds": [
+            0.9,
+            1.1
+          ],
+          "parent_rms": 0.04354205831274951,
+          "candidate_rms": 0.043542053310382356,
+          "candidate_parent_db": -9.978860252067519e-07,
+          "difference_rms": 3.1453767799691236e-06,
+          "difference_to_parent_db": -82.82472557405198
+        }
+      ]
+    },
+    "il_static": {
+      "byte_identical": true,
+      "sample_count": 96000,
+      "max_sample_difference": 0.0,
+      "windows": [
+        {
+          "seconds": [
+            0.55,
+            0.6
+          ],
+          "parent_rms": 0.03755671742219821,
+          "candidate_rms": 0.03755671742219821,
+          "candidate_parent_db": 0.0,
+          "difference_rms": 0.0,
+          "difference_to_parent_db": null
+        },
+        {
+          "seconds": [
+            0.6,
+            0.7
+          ],
+          "parent_rms": 0.04246312493581645,
+          "candidate_rms": 0.04246312493581645,
+          "candidate_parent_db": 0.0,
+          "difference_rms": 0.0,
+          "difference_to_parent_db": null
+        },
+        {
+          "seconds": [
+            0.7,
+            0.8
+          ],
+          "parent_rms": 0.04322734601160274,
+          "candidate_rms": 0.04322734601160274,
+          "candidate_parent_db": 0.0,
+          "difference_rms": 0.0,
+          "difference_to_parent_db": null
+        },
+        {
+          "seconds": [
+            0.9,
+            1.1
+          ],
+          "parent_rms": 0.0435420545767483,
+          "candidate_rms": 0.0435420545767483,
+          "candidate_parent_db": 0.0,
+          "difference_rms": 0.0,
+          "difference_to_parent_db": null
+        }
+      ]
+    }
+  },
+  "interpretation": "Fixed-gain native A/B; transient differences with exact static controls. No hardware accuracy claim or fit."
+}

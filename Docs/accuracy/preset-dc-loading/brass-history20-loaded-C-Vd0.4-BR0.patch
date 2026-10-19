@@ -1,0 +1,7 @@
+# DC-intercept-only comparison: only HP/LP reference frequencies change.
+octave=-1
+hp_cutoff=34.575169232892961
+lp_cutoff=1046.9844709869653
+lfo_rate=6.6692178847138601
+tremolo=0.83104137105739762
+global_release=0.43688480401270802

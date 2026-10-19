@@ -1,0 +1,272 @@
+{
+  "source": "https://www.youtube.com/watch?v=ivVAJ13Tzvc",
+  "method": "Focused on-service LP region inspection; no audio analysis.",
+  "observations": [
+    {
+      "t": 94,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 94,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"so we're hearing the\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=94;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=ivVAJ13Tzvc\n- Page Title: The Yamaha CS-50 Part 2- The Filter - YouTube\n- Console: 14 errors, 148 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T19-06-30-460Z.log#L148-L165"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-094.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-094.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-094.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 98,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 98,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"that\\n[Music]\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=98;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-098.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-098.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-098.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 102,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 102,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=102;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-102.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-102.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-102.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 106,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 106,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=106;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-106.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-106.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-106.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 110,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 110,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"down um we also have resonance it does\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=110;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-110.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-110.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-110.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 114,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 114,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"not self oscillate so when we push the\\nresonance all the way up we're\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=114;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-114.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-114.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-114.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 118,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 118,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"to hear that self oscillating sound that\\nwe hear from a lot of 24\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=118;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-118.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-118.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-118.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 122,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 122,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"filters\\n[Music]\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=122;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-122.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-122.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-122.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 126,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 126,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"filters\\n[Music]\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=126;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-126.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-126.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-126.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 130,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 130,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"filters\\n[Music]\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=130;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-130.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-130.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-130.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 134,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 134,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"so it has a nice resonant effect with\\nits filter\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=134;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=ivVAJ13Tzvc\n- Page Title: The Yamaha CS-50 Part 2- The Filter - YouTube\n- Console: 14 errors, 151 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T19-06-30-460Z.log#L166-L168"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-134.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-134.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-134.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 138,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 138,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"so it has a nice resonant effect with\\nits filter it's just not going over the\\ntop into um self oscillation\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=138;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-138.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-138.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-138.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 142,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 142,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"its filter it's just not going over the\\ntop into um self oscillation like um\\nyou'd find in say an ms20 or a 24\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=142;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-142.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-142.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-142.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 146,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 146,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"octave\\n[Music]\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=146;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-146.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-146.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-146.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    }
+  ]
+}

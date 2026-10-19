@@ -1,0 +1,93 @@
+{
+  "status": "pass",
+  "input_bindings": 45,
+  "native_candidate_renders": 8,
+  "source_commit": "28ddadca6b546f2f81b18adc2d060449214c4da3",
+  "all5_final_source_hashes_match": true,
+  "all16_parent_candidate_metrics_recomputed": true,
+  "all8_commands_exact_except_renderer_and_output": true,
+  "all24_listening_segments_exact": true,
+  "listening_common_gain": 1.0,
+  "individual_normalization": false,
+  "all_audio_finite": true,
+  "total_candidate_samples_above_unity": 0,
+  "audio_pairs": [
+    {
+      "id": "flute-high-factory-physical",
+      "byte_identical_to_parent": false,
+      "parent_sha256": "0672f265c4fdbf9f8050fcff18a6447bc5c362d9e521c97d6440084504b55f9b",
+      "candidate_sha256": "405d45f15aeca9b53abf43f4774deee076411f57fe71689c93ea0231dd7322f6"
+    },
+    {
+      "id": "flute-high-effective-compensated",
+      "byte_identical_to_parent": false,
+      "parent_sha256": "cf5a3acb608b6f9e53ff0d5ec26f3f2fc14f7e3e242d1574ba2ff466caf202d9",
+      "candidate_sha256": "766c219bbdebb833a5b54bc9d26d7c8f0a2e45ee6a2bcf9eba9332dc2ead26c3"
+    },
+    {
+      "id": "flute-lower-factory-physical",
+      "byte_identical_to_parent": false,
+      "parent_sha256": "7497eeb7b4a268532d2279e3ac085abbd7a18886f4d48032ecedaba0c1bc29ec",
+      "candidate_sha256": "60b99617d98044dcb03dca7dde58096d20b78b574714463fe55ca61fb337b353"
+    },
+    {
+      "id": "flute-lower-effective-compensated",
+      "byte_identical_to_parent": false,
+      "parent_sha256": "117bb8264841fbe70aac3ac1059765594cdbf2877d7b450b01ac4608c67ea002",
+      "candidate_sha256": "6f753bba27b99a334b149b245eb73b624f0aa9205fe26497c4de92a9ade0ee8a"
+    },
+    {
+      "id": "brass-history20",
+      "byte_identical_to_parent": false,
+      "parent_sha256": "4a10b16c8c7a82dd2dbd38f49c611d51ae9e71022b8b8be98f487f94dfa4e1a5",
+      "candidate_sha256": "e992df17a7fe50f300b0b58af4d3a4734e8ad8ffab835871dac233914440b3f0"
+    },
+    {
+      "id": "brass-history10",
+      "byte_identical_to_parent": false,
+      "parent_sha256": "b54968b0705ead350d4fe7b7d5e351984bca06f0eb013c619af5caae7a907107",
+      "candidate_sha256": "10dfe3d9a66c81adc8c51c6233fdee79afdb1fe673939d6573989a842e93b910"
+    },
+    {
+      "id": "dry-sawtooth",
+      "byte_identical_to_parent": false,
+      "parent_sha256": "8d0ec15f02c949e531601f7d931b7bd5ddc05af57e0ceb95ecc11413d1a2a6f9",
+      "candidate_sha256": "e653ae47545349e8832939b877db224af3f04f1027c230f989e62fdfc7ff8daa"
+    },
+    {
+      "id": "dry-square",
+      "byte_identical_to_parent": true,
+      "parent_sha256": "9654d20841422ba9f016ea9e63794538a8d5b68b7af8ae31158ab77c0ed9fbe2",
+      "candidate_sha256": "9654d20841422ba9f016ea9e63794538a8d5b68b7af8ae31158ab77c0ed9fbe2"
+    }
+  ],
+  "output_sha256": {
+    "public-frozen/plan.json": "3482bca5ed0305c2a384125d05da73d19c17ed3c7f699e8cde262c045151071a",
+    "public-frozen/comparison.json": "855a330e5b31548598ab62a429b5a8aaf87e293515d6a2c677d02f13eceb6ed4",
+    "public-frozen/README.md": "ceb016ed67324f674a5a9d3bcad30ba33ee3e9ca5856c663ce0a3321ff4e204b",
+    "public-frozen/listening-hardware-parent-candidate.wav": "a9b533a4167688bd869212a6076759ad2242d4a476fed1c1de44dc8af26ba4b8",
+    "public-frozen/candidate-identity.json": "0ad675d34176a6b430dbe307714d7b544ddb533f326258c4715031ad393968c5",
+    "public-frozen/run-identities/audible-final/CMakeLists.txt": "3d922bcfbe24bf253e6338ab32a9348830cb0ef21cd8f74607c8ed06c5151b6d",
+    "public-frozen/run-identities/audible-final/identity.json": "635da1cf471c692adc0f23a54e0ead71bdd88add995a9cb2600acfc1be4a6a1f",
+    "public-frozen/run-identities/audible-final/ceres_render": "59964a09832bb14772976e5dd53e2b61f5f65de6278d46767948800669dc3a3a",
+    "public-frozen/run-identities/audible-final/Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "public-frozen/run-identities/audible-final/Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "public-frozen/run-identities/audible-final/Source/DSP/ceres.cpp": "3fe87405e051b6bfade6b37324789eb1567f83e61cd8a493d4c5a1e0a6c6fa31",
+    "public-frozen/run-identities/audible-final/Source/DSP/ceres.hpp": "e90e883a9a41a61ce596d5fc316e3cca3f0f2fa03422ea4744e61d70faa17952",
+    "public-frozen/runs/audible-final/brass-history20.wav": "e992df17a7fe50f300b0b58af4d3a4734e8ad8ffab835871dac233914440b3f0",
+    "public-frozen/runs/audible-final/dry-sawtooth.wav": "e653ae47545349e8832939b877db224af3f04f1027c230f989e62fdfc7ff8daa",
+    "public-frozen/runs/audible-final/report.json": "7d7a44e309f50fe64b1ef4181f33c70fa5c87db746388a8491b5ee80c35964ed",
+    "public-frozen/runs/audible-final/flute-high-effective-compensated.wav": "766c219bbdebb833a5b54bc9d26d7c8f0a2e45ee6a2bcf9eba9332dc2ead26c3",
+    "public-frozen/runs/audible-final/dry-square.wav": "9654d20841422ba9f016ea9e63794538a8d5b68b7af8ae31158ab77c0ed9fbe2",
+    "public-frozen/runs/audible-final/flute-high-factory-physical.wav": "405d45f15aeca9b53abf43f4774deee076411f57fe71689c93ea0231dd7322f6",
+    "public-frozen/runs/audible-final/flute-lower-factory-physical.wav": "60b99617d98044dcb03dca7dde58096d20b78b574714463fe55ca61fb337b353",
+    "public-frozen/runs/audible-final/flute-lower-effective-compensated.wav": "6f753bba27b99a334b149b245eb73b624f0aa9205fe26497c4de92a9ade0ee8a",
+    "public-frozen/runs/audible-final/brass-history10.wav": "10dfe3d9a66c81adc8c51c6233fdee79afdb1fe673939d6573989a842e93b910"
+  },
+  "helper_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/evaluate_public.py": "ef5ddcce1e3d644e8718228bd18cd7dc049150c747c3259e8ed95139f117d585",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/run_frozen.py": "364bbb7a1036b08d6dee853a3f9b67be889e7e6896772bc0ffdf500ce9870e41",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/run_battery.py": "19153bec22f120d0cd4d643dd87c37dee096d5c6d24adc9aa6368a18538b71ea",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/metrics.py": "34cba33ccf34b62be818518cc34a5d4d48ece032366b1b238a5075f94b9935cd"
+  }
+}

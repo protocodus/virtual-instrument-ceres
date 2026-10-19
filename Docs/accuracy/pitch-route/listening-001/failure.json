@@ -1,0 +1,7 @@
+{
+  "manifest_sha256": "406f8c9848fc915552c60bbc8cc9688d5e7d30c4e2cd41f4572301a5f5c6eff8",
+  "normalization_performed": false,
+  "output_exists": false,
+  "status": "failed_attempt_preserved",
+  "traceback": "Traceback (most recent call last):\n  File \"/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/listening-001/producer.py\", line 151, in render\n    samples, dtype = expected_segment(segment)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/listening-001/producer.py\", line 126, in expected_segment\n    assert rate == RATE and samples.ndim == 1\nAssertionError\n"
+}

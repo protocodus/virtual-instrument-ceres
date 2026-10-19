@@ -1,0 +1,198 @@
+{
+  "plan_sha256": "4e34a2725b5f7ef9d3bfae93545803f712bd8d67edb666233fb58aba031bbe01",
+  "driver_sha256": "750a72cba3e16869091678fca76543a29d47ff26913bce0e32924871e2ccf3bc",
+  "variants": {
+    "parent": {
+      "source": "/tmp/ceres-sub-polarity-20261018",
+      "commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+      "source_sha256": {
+        "Source/DSP/ceres.cpp": "cc2ee3cdcf7dfab7ebc60071627a2557520f6cdbadd2a590796629a9aad8fd10",
+        "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8"
+      },
+      "library_sha256": "7cacbc62517def782ea5076cb0ccb69c1f753a5ec5f6ad97d395d6d0b70ff9bd",
+      "binary_sha256": "08f303f352efff9fff14775dfcfa6136da595d156ba77acd48cd629721145698",
+      "compile": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-I/tmp/ceres-sub-polarity-20261018/Source/DSP",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor_demo.cpp",
+        "/tmp/ceres-sub-polarity-20261018/build/libceres.a",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-demo"
+      ]
+    },
+    "capacitors": {
+      "source": "/tmp/ceres-audible-circuits-20261019",
+      "commit": "0af42568862c540709610fa2488151b582f0e771",
+      "source_sha256": {
+        "Source/DSP/ceres.cpp": "f3403b7855b97f2043d19b7a5ed2fd27778993da2af33351a90cb55880705188",
+        "Source/DSP/ceres.hpp": "a41e4266ad826a22da6c3078b1ac181c012a33a70cbd58c2326060ede53f1cc3"
+      },
+      "library_sha256": "09de7c5ad8858b7e142ff47433e60346d6244cbfa7b4acc0f43ebe076cf85203",
+      "binary_sha256": "0ae6a1c63d92dd23e80589f312cc2628fbafd95deb9d20fe71b16159c88fabf1",
+      "compile": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-I/tmp/ceres-audible-circuits-20261019/Source/DSP",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor_demo.cpp",
+        "/tmp/ceres-audible-circuits-20261019/build/libceres.a",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-demo"
+      ]
+    }
+  },
+  "renders": {
+    "parent-lp_q_step": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-demo",
+        "lp_q_step",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-lp_q_step.wav"
+      ],
+      "wav_sha256": "72dbe5913173ff43c155903d884fb2bde9b0e01bcf74150c7441e5490aed5e6b",
+      "stats": {
+        "scene": "lp_q_step",
+        "frames": 360000,
+        "peak": 0.135608,
+        "rms": 0.0461738,
+        "normalization": "none"
+      }
+    },
+    "parent-lp_q_static": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-demo",
+        "lp_q_static",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-lp_q_static.wav"
+      ],
+      "wav_sha256": "88513f02cbc4175832b34d9be8a4f01fe11643f84b84e34edc803929e223df29",
+      "stats": {
+        "scene": "lp_q_static",
+        "frames": 360000,
+        "peak": 0.135441,
+        "rms": 0.0476495,
+        "normalization": "none"
+      }
+    },
+    "parent-hp_q_step": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-demo",
+        "hp_q_step",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-hp_q_step.wav"
+      ],
+      "wav_sha256": "c7fafebe81a1c5cfa870ea5441e1dd30d2cd59ecc7327be4b707234159d76c9c",
+      "stats": {
+        "scene": "hp_q_step",
+        "frames": 360000,
+        "peak": 0.173629,
+        "rms": 0.0615264,
+        "normalization": "none"
+      }
+    },
+    "parent-idle_il": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-demo",
+        "idle_il",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-idle_il.wav"
+      ],
+      "wav_sha256": "499a8360fa6d1a278055273a1a21476c84224735a5e2a74066814612077613e1",
+      "stats": {
+        "scene": "idle_il",
+        "frames": 96000,
+        "peak": 0.0888651,
+        "rms": 0.0246975,
+        "normalization": "none"
+      }
+    },
+    "parent-il_static": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-demo",
+        "il_static",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-il_static.wav"
+      ],
+      "wav_sha256": "4803ff23591d31ed998276db1126adb6da1a47d6a72cb1519b82c1dd4b5c5e64",
+      "stats": {
+        "scene": "il_static",
+        "frames": 96000,
+        "peak": 0.0888587,
+        "rms": 0.0246975,
+        "normalization": "none"
+      }
+    },
+    "capacitors-lp_q_step": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-demo",
+        "lp_q_step",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-lp_q_step.wav"
+      ],
+      "wav_sha256": "df83c5a1ef23b90e8f504f2f5148d73e6a4a6389eeef21332180156a533c46f1",
+      "stats": {
+        "scene": "lp_q_step",
+        "frames": 360000,
+        "peak": 0.134695,
+        "rms": 0.0438563,
+        "normalization": "none"
+      }
+    },
+    "capacitors-lp_q_static": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-demo",
+        "lp_q_static",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-lp_q_static.wav"
+      ],
+      "wav_sha256": "88513f02cbc4175832b34d9be8a4f01fe11643f84b84e34edc803929e223df29",
+      "stats": {
+        "scene": "lp_q_static",
+        "frames": 360000,
+        "peak": 0.135441,
+        "rms": 0.0476495,
+        "normalization": "none"
+      }
+    },
+    "capacitors-hp_q_step": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-demo",
+        "hp_q_step",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-hp_q_step.wav"
+      ],
+      "wav_sha256": "69e5054a9d3f0b2b25121ad9a0d7a46a47c034f2f91da2aaef070312c31f69e1",
+      "stats": {
+        "scene": "hp_q_step",
+        "frames": 360000,
+        "peak": 0.172644,
+        "rms": 0.05234,
+        "normalization": "none"
+      }
+    },
+    "capacitors-idle_il": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-demo",
+        "idle_il",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-idle_il.wav"
+      ],
+      "wav_sha256": "618010f27a64a8beaa3f4d6686489908acf3a2ae3931b9c4d73cdaa612c2948f",
+      "stats": {
+        "scene": "idle_il",
+        "frames": 96000,
+        "peak": 0.0888562,
+        "rms": 0.024905,
+        "normalization": "none"
+      }
+    },
+    "capacitors-il_static": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-demo",
+        "il_static",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-il_static.wav"
+      ],
+      "wav_sha256": "4803ff23591d31ed998276db1126adb6da1a47d6a72cb1519b82c1dd4b5c5e64",
+      "stats": {
+        "scene": "il_static",
+        "frames": 96000,
+        "peak": 0.0888587,
+        "rms": 0.0246975,
+        "normalization": "none"
+      }
+    }
+  }
+}

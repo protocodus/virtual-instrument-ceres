@@ -1,0 +1,67 @@
+{
+  "wav_sha256": "f275524233b58113237c7b43afe032c466bea5ce458feb98bc9639f7bb77d1ff",
+  "gain": 1,
+  "fades": false,
+  "segments": [
+    {
+      "rate": 1,
+      "variant": "parent",
+      "source_seconds": [
+        2,
+        4
+      ],
+      "start_seconds": 0.0,
+      "end_seconds": 2.0
+    },
+    {
+      "rate": 1,
+      "variant": "ring",
+      "source_seconds": [
+        2,
+        4
+      ],
+      "start_seconds": 2.25,
+      "end_seconds": 4.25
+    },
+    {
+      "rate": 30,
+      "variant": "parent",
+      "source_seconds": [
+        2,
+        4
+      ],
+      "start_seconds": 4.5,
+      "end_seconds": 6.5
+    },
+    {
+      "rate": 30,
+      "variant": "ring",
+      "source_seconds": [
+        2,
+        4
+      ],
+      "start_seconds": 6.75,
+      "end_seconds": 8.75
+    },
+    {
+      "rate": 220,
+      "variant": "parent",
+      "source_seconds": [
+        2,
+        4
+      ],
+      "start_seconds": 9.0,
+      "end_seconds": 11.0
+    },
+    {
+      "rate": 220,
+      "variant": "ring",
+      "source_seconds": [
+        2,
+        4
+      ],
+      "start_seconds": 11.25,
+      "end_seconds": 13.25
+    }
+  ]
+}
