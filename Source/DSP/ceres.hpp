@@ -40,8 +40,9 @@ struct Patch {
     // offset does not imply every value is reachable from an unknown real
     // 0..10V wiper baseline. Stiff preset/source, zero chip input-current
     // limit: each pin7 has 220k to each source and 10uF to ground, giving
-    // deltaVq -> offset/2 with tau1.1s. Only this incremental control is
-    // smoothed; existing effective hp/lp_resonance edits remain immediate.
+    // deltaVq -> offset/2 with tau1.1s. This incremental control is
+    // smoothed together with the independent hp/lp_resonance anchor terms;
+    // live edits preserve both stage capacitor coordinates.
     double resonanceOffset = 0.0;
     // Separate envelope coupling in octaves per EG unit. Defaults retain
     // direct octave-valued engineering patches. Factory EG units are volts;
@@ -150,6 +151,8 @@ public:
     Synth& operator=(Synth&&) noexcept;
     Synth(const Synth&) = delete;
     Synth& operator=(const Synth&) = delete;
+    // Before the first processed sample, configure settled Q/idle-IL state.
+    // Live edits change targets while preserving those capacitor voltages.
     void setPatch(const Patch&);
     void noteOn(int note, double velocity = 1.0);
     void noteOff(int note);
@@ -160,9 +163,10 @@ public:
     void sustain(bool down);
     void allNotesOff();
     // Clears voices, output-coupling capacitors and FIR history; preserves
-    // controllers and the continuously connected global Q-control capacitor.
+    // controllers, Q-control capacitor coordinates and clock-start history.
     void allSoundOff();
-    // Restores seeded oscillator phases, controller state and all capacitors.
+    // Restores seeded oscillator phases, controllers and configured capacitor
+    // initial conditions; permits pre-clock configuration again.
     void reset();
     float process();
     // Counts active amplitude envelopes, not residual output capacitor tails.
@@ -190,6 +194,8 @@ public:
     struct SoundPathState {
         double resonanceVoltageOffset, hpResonance, lpResonance;
         double commonVcaGain;
+        double hpResonanceAnchor, lpResonanceAnchor;
+        bool hasProcessed;
     };
     std::array<VoiceState,voiceCount> voiceState() const;
     ModulationState modulationState() const;

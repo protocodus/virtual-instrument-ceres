@@ -9,6 +9,7 @@
 int main(int argc,char** argv) {
     if(argc<2 || argc>3)return 2;
     const bool panelControls=argc==3;
+    const bool capacitorControls=argc==3 && std::strcmp(argv[2],"capacitors")==0;
     const bool expressionControls=argc==3 && std::strcmp(argv[2],"expression")==0;
     const bool soundPathControls=argc==3 && (std::strcmp(argv[2],"soundpath")==0 || expressionControls);
     std::ofstream output(argv[1],std::ios::binary);
@@ -77,6 +78,13 @@ int main(int argc,char** argv) {
                 ceres::setParameter(patch,"amp_level",.73);synth.setPatch(patch);
             }
             if(frame==6000)synth.allSoundOff();
+            if(capacitorControls && (frame==2048 || frame==4501 || frame==6001)) {
+                patch.hpResonance=frame==4501 ? .1:.8;
+                patch.lpResonance=frame==4501 ? .9:.2;
+                patch.filterInitial=frame==6001 ? -5:-.1;
+                patch.resonanceOffset=frame==4501 ? -4:6;
+                synth.setPatch(patch);
+            }
             if(expressionControls && (frame==5000 || frame==5500)) {
                 ceres::setParameter(patch,"expression_source",frame==5500 ? 1:0);synth.setPatch(patch);
             }

@@ -317,7 +317,10 @@ struct Envelope {
     double advance(double initial, double peak, double sustained,
                    double headroom, double saturation, double attackIncrement, double currentStep,
                    double decayCoefficient, double releaseCoefficient) {
-        if (stage == Idle) { voltage = initial; return voltage; }
+        // Key-off keeps IL/RT selected (Guide pp.43–44): an idle board is
+        // still a connected capacitor, not a reset switch. Continue the
+        // existing release law if its target moves; Idle remains an audio
+        // bookkeeping state. The physical post-settling rate is unmeasured.
         double target = initial, coefficient = 0;
         if (stage == Attack) {
             const double span = std::max(1e-9, std::abs(peak - initial));
@@ -517,7 +520,11 @@ struct Synth::Impl {
     // Eight equal pin7 networks reduce exactly to one common delta state
     // for this stiff-source/zero-input-current limit and equal initial delta.
     // Existing per-stage effective Q anchors are NOT raw chip voltages.
+    // Two independently smoothed anchors plus the shared delta decompose
+    // two stage capacitor coordinates, not three physical capacitors.
     double qVoltageOffset=0, qControlCoefficient=0;
+    double hpResonanceAnchor=0, lpResonanceAnchor=0;
+    bool hasProcessed=false;
     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
     double outputTrimGain=1;
     // Guide printed32: SUB-N uses22k/.1uF, independent of audio NO level.
@@ -606,6 +613,8 @@ struct Synth::Impl {
         subNoiseMemory=0; ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={};
         qVoltageOffset=0;
+        hpResonanceAnchor=patch.hpResonance; lpResonanceAnchor=patch.lpResonance;
+        hasProcessed=false;
         effectiveHpResonance=patch.hpResonance; effectiveLpResonance=patch.lpResonance;
         commonVcaGain=patch.ampLevel;
         decimator.clear();
@@ -617,6 +626,7 @@ struct Synth::Impl {
         }
     }
     double sample() {
+        hasProcessed=true;
         const double dt = 1 / internalFs;
         pressureValue += (pressureTarget-pressureValue) * pressureCoefficient;
         const double noise = random.bipolar(); // one shared physical noise source
@@ -629,10 +639,12 @@ struct Synth::Impl {
         // to zero: capacitor charge survives note allocation, patch edits,
         // and audio panic. reset() is the explicit electrical-state reset.
         qVoltageOffset+=(patch.resonanceOffset*.5-qVoltageOffset)*qControlCoefficient;
+        hpResonanceAnchor+=(patch.hpResonance-hpResonanceAnchor)*qControlCoefficient;
+        lpResonanceAnchor+=(patch.lpResonance-lpResonanceAnchor)*qControlCoefficient;
         // Direct chip endpoints Vq0:Q5,Vq10:Q.5 only. The intermediate
         // d=2-1.8*r law is provisional; delta d=.18*deltaVq retains that law.
-        effectiveHpResonance=clamp(patch.hpResonance-qVoltageOffset*.1,0,1);
-        effectiveLpResonance=clamp(patch.lpResonance-qVoltageOffset*.1,0,1);
+        effectiveHpResonance=clamp(hpResonanceAnchor-qVoltageOffset*.1,0,1);
+        effectiveLpResonance=clamp(lpResonanceAnchor-qVoltageOffset*.1,0,1);
         // R7 LC sums LEVEL(270k) and SUB(120k) currents before common VCA2.
         // PN3 VCF/VCA depth pots share SUO and ground; their passive R7
         // paths do not invert. Positive LI raises VCA gain (Guide pp.40–41),
@@ -740,8 +752,17 @@ void Synth::setPatch(const Patch& patch) {
     impl_->patch = validated;
     impl_->updateCoefficients();
     if (openingKeyHold) impl_->followFreeKeys();
-    for (auto& voice : impl_->voices)
-        if (voice.filter.stage == Envelope::Idle) voice.filter.voltage = validated.filterInitial;
+    // A newly configured, unclocked instance starts at its chosen settled
+    // anchors/IL. Once even silence has been processed, preset recall only
+    // changes targets; it cannot erase continuously connected charge.
+    if (!impl_->hasProcessed) {
+        impl_->hpResonanceAnchor=validated.hpResonance;
+        impl_->lpResonanceAnchor=validated.lpResonance;
+        impl_->effectiveHpResonance=validated.hpResonance;
+        impl_->effectiveLpResonance=validated.lpResonance;
+        for (auto& voice : impl_->voices)
+            if (voice.filter.stage == Envelope::Idle) voice.filter.voltage = validated.filterInitial;
+    }
 }
 void Synth::noteOn(int note, double velocity) {
     if (note < 0 || note > 127 || !std::isfinite(velocity)) return;
@@ -850,7 +871,8 @@ Synth::ModulationState Synth::modulationState() const {
 }
 Synth::SoundPathState Synth::soundPathState() const {
     return {impl_->qVoltageOffset,impl_->effectiveHpResonance,
-        impl_->effectiveLpResonance,impl_->commonVcaGain};
+        impl_->effectiveLpResonance,impl_->commonVcaGain,
+        impl_->hpResonanceAnchor,impl_->lpResonanceAnchor,impl_->hasProcessed};
 }
 // Individual normalized section, using the same RC class/constants as voices.
 std::vector<double> outputCouplingImpulse(unsigned stage,double fs,std::size_t frames) {
