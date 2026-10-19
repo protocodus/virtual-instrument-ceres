@@ -1,0 +1,128 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ec6f93d..388bf5c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,6 +41,9 @@ target_link_libraries(ceres_render PRIVATE ceres)
+ 
+ include(CTest)
+ if(BUILD_TESTING)
++  add_executable(ceres_oscillator_circuit_tests Tests/OscillatorCircuitTests.cpp)
++  target_link_libraries(ceres_oscillator_circuit_tests PRIVATE ceres)
++  add_test(NAME oscillator_circuit_contracts COMMAND ceres_oscillator_circuit_tests)
+   add_executable(ceres_tests Tests/dsp_tests.cpp)
+   target_link_libraries(ceres_tests PRIVATE ceres)
+   add_test(NAME native_dsp_contracts COMMAND ceres_tests)
+diff --git a/Source/DSP/ceres.cpp b/Source/DSP/ceres.cpp
+index 149c63b..872b4f6 100644
+--- a/Source/DSP/ceres.cpp
++++ b/Source/DSP/ceres.cpp
+@@ -77,7 +77,7 @@ const Parameter parameters[] = {
+     {"expression_source", &Patch::expressionSource, 0, 1},
+     {"velocity_sensitivity", &Patch::velocitySensitivity, 0, 1},
+     {"drive", &Patch::drive, .05, 8},
+-    {"reset_microseconds", &Patch::resetMicroseconds, .1, 50}
++    {"reset_microseconds", &Patch::resetMicroseconds, .1, 60}
+ };
+ 
+ double parameterValue(const Parameter& parameter, double value) {
+@@ -380,40 +380,44 @@ double subWaveform(double phase,double step,double waveform,double noise) {
+ struct Oscillator {
+     double phase = 0;
+     OscillatorFrame process(double frequency, double pulseWidth, double resetSeconds, double fs) {
+-        // Guide pp.28–31: constant-current capacitor discharge, comparator and
+-        // monostable timed recharge, then WSC normalization and comparator PW.
+-        // phase parameterizes the EXACT piecewise-linear capacitor solution;
+-        // recharge occupies f*t_reset of its period. Absolute C/I values cancel
+-        // on amplitude normalization. t_reset is an unmeasured estimate.
++        // Guide pp.28-31: OUT7 conditions the integrating-capacitor signal
++        // with the monostable pulse before the WSC. It is not the exposed raw
++        // recharge triangle. In the nominal current law r=f*tau, fixed A0
++        // normalization makes the descending segment exactly 1-2*phase.
++        // A flat reset plateau followed by a 2r step is a reduced clamp model
++        // of the published sketch, not a recovered hidden-chip transfer.
+         const double step = clamp(frequency / fs, 1e-8, .18);
+         const double recharge = clamp(frequency * resetSeconds, 1e-7, .35);
+-        const double discharge = 1 - recharge;
+-        const double cap = phase < discharge ? 1 - 2*phase/discharge
+-                                            : -1 + 2*(phase-discharge)/recharge;
+-        const double slopeChange = 2/discharge + 2/recharge;
+-        // Analytic BLAMP event corrections remove the worst aliases from the
+-        // two changes in capacitor slope; no oscillator wavetable is present.
+-        // IG00158 WSC pin 5 supplies the INVERTED VCO ramp to the audio
+-        // mixer (CS-50 service manual, WSC pin descriptions p.21).
+-        const double saw = -(cap + .5 * slopeChange *
+-            (blamp(wrap(phase-discharge),step) - blamp(phase,step)));
++        // The .35 guard is a defensive extrapolation outside the calibrated
++        // Normal keyboard range; no high-CV/pulse overlap behavior is claimed.
++        const double resetPhase = wrap(phase-recharge);
++        // WSC pin5 inverts the conditioned downward ramp. Correct both
++        // voltage jumps and both slope changes analytically, without tables.
++        const double sawBase = phase < recharge ? -1 : 2*phase-1;
++        const double saw = sawBase - blep(phase,step)
++            + recharge*blep(resetPhase,step)
++            + blamp(resetPhase,step)-blamp(phase,step);
+         const double duty = clamp(pulseWidth, .01, .99);
+         // WSC guide p.31 explicitly states that PWM moves only the falling
+         // edge. Its rising edge stays locked to the VCO period. Applying a
+         // comparator to BOTH slopes of the internal recharge capacitor would
+         // incorrectly move both edges; WSC uses the conditioned VCO output.
+-        // Retain the documented positive pulse polarity after reset.
++        // Retain the documented positive pulse polarity after reset. At
++        // deep PWM where duty<recharge, this fixed-edge rule is an independent
++        // WSC approximation; hidden reset/comparator compensation is unknown.
+         double square = phase < duty ? 1 : -1;
+         square += blep(phase,step) - blep(wrap(phase-duty),step);
+-        // WSC pin 14 -> pin 3 folds the ramp at its midpoint into a triangle;
+-        // pin 15 -> pin 2 rounds that triangle into a sine (service p.21).
+-        // The normalized fold places sine maxima at the VCO reset, not at
+-        // a quarter-cycle offset. This ideal sine transfer and ideal reset
+-        // compensation are estimates; the actual slice trim and nonlinear
+-        // transfer still need measurement. No independent sine oscillator.
+-        const double shaperRamp = 1 - 2*phase;
+-        const double triangle = 2*std::abs(shaperRamp) - 1;
+-        const double sine = std::sin(.5*pi*triangle);
++        // WSC pin14 -> pin3 folds the SAME conditioned ramp, then pin15 ->
++        // pin2 rounds it. Retain the existing ideal sine transfer, but stop
++        // bypassing the finite reset with an unrelated ideal phase ramp.
++        // The flat plateau is thus 1; the descending branch is cos(2pi*phi).
++        // Sine slice trim/compensation and exact transistor shape are unknown.
++        const double resetAngle = 2*pi*recharge;
++        const double resetSine = std::sin(resetAngle);
++        const double resetCosine = std::cos(resetAngle);
++        const double sineBase = phase < recharge ? 1 : std::cos(2*pi*phase);
++        const double sine = sineBase + .5*(resetCosine-1)*blep(resetPhase,step)
++            - pi*resetSine*blamp(resetPhase,step);
+         phase = wrap(phase + step);
+         return {saw, square, sine};
+     }
+diff --git a/Source/DSP/ceres.hpp b/Source/DSP/ceres.hpp
+index e60b37a..f6dabbd 100644
+--- a/Source/DSP/ceres.hpp
++++ b/Source/DSP/ceres.hpp
+@@ -125,7 +125,10 @@ struct Patch {
+     double velocitySensitivity = 0.0;
+     // Effective differential-pair input scaling, uncalibrated. 1 is restrained.
+     double drive = 1.0;
+-    double resetMicroseconds = 6.0;
++    // Nominal one-shot time from Yamaha's Normal calibration: 523.2 Hz/V,
++    // 40 kohm FT branch, 800 uA reference. Not the bare CT resistor*C.
++    // Actual chip current and trim tolerances remain unmeasured.
++    double resetMicroseconds = 1e6 / (523.2 * 40e3 * 800e-6);
+ };
+ 
+ // Keys use snake_case (e.g. lp_cutoff, filter_initial, amp_attack). Finite values
+diff --git a/Tests/dsp_tests.cpp b/Tests/dsp_tests.cpp
+index 6e13c3d..ded58db 100644
+--- a/Tests/dsp_tests.cpp
++++ b/Tests/dsp_tests.cpp
+@@ -757,8 +757,8 @@ void pwmSourceBehavior() {
+         }
+         require(std::abs(average/(period*4)-(2*duty-1))<1e-10,
+                 "Static comparator duty must preserve 50..90 percent range");
+-        require(shortReset[period-3].saw!=longReset[period-3].saw,
+-                "Reset-duration stress must actually alter capacitor saw trajectory");
++        require(shortReset[3].saw!=longReset[3].saw,
++                "Reset-duration stress must alter the conditioned reset segment");
+     }
+     p.pulseWidth=.6; p.pwmDepth=.35; p.pwmRate=13; p.pwmPhase=.12;
+     p.resetMicroseconds=50; // Magnifies the old moving-rising-edge defect.

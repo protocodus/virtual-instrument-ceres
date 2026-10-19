@@ -1,0 +1,36 @@
+{
+  "status": "pass",
+  "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "8554b963f92c02930ef433c27a2239e3fa07e0425141a12171506b9a74d2d5f3",
+    "Source/DSP/ceres.cpp": "adb699e99a3cf70e07f37f63cf2ea2eba28652d46a7a24d51db5d53d8f8ec070",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "9fca47449aaf206305bd2436b6cc673dc133bd18fddda5440a0864251bc69845"
+  },
+  "release_ctest_passed": 8,
+  "targeted_asan_ubsan_passed": 3,
+  "asan_options": "detect_leaks=0",
+  "binary_sha256": {
+    "build-audible-release/ceres_render": "6006bed74b3ab0b059e3903a4b85cb3b95499cad7a07d4141f03fd1bd969856c",
+    "build-audible-release/libceres.a": "6c7cf60c32c713f10b9d9baa060d6caf3cd7595dd5bf6461e9384380a44e8e54",
+    "build-audible-release/libceres_embedded.a": "cb29ba6140da796fb050efca13f5a1c497b18e0e6aa7fdceb6016836a051368b",
+    "build-audible-release/ceres_oscillator_circuit_tests": "8f87999cdb2b592e90087ef99c2f80ca8c8dd0cf5b602c4c4f941a3af444447b"
+  },
+  "verified_file_sha256": {
+    "Source/DSP/ceres.cpp": "adb699e99a3cf70e07f37f63cf2ea2eba28652d46a7a24d51db5d53d8f8ec070",
+    "Source/DSP/ceres.hpp": "8554b963f92c02930ef433c27a2239e3fa07e0425141a12171506b9a74d2d5f3",
+    "CMakeLists.txt": "9fca47449aaf206305bd2436b6cc673dc133bd18fddda5440a0864251bc69845",
+    "Tests/OscillatorCircuitTests.cpp": "0be7127f3dbe1acb0c8039ba16b9bc0c4d5b07e9abbe8c043c8b5a42354198a3",
+    "Tests/dsp_tests.cpp": "6af9938a6969144df9b057530527d761d72254f9ab6b129a11dad3259681b5f8",
+    "Docs/DSP_SOURCE.md": "ff916c0201c99a36b4874874ef5d1b5950752c1074ef6171d1dcb8deedbc7171",
+    "Docs/oscillator-conditioning/README.md": "4931d01e9c631ce2a3890fee9c52e6a7af0b1b41623998d2e6f161a59287bf7b",
+    "Docs/oscillator-conditioning/release.log": "aa9702aedf970747d44c989036bbd1650bec96e7100f43776412c003551f7167",
+    "Docs/oscillator-conditioning/sanitize.log": "a30dc021344bbfc6ec1b8ec597b8eaf408cef807dc9538cf8294a89b4a9dc800"
+  },
+  "primary_source_audit_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/source-review.md": "ebc209139290d3e25690248e842907cc3442f781c432d541c95c66dafff80002",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/evidence.json": "afa33dd2d74d3352167a00d28d00d1134ab173cfcba52f738cf647a146f3286f"
+  },
+  "scope": "Source-derived nominal reset and reduced conditioned saw/shared sine fold. Implementation verified; no improved recording agreement or exact chip calibration claimed."
+}

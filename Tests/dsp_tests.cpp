@@ -757,8 +757,8 @@ void pwmSourceBehavior() {
         }
         require(std::abs(average/(period*4)-(2*duty-1))<1e-10,
                 "Static comparator duty must preserve 50..90 percent range");
-        require(shortReset[period-3].saw!=longReset[period-3].saw,
-                "Reset-duration stress must actually alter capacitor saw trajectory");
+        require(shortReset[3].saw!=longReset[3].saw,
+                "Reset-duration stress must alter the conditioned reset segment");
     }
     p.pulseWidth=.6; p.pwmDepth=.35; p.pwmRate=13; p.pwmPhase=.12;
     p.resetMicroseconds=50; // Magnifies the old moving-rising-edge defect.

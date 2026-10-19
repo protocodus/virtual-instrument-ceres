@@ -1,0 +1,27 @@
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /private/tmp/ceres-vco-conditioning-20261019/build-audible-sanitize
+[ 10%] Building CXX object CMakeFiles/ceres.dir/Source/DSP/ceres.cpp.o
+[ 10%] Building CXX object CMakeFiles/ceres_embedded.dir/Source/DSP/ceres.cpp.o
+[ 15%] Linking CXX static library libceres_embedded.a
+[ 15%] Built target ceres_embedded
+[ 20%] Linking CXX executable ceres_embedded_contract
+[ 25%] Linking CXX executable ceres_embedded_parity
+[ 30%] Built target ceres_embedded_contract
+[ 35%] Built target ceres_embedded_parity
+[ 40%] Linking CXX static library libceres.a
+[ 40%] Built target ceres
+[ 55%] Linking CXX executable ceres_native_parity
+[ 65%] Linking CXX executable ceres_tests
+[ 70%] Linking CXX executable ceres_sound_path_tests
+[ 70%] Linking CXX executable ceres_expression_tests
+[ 70%] Building CXX object CMakeFiles/ceres_oscillator_circuit_tests.dir/Tests/OscillatorCircuitTests.cpp.o
+[ 70%] Building CXX object CMakeFiles/ceres_render.dir/Tools/render_main.cpp.o
+[ 75%] Built target ceres_sound_path_tests
+[ 80%] Built target ceres_native_parity
+[ 85%] Built target ceres_expression_tests
+[ 90%] Built target ceres_tests
+[ 95%] Linking CXX executable ceres_oscillator_circuit_tests
+[ 95%] Built target ceres_oscillator_circuit_tests
+[100%] Linking CXX executable ceres_render
+[100%] Built target ceres_render

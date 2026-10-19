@@ -125,7 +125,10 @@ struct Patch {
     double velocitySensitivity = 0.0;
     // Effective differential-pair input scaling, uncalibrated. 1 is restrained.
     double drive = 1.0;
-    double resetMicroseconds = 6.0;
+    // Nominal one-shot time from Yamaha's Normal calibration: 523.2 Hz/V,
+    // 40 kohm FT branch, 800 uA reference. Not the bare CT resistor*C.
+    // Actual chip current and trim tolerances remain unmeasured.
+    double resetMicroseconds = 1e6 / (523.2 * 40e3 * 800e-6);
 };
 
 // Keys use snake_case (e.g. lp_cutoff, filter_initial, amp_attack). Finite values

@@ -1,0 +1,21 @@
+Test project /private/tmp/ceres-vco-conditioning-20261019/build-audible-release
+    Start 1: oscillator_circuit_contracts
+1/8 Test #1: oscillator_circuit_contracts .....   Passed    0.49 sec
+    Start 2: native_dsp_contracts
+2/8 Test #2: native_dsp_contracts .............   Passed    6.48 sec
+    Start 3: sound_path_circuit_contracts
+3/8 Test #3: sound_path_circuit_contracts .....   Passed    0.87 sec
+    Start 4: voice_expression_contracts
+4/8 Test #4: voice_expression_contracts .......   Passed    0.28 sec
+    Start 5: embedded_allocation_contract
+5/8 Test #5: embedded_allocation_contract .....   Passed    0.31 sec
+    Start 6: native_embedded_audio_parity
+6/8 Test #6: native_embedded_audio_parity .....   Passed    2.97 sec
+    Start 7: active_sound_path_audio_parity
+7/8 Test #7: active_sound_path_audio_parity ...   Passed    2.54 sec
+    Start 8: expression_audio_parity
+8/8 Test #8: expression_audio_parity ..........   Passed    2.52 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Total Test time (real) =  16.46 sec

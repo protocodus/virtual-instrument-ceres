@@ -77,7 +77,7 @@ const Parameter parameters[] = {
     {"expression_source", &Patch::expressionSource, 0, 1},
     {"velocity_sensitivity", &Patch::velocitySensitivity, 0, 1},
     {"drive", &Patch::drive, .05, 8},
-    {"reset_microseconds", &Patch::resetMicroseconds, .1, 50}
+    {"reset_microseconds", &Patch::resetMicroseconds, .1, 60}
 };
 
 double parameterValue(const Parameter& parameter, double value) {
@@ -380,40 +380,44 @@ double subWaveform(double phase,double step,double waveform,double noise) {
 struct Oscillator {
     double phase = 0;
     OscillatorFrame process(double frequency, double pulseWidth, double resetSeconds, double fs) {
-        // Guide pp.28–31: constant-current capacitor discharge, comparator and
-        // monostable timed recharge, then WSC normalization and comparator PW.
-        // phase parameterizes the EXACT piecewise-linear capacitor solution;
-        // recharge occupies f*t_reset of its period. Absolute C/I values cancel
-        // on amplitude normalization. t_reset is an unmeasured estimate.
+        // Guide pp.28-31: OUT7 conditions the integrating-capacitor signal
+        // with the monostable pulse before the WSC. It is not the exposed raw
+        // recharge triangle. In the nominal current law r=f*tau, fixed A0
+        // normalization makes the descending segment exactly 1-2*phase.
+        // A flat reset plateau followed by a 2r step is a reduced clamp model
+        // of the published sketch, not a recovered hidden-chip transfer.
         const double step = clamp(frequency / fs, 1e-8, .18);
         const double recharge = clamp(frequency * resetSeconds, 1e-7, .35);
-        const double discharge = 1 - recharge;
-        const double cap = phase < discharge ? 1 - 2*phase/discharge
-                                            : -1 + 2*(phase-discharge)/recharge;
-        const double slopeChange = 2/discharge + 2/recharge;
-        // Analytic BLAMP event corrections remove the worst aliases from the
-        // two changes in capacitor slope; no oscillator wavetable is present.
-        // IG00158 WSC pin 5 supplies the INVERTED VCO ramp to the audio
-        // mixer (CS-50 service manual, WSC pin descriptions p.21).
-        const double saw = -(cap + .5 * slopeChange *
-            (blamp(wrap(phase-discharge),step) - blamp(phase,step)));
+        // The .35 guard is a defensive extrapolation outside the calibrated
+        // Normal keyboard range; no high-CV/pulse overlap behavior is claimed.
+        const double resetPhase = wrap(phase-recharge);
+        // WSC pin5 inverts the conditioned downward ramp. Correct both
+        // voltage jumps and both slope changes analytically, without tables.
+        const double sawBase = phase < recharge ? -1 : 2*phase-1;
+        const double saw = sawBase - blep(phase,step)
+            + recharge*blep(resetPhase,step)
+            + blamp(resetPhase,step)-blamp(phase,step);
         const double duty = clamp(pulseWidth, .01, .99);
         // WSC guide p.31 explicitly states that PWM moves only the falling
         // edge. Its rising edge stays locked to the VCO period. Applying a
         // comparator to BOTH slopes of the internal recharge capacitor would
         // incorrectly move both edges; WSC uses the conditioned VCO output.
-        // Retain the documented positive pulse polarity after reset.
+        // Retain the documented positive pulse polarity after reset. At
+        // deep PWM where duty<recharge, this fixed-edge rule is an independent
+        // WSC approximation; hidden reset/comparator compensation is unknown.
         double square = phase < duty ? 1 : -1;
         square += blep(phase,step) - blep(wrap(phase-duty),step);
-        // WSC pin 14 -> pin 3 folds the ramp at its midpoint into a triangle;
-        // pin 15 -> pin 2 rounds that triangle into a sine (service p.21).
-        // The normalized fold places sine maxima at the VCO reset, not at
-        // a quarter-cycle offset. This ideal sine transfer and ideal reset
-        // compensation are estimates; the actual slice trim and nonlinear
-        // transfer still need measurement. No independent sine oscillator.
-        const double shaperRamp = 1 - 2*phase;
-        const double triangle = 2*std::abs(shaperRamp) - 1;
-        const double sine = std::sin(.5*pi*triangle);
+        // WSC pin14 -> pin3 folds the SAME conditioned ramp, then pin15 ->
+        // pin2 rounds it. Retain the existing ideal sine transfer, but stop
+        // bypassing the finite reset with an unrelated ideal phase ramp.
+        // The flat plateau is thus 1; the descending branch is cos(2pi*phi).
+        // Sine slice trim/compensation and exact transistor shape are unknown.
+        const double resetAngle = 2*pi*recharge;
+        const double resetSine = std::sin(resetAngle);
+        const double resetCosine = std::cos(resetAngle);
+        const double sineBase = phase < recharge ? 1 : std::cos(2*pi*phase);
+        const double sine = sineBase + .5*(resetCosine-1)*blep(resetPhase,step)
+            - pi*resetSine*blamp(resetPhase,step);
         phase = wrap(phase + step);
         return {saw, square, sine};
     }

@@ -86,3 +86,7 @@ cmp /tmp/ceres-panel-native.f32 /tmp/ceres-panel-embedded.f32
 ```
 
 Each file contains 384,000 float32 samples. The `controls` argument enables ring blend/rate/depth/A/D, all five SUB shapes and both Sustain modes across the same four rates and allocation/pedal/reset sequences; `soundpath` additionally enables the new globals, VCA level and output trim. The prior recorded enabled-control comparison is [panel-enabled-parity.json](validation/panel-enabled-parity.json), and its prior unchanged-default comparison is [panel-default-parity.json](validation/panel-default-parity.json). Those and the initial-import reports remain historical evidence and are not overwritten.
+
+## Source-timed oscillator conditioning experiment
+
+The default VCO one-shot now follows the published nominal current/frequency calibration (59.728593us), and the reset setter extends to60us. OUT7 uses a conditioned plateau/step approximation, with the same ramp feeding saw and the ideal WSC sine fold. Analytic discontinuity corrections cover both outputs; the pulse clock/duty is unchanged. This intentionally changes saw/sine audio, especially upper notes. Exact clamp/slice behavior is unmeasured and the existing r<=.35 guard is an explicit high-CV extrapolation. See [derivation, retained adverse benchmark and implementation limits](oscillator-conditioning/README.md). Earlier references to a provisional oscillator reset are historical; the new nominal inference still has unknown current/trim tolerances.
