@@ -283,6 +283,9 @@ if(BUILD_TESTING)
   add_executable(ceres_note_reuse_tests Tests/NoteReuseTests.cpp)
   target_link_libraries(ceres_note_reuse_tests PRIVATE ceres)
   add_test(NAME Ceres.note_reuse_contracts COMMAND ceres_note_reuse_tests)
+  add_executable(ceres_fast_note_envelope_tests Tests/FastNoteEnvelopeTests.cpp)
+  target_link_libraries(ceres_fast_note_envelope_tests PRIVATE ceres)
+  add_test(NAME Ceres.fast_note_envelope_contracts COMMAND ceres_fast_note_envelope_tests)
   add_executable(ceres_embedded_contract Tests/EmbeddedContract.cpp)
   target_link_libraries(ceres_embedded_contract PRIVATE ceres_embedded)
   if(NOT MSVC)
@@ -323,7 +326,7 @@ if(BUILD_TESTING)
   endif()
 
   foreach(target IN ITEMS ceres_configuration_tests ceres_noise_quality_tests ceres_oscillator_circuit_tests ceres_tests ceres_sound_path_tests
-      ceres_capacitor_tests ceres_ring_depth_tests ceres_ring_carrier_tests ceres_ring_switching_tests ceres_expression_tests ceres_note_reuse_tests
+      ceres_capacitor_tests ceres_ring_depth_tests ceres_ring_carrier_tests ceres_ring_switching_tests ceres_expression_tests ceres_note_reuse_tests ceres_fast_note_envelope_tests
       ceres_embedded_contract ceres_native_parity ceres_embedded_parity
       ceres_native_configuration_parity ceres_embedded_configuration_parity)
     set_target_properties(${target} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
