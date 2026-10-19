@@ -2,88 +2,43 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index ec6f93d..cd64140 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -47,6 +47,9 @@ if(BUILD_TESTING)
-   add_executable(ceres_sound_path_tests Tests/SoundPathTests.cpp)
-   target_link_libraries(ceres_sound_path_tests PRIVATE ceres)
-   add_test(NAME sound_path_circuit_contracts COMMAND ceres_sound_path_tests)
+@@ -49,0 +50,3 @@ if(BUILD_TESTING)
 +  add_executable(ceres_capacitor_tests Tests/CapacitorContinuityTests.cpp)
 +  target_link_libraries(ceres_capacitor_tests PRIVATE ceres)
 +  add_test(NAME capacitor_continuity_contracts COMMAND ceres_capacitor_tests)
-   add_executable(ceres_expression_tests Tests/ExpressionTests.cpp)
-   target_link_libraries(ceres_expression_tests PRIVATE ceres)
-   add_test(NAME voice_expression_contracts COMMAND ceres_expression_tests)
-@@ -68,5 +71,7 @@ if(BUILD_TESTING)
-       "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_sound_path_parity.py" "${CMAKE_CURRENT_BINARY_DIR}")
-     add_test(NAME expression_audio_parity COMMAND "${Python3_EXECUTABLE}"
-       "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_expression_parity.py" "${CMAKE_CURRENT_BINARY_DIR}")
+@@ -70,0 +74,2 @@ if(BUILD_TESTING)
 +    add_test(NAME capacitor_native_embedded_parity COMMAND "${Python3_EXECUTABLE}"
 +      "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_capacitor_parity.py" "${CMAKE_CURRENT_BINARY_DIR}")
-   endif()
- endif()
 diff --git a/Source/DSP/ceres.cpp b/Source/DSP/ceres.cpp
 index 149c63b..73d14c6 100644
 --- a/Source/DSP/ceres.cpp
 +++ b/Source/DSP/ceres.cpp
-@@ -317,7 +317,10 @@ struct Envelope {
-     double advance(double initial, double peak, double sustained,
-                    double headroom, double saturation, double attackIncrement, double currentStep,
-                    double decayCoefficient, double releaseCoefficient) {
+@@ -320 +320,4 @@ struct Envelope {
 -        if (stage == Idle) { voltage = initial; return voltage; }
 +        // Key-off keeps IL/RT selected (Guide pp.43–44): an idle board is
 +        // still a connected capacitor, not a reset switch. Continue the
 +        // existing release law if its target moves; Idle remains an audio
 +        // bookkeeping state. The physical post-settling rate is unmeasured.
-         double target = initial, coefficient = 0;
-         if (stage == Attack) {
-             const double span = std::max(1e-9, std::abs(peak - initial));
-@@ -513,7 +516,11 @@ struct Synth::Impl {
-     // Eight equal pin7 networks reduce exactly to one common delta state
-     // for this stiff-source/zero-input-current limit and equal initial delta.
-     // Existing per-stage effective Q anchors are NOT raw chip voltages.
+@@ -515,0 +519,2 @@ struct Synth::Impl {
 +    // Two independently smoothed anchors plus the shared delta decompose
 +    // two stage capacitor coordinates, not three physical capacitors.
-     double qVoltageOffset=0, qControlCoefficient=0;
+@@ -516,0 +522,2 @@ struct Synth::Impl {
 +    double hpResonanceAnchor=0, lpResonanceAnchor=0;
 +    bool hasProcessed=false;
-     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
-     double outputTrimGain=1;
-     // Guide printed32: SUB-N uses22k/.1uF, independent of audio NO level.
-@@ -602,6 +609,8 @@ struct Synth::Impl {
-         subNoiseMemory=0; ringEnvelope={}; ringPhase=ringCarrier=0;
-         ringFrequency=patch.ringRate; ringWetCoupling={};
-         qVoltageOffset=0;
+@@ -604,0 +612,2 @@ struct Synth::Impl {
 +        hpResonanceAnchor=patch.hpResonance; lpResonanceAnchor=patch.lpResonance;
 +        hasProcessed=false;
-         effectiveHpResonance=patch.hpResonance; effectiveLpResonance=patch.lpResonance;
-         commonVcaGain=patch.ampLevel;
-         decimator.clear();
-@@ -613,6 +622,7 @@ struct Synth::Impl {
-         }
-     }
-     double sample() {
+@@ -615,0 +625 @@ struct Synth::Impl {
 +        hasProcessed=true;
-         const double dt = 1 / internalFs;
-         pressureValue += (pressureTarget-pressureValue) * pressureCoefficient;
-         const double noise = random.bipolar(); // one shared physical noise source
-@@ -625,10 +635,12 @@ struct Synth::Impl {
-         // to zero: capacitor charge survives note allocation, patch edits,
-         // and audio panic. reset() is the explicit electrical-state reset.
-         qVoltageOffset+=(patch.resonanceOffset*.5-qVoltageOffset)*qControlCoefficient;
+@@ -627,0 +638,2 @@ struct Synth::Impl {
 +        hpResonanceAnchor+=(patch.hpResonance-hpResonanceAnchor)*qControlCoefficient;
 +        lpResonanceAnchor+=(patch.lpResonance-lpResonanceAnchor)*qControlCoefficient;
-         // Direct chip endpoints Vq0:Q5,Vq10:Q.5 only. The intermediate
-         // d=2-1.8*r law is provisional; delta d=.18*deltaVq retains that law.
+@@ -630,2 +642,2 @@ struct Synth::Impl {
 -        effectiveHpResonance=clamp(patch.hpResonance-qVoltageOffset*.1,0,1);
 -        effectiveLpResonance=clamp(patch.lpResonance-qVoltageOffset*.1,0,1);
 +        effectiveHpResonance=clamp(hpResonanceAnchor-qVoltageOffset*.1,0,1);
 +        effectiveLpResonance=clamp(lpResonanceAnchor-qVoltageOffset*.1,0,1);
-         // R7 LC sums LEVEL(270k) and SUB(120k) currents before common VCA2.
-         // PN3 VCF/VCA depth pots share SUO and ground; their passive R7
-         // paths do not invert. Positive LI raises VCA gain (Guide pp.40–41),
-@@ -736,8 +748,17 @@ void Synth::setPatch(const Patch& patch) {
-     impl_->patch = validated;
-     impl_->updateCoefficients();
-     if (openingKeyHold) impl_->followFreeKeys();
+@@ -739,2 +751,11 @@ void Synth::setPatch(const Patch& patch) {
 -    for (auto& voice : impl_->voices)
 -        if (voice.filter.stage == Envelope::Idle) voice.filter.voltage = validated.filterInitial;
 +    // A newly configured, unclocked instance starts at its chosen settled
@@ -97,66 +52,33 @@ index 149c63b..73d14c6 100644
 +        for (auto& voice : impl_->voices)
 +            if (voice.filter.stage == Envelope::Idle) voice.filter.voltage = validated.filterInitial;
 +    }
- }
- void Synth::noteOn(int note, double velocity) {
-     if (note < 0 || note > 127 || !std::isfinite(velocity)) return;
-@@ -846,7 +867,8 @@ Synth::ModulationState Synth::modulationState() const {
- }
- Synth::SoundPathState Synth::soundPathState() const {
-     return {impl_->qVoltageOffset,impl_->effectiveHpResonance,
+@@ -849 +870,2 @@ Synth::SoundPathState Synth::soundPathState() const {
 -        impl_->effectiveLpResonance,impl_->commonVcaGain};
 +        impl_->effectiveLpResonance,impl_->commonVcaGain,
 +        impl_->hpResonanceAnchor,impl_->lpResonanceAnchor,impl_->hasProcessed};
- }
- // Individual normalized section, using the same RC class/constants as voices.
- std::vector<double> outputCouplingImpulse(unsigned stage,double fs,std::size_t frames) {
 diff --git a/Source/DSP/ceres.hpp b/Source/DSP/ceres.hpp
 index e60b37a..2bf2c91 100644
 --- a/Source/DSP/ceres.hpp
 +++ b/Source/DSP/ceres.hpp
-@@ -40,8 +40,9 @@ struct Patch {
-     // offset does not imply every value is reachable from an unknown real
-     // 0..10V wiper baseline. Stiff preset/source, zero chip input-current
-     // limit: each pin7 has 220k to each source and 10uF to ground, giving
+@@ -43,2 +43,3 @@ struct Patch {
 -    // deltaVq -> offset/2 with tau1.1s. Only this incremental control is
 -    // smoothed; existing effective hp/lp_resonance edits remain immediate.
 +    // deltaVq -> offset/2 with tau1.1s. This incremental control is
 +    // smoothed together with the independent hp/lp_resonance anchor terms;
 +    // live edits preserve both stage capacitor coordinates.
-     double resonanceOffset = 0.0;
-     // Separate envelope coupling in octaves per EG unit. Defaults retain
-     // direct octave-valued engineering patches. Factory EG units are volts;
-@@ -147,6 +148,8 @@ public:
-     Synth& operator=(Synth&&) noexcept;
-     Synth(const Synth&) = delete;
-     Synth& operator=(const Synth&) = delete;
+@@ -149,0 +151,2 @@ public:
 +    // Before the first processed sample, configure settled Q/idle-IL state.
 +    // Live edits change targets while preserving those capacitor voltages.
-     void setPatch(const Patch&);
-     void noteOn(int note, double velocity = 1.0);
-     void noteOff(int note);
-@@ -157,9 +160,10 @@ public:
-     void sustain(bool down);
-     void allNotesOff();
-     // Clears voices, output-coupling capacitors and FIR history; preserves
+@@ -160 +163 @@ public:
 -    // controllers and the continuously connected global Q-control capacitor.
 +    // controllers, Q-control capacitor coordinates and clock-start history.
-     void allSoundOff();
+@@ -162 +165,2 @@ public:
 -    // Restores seeded oscillator phases, controller state and all capacitors.
 +    // Restores seeded oscillator phases, controllers and configured capacitor
 +    // initial conditions; permits pre-clock configuration again.
-     void reset();
-     float process();
-     // Counts active amplitude envelopes, not residual output capacitor tails.
-@@ -187,6 +191,8 @@ public:
-     struct SoundPathState {
-         double resonanceVoltageOffset, hpResonance, lpResonance;
-         double commonVcaGain;
+@@ -189,0 +194,2 @@ public:
 +        double hpResonanceAnchor, lpResonanceAnchor;
 +        bool hasProcessed;
-     };
-     std::array<VoiceState,voiceCount> voiceState() const;
-     ModulationState modulationState() const;
 diff --git a/Tests/CapacitorContinuityTests.cpp b/Tests/CapacitorContinuityTests.cpp
 new file mode 100644
 index 0000000..72b8c7c
@@ -348,18 +270,9 @@ diff --git a/Tests/ParityDriver.cpp b/Tests/ParityDriver.cpp
 index 62e4e7a..da63ff3 100644
 --- a/Tests/ParityDriver.cpp
 +++ b/Tests/ParityDriver.cpp
-@@ -9,6 +9,7 @@
- int main(int argc,char** argv) {
-     if(argc<2 || argc>3)return 2;
-     const bool panelControls=argc==3;
+@@ -11,0 +12 @@ int main(int argc,char** argv) {
 +    const bool capacitorControls=argc==3 && std::strcmp(argv[2],"capacitors")==0;
-     const bool expressionControls=argc==3 && std::strcmp(argv[2],"expression")==0;
-     const bool soundPathControls=argc==3 && (std::strcmp(argv[2],"soundpath")==0 || expressionControls);
-     std::ofstream output(argv[1],std::ios::binary);
-@@ -77,6 +78,13 @@ int main(int argc,char** argv) {
-                 ceres::setParameter(patch,"amp_level",.73);synth.setPatch(patch);
-             }
-             if(frame==6000)synth.allSoundOff();
+@@ -79,0 +81,7 @@ int main(int argc,char** argv) {
 +            if(capacitorControls && (frame==2048 || frame==4501 || frame==6001)) {
 +                patch.hpResonance=frame==4501 ? .1:.8;
 +                patch.lpResonance=frame==4501 ? .9:.2;
@@ -367,9 +280,6 @@ index 62e4e7a..da63ff3 100644
 +                patch.resonanceOffset=frame==4501 ? -4:6;
 +                synth.setPatch(patch);
 +            }
-             if(expressionControls && (frame==5000 || frame==5500)) {
-                 ceres::setParameter(patch,"expression_source",frame==5500 ? 1:0);synth.setPatch(patch);
-             }
 diff --git a/Tests/check_capacitor_parent_parity.py b/Tests/check_capacitor_parent_parity.py
 new file mode 100644
 index 0000000..0d37fb3
@@ -453,7 +363,7 @@ index 0000000..91e50f0
 +    print('PASS 384000 samples, 4 rates x8 scenes, live Q/IL, panic/reset; SHA256 '+hashlib.sha256(streams[0]).hexdigest())
 diff --git a/Tests/record_capacitor_validation.py b/Tests/record_capacitor_validation.py
 new file mode 100644
-index 0000000..45cee79
+index 0000000..00ff40b
 --- /dev/null
 +++ b/Tests/record_capacitor_validation.py
 @@ -0,0 +1,54 @@
@@ -489,8 +399,8 @@ index 0000000..45cee79
 +        'Tests/CapacitorContinuityTests.cpp','Tests/CapacitorStaticDriver.cpp',
 +        'Tests/ParityDriver.cpp','Tests/check_capacitor_parity.py',
 +        'Tests/check_capacitor_parent_parity.py','Tests/record_capacitor_validation.py']
-+    diff=subprocess.check_output(['git','diff','--cached','--binary','--',*tracked],cwd=ROOT)
-+    assert diff, 'Stage owned source/tests before recording the full source patch'
++    diff=subprocess.check_output(['git','diff',PARENT,'--binary','--unified=0','--',*tracked],cwd=ROOT)
++    assert diff, 'Source must differ from the immutable parent'
 +    (OUT/'source.patch').write_bytes(diff)
 +    research=Path('/tmp/ceres-cs50-1x8LGd/research')
 +    audit=Path('/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/filter-eg-capacitor-continuity/source-audit.md')

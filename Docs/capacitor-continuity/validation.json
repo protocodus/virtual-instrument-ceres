@@ -1,6 +1,6 @@
 {
   "status": "pass",
-  "created_utc": "2026-10-19T07:33:22.076447+00:00",
+  "created_utc": "2026-10-19T07:43:58.405765+00:00",
   "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
   "compiled_source_sha256": {
     "Source/DSP/ceres.hpp": "a41e4266ad826a22da6c3078b1ac181c012a33a70cbd58c2326060ede53f1cc3",
@@ -35,9 +35,9 @@
     "Tests/ParityDriver.cpp": "8039150294df6e1d1a660897f55b07dc7ebd7f1ac3ffe50f305b41ee55edc0ff",
     "Tests/check_capacitor_parity.py": "8563addea43dea365b33b0dca7db6c7b92c525d0bef140288b4074cde09f42fb",
     "Tests/check_capacitor_parent_parity.py": "f51b17acf51cf0476f8c80f0f5b67f47b38a1703f5b4d4b993ad3ee3e256eb5e",
-    "Tests/record_capacitor_validation.py": "410afbf100cdae49d3acf139fa8de269a43e746ae962cfa38dd750586f25240c",
+    "Tests/record_capacitor_validation.py": "b18da3af3b5ec018f5356aacb59b83fedacb883687dc5a857b20ec8ca8c9287d",
     "Docs/capacitor-continuity/README.md": "d7b8d20eec2bb36d1dfacb7fc31aa238b58b695c428505ee9ed7dbf78ac64ff8",
-    "Docs/capacitor-continuity/source.patch": "d28fc7fd53245a46caa8c5e5a35d2180ed512702d72396cd868b0179d34169c8",
+    "Docs/capacitor-continuity/source.patch": "a55a7fb9560774750fbccb8b5f782aa05d956daa4fd4456e2245dba784a3ce01",
     "Docs/capacitor-continuity/release.log": "2e3d14a87ea2e64a5271cbbde334245370de97a94df79d7525e4044406dcb7de",
     "Docs/capacitor-continuity/build.log": "010ced73a9e2cdcf3598838781c047988bf75c65f3515e5ac3edcd93739369a5",
     "Docs/capacitor-continuity/sanitize.log": "b67cdf96fbe70cc5b2d7e1ebe5132ae73c6d203dce07870388cc0a514e5ca569",

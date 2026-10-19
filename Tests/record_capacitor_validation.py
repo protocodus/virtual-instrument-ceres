@@ -30,8 +30,8 @@ def main():
         'Tests/CapacitorContinuityTests.cpp','Tests/CapacitorStaticDriver.cpp',
         'Tests/ParityDriver.cpp','Tests/check_capacitor_parity.py',
         'Tests/check_capacitor_parent_parity.py','Tests/record_capacitor_validation.py']
-    diff=subprocess.check_output(['git','diff','--cached','--binary','--',*tracked],cwd=ROOT)
-    assert diff, 'Stage owned source/tests before recording the full source patch'
+    diff=subprocess.check_output(['git','diff',PARENT,'--binary','--unified=0','--',*tracked],cwd=ROOT)
+    assert diff, 'Source must differ from the immutable parent'
     (OUT/'source.patch').write_bytes(diff)
     research=Path('/tmp/ceres-cs50-1x8LGd/research')
     audit=Path('/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/filter-eg-capacitor-continuity/source-audit.md')
