@@ -1,0 +1,66 @@
+{
+  "scope": "Independent same-host audio-noise density normalization and exact no-audio-noise/SUB/drift sequence parity; no hardware gain fit or preset calibration",
+  "baseline_commit": "652e3722eb40f67001f0467103f9f31a957ec363",
+  "sample_rate": 48000,
+  "seed": 50,
+  "qualities": [
+    1,
+    2,
+    4
+  ],
+  "profiles": [
+    "saw_noise0",
+    "sub_noise0",
+    "drift_noise0",
+    "mixed_noise",
+    "noise_only"
+  ],
+  "frames": {
+    "noise_only": 245760,
+    "other": 48000
+  },
+  "noise_psd": {
+    "discard_frames": 48000,
+    "method": "Welch density, Hann8192, overlap4096, constant detrend, arithmetic sum of bins times df",
+    "bands_hz": [
+      [
+        100,
+        1000
+      ],
+      [
+        1000,
+        3000
+      ]
+    ],
+    "candidate_relative_4x_band_tolerances_db": [
+      0.3,
+      0.5
+    ]
+  },
+  "expected_audio_identity": "all9 noise0 and both4x noisy scenes exact; other4 noisy outputs must change",
+  "expected_state_identity": "all15 full sample sequences of SUB output,voice0 oscillator frequency and phase exact within each quality",
+  "analytic_density": "two-sided white PSD sigma^2/Fs_internal; gain^2=factor/4 makes sigma^2/(4*Fs_host), preserving historical4x; no host-rate normalization",
+  "input_sha256": {
+    "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-source/ceres.cpp": "5f132ec0a9414d5d0a290da748c5843993665d0f3f131ffd0934a1df34994baf",
+    "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-source/ceres.hpp": "00de3665dffd8cbb71772b1cbe2fece179295d648af659758ac69b52a3cef588",
+    "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-source/ceres.cpp": "2414c0944a2bd979fc88030e8745bc288747be6829f24f4fd0b49f29e69070a5",
+    "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-source/ceres.hpp": "4ee7758c0401bf7a61f10b08f33baa93debb0fdcb32e73b287359db0669eb2a1",
+    "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/run.py": "762ae26c3bf36443c4bafc638b41d365d2957fc0bfb00f0d86a5a6921c30ca64",
+    "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/probe.cpp": "70acd33004cbbfeac62b0f3a8b352fd067ceced19688ca8cf25a16a699628b3d"
+  },
+  "candidate_original_source_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/Source/DSP/ceres.cpp": "2414c0944a2bd979fc88030e8745bc288747be6829f24f4fd0b49f29e69070a5",
+    "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/Source/DSP/ceres.hpp": "4ee7758c0401bf7a61f10b08f33baa93debb0fdcb32e73b287359db0669eb2a1"
+  },
+  "runtime": {
+    "python": "3.11.0 (v3.11.0:deaf509e8f, Oct 24 2022, 14:43:23) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "numpy": "1.26.4",
+    "scipy": "1.14.1",
+    "platform": "macOS-26.5.1-arm64-arm-64bit"
+  },
+  "limits": [
+    "Quality-dependent filter warping/anti-alias bandwidth and nonlinear drive can still change full-band RMS, peaks and timbre.",
+    "No assertion of exact audio equivalence across qualities, or identical noise samples across different internal clocks.",
+    "SUB has its own rate-dependent RC variance normalization and must continue receiving the unscaled raw draw."
+  ]
+}

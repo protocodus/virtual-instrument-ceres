@@ -18,6 +18,9 @@ struct Patch {
 #if !defined(CERES_EMBEDDED_TARGET)
     std::string name = "init";
 #endif
+    // Audio noise keeps the legacy4x in-band density at a fixed host rate:
+    // its source amplitude scales sqrt(internalFactor/4). SUB noise uses
+    // its separate RC/RMS convention and the unchanged raw random sample.
     double saw = 1.0, pulse = 0.0, sine = 0.0, noise = 0.0;
     double pulseWidth = 0.5, pwmDepth = 0.0, pwmRate = 1.0;
     // Continuous sine-LFO phase offset in cycles, applied immediately by

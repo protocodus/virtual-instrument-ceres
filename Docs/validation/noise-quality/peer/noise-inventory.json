@@ -1,0 +1,438 @@
+{
+  "scope": "Noise source tokens only; later posttrim recalibration may change patch hashes without changing this classification",
+  "patches": [
+    {
+      "patch": "Bass/Bowed Current.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Bass/Copper Wire.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Bass/Dry Current.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Bass/Low Voltage Steps.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Bass/Muted Robot.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Bass/Pulse Anchor.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Bass/Roundwood.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Bass/Rubber Room.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Bass/Taped Square.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Bass/Velvet Sub.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Bloom.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Brass/Air Column.repatch",
+      "noise_stored": "0.044999999999999998",
+      "affected": true
+    },
+    {
+      "patch": "Brass/Brass Knuckles.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Brass/Bright Stabs.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Brass/Bronze Reed.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Brass/Copper Section.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Brass/Muted Bell.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Brass/Resonant Herald.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Brass/Slow Burn.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Brass/Soft Flugel.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Brass/Velvet Horns.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Current.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Ember.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "FX/Air Sweep.repatch",
+      "noise_stored": "0.90000000000000002",
+      "affected": true
+    },
+    {
+      "patch": "FX/Broken Satellites.repatch",
+      "noise_stored": "0.040000000000000001",
+      "affected": true
+    },
+    {
+      "patch": "FX/Descending Beacon.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "FX/Metal Rain.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "FX/Orbiting Dust.repatch",
+      "noise_stored": "0.080000000000000002",
+      "affected": true
+    },
+    {
+      "patch": "FX/Radar Bloom.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "FX/Spark Gap.repatch",
+      "noise_stored": "0.5",
+      "affected": true
+    },
+    {
+      "patch": "FX/Tonal Siren.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "FX/Vacuum Fall.repatch",
+      "noise_stored": "0.29999999999999999",
+      "affected": true
+    },
+    {
+      "patch": "FX/Wind Chamber.repatch",
+      "noise_stored": "0.84999999999999998",
+      "affected": true
+    },
+    {
+      "patch": "Glass.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Init.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Keys/Copper Tines.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Keys/Dry Clavinet.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Keys/Felt Circuit.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Keys/Hollow Mallet.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Keys/Lamp Organ.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Keys/Music Box Wire.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Keys/Paper Piano.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Keys/Prism Hammer.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Keys/Round Reed.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Keys/Velour Tremolo.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Lead/Copper Voice.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Lead/Digital Reed.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Lead/Narrow Arrow.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Lead/Pulse Motion.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Lead/Resonant Silk.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Lead/Soft Whistle.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Lead/Square Lantern.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Lead/Stepped Ember.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Lead/Swept Chrome.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Lead/Warm Ribbon.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pad/Breathing Room.repatch",
+      "noise_stored": "0.025000000000000001",
+      "affected": true
+    },
+    {
+      "patch": "Pad/Bronze Halo.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pad/Frosted Pulse.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pad/Low Tide.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pad/Night Glass.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pad/Olive Haze.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pad/Shifting Veil.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pad/Slow Current.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pad/Still Water.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pad/Warm Horizon.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pluck/Amber Pick.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pluck/Clockwork.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pluck/Glass Thread.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pluck/Long Copper.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pluck/Muted Wire.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pluck/Nylon Pulse.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pluck/Pinpoint.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pluck/Resin Snap.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pluck/Water Droplet.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Pluck/Wood Block.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Reed.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Strings/Chamber Wire.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Strings/High Harmonics.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Strings/Low Cello.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Strings/Muted Section.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Strings/Pulse Quartet.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Strings/Rosin Edge.repatch",
+      "noise_stored": "0.035000000000000003",
+      "affected": true
+    },
+    {
+      "patch": "Strings/Silken Motion.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Strings/Silver Ensemble.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Strings/Slow Arches.repatch",
+      "noise_stored": "0",
+      "affected": false
+    },
+    {
+      "patch": "Strings/Soft Bow.repatch",
+      "noise_stored": "0",
+      "affected": false
+    }
+  ],
+  "affected_count": 9,
+  "unaffected_count": 77,
+  "base_presets_affected": 0
+}

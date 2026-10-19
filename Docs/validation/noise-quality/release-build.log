@@ -1,0 +1,35 @@
+[  6%] Built target CeresDSPCxx17
+[  6%] Built target CeresDSP
+[ 15%] Built target ceres
+[ 15%] Built target ceres_embedded
+[ 22%] Built target CeresDspFuzz
+[ 24%] Built target CeresDSPTests
+[ 33%] Built target RenderCeresPresetDemos
+[ 33%] Built target ceres_render
+[ 37%] Building CXX object CMakeFiles/ceres_noise_quality_tests.dir/Tests/NoiseQualityTests.cpp.o
+[ 37%] Building CXX object CMakeFiles/ceres_configuration_tests.dir/Tests/ConfigurationTests.cpp.o
+[ 40%] Linking CXX executable ceres_noise_quality_tests
+[ 42%] Linking CXX executable ceres_configuration_tests
+[ 42%] Built target ceres_noise_quality_tests
+[ 42%] Built target ceres_configuration_tests
+[ 46%] Built target ceres_oscillator_circuit_tests
+[ 51%] Built target ceres_tests
+[ 55%] Built target ceres_sound_path_tests
+[ 60%] Built target ceres_capacitor_tests
+[ 62%] Building CXX object CMakeFiles/ceres_ring_depth_tests.dir/Tests/RingDepthContinuityTests.cpp.o
+[ 66%] Built target ceres_ring_carrier_tests
+[ 71%] Built target ceres_ring_switching_tests
+[ 75%] Built target ceres_expression_tests
+[ 77%] Building CXX object CMakeFiles/ceres_embedded_contract.dir/Tests/EmbeddedContract.cpp.o
+[ 82%] Linking CXX executable ceres_embedded_contract
+[ 82%] Linking CXX executable ceres_ring_depth_tests
+[ 82%] Built target ceres_ring_depth_tests
+[ 82%] Built target ceres_embedded_contract
+[ 91%] Built target ceres_embedded_parity
+[ 91%] Built target ceres_native_parity
+[ 93%] Building CXX object CMakeFiles/ceres_embedded_configuration_parity.dir/Tests/ConfigurationParityDriver.cpp.o
+[ 95%] Building CXX object CMakeFiles/ceres_native_configuration_parity.dir/Tests/ConfigurationParityDriver.cpp.o
+[ 97%] Linking CXX executable ceres_embedded_configuration_parity
+[ 97%] Built target ceres_embedded_configuration_parity
+[100%] Linking CXX executable ceres_native_configuration_parity
+[100%] Built target ceres_native_configuration_parity

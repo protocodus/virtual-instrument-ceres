@@ -1,0 +1,662 @@
+[
+  {
+    "build": "baseline",
+    "factor": 1,
+    "profile": "saw_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "saw_noise0",
+      "1",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "2a7c4486448212d9f0b66ae9fa4e45eaaec1a5af45025d2cc803b1e58d220723",
+    "field_sha256": {
+      "audio": "952c5f517e26bbb12568f4dfa129c18b963f0fb9001aab824f9ef20c3b686433",
+      "sub": "64ca0ec605d242d0a3dde7aca67ad68a900c4f57e6478fc2b4fe6819e2947e5d",
+      "frequency": "7dbc49543f8ed44f26bbbfdd4b2e0e8c871934ab507e34d67fe04e2ff60b6e9c",
+      "phase": "ecb91102809aab467bdbf517c986a823ae1ff007550e0f9551aff2322173fa55"
+    },
+    "peak": 0.019540313631296158
+  },
+  {
+    "build": "baseline",
+    "factor": 1,
+    "profile": "sub_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "sub_noise0",
+      "1",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "607fc9726274fbed387d1071f0a1307bfd0ac9bb8de8298e627ebec73fed26bf",
+    "field_sha256": {
+      "audio": "ca8755f0b25023e6bdd4a5da9e603a71c48572f4aa9fa7d6e89976297e4be295",
+      "sub": "45a10a210e91b77452dbbee2b01fc2e1a05729ecdb3c35cf0f742429e4e44f1c",
+      "frequency": "cfce1be41c3f411bf9a94719a9b2a73468369c1674ee57422bce26010e8f8941",
+      "phase": "74a69b47e1554be2a999bccf46a7d6fbeeda0278a79ccbadc811708031bd0702"
+    },
+    "peak": 0.019339263439178467
+  },
+  {
+    "build": "baseline",
+    "factor": 1,
+    "profile": "drift_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "drift_noise0",
+      "1",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "adf96a686ddd24c2668f6fad9bade165c7fc52397698a5e7761ac7162807df4a",
+    "field_sha256": {
+      "audio": "57f87411a2faed5ddd407c54c672231af3a032ad93a0984cb1c59d9ec77ebee9",
+      "sub": "64ca0ec605d242d0a3dde7aca67ad68a900c4f57e6478fc2b4fe6819e2947e5d",
+      "frequency": "cc2a0f332047ff08cdb9e90a920b40a5ce748ddfb041649b5bddf13bc82edec3",
+      "phase": "a0108b17dabd871012be4d0cacefecd65e309422934b2db6f7997272182ae27d"
+    },
+    "peak": 0.06351881474256516
+  },
+  {
+    "build": "baseline",
+    "factor": 1,
+    "profile": "mixed_noise",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "mixed_noise",
+      "1",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "c6472c6e2d6827dced148dfde290e5254d88135a048669e2a6140db3e68a151f",
+    "field_sha256": {
+      "audio": "72d35656e491885bd32caf32636b088fa4e9c449d0f6f96360fca2fd185c1951",
+      "sub": "45a10a210e91b77452dbbee2b01fc2e1a05729ecdb3c35cf0f742429e4e44f1c",
+      "frequency": "cc4d5882efb3f03a9ff0dfea4fba303ecefa50f54b3a9a13c20b7ca806dfc6dc",
+      "phase": "38a0dbda23ae9ad98e303927ab05b2486960ea1c81ccdcd896506dedfe240b7e"
+    },
+    "peak": 0.03889130428433418
+  },
+  {
+    "build": "baseline",
+    "factor": 1,
+    "profile": "noise_only",
+    "frames": 245760,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "noise_only",
+      "1",
+      "245760"
+    ],
+    "record_bytes": 6881280,
+    "record_sha256": "a9b292e0b8cad25a973228cbdb17a2016cb3229fcdaecbb3f0973b93ffbad0bf",
+    "field_sha256": {
+      "audio": "224d7c59cf09b065a419eaeda610a147802db32e80962177be80d56f47c0f2e8",
+      "sub": "1608e7ad7410239c070c4090948c63a3a50e968337b9d1611e2f805ec273f9c0",
+      "frequency": "6f128bb29cb2b8a71857c37c4e3987f682b83759ca74ab6be3e9167ec7f0ae4d",
+      "phase": "e628088c4573efba4f0f41f57fae9fa373c3c768812dd71d5bea1c127545bba6"
+    },
+    "peak": 0.0014779763296246529,
+    "band_powers": [
+      4.870911779582938e-08,
+      5.925731290428134e-08
+    ],
+    "measured_rms": 0.0003619481684774001
+  },
+  {
+    "build": "baseline",
+    "factor": 2,
+    "profile": "saw_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "saw_noise0",
+      "2",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "34d4ae8ca1cbf77f24b8e0456c1c11fb1e1840ef32fa64d62516c9c7bccd29a6",
+    "field_sha256": {
+      "audio": "327576d8d9129a32adbd77a3d26131e9b4ef290c143e250348bfa219988a9739",
+      "sub": "bd5d2487e5256d9e6b663359b1fe9c71003ec9021fc5538a387ded60141a1e4e",
+      "frequency": "7dbc49543f8ed44f26bbbfdd4b2e0e8c871934ab507e34d67fe04e2ff60b6e9c",
+      "phase": "b39f3b4555539ee96fd14fe1f8fdff60cf23175e8107f7138f2e522837c35b0e"
+    },
+    "peak": 0.019468002021312714
+  },
+  {
+    "build": "baseline",
+    "factor": 2,
+    "profile": "sub_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "sub_noise0",
+      "2",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "2178582e1542dfd841544c4a5998a316827b8252c7aa648b38dfc07ffaf5aca8",
+    "field_sha256": {
+      "audio": "15f8527ee0940d57edb83332595db9a9784ca700847f0f558cf9f6cb254f1166",
+      "sub": "0468fcfd7d0af0593a5254dd14d35696dd7b541d79b549bb132de7bb2b52cef9",
+      "frequency": "fe1f6829d81021d59c10a2c66f0474a216c66ca4c3c090253fb798831563dc45",
+      "phase": "bea8cef9c01d886283a6422bde063acfde196a398c3a8646742882222d9dc0c4"
+    },
+    "peak": 0.019393861293792725
+  },
+  {
+    "build": "baseline",
+    "factor": 2,
+    "profile": "drift_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "drift_noise0",
+      "2",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "fc893c36e08953d2472e1573f0a428976af72b1a3187d3598dff56f176892d39",
+    "field_sha256": {
+      "audio": "021e42ee598fb96f9d12e6cf816df9c023723ca3c484b90a56b3eac8384ba747",
+      "sub": "bd5d2487e5256d9e6b663359b1fe9c71003ec9021fc5538a387ded60141a1e4e",
+      "frequency": "375a4969e81ebac904e0c977a8e044365448b3f2e102fb8403a596e0926da395",
+      "phase": "6b066fac6b404a8724d4070ac12bf636e72c84346be31a8d3a36061e5c62f74a"
+    },
+    "peak": 0.061723191291093826
+  },
+  {
+    "build": "baseline",
+    "factor": 2,
+    "profile": "mixed_noise",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "mixed_noise",
+      "2",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "dd8f533c99b81122192924628c6b12548a77c97fe5125348796b790b56acde51",
+    "field_sha256": {
+      "audio": "f9e1489ed69aacd3c85c43bf3a74469b4325e5f5d30ea95fe5de6b7adf94d7c0",
+      "sub": "0468fcfd7d0af0593a5254dd14d35696dd7b541d79b549bb132de7bb2b52cef9",
+      "frequency": "6a1333f2b13c875e92082241b24315571b628b99f05f1c976af9cdfd33d0fc51",
+      "phase": "21dabb7560d9fe80084d6f7ff7a08f46fd66e9bb0995fd71fa89bcf1d24c0406"
+    },
+    "peak": 0.034573499113321304
+  },
+  {
+    "build": "baseline",
+    "factor": 2,
+    "profile": "noise_only",
+    "frames": 245760,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "noise_only",
+      "2",
+      "245760"
+    ],
+    "record_bytes": 6881280,
+    "record_sha256": "ed2880311662d5c0563c9909c7f95849680669fe597abf91b7923bd9a4a40e7c",
+    "field_sha256": {
+      "audio": "d7858bb03a455cf3e083ea5b7dac643c9e8fd6f95ac2801174fa29816804710e",
+      "sub": "8b30f90fd6732bf42cd58eb569432f3ba55102b7e989b88cdbbd64498758a510",
+      "frequency": "6f128bb29cb2b8a71857c37c4e3987f682b83759ca74ab6be3e9167ec7f0ae4d",
+      "phase": "d7fe216ab8b663c1281f7d9e9f8bc780e2fb80fe474f5eb3162b9bd675ab25e4"
+    },
+    "peak": 0.0011155366664752364,
+    "band_powers": [
+      2.3998889804273364e-08,
+      3.062402798389301e-08
+    ],
+    "measured_rms": 0.0002596680398348484
+  },
+  {
+    "build": "baseline",
+    "factor": 4,
+    "profile": "saw_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "saw_noise0",
+      "4",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "d0ceb930f10fbc503b782ad9de3454424e92a077ad06c9176743e7501bee066c",
+    "field_sha256": {
+      "audio": "a95274fdd76a3641157f3a3c1ca14c06a6cb506085fb86ffcc7a69459a8f6901",
+      "sub": "a5ed9ebf6fc740bcf4e4cd6ed190d92cbd9cade36e6df83630f65607350c54c8",
+      "frequency": "7dbc49543f8ed44f26bbbfdd4b2e0e8c871934ab507e34d67fe04e2ff60b6e9c",
+      "phase": "66216b4f3ec5748acf3529b5e255e0b041a8caf0527a44cf35b84ce6574e3d0f"
+    },
+    "peak": 0.01945999078452587
+  },
+  {
+    "build": "baseline",
+    "factor": 4,
+    "profile": "sub_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "sub_noise0",
+      "4",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "79df0433043c126dc9d3f5935725f6b4cdf41ba84646f48212980e3e088edcf0",
+    "field_sha256": {
+      "audio": "e978536b81366b25f76ded8ea1e4be1ca3743a3d9a07026e5f2028be023b82e3",
+      "sub": "4374b5d1de59be13dbd0c17b438a72b5dc0d2d8278ea5571602b0a79c9bb2e7c",
+      "frequency": "397c5970e6179fed666f3913e079eb234407c52adba679680395e3a4c3c78ecd",
+      "phase": "14db28c8c35c3bfb9c58b255bb169fdf182092290fd7006144ad54948a22c2aa"
+    },
+    "peak": 0.01894310489296913
+  },
+  {
+    "build": "baseline",
+    "factor": 4,
+    "profile": "drift_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "drift_noise0",
+      "4",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "3aa2874258a236da83704213451112413e8a6d84bec177ea67b3779911ebb983",
+    "field_sha256": {
+      "audio": "543ec94931583afce89d93738c0965ee664047857229484cbe885bee636f9004",
+      "sub": "a5ed9ebf6fc740bcf4e4cd6ed190d92cbd9cade36e6df83630f65607350c54c8",
+      "frequency": "7141c2df088687d3e93023119b7b38b7ef62f2032472d813b1e4c50b287dd8fa",
+      "phase": "01c18b682869ef5d1b9c83ae6a3d0c74c4cb45f3c67c0df9e4d165a7579ed5fc"
+    },
+    "peak": 0.06240154430270195
+  },
+  {
+    "build": "baseline",
+    "factor": 4,
+    "profile": "mixed_noise",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "mixed_noise",
+      "4",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "dc6178902b7a1efb5670097a8aa680dc6f4dd67d5df6fb95f18f70233b6175eb",
+    "field_sha256": {
+      "audio": "62e8ddfe398e81c8178279c7a7be9a99c4e666181edd9856a57ef8ae22e1348a",
+      "sub": "4374b5d1de59be13dbd0c17b438a72b5dc0d2d8278ea5571602b0a79c9bb2e7c",
+      "frequency": "9ffe4df2591f2f16759cdfbbebac299f0923c27f5a9c5e74ae873a156f2b3aa4",
+      "phase": "b8179fab6cdc2c152f496ec77bc39877f262a2f2874b7bdfeb5d4e52fdee71a2"
+    },
+    "peak": 0.03588166460394859
+  },
+  {
+    "build": "baseline",
+    "factor": 4,
+    "profile": "noise_only",
+    "frames": 245760,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe",
+      "noise_only",
+      "4",
+      "245760"
+    ],
+    "record_bytes": 6881280,
+    "record_sha256": "b245abfb23b248740dcc708e267fe1ce2b325b1b57d54f6aa736fb65bc40444e",
+    "field_sha256": {
+      "audio": "5a8440fa80e101e0c174a96767803aab529b0a4a0d5f1a42b2a00ee631a20aa0",
+      "sub": "0ff64c7424fa1e3d5fc6907eb168c37eb84cea4f7ffee6c4614295e156604489",
+      "frequency": "6f128bb29cb2b8a71857c37c4e3987f682b83759ca74ab6be3e9167ec7f0ae4d",
+      "phase": "218982a6b8e150c357bbd342a31c723153b0ba0a6d0da0bcd4a07c0988edfd12"
+    },
+    "peak": 0.0007585620624013245,
+    "band_powers": [
+      1.183529925386316e-08,
+      1.4911376354928405e-08
+    ],
+    "measured_rms": 0.00018216158384014446
+  },
+  {
+    "build": "candidate",
+    "factor": 1,
+    "profile": "saw_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "saw_noise0",
+      "1",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "2a7c4486448212d9f0b66ae9fa4e45eaaec1a5af45025d2cc803b1e58d220723",
+    "field_sha256": {
+      "audio": "952c5f517e26bbb12568f4dfa129c18b963f0fb9001aab824f9ef20c3b686433",
+      "sub": "64ca0ec605d242d0a3dde7aca67ad68a900c4f57e6478fc2b4fe6819e2947e5d",
+      "frequency": "7dbc49543f8ed44f26bbbfdd4b2e0e8c871934ab507e34d67fe04e2ff60b6e9c",
+      "phase": "ecb91102809aab467bdbf517c986a823ae1ff007550e0f9551aff2322173fa55"
+    },
+    "peak": 0.019540313631296158
+  },
+  {
+    "build": "candidate",
+    "factor": 1,
+    "profile": "sub_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "sub_noise0",
+      "1",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "607fc9726274fbed387d1071f0a1307bfd0ac9bb8de8298e627ebec73fed26bf",
+    "field_sha256": {
+      "audio": "ca8755f0b25023e6bdd4a5da9e603a71c48572f4aa9fa7d6e89976297e4be295",
+      "sub": "45a10a210e91b77452dbbee2b01fc2e1a05729ecdb3c35cf0f742429e4e44f1c",
+      "frequency": "cfce1be41c3f411bf9a94719a9b2a73468369c1674ee57422bce26010e8f8941",
+      "phase": "74a69b47e1554be2a999bccf46a7d6fbeeda0278a79ccbadc811708031bd0702"
+    },
+    "peak": 0.019339263439178467
+  },
+  {
+    "build": "candidate",
+    "factor": 1,
+    "profile": "drift_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "drift_noise0",
+      "1",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "adf96a686ddd24c2668f6fad9bade165c7fc52397698a5e7761ac7162807df4a",
+    "field_sha256": {
+      "audio": "57f87411a2faed5ddd407c54c672231af3a032ad93a0984cb1c59d9ec77ebee9",
+      "sub": "64ca0ec605d242d0a3dde7aca67ad68a900c4f57e6478fc2b4fe6819e2947e5d",
+      "frequency": "cc2a0f332047ff08cdb9e90a920b40a5ce748ddfb041649b5bddf13bc82edec3",
+      "phase": "a0108b17dabd871012be4d0cacefecd65e309422934b2db6f7997272182ae27d"
+    },
+    "peak": 0.06351881474256516
+  },
+  {
+    "build": "candidate",
+    "factor": 1,
+    "profile": "mixed_noise",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "mixed_noise",
+      "1",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "6cf30f85d9b1d036260276bc3537c7d5015170cb64ac59b90171e18b26069449",
+    "field_sha256": {
+      "audio": "c5bd96cfceb1a155f4509b53b01c6a9d1d116f0b3b8a396238a6b174758024ca",
+      "sub": "45a10a210e91b77452dbbee2b01fc2e1a05729ecdb3c35cf0f742429e4e44f1c",
+      "frequency": "cc4d5882efb3f03a9ff0dfea4fba303ecefa50f54b3a9a13c20b7ca806dfc6dc",
+      "phase": "38a0dbda23ae9ad98e303927ab05b2486960ea1c81ccdcd896506dedfe240b7e"
+    },
+    "peak": 0.03410886973142624
+  },
+  {
+    "build": "candidate",
+    "factor": 1,
+    "profile": "noise_only",
+    "frames": 245760,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "noise_only",
+      "1",
+      "245760"
+    ],
+    "record_bytes": 6881280,
+    "record_sha256": "6b389d84ee25e33317107cf76f2c91c00f87f298f239120e26d85298ef3f2962",
+    "field_sha256": {
+      "audio": "a94cf10ced9d92648b13d6d0fbacf2af103b68a2e4ee2a82b04ef9673a254c25",
+      "sub": "1608e7ad7410239c070c4090948c63a3a50e968337b9d1611e2f805ec273f9c0",
+      "frequency": "6f128bb29cb2b8a71857c37c4e3987f682b83759ca74ab6be3e9167ec7f0ae4d",
+      "phase": "e628088c4573efba4f0f41f57fae9fa373c3c768812dd71d5bea1c127545bba6"
+    },
+    "peak": 0.0007389886886812747,
+    "band_powers": [
+      1.2177280208519757e-08,
+      1.4814331747390857e-08
+    ],
+    "measured_rms": 0.00018097409928978644
+  },
+  {
+    "build": "candidate",
+    "factor": 2,
+    "profile": "saw_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "saw_noise0",
+      "2",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "34d4ae8ca1cbf77f24b8e0456c1c11fb1e1840ef32fa64d62516c9c7bccd29a6",
+    "field_sha256": {
+      "audio": "327576d8d9129a32adbd77a3d26131e9b4ef290c143e250348bfa219988a9739",
+      "sub": "bd5d2487e5256d9e6b663359b1fe9c71003ec9021fc5538a387ded60141a1e4e",
+      "frequency": "7dbc49543f8ed44f26bbbfdd4b2e0e8c871934ab507e34d67fe04e2ff60b6e9c",
+      "phase": "b39f3b4555539ee96fd14fe1f8fdff60cf23175e8107f7138f2e522837c35b0e"
+    },
+    "peak": 0.019468002021312714
+  },
+  {
+    "build": "candidate",
+    "factor": 2,
+    "profile": "sub_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "sub_noise0",
+      "2",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "2178582e1542dfd841544c4a5998a316827b8252c7aa648b38dfc07ffaf5aca8",
+    "field_sha256": {
+      "audio": "15f8527ee0940d57edb83332595db9a9784ca700847f0f558cf9f6cb254f1166",
+      "sub": "0468fcfd7d0af0593a5254dd14d35696dd7b541d79b549bb132de7bb2b52cef9",
+      "frequency": "fe1f6829d81021d59c10a2c66f0474a216c66ca4c3c090253fb798831563dc45",
+      "phase": "bea8cef9c01d886283a6422bde063acfde196a398c3a8646742882222d9dc0c4"
+    },
+    "peak": 0.019393861293792725
+  },
+  {
+    "build": "candidate",
+    "factor": 2,
+    "profile": "drift_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "drift_noise0",
+      "2",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "fc893c36e08953d2472e1573f0a428976af72b1a3187d3598dff56f176892d39",
+    "field_sha256": {
+      "audio": "021e42ee598fb96f9d12e6cf816df9c023723ca3c484b90a56b3eac8384ba747",
+      "sub": "bd5d2487e5256d9e6b663359b1fe9c71003ec9021fc5538a387ded60141a1e4e",
+      "frequency": "375a4969e81ebac904e0c977a8e044365448b3f2e102fb8403a596e0926da395",
+      "phase": "6b066fac6b404a8724d4070ac12bf636e72c84346be31a8d3a36061e5c62f74a"
+    },
+    "peak": 0.061723191291093826
+  },
+  {
+    "build": "candidate",
+    "factor": 2,
+    "profile": "mixed_noise",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "mixed_noise",
+      "2",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "6bde62c5ebc70b36a2ade7fa9a5690301944761d6eff4c0433178a0743df35ac",
+    "field_sha256": {
+      "audio": "5e0f2c7d76a36861f53bc82b3f58b7339b9d11b475b0f6b12dddeeaffd2ca0f1",
+      "sub": "0468fcfd7d0af0593a5254dd14d35696dd7b541d79b549bb132de7bb2b52cef9",
+      "frequency": "6a1333f2b13c875e92082241b24315571b628b99f05f1c976af9cdfd33d0fc51",
+      "phase": "21dabb7560d9fe80084d6f7ff7a08f46fd66e9bb0995fd71fa89bcf1d24c0406"
+    },
+    "peak": 0.032498136162757874
+  },
+  {
+    "build": "candidate",
+    "factor": 2,
+    "profile": "noise_only",
+    "frames": 245760,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "noise_only",
+      "2",
+      "245760"
+    ],
+    "record_bytes": 6881280,
+    "record_sha256": "f73e242c1516d8090b6aa96b7e589e32bd485f7a0714f613bee5321f232435c0",
+    "field_sha256": {
+      "audio": "23844f021479a47e20a4bd99ce7cffd3c5fffe26187d751a52c02a3e80ce7813",
+      "sub": "8b30f90fd6732bf42cd58eb569432f3ba55102b7e989b88cdbbd64498758a510",
+      "frequency": "6f128bb29cb2b8a71857c37c4e3987f682b83759ca74ab6be3e9167ec7f0ae4d",
+      "phase": "d7fe216ab8b663c1281f7d9e9f8bc780e2fb80fe474f5eb3162b9bd675ab25e4"
+    },
+    "peak": 0.0007888036780059338,
+    "band_powers": [
+      1.1999444430198849e-08,
+      1.5312014862444443e-08
+    ],
+    "measured_rms": 0.00018361303389987727
+  },
+  {
+    "build": "candidate",
+    "factor": 4,
+    "profile": "saw_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "saw_noise0",
+      "4",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "d0ceb930f10fbc503b782ad9de3454424e92a077ad06c9176743e7501bee066c",
+    "field_sha256": {
+      "audio": "a95274fdd76a3641157f3a3c1ca14c06a6cb506085fb86ffcc7a69459a8f6901",
+      "sub": "a5ed9ebf6fc740bcf4e4cd6ed190d92cbd9cade36e6df83630f65607350c54c8",
+      "frequency": "7dbc49543f8ed44f26bbbfdd4b2e0e8c871934ab507e34d67fe04e2ff60b6e9c",
+      "phase": "66216b4f3ec5748acf3529b5e255e0b041a8caf0527a44cf35b84ce6574e3d0f"
+    },
+    "peak": 0.01945999078452587
+  },
+  {
+    "build": "candidate",
+    "factor": 4,
+    "profile": "sub_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "sub_noise0",
+      "4",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "79df0433043c126dc9d3f5935725f6b4cdf41ba84646f48212980e3e088edcf0",
+    "field_sha256": {
+      "audio": "e978536b81366b25f76ded8ea1e4be1ca3743a3d9a07026e5f2028be023b82e3",
+      "sub": "4374b5d1de59be13dbd0c17b438a72b5dc0d2d8278ea5571602b0a79c9bb2e7c",
+      "frequency": "397c5970e6179fed666f3913e079eb234407c52adba679680395e3a4c3c78ecd",
+      "phase": "14db28c8c35c3bfb9c58b255bb169fdf182092290fd7006144ad54948a22c2aa"
+    },
+    "peak": 0.01894310489296913
+  },
+  {
+    "build": "candidate",
+    "factor": 4,
+    "profile": "drift_noise0",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "drift_noise0",
+      "4",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "3aa2874258a236da83704213451112413e8a6d84bec177ea67b3779911ebb983",
+    "field_sha256": {
+      "audio": "543ec94931583afce89d93738c0965ee664047857229484cbe885bee636f9004",
+      "sub": "a5ed9ebf6fc740bcf4e4cd6ed190d92cbd9cade36e6df83630f65607350c54c8",
+      "frequency": "7141c2df088687d3e93023119b7b38b7ef62f2032472d813b1e4c50b287dd8fa",
+      "phase": "01c18b682869ef5d1b9c83ae6a3d0c74c4cb45f3c67c0df9e4d165a7579ed5fc"
+    },
+    "peak": 0.06240154430270195
+  },
+  {
+    "build": "candidate",
+    "factor": 4,
+    "profile": "mixed_noise",
+    "frames": 48000,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "mixed_noise",
+      "4",
+      "48000"
+    ],
+    "record_bytes": 1344000,
+    "record_sha256": "dc6178902b7a1efb5670097a8aa680dc6f4dd67d5df6fb95f18f70233b6175eb",
+    "field_sha256": {
+      "audio": "62e8ddfe398e81c8178279c7a7be9a99c4e666181edd9856a57ef8ae22e1348a",
+      "sub": "4374b5d1de59be13dbd0c17b438a72b5dc0d2d8278ea5571602b0a79c9bb2e7c",
+      "frequency": "9ffe4df2591f2f16759cdfbbebac299f0923c27f5a9c5e74ae873a156f2b3aa4",
+      "phase": "b8179fab6cdc2c152f496ec77bc39877f262a2f2874b7bdfeb5d4e52fdee71a2"
+    },
+    "peak": 0.03588166460394859
+  },
+  {
+    "build": "candidate",
+    "factor": 4,
+    "profile": "noise_only",
+    "frames": 245760,
+    "command": [
+      "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe",
+      "noise_only",
+      "4",
+      "245760"
+    ],
+    "record_bytes": 6881280,
+    "record_sha256": "b245abfb23b248740dcc708e267fe1ce2b325b1b57d54f6aa736fb65bc40444e",
+    "field_sha256": {
+      "audio": "5a8440fa80e101e0c174a96767803aab529b0a4a0d5f1a42b2a00ee631a20aa0",
+      "sub": "0ff64c7424fa1e3d5fc6907eb168c37eb84cea4f7ffee6c4614295e156604489",
+      "frequency": "6f128bb29cb2b8a71857c37c4e3987f682b83759ca74ab6be3e9167ec7f0ae4d",
+      "phase": "218982a6b8e150c357bbd342a31c723153b0ba0a6d0da0bcd4a07c0988edfd12"
+    },
+    "peak": 0.0007585620624013245,
+    "band_powers": [
+      1.183529925386316e-08,
+      1.4911376354928405e-08
+    ],
+    "measured_rms": 0.00018216158384014446
+  }
+]

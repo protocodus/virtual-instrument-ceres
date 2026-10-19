@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <initializer_list>
 #include <limits>
 namespace {
 constexpr double pi=3.14159265358979323846;

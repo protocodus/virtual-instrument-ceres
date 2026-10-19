@@ -1,0 +1,148 @@
+{
+  "status": "pass",
+  "product_version": "0.2.0",
+  "previous_commit": "652e3722eb40f67001f0467103f9f31a957ec363",
+  "scope": "Audio NO only; fixed-host-rate variance/frequency normalization, no hardware gain fit, SUB/drift unchanged. Prior configuration/CPU reports historical.",
+  "release_tests_passed": 20,
+  "targeted_asan_ubsan_tests_passed": 5,
+  "legacy4x_exact_samples": 768000,
+  "configured_native_embedded_exact_samples": 184320,
+  "postconstruction_allocation_contract": "pass",
+  "band_hz": [
+    [
+      200,
+      800
+    ],
+    [
+      800,
+      2000
+    ],
+    [
+      2000,
+      4000
+    ]
+  ],
+  "samples_per_noise_case": 262144,
+  "warmup_seconds": 1,
+  "noise_band_deltas_db": [
+    {
+      "host_hz": 48000,
+      "factor": 1,
+      "band": 0,
+      "db": 0.10843646344537383
+    },
+    {
+      "host_hz": 48000,
+      "factor": 1,
+      "band": 1,
+      "db": 0.0027979161176303704
+    },
+    {
+      "host_hz": 48000,
+      "factor": 1,
+      "band": 2,
+      "db": 0.055939264967475456
+    },
+    {
+      "host_hz": 48000,
+      "factor": 2,
+      "band": 0,
+      "db": 0.0838760372410009
+    },
+    {
+      "host_hz": 48000,
+      "factor": 2,
+      "band": 1,
+      "db": 0.09182069084822408
+    },
+    {
+      "host_hz": 48000,
+      "factor": 2,
+      "band": 2,
+      "db": 0.03615357834499333
+    },
+    {
+      "host_hz": 96000,
+      "factor": 1,
+      "band": 0,
+      "db": 0.2006860360106431
+    },
+    {
+      "host_hz": 96000,
+      "factor": 1,
+      "band": 1,
+      "db": 0.26462917689319526
+    },
+    {
+      "host_hz": 96000,
+      "factor": 1,
+      "band": 2,
+      "db": 0.028954044893206788
+    },
+    {
+      "host_hz": 96000,
+      "factor": 2,
+      "band": 0,
+      "db": 0.23535023203431663
+    },
+    {
+      "host_hz": 96000,
+      "factor": 2,
+      "band": 1,
+      "db": 0.14307894848976496
+    },
+    {
+      "host_hz": 96000,
+      "factor": 2,
+      "band": 2,
+      "db": 0.13165178932220178
+    }
+  ],
+  "maximum_absolute_band_delta_db": 0.26462917689319526,
+  "independent_peer_audio_exact_cases": 11,
+  "independent_peer_state_exact_cases": 15,
+  "build_identity": {
+    "Source/DSP/ceres.hpp": "4ee7758c0401bf7a61f10b08f33baa93debb0fdcb32e73b287359db0669eb2a1",
+    "Source/DSP/ceres.cpp": "2414c0944a2bd979fc88030e8745bc288747be6829f24f4fd0b49f29e69070a5",
+    "Tools/render_main.cpp": "dafd2077370a49fec8cdf04ee56349f501c6051e1cb5a5455842f602c479bcbf",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "060a42421eb348489e8848bd0ac6db152cd8dda2770aebb8d7bbf5ce9d201c51"
+  },
+  "renderer_sha256": "9870546f7e1405a8145bdb1e6d0908e5213b941d3a48455eaf8d0bd458690bb9",
+  "verified_file_sha256": {
+    "CMakeLists.txt": "060a42421eb348489e8848bd0ac6db152cd8dda2770aebb8d7bbf5ce9d201c51",
+    "Docs/DSP_SOURCE.md": "7f0d4d549b26589fc79d45d31526c1a09ef1cb516cf68bc6c5334d8bd5deebc5",
+    "Docs/validation/noise-quality/README.md": "e94e30063c6fbbceec157fd0417a3ecbd92c2da83136c35c1b1d0bd38b34e637",
+    "Docs/validation/noise-quality/commands.json": "8fdaa9cc3cbb1d5c33ac46d2b7ae4bd52e7f926a8ca693c08a2abcca2f489a98",
+    "Docs/validation/noise-quality/legacy-parity.json": "8e2f637931409e9e5a8d7b3638cd23a7bb66d6d525adb14cbd78a7ec99bfc75e",
+    "Docs/validation/noise-quality/legacy-parity.log": "8e2f637931409e9e5a8d7b3638cd23a7bb66d6d525adb14cbd78a7ec99bfc75e",
+    "Docs/validation/noise-quality/peer/README.md": "2307293dea93618d4777d032a23805b855c2f360b377f6afad219e42916d5db9",
+    "Docs/validation/noise-quality/peer/measurements.json": "9b48ec55d87a1ca63e8cb1d5eb93ac0c9440c6f580864f8708177ba10ddc64b6",
+    "Docs/validation/noise-quality/peer/noise-inventory.json": "90f1efd14788d2a3f13bd3a95ab83c3ab9b040d0bce7f8cb131fade041476032",
+    "Docs/validation/noise-quality/peer/plan.json": "bb291b5ac823238c9528c5585a06adbc351cbbea8d32049e9b3d037f0e66ca7d",
+    "Docs/validation/noise-quality/peer/probe.cpp": "70acd33004cbbfeac62b0f3a8b352fd067ceced19688ca8cf25a16a699628b3d",
+    "Docs/validation/noise-quality/peer/report.json": "894828632fc315913943bfbe2475eda98cceac8998ab384f8892ec7e78d63e41",
+    "Docs/validation/noise-quality/peer/run.py": "762ae26c3bf36443c4bafc638b41d365d2957fc0bfb00f0d86a5a6921c30ca64",
+    "Docs/validation/noise-quality/peer/source-review.md": "a234c3b47aef03ecaf87b7b669a14fea777adc45e17c637884280035b0ae5329",
+    "Docs/validation/noise-quality/prior-linux-ci.log": "2200b36829a07565743e64af31651ab032e464400e0000ee0d20aa1625dca5d1",
+    "Docs/validation/noise-quality/prior-sanitizer-ci.log": "8e657917e0ffb1fad577084fcfc385e9a6d9e8a77afd4f96b42d6cecc6e08c35",
+    "Docs/validation/noise-quality/release-build.log": "c0cf5b8a6491c9ddd9362706672dc0f315850da143d4fa6e2cf52e3a317fd066",
+    "Docs/validation/noise-quality/release-configure.log": "3c2c4c113e55264b1fbc7502f35b708f603ce141605b2ee9a5430f74257a3438",
+    "Docs/validation/noise-quality/release-ctest.log": "15e59fafc2aa884ecad048bf672324515b6d603b06c59bfae9bd072dbc66cfff",
+    "Docs/validation/noise-quality/sanitizer-build.log": "de5346dd897a77077d1752633183d63c84c3eac63c958e92e73955ff156918ea",
+    "Docs/validation/noise-quality/sanitizer-configure.log": "4a7e53371151776d7581bdbe28346db031826199ee862fbbc60770aeecc7b6e6",
+    "Docs/validation/noise-quality/sanitizer-ctest.log": "b28d2002f40f5db84edcfcb9caa96d998a50f2a7b80fdcbafa39c1be27278430",
+    "README.md": "01a3051beaa349cee6d93b2ff3ec14893d227aa90b385136bab3703aec35a8c1",
+    "Source/DSP/ceres.cpp": "2414c0944a2bd979fc88030e8745bc288747be6829f24f4fd0b49f29e69070a5",
+    "Source/DSP/ceres.hpp": "4ee7758c0401bf7a61f10b08f33baa93debb0fdcb32e73b287359db0669eb2a1",
+    "Tests/ConfigurationParityDriver.cpp": "3b69af43a7f757d81c3770d850b71d0815188f3f1207a3b768ffbd397b627515",
+    "Tests/ConfigurationTests.cpp": "4e3aea4273e157f2e2b7c0ca1d9b13d0fdcc9cfd417ef273f4f65e74fe20e107",
+    "Tests/EmbeddedContract.cpp": "6f27911c888032788782c382776bd87289bc42391d9160b09104f48dc7b1e851",
+    "Tests/NoiseQualityTests.cpp": "c3f72ded24e2a834591f96880a03c45f63c039307571f1dacad1e4dce97a6137",
+    "Tests/ParityDriver.cpp": "34e352d2bca9f18387610c4bd26881936c246afc5820a4c1b3a76259eb8e43b3",
+    "Tests/RingDepthContinuityTests.cpp": "6be1e94f0708cdf4a7b4e5b5d8cd74fe20d089f8a9205f7414686566ead4d08d",
+    "Tools/benchmark_configuration.cpp": "2e1354068a861b11fc2e2942d073e610e63cfbfb0e71f5ede1322833af4aef78",
+    "Tools/check_legacy_configuration.py": "0869c9f24e2ad3ef315fcb06636dcfafd55b231376587a8d5eaf8dd352c230a4",
+    "Tools/record_noise_quality_validation.py": "0eb31664eceb8b89ee2704136e47c3954ea3619f1f646787cefad91eb9530ce3"
+  }
+}

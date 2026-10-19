@@ -253,6 +253,9 @@ if(BUILD_TESTING)
   add_executable(ceres_configuration_tests Tests/ConfigurationTests.cpp)
   target_link_libraries(ceres_configuration_tests PRIVATE ceres)
   add_test(NAME Ceres.configuration_contracts COMMAND ceres_configuration_tests)
+  add_executable(ceres_noise_quality_tests Tests/NoiseQualityTests.cpp)
+  target_link_libraries(ceres_noise_quality_tests PRIVATE ceres)
+  add_test(NAME Ceres.noise_quality_contracts COMMAND ceres_noise_quality_tests)
   add_executable(ceres_oscillator_circuit_tests Tests/OscillatorCircuitTests.cpp)
   target_link_libraries(ceres_oscillator_circuit_tests PRIVATE ceres)
   add_test(NAME Ceres.oscillator_circuit_contracts COMMAND ceres_oscillator_circuit_tests)
@@ -316,7 +319,7 @@ if(BUILD_TESTING)
       --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
   endif()
 
-  foreach(target IN ITEMS ceres_configuration_tests ceres_oscillator_circuit_tests ceres_tests ceres_sound_path_tests
+  foreach(target IN ITEMS ceres_configuration_tests ceres_noise_quality_tests ceres_oscillator_circuit_tests ceres_tests ceres_sound_path_tests
       ceres_capacitor_tests ceres_ring_depth_tests ceres_ring_carrier_tests ceres_ring_switching_tests ceres_expression_tests
       ceres_embedded_contract ceres_native_parity ceres_embedded_parity
       ceres_native_configuration_parity ceres_embedded_configuration_parity)

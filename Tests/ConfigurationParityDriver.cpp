@@ -1,6 +1,7 @@
 #include "ceres.hpp"
 #include <cmath>
 #include <cstdio>
+#include <initializer_list>
 int main(int argc,char** argv){
     if(argc!=2)return 2;
     FILE* file=std::fopen(argv[1],"wb");if(!file)return 3;

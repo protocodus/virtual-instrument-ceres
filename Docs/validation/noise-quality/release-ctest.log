@@ -1,0 +1,407 @@
+UpdateCTestConfiguration  from :/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/DartConfiguration.tcl
+Parse Config file:/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/DartConfiguration.tcl
+Test project /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+      Start  1: Ceres.configuration_contracts
+
+1: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_configuration_tests
+1: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+1: Test timeout computed to be: 1500
+1: PASS configuration: 1/4/16 voices, real1/2/4x clocks, lifecycle and independent output-filter delay/response
+ 1/20 Test  #1: Ceres.configuration_contracts ................   Passed    1.71 sec
+test 2
+      Start  2: Ceres.noise_quality_contracts
+
+2: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_noise_quality_tests
+2: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+2: Test timeout computed to be: 1500
+2: NOISE_POWER,48000,1,0,1.3398112187830535e-07
+2: NOISE_POWER,48000,1,1,2.5767793916398796e-07
+2: NOISE_POWER,48000,1,2,3.0810421889882866e-07
+2: NOISE_POWER,48000,2,0,1.3322556397093876e-07
+2: NOISE_POWER,48000,2,1,2.6301439347920981e-07
+2: NOISE_POWER,48000,2,2,3.0670374328380129e-07
+2: NOISE_POWER,48000,4,0,1.3067724312036077e-07
+2: NOISE_POWER,48000,4,1,2.5751198516236905e-07
+2: NOISE_POWER,48000,4,2,3.0416113399686468e-07
+2: NOISE_DELTA_DB,48000,1,0,0.10843646344537383
+2: NOISE_DELTA_DB,48000,1,1,0.0027979161176303704
+2: NOISE_DELTA_DB,48000,1,2,0.055939264967475456
+2: NOISE_DELTA_DB,48000,2,0,0.0838760372410009
+2: NOISE_DELTA_DB,48000,2,1,0.091820690848224085
+2: NOISE_DELTA_DB,48000,2,2,0.036153578344993331
+2: NOISE_POWER,96000,1,0,6.7637106688560203e-08
+2: NOISE_POWER,96000,1,1,1.3127695147545529e-07
+2: NOISE_POWER,96000,1,2,1.5216795140155272e-07
+2: NOISE_POWER,96000,2,0,6.817912780296569e-08
+2: NOISE_POWER,96000,2,1,1.2765371554751639e-07
+2: NOISE_POWER,96000,2,2,1.5580915357821999e-07
+2: NOISE_POWER,96000,4,0,6.4582732769689149e-08
+2: NOISE_POWER,96000,4,1,1.2351666733964789e-07
+2: NOISE_POWER,96000,4,2,1.5115683483045182e-07
+2: NOISE_DELTA_DB,96000,1,0,0.20068603601064311
+2: NOISE_DELTA_DB,96000,1,1,0.26462917689319526
+2: NOISE_DELTA_DB,96000,1,2,0.028954044893206788
+2: NOISE_DELTA_DB,96000,2,0,0.23535023203431663
+2: NOISE_DELTA_DB,96000,2,1,0.14307894848976496
+2: NOISE_DELTA_DB,96000,2,2,0.13165178932220178
+2: PASS noise quality: full-engine stationary band powers at48/96k, independent FFT normalization
+ 2/20 Test  #2: Ceres.noise_quality_contracts ................   Passed    1.83 sec
+test 3
+      Start  3: Ceres.oscillator_circuit_contracts
+
+3: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_oscillator_circuit_tests
+3: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+3: Test timeout computed to be: 1500
+3: PASS nominal VCO timing, conditioned current slope, WSC shared fold, Fourier/DC/edge and high-CV bounds
+ 3/20 Test  #3: Ceres.oscillator_circuit_contracts ...........   Passed    0.01 sec
+test 4
+      Start  4: Ceres.native_dsp_contracts
+
+4: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_tests
+4: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+4: Test timeout computed to be: 1500
+4: PASS ring/SUB/Sustain mode ranges and validation
+4: PASS SUB shapes, sourced noise pole, destinations and separate PWM
+4: PASS ring RC timing, key ledger, legato/retrigger, bounds and panic
+4: PASS global ring sidebands, dry bypass, free carrier and reset
+4: PASS Sustain I/II live key CV, shared VCO/filters, state continuity and MIDI pedal adaptation
+4: PASS parameter ranges and constructor validation
+4: PASS physical source/Q capacitor transfer, four source loads, DC rejection, Q and slope
+4: PASS production cascade physical voltages, passive mixer, fixed Q current and VCA calibration
+4: PASS keyboard/envelope gm scaling with fixed feed conductance
+4: PASS shared master PITCH, independent oscillator routes, fixed feed floor and nominal range
+4: PASS deterministic seed and reset
+4: PASS four output coupling RC transfers, decay and diagnostic validation
+4: PASS output capacitor allocation/idle/panic lifecycle and dry-line polarity
+4: PASS four voices, stealing, repeated notes and release tails
+4: PASS sustain, CC123 behavior and controller-preserving panic
+4: PASS shared global release bounds, independent RC trajectories and held-note invariance
+4: PASS global release production equivalence and live capacitor-state continuity
+4: PASS global release versus MIDI pedal, panic and reset lifecycle
+4: PASS hardware velocity behavior and sample-rate pitch invariance
+4: PASS WSC saw/pulse polarity and folded-sine phase
+4: PASS RC attack curvature, fixed duration, linear limit and retrigger charge
+4: PASS optional saturating-current attack ODE, exact solution, limits and retrigger
+4: PASS factory five-RC envelope trajectories and engineering T60 compatibility
+4: PASS factory HP/LP envelope resistor ratios and engineering-patch compatibility
+4: PASS fixed PWM reset edge, duty, phase offset and sourced speed calibration
+4: PASS extreme finite output and all factory presets
+ 4/20 Test  #4: Ceres.native_dsp_contracts ...................   Passed    6.30 sec
+test 5
+      Start  5: Ceres.sound_path_circuit_contracts
+
+5: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_sound_path_tests
+5: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+5: Test timeout computed to be: 1500
+5: PASS new control ranges/neutral/invalid-input contract
+5: PASS BR/SUB nodal ratios, shared key modulation, fixed-gm floor and audio equivalence
+5: PASS eight-node Q capacitor KCL, exact RC dynamics, lifecycle and audio routing
+5: PASS additive common VCA, sine path, downstream bus/ring state and factory LEVEL
+5: PASS all five shared SUB polarities, continuous clock, lifecycle and reset
+5: PASS post-FIR utility trim linearity, neutral bypass and state/latency independence
+ 5/20 Test  #5: Ceres.sound_path_circuit_contracts ...........   Passed    0.74 sec
+test 6
+      Start  6: Ceres.capacitor_continuity_contracts
+
+6: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_capacitor_tests
+6: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+6: Test timeout computed to be: 1500
+6: PASS Q steps/reversal/absolute KCL and lifecycle
+6: PASS stage independence, preset continuity and audio connection
+6: PASS idle IL RC/reversal, retrigger and initialization
+6: PASS retired-board capacitor return
+ 6/20 Test  #6: Ceres.capacitor_continuity_contracts .........   Passed    0.38 sec
+test 7
+      Start  7: Ceres.ring_depth_continuity_contracts
+
+7: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_ring_depth_tests
+7: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+7: Test timeout computed to be: 1500
+7: rate 44100 factor 1
+7: rate 44100 factor 2
+7: rate 44100 factor 4
+7: rate 48000 factor 1
+7: rate 48000 factor 2
+7: rate 48000 factor 4
+7: rate 96000 factor 1
+7: rate 96000 factor 2
+7: rate 96000 factor 4
+7: rate 192000 factor 1
+7: rate 192000 factor 2
+7: rate 192000 factor 4
+7: PASS ring Depth:12 rate/quality paths,20ms closed-form ramp/reversal, identical target immunity, startup/reset/panic, unchanged EG/free phase/cap, reduced discrete frequency jump
+ 7/20 Test  #7: Ceres.ring_depth_continuity_contracts ........   Passed    0.58 sec
+test 8
+      Start  8: Ceres.ring_carrier_circuit_contracts
+
+8: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_ring_carrier_tests
+8: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+8: Test timeout computed to be: 1500
+8: response fs=8000 f=0.2 dB=-38.4345 phase=83.8094
+8: response fs=8000 f=1 dB=-26.437 phase=72.3764
+8: response fs=8000 f=6.66922 dB=-13.3059 phase=67.9012
+8: response fs=8000 f=30 dB=-3.46981 phase=44.9545
+8: response fs=8000 f=220 dB=-0.0987252 phase=8.21498
+8: response fs=192000 f=0.2 dB=-38.4345 phase=83.8094
+8: response fs=192000 f=1 dB=-26.437 phase=72.3764
+8: response fs=192000 f=6.66922 dB=-13.3059 phase=67.9012
+8: response fs=192000 f=30 dB=-3.47003 phase=44.9557
+8: response fs=192000 f=220 dB=-0.099212 phase=8.23511
+8: PASS complex carrier frequency response
+8: PASS independent physical-state trapezoids/KCL
+8: PASS native connection, mix bypass history, notes/live edits/panic/reset
+8: PASS native diagnostic validation
+ 8/20 Test  #8: Ceres.ring_carrier_circuit_contracts .........   Passed    0.06 sec
+test 9
+      Start  9: Ceres.ring_switching_circuit_contracts
+
+9: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_ring_switching_tests
+9: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+9: Test timeout computed to be: 1500
+9: PASS physical BJT current law,units,factor2VT,limits
+9: PASS independent6node DC,production wiring/lifecycle/no DC removal
+9: slow0.2Hz steering min=-0.667761 max=-0.107146 mean=-0.4073
+9: PASS nominal slow-rate no-crossing boundary
+ 9/20 Test  #9: Ceres.ring_switching_circuit_contracts .......   Passed    0.44 sec
+test 10
+      Start 10: Ceres.voice_expression_contracts
+
+10: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_expression_tests
+10: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+10: Test timeout computed to be: 1500
+10: PASS expression enum/default/nonfinite contract
+10: PASS mixed-velocity polyphony oscillator/filter/audio isolation
+10: PASS expression release, repeated notes, pedal, Sustain II, steal, panic and reset
+10: PASS pressure isolation and state-preserving live source selection
+10: PASS independent expression audio laws, zero-depth parity and legacy velocity gain
+10/20 Test #10: Ceres.voice_expression_contracts .............   Passed    0.10 sec
+test 11
+      Start 11: Ceres.embedded_allocation_contract
+
+11: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_embedded_contract
+11: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+11: Test timeout computed to be: 1500
+11: PASS embedded: no exceptions, numeric Patch, active expression and9 render configurations, 57 control keys, zero post-construction new/new[] allocations
+11/20 Test #11: Ceres.embedded_allocation_contract ...........   Passed    0.39 sec
+test 12
+      Start 12: Ceres.configuration_cli_contract
+
+12: Test command: /opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14 "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/Tests/check_configuration_cli.py" "--renderer" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_render"
+12: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+12: Test timeout computed to be: 1500
+12: {
+12:   "status": "pass",
+12:   "cases": [
+12:     {
+12:       "voices": 1,
+12:       "factor": 1,
+12:       "sha256": "2326368dbafe1deb88a7262ac452cdf91b9e2e7f6d627119e01eaeccb2cd7ff9",
+12:       "peak": 0.0769286379218
+12:     },
+12:     {
+12:       "voices": 1,
+12:       "factor": 2,
+12:       "sha256": "7416c85ca67b4fd1dafd3baf62c261f4fc5fedc063a7bb325c90140a568b76ef",
+12:       "peak": 0.0838591679931
+12:     },
+12:     {
+12:       "voices": 1,
+12:       "factor": 4,
+12:       "sha256": "113952e5557249e3e6639b61067ead40e092ecf5eaa0f2a155552d42ab42facd",
+12:       "peak": 0.0886537507176
+12:     },
+12:     {
+12:       "voices": 4,
+12:       "factor": 1,
+12:       "sha256": "2b210a399883805438b7133a79759ee72f89f933ea2ebccc7c164ed0aa08321f",
+12:       "peak": 0.218127787113
+12:     },
+12:     {
+12:       "voices": 4,
+12:       "factor": 2,
+12:       "sha256": "3a610bbb5424263cabce6203abdd808beb22c4c82ab17cdc3e6c22b2dfb52421",
+12:       "peak": 0.224504306912
+12:     },
+12:     {
+12:       "voices": 4,
+12:       "factor": 4,
+12:       "sha256": "5d253e79d142162360b75698f70cf71a23a7685a2bd4ecfa40713c0cb5adaad3",
+12:       "peak": 0.228986784816
+12:     },
+12:     {
+12:       "voices": 16,
+12:       "factor": 1,
+12:       "sha256": "fc401332fdee593d49893b73b3e3e99dc8f435760a216168d77a0178c633561f",
+12:       "peak": 0.361027747393
+12:     },
+12:     {
+12:       "voices": 16,
+12:       "factor": 2,
+12:       "sha256": "11fedba0ee7b63199cc6dea453d9cb81b358dfc02f33ecabfc320cc8d7f9fc08",
+12:       "peak": 0.364925980568
+12:     },
+12:     {
+12:       "voices": 16,
+12:       "factor": 4,
+12:       "sha256": "ae725bf55d8d4c9c98447bc39fddcfbca88d18cc67b493f3948f04b4eb73e568",
+12:       "peak": 0.359845727682
+12:     }
+12:   ],
+12:   "explicit_default_exact": true,
+12:   "invalid_rejections": 7
+12: }
+12/20 Test #12: Ceres.configuration_cli_contract .............   Passed    0.16 sec
+test 13
+      Start 13: Ceres.configuration_native_embedded_parity
+
+13: Test command: /opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14 "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/Tests/check_configuration_parity.py" "--native" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_native_configuration_parity" "--embedded" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_embedded_configuration_parity"
+13: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+13: Test timeout computed to be: 1500
+13: {
+13:   "status": "pass",
+13:   "sample_count": 184320,
+13:   "rates": [
+13:     44100,
+13:     48000,
+13:     88200,
+13:     96000,
+13:     192000
+13:   ],
+13:   "polyphony": [
+13:     1,
+13:     4,
+13:     16
+13:   ],
+13:   "oversampling": [
+13:     1,
+13:     2,
+13:     4
+13:   ],
+13:   "variants": {
+13:     "native": {
+13:       "binary_sha256": "b8b8da8b86eac6c9e636179405adee07630e2a6843c9f1cf24cf3217fc928c3e",
+13:       "audio_sha256": "75855ec9796e3a173dd09a7f176ace6ba2519301b26272843fab006525e51d52"
+13:     },
+13:     "embedded": {
+13:       "binary_sha256": "8fae8f312eb93888c3ec807a1b8daefdbdc379e7db4aa785109385bad2688d9f",
+13:       "audio_sha256": "75855ec9796e3a173dd09a7f176ace6ba2519301b26272843fab006525e51d52"
+13:     }
+13:   }
+13: }
+13/20 Test #13: Ceres.configuration_native_embedded_parity ...   Passed    1.96 sec
+test 14
+      Start 14: Ceres.native_embedded_audio_parity
+
+14: Test command: /opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14 "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/Tools/check_embedded.py" "--build-dir" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp" "--native" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_native_parity" "--embedded" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_embedded_parity"
+14: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+14: Test timeout computed to be: 1500
+14: {
+14:   "status": "pass",
+14:   "comparison": "byte-exact float32 stream on this compiler/math-library build",
+14:   "rates": [
+14:     44100,
+14:     48000,
+14:     96000,
+14:     192000
+14:   ],
+14:   "scenes_per_rate": 8,
+14:   "frames_per_scene": 12000,
+14:   "samples_per_variant": 384000,
+14:   "variants": {
+14:     "native": {
+14:       "audio_sha256": "6d0e609e106af8d81d28ab389a0b5eb5b76540a9786be70f2cebcf035b0840b6",
+14:       "bytes": 1536000,
+14:       "binary_sha256": "8f31cb2e18aa36ff56257f2f1b03d6da6f7afd106339f3ecfdabb09ccff03f75"
+14:     },
+14:     "embedded": {
+14:       "audio_sha256": "6d0e609e106af8d81d28ab389a0b5eb5b76540a9786be70f2cebcf035b0840b6",
+14:       "bytes": 1536000,
+14:       "binary_sha256": "bc98b07b0db7b6e408953bc248edc61f26da8d77312c76d38642a26f6e758122"
+14:     }
+14:   },
+14:   "input_sha256": {
+14:     "Source/DSP/ceres.hpp": "4ee7758c0401bf7a61f10b08f33baa93debb0fdcb32e73b287359db0669eb2a1",
+14:     "Source/DSP/ceres.cpp": "2414c0944a2bd979fc88030e8745bc288747be6829f24f4fd0b49f29e69070a5",
+14:     "Tests/ParityDriver.cpp": "34e352d2bca9f18387610c4bd26881936c246afc5820a4c1b3a76259eb8e43b3",
+14:     "Tools/check_embedded.py": "9ca446f7d9936a7120aedeedd874601332e0a65ba219c332b03d544c18657f1f",
+14:     "Docs/EXPERIMENT_IMPORT.json": "23fab3632d93660191ae2eb5ab1edabad20f67d7d1c7a659a742983f58c56bab"
+14:   }
+14: }
+14/20 Test #14: Ceres.native_embedded_audio_parity ...........   Passed    2.71 sec
+test 15
+      Start 15: Ceres.active_sound_path_audio_parity
+
+15: Test command: /opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14 "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/Tests/check_sound_path_parity.py" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp" "--native" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_native_parity" "--embedded" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_embedded_parity"
+15: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+15: Test timeout computed to be: 1500
+15: PASS active sound-path parity: 384000 float32 samples, 4 rates, 8 scenes; SHA256 f381eb41756ef25d17a91e8cfa10aa5d1361d578127e67229f5666d771890ce4
+15/20 Test #15: Ceres.active_sound_path_audio_parity .........   Passed    2.68 sec
+test 16
+      Start 16: Ceres.expression_audio_parity
+
+16: Test command: /opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14 "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/Tests/check_expression_parity.py" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp" "--native" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_native_parity" "--embedded" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_embedded_parity"
+16: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+16: Test timeout computed to be: 1500
+16: PASS active expression parity: 384000 float32 samples, 4 rates, 8 scenes; SHA256 e95e0233b4b8ec86f39a77745266cc84a56e2aafe08e427ff3b70388ea9e4b84
+16/20 Test #16: Ceres.expression_audio_parity ................   Passed    2.72 sec
+test 17
+      Start 17: Ceres.capacitor_native_embedded_parity
+
+17: Test command: /opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14 "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/Tests/check_capacitor_parity.py" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp" "--native" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_native_parity" "--embedded" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/ceres_embedded_parity"
+17: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+17: Test timeout computed to be: 1500
+17: PASS 384000 samples, 4 rates x8 scenes, live Q/IL, panic/reset; SHA256 f7561644a6b401bd2077e76defcca5efebc8de4f9fe032a3207d84a46fd60078
+17/20 Test #17: Ceres.capacitor_native_embedded_parity .......   Passed    2.83 sec
+test 18
+      Start 18: Ceres.DSP
+
+18: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/CeresDSPTests
+18: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+18: Test timeout computed to be: 1500
+18: Ceres engine contracts: 0 failure(s)
+18/20 Test #18: Ceres.DSP ....................................   Passed    0.00 sec
+test 19
+      Start 19: Ceres.DspFuzz
+
+19: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/CeresDspFuzz "-seed=1" "-runs=300"
+19: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+19: Test timeout computed to be: 600
+19: 300 random inputs from seed 1 passed
+19/20 Test #19: Ceres.DspFuzz ................................   Passed    0.01 sec
+test 20
+      Start 20: Ceres.AudioDemos
+
+20: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp/RenderCeresPresetDemos "--jobs" "4" "--check" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/Docs/audio/midi"
+20: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+20: Test timeout computed to be: 900
+20: PASS 01-init: 12.0 s, peak -11.09 dBFS
+20: PASS 02-string1: 12.0 s, peak -9.52 dBFS
+20: PASS 03-string2: 12.0 s, peak -13.44 dBFS
+20: PASS 04-brass1: 12.0 s, peak -13.60 dBFS
+20: PASS 05-brass2: 12.0 s, peak -14.80 dBFS
+20: PASS 06-flute: 12.0 s, peak -9.42 dBFS
+20: PASS 07-electric-piano: 12.0 s, peak -10.80 dBFS
+20: PASS 08-clavichord: 12.0 s, peak -16.51 dBFS
+20: PASS 09-harpsichord: 12.0 s, peak -12.84 dBFS
+20: PASS 10-guitar1: 12.0 s, peak -10.22 dBFS
+20: PASS 11-guitar2: 12.0 s, peak -12.44 dBFS
+20: PASS 12-funky1: 12.0 s, peak -12.53 dBFS
+20: PASS 13-funky2: 12.0 s, peak -8.26 dBFS
+20: PASS 14-funky3: 12.0 s, peak -10.06 dBFS
+20/20 Test #20: Ceres.AudioDemos .............................   Passed   19.55 sec
+
+100% tests passed, 0 tests failed out of 20
+
+Label Time Summary:
+audio    =  19.55 sec*proc (1 test)
+fuzz     =   0.01 sec*proc (1 test)
+unit     =  25.59 sec*proc (18 tests)
+
+Total Test time (real) =  45.16 sec

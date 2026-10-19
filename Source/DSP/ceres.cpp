@@ -606,7 +606,7 @@ struct Synth::Impl {
     double hpResonanceAnchor=0, lpResonanceAnchor=0;
     bool hasProcessed=false;
     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
-    double outputTrimGain=1;
+    double outputTrimGain=1, audioNoiseGain=1;
     // Guide printed32: SUB-N uses22k/.1uF, independent of audio NO level.
     // This is the documented single low-pass (called pink in the prose),
     // not an invented ideal1/f filter. Normalize its unknown limiter level
@@ -643,6 +643,11 @@ struct Synth::Impl {
     }
     void configureRate() {
         internalFs=fs*rateFactor;
+        // Discrete white-noise PSD is variance/internalFs. Preserve the
+        // legacy4x density at this host rate: variance scales by factor/4.
+        // Audio NO only; SUB-N has its own RC/RMS convention below and
+        // must continue to receive the original shared random sample.
+        audioNoiseGain=std::sqrt(rateFactor/4.0);
         pressureCoefficient = 1-std::exp(-1/(internalFs*.005));
         driftCoefficient = 1-std::exp(-1/(internalFs*.3));
         qControlCoefficient=-std::expm1(-1/(internalFs*qControlTau));
@@ -729,6 +734,7 @@ struct Synth::Impl {
         const double dt = 1 / internalFs;
         pressureValue += (pressureTarget-pressureValue) * pressureCoefficient;
         const double noise = random.bipolar(); // one shared physical noise source
+        const double audioNoise=rateFactor==4 ? noise : noise*audioNoiseGain;
         const double subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
         subNoiseMemory=2*subNoise-subNoiseMemory;
         const double lfo = subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
@@ -797,7 +803,7 @@ struct Synth::Impl {
                 : std::exp2(keyOctaves+filterEnvelope*patch.lpEnvelopeScale
                     + expression*patch.pressureFilter+lfo*patch.filterLfo
                     + patch.brilliance*lpBrillianceScale);
-            const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*noise;
+            const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*audioNoise;
             const double hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor);
             const double lpFrequency=modulatedFilterFrequency(patch.lpCutoff,lpFactor);
 #if !defined(CERES_EMBEDDED_TARGET)

@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <initializer_list>
 static double now(clockid_t id){timespec t{};if(clock_gettime(id,&t))std::abort();return t.tv_sec+t.tv_nsec*1e-9;}
 int main(){
     constexpr unsigned blocks=1000,frames=64,warmup=128;

@@ -17,6 +17,7 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 
 - Adds 1–16 preallocated voices and actual 1×, 2× or 4× internal processing. The standalone default remains four voices at 4×.
 - Smooths live Ring Depth edits over 20 ms without restarting the carrier or envelope; saved/static depths start immediately at their configured value.
+- Keeps audio-noise density consistent across 1×/2×/4× at the same host sample rate, preserving the original 4× level and the separate SUB-noise path.
 - Keeps the existing four-voice, 4× audio byte-identical in the recorded parent comparison. Configuration changes require an unclocked/reset engine; adapters can defer them until idle and fade residual tails.
 - Retains nominal 31-host-sample output latency at all qualities. Lower quality trades oversampling headroom and alias rejection for CPU cost; it is not the same sound under a new label.
 
@@ -75,6 +76,8 @@ Configure before sending notes, or explicitly reset first, then reapply controll
 The 4× path retains its original 249-tap FIR. The 2× path has a 125-tap FIR with the same nominal group delay; 1× uses an exact 31-sample delay and no redundant low-pass. Final-of-factor sampling retains the legacy fractional decimation phase, so the modes do not promise identical transients. All oscillators, filters, envelopes and circuit states actually run at the selected internal rate. The existing frequency guards operate at that rate, so lower qualities can also limit extreme settings earlier.
 
 Additional voices are a virtual extension of the four-board model. The calibrated common bus and per-voice gain remain unchanged; no voice-count normalization or limiter is added. Larger chords can increase rail saturation and output level. Extra voices use a separate initialization stream; at the default four-voice setting the original shared noise/drift stream remains exact. See [configuration validation](Docs/validation/poly-quality/README.md).
+
+Audio noise scales by `sqrt(factor/4)` before the waveform mixer. This corrects the increased in-band noise density that unscaled random samples would produce at lower internal rates. The 4× source is unchanged, and SUB noise retains its own RC normalization. Different quality settings can still differ through filter discretization, nonlinear processing and alias rejection; this is not hardware gain calibration. See [noise-quality validation](Docs/validation/noise-quality/README.md).
 
 The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults `4` and `4`. Host adapters may choose and save different defaults independently of the 57 hardware/engineering patch keys.
 
