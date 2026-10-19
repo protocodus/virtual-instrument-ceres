@@ -1,0 +1,6 @@
+# Generators and receipts hash these files, so preserve LF on every platform,
+# including Windows runners where core.autocrlf is enabled.
+* text=auto eol=lf
+# Generated upstream license payloads must retain their exact bytes, including
+# original line endings and whitespace, on every platform.
+ThirdParty/JUCE-DEPENDENCY-NOTICES.txt -text -whitespace

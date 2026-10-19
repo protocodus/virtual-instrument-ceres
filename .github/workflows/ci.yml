@@ -1,0 +1,252 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  BUILD_NUMBER: ${{ github.run_number }}
+
+# A newer push to the same branch/PR cancels the older, still-running check.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dsp-tests:
+    name: DSP unit and audio tiers, Linux package
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install JUCE Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ninja-build pkg-config \
+            libasound2-dev \
+            libfreetype-dev libfontconfig1-dev \
+            libx11-dev libxcomposite-dev libxcursor-dev libxext-dev \
+            libxinerama-dev libxrandr-dev libxrender-dev \
+            ffmpeg
+
+      # The registered Python checks use the standard library only.
+      - name: Set up Python for the checks
+        id: python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Configure DSP build
+        run: >-
+          cmake -S . -B build-dsp -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DCERES_BUILD_PLUGIN=OFF -DBUILD_TESTING=ON
+          "-DPython3_EXECUTABLE=${{ steps.python.outputs.python-path }}"
+
+      - name: Build DSP engine, tools and tests
+        run: cmake --build build-dsp --parallel
+
+      - name: Unit tier
+        run: ctest --test-dir build-dsp -L '^unit$' --no-tests=error --output-on-failure
+
+      - name: Audio tier
+        run: ctest --test-dir build-dsp -L '^audio$' --no-tests=error --output-on-failure
+
+      - name: Render the demos for review
+        run: |
+          set -euo pipefail
+          ./build-dsp/RenderCeresPresetDemos --jobs 4 Docs/audio/midi build-dsp/demo-audio
+
+      - name: Upload demo audio
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-audio-ceres-build-${{ github.run_number }}
+          path: build-dsp/demo-audio/*.mp3
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Configure Linux plug-in build
+        run: >-
+          cmake -S . -B build-plugin -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DCERES_BUILD_PLUGIN=ON -DCERES_BUILD_TOOLS=OFF -DBUILD_TESTING=OFF
+
+      - name: Build Linux VST3, CLAP and standalone
+        run: cmake --build build-plugin --parallel --target Ceres_VST3 Ceres_CLAP Ceres_Standalone
+
+      - name: Package Linux VST3, CLAP and standalone
+        run: python3 scripts/package-linux.py --build-dir build-plugin
+
+      - name: Upload Linux package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-linux-ceres-build-${{ github.run_number }}
+          path: build-plugin/dist/Ceres-*-build.${{ github.run_number }}-Linux-x64.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  plugin-macos:
+    name: Plug-in unit and render tiers, macOS universal package
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # build-macos.sh builds universal arm64 + x86_64 and runs the whole
+      # suite, including the processor unit tests and the render tier.
+      - name: Build universal plug-in and run tests
+        env:
+          BUILD_UNIVERSAL: "ON"
+          CERES_EDITOR_SNAPSHOT: "${{ runner.temp }}/ceres.png"
+        run: ./scripts/build-macos.sh
+
+      - name: Upload the rendered editor screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-screenshot-ceres-build-${{ github.run_number }}
+          path: ${{ runner.temp }}/ceres.png
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Package macOS VST3, Audio Unit, CLAP and standalone
+        run: ./scripts/sign-and-package-macos.sh
+
+      - name: Upload macOS packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-macos-ceres-build-${{ github.run_number }}
+          path: |
+            build-macos/dist/Ceres-*-build.${{ github.run_number }}-macOS-universal.zip
+            build-macos/dist/Ceres-*-build.${{ github.run_number }}-macOS-universal.pkg
+          if-no-files-found: error
+          retention-days: 7
+
+  dsp-tests-windows:
+    name: DSP unit tier, Windows package
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Configure DSP tests
+        run: |
+          cmake -S "." -B "build-win" -A x64 "-DCERES_BUILD_PLUGIN=OFF" -DBUILD_TESTING=ON "-DCMAKE_EXE_LINKER_FLAGS=/STACK:33554432"
+
+      - name: Build and run the unit tier
+        run: |
+          cmake --build "build-win" --config Release --parallel
+          ctest --test-dir "build-win" -C Release -L "^unit$" --no-tests=error --output-on-failure
+
+      - name: Configure Windows plug-in build
+        run: |
+          cmake -S "." -B "build-plugin" -A x64 "-DCERES_BUILD_PLUGIN=ON" "-DCERES_BUILD_TOOLS=OFF" -DBUILD_TESTING=OFF
+
+      - name: Build Windows VST3, CLAP and standalone
+        run: |
+          cmake --build "build-plugin" --config Release --parallel --target "Ceres_VST3" "Ceres_CLAP" "Ceres_Standalone"
+
+      - name: Package Windows VST3, CLAP and standalone
+        run: python scripts/package-windows.py --build-dir build-plugin
+
+      - name: Upload Windows package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-windows-ceres-build-${{ github.run_number }}
+          path: build-plugin/dist/Ceres-*-build.${{ github.run_number }}-Windows-x64.zip
+          if-no-files-found: error
+          retention-days: 7
+
+  sanitizers:
+    name: Unit and fuzz tiers under ASan + UBSan, C++17 DSP
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Configure instrumented DSP and tools
+        run: >-
+          cmake -S . -B build-sanitize
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          -DCERES_BUILD_PLUGIN=OFF
+          -DCERES_ENABLE_SANITIZERS=ON
+          -DBUILD_TESTING=ON
+
+      # The default build includes CeresDSPCxx17, the Rack toolchain's C++17 check.
+      - name: Build
+        run: cmake --build build-sanitize --parallel 2
+
+      - name: Unit and fuzz tiers
+        run: ctest --test-dir build-sanitize -L '^(unit|fuzz)$' --no-tests=error --output-on-failure --parallel 2
+
+      # U4: a short fixed-seed libFuzzer run over coverage-instrumented DSP.
+      - name: Build the libFuzzer target
+        run: >-
+          cmake -S . -B build-fuzz -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+          -DCERES_BUILD_PLUGIN=OFF -DCERES_BUILD_TOOLS=OFF -DCERES_BUILD_LIBFUZZER=ON
+          -DBUILD_TESTING=ON
+          && cmake --build build-fuzz --parallel --target CeresDspFuzz
+
+      - name: Fuzz the DSP for two minutes
+        working-directory: build-fuzz
+        run: |
+          mkdir -p corpus
+          ./CeresDspFuzz -seed=1 -max_total_time=120 -max_len=4096 -timeout=30 \
+            -rss_limit_mb=2048 corpus
+
+      - name: Upload fuzz reproducers
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-fuzz-reproducers-ceres-build-${{ github.run_number }}
+          path: |
+            build-fuzz/crash-*
+            build-fuzz/timeout-*
+            build-fuzz/oom-*
+          if-no-files-found: ignore
+          retention-days: 7
+
+  parameter-matrix:
+    name: Parameter-extremes matrix sample under ASan + UBSan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install JUCE Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ninja-build pkg-config \
+            libasound2-dev \
+            libfreetype-dev libfontconfig1-dev \
+            libx11-dev libxcomposite-dev libxcursor-dev libxext-dev \
+            libxinerama-dev libxrandr-dev libxrender-dev
+
+      - name: Configure and build the instrumented processor
+        run: >-
+          cmake -S . -B build-sanitize-plugin -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          -DCERES_BUILD_PLUGIN=ON -DCERES_BUILD_TOOLS=OFF -DCERES_ENABLE_SANITIZERS=ON
+          -DBUILD_TESTING=ON
+          && cmake --build build-sanitize-plugin --parallel --target CeresParameterMatrixTests
+
+      - name: Parameter matrix sample
+        run: ctest --test-dir build-sanitize-plugin -R '^Ceres[.]ParameterMatrix$' --no-tests=error --output-on-failure
