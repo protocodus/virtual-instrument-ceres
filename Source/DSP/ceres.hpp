@@ -186,6 +186,7 @@ public:
         double sub, ringEnvelope, ringFrequency, ringCarrier;
         std::size_t physicalKeyPresses;
         double ringCoupledCarrier;
+        double ringSwitchGain; // matched upper-pair steering, includes nominal DC bias
     };
     struct SoundPathState {
         double resonanceVoltageOffset, hpResonance, lpResonance;
@@ -205,6 +206,9 @@ private:
 // Exact production passive carrier network, zero initial incremental charge.
 // Ideal source, four100uF caps, zero incremental IC current; returns pin7-pin8.
 std::vector<double> ringCarrierResponse(double sampleRate,const std::vector<double>& input);
+// Matched carrier-pair steering at25C, input in physical differential volts.
+// No source amplitude/DC offset is added by this pointwise diagnostic.
+double ringSwitchingResponse(double differentialVolts);
 // Normalized output-coupling sections at their actual processing rate
 // (4*hostRate in production), without the final line inversion or rail.
 // Stages: 0=CP3 filtered branch, 1=CP4 common voice, 2=four-voice bus,

@@ -1,0 +1,13 @@
+Test project /private/tmp/ceres-ring-switching-20261019/build-sanitize
+    Start 1: native_dsp_contracts
+1/4 Test #1: native_dsp_contracts ...............   Passed   49.71 sec
+    Start 3: ring_carrier_circuit_contracts
+2/4 Test #3: ring_carrier_circuit_contracts .....   Passed    2.35 sec
+    Start 4: ring_switching_circuit_contracts
+3/4 Test #4: ring_switching_circuit_contracts ...   Passed    2.99 sec
+    Start 6: embedded_allocation_contract
+4/4 Test #6: embedded_allocation_contract .......   Passed    1.31 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  56.36 sec

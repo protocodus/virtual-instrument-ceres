@@ -22,6 +22,18 @@ constexpr double filterFrequencyFloor = 1/(2*pi*filterCapacitance*filterFeedResi
 constexpr double hpBrillianceScale=.7*39/680, lpBrillianceScale=.65*39/220;
 constexpr double hpSubRelativeScale=(.7/.65)*(47./150.);
 constexpr double qControlTau=10e-6*(220e3/2);
+// Fairchild uA796 upper carrier pairs have no emitter degeneration. In the
+// matched, forward-active/infinite-beta limit their current steering is
+// tanh(V7minus8/(2VT)). Guide p49 gives the carrier sine as nominal3Vpp.
+constexpr double ringThermalVoltage=1.380649e-23*298.15/1.602176634e-19;
+constexpr double ringSourcePeakVolts=1.5;
+// Nominal zero-IC-current DC circuit, balance VR5 at center. Unlike the
+// reduced AC network, include both470+(100k+25k) signal-input returns.
+constexpr double ringBiasGround=1/(1/1000.+2/(470.+125000.));
+constexpr double ringBiasLoad=1/(1/33100.+1/(820.+ringBiasGround));
+constexpr double ringPin8Dc=15*ringBiasLoad/(390+1200+ringBiasLoad);
+constexpr double ringDifferentialDc=-ringPin8Dc*100/33100.;
+double ringSteering(double volts) { return std::tanh(volts/(2*ringThermalVoltage)); }
 // The patch specifies TOTAL integrator Hz at middle C. Only variable gm
 // responds to exponential control; the parallel 4.7Mohm path stays fixed.
 double modulatedFilterFrequency(double referenceHz, double factor) {
@@ -573,6 +585,7 @@ struct Synth::Impl {
     std::array<double,4> ringCoefficients{};
     double ringPhase = 0, ringCarrier = 0, ringFrequency = 30;
     double ringCoupledCarrier=0;
+    double ringSwitchGain=ringSteering(ringDifferentialDc);
     RingCarrierCoupling ringCarrierCoupling;
     OutputCoupling ringWetCoupling;
     int lastAssignedKey = 60;
@@ -653,6 +666,7 @@ struct Synth::Impl {
         subNoiseMemory=0; ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={};
         ringCarrierCoupling.clear();ringCoupledCarrier=0;
+        ringSwitchGain=ringSteering(ringDifferentialDc);
         qVoltageOffset=0;
         effectiveHpResonance=patch.hpResonance; effectiveLpResonance=patch.lpResonance;
         commonVcaGain=patch.ampLevel;
@@ -759,9 +773,9 @@ struct Synth::Impl {
         // with previous overall midband gain retained as a calibration choice.
         const double bus=busCoupling.process(mixed,outputCouplingTau[2],internalFs);
         // One global processor, after the voice bus and before expression/
-        // output. Ideal balanced multiplier models the uA796 functional
-        // topology; carrier leak, transistor transfer, audio-input loading
-        // and wet-gain trim remain unidentified. Direct PRA/Overall wet output uses
+        // output. The carrier uses the physical matched upper-BJT steering
+        // law; signal-pair nonlinearity/loading, mismatch and wet gain remain
+        // unidentified. Direct PRA/Overall wet output uses
         // 10uF into10k (Guide differs): retain that physical RC at tau=.1s.
         const double ringControl=ringEnvelope.advance(0,1,0,.01,0,
             ringCoefficients[0],0,ringCoefficients[1],ringCoefficients[2]);
@@ -770,7 +784,12 @@ struct Synth::Impl {
         ringPhase=wrap(ringPhase+ringFrequency*dt);
         // Keep this free-running passive network connected even at mix0.
         ringCoupledCarrier=ringCarrierCoupling.process(ringCarrier);
-        const double wet=ringWetCoupling.process(bus*ringCoupledCarrier,.1,internalFs);
+        // No mean removal or gain normalization: the nominal DC mismatch
+        // permits signal feedthrough and even carrier harmonics. This is a
+        // 25C ideal-source/zero-IC-DC-load and zero-incremental-input-current
+        // limit, not fitted hardware gain (collector/bias loads also omitted).
+        ringSwitchGain=ringSteering(ringDifferentialDc+ringSourcePeakVolts*ringCoupledCarrier);
+        const double wet=ringWetCoupling.process(bus*ringSwitchGain,.1,internalFs);
         // Explicit bypass avoids even a rounding change for old patches.
         const double ringed=patch.ringMix==0 ? bus : bus+patch.ringMix*(wet-bus);
         const double rail=.9*std::tanh(ringed*.18*patch.volume/.9);
@@ -861,6 +880,7 @@ void Synth::allNotesOff() {
 void Synth::allSoundOff() {
     impl_->keysOff(); impl_->ringEnvelope={}; impl_->ringWetCoupling={};
     impl_->ringCarrierCoupling.clear();impl_->ringCoupledCarrier=0;
+    impl_->ringSwitchGain=ringSteering(ringDifferentialDc);
     for (auto& voice : impl_->voices) {
         voice.held = voice.pedalHeld = false;
         voice.amp = {};
@@ -897,7 +917,7 @@ std::array<Synth::VoiceState,Synth::voiceCount> Synth::voiceState() const {
 }
 Synth::ModulationState Synth::modulationState() const {
     return {impl_->lastSub,impl_->ringEnvelope.voltage,impl_->ringFrequency,
-        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier};
+        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier,impl_->ringSwitchGain};
 }
 Synth::SoundPathState Synth::soundPathState() const {
     return {impl_->qVoltageOffset,impl_->effectiveHpResonance,
@@ -913,6 +933,10 @@ std::vector<double> ringCarrierResponse(double fs,const std::vector<double>& inp
         result.push_back(coupling.process(value));
     }
     return result;
+}
+double ringSwitchingResponse(double differentialVolts) {
+    if(!std::isfinite(differentialVolts))throw std::invalid_argument("Nonfinite carrier differential voltage");
+    return ringSteering(differentialVolts);
 }
 // Individual normalized section, using the same RC class/constants as voices.
 std::vector<double> outputCouplingImpulse(unsigned stage,double fs,std::size_t frames) {

@@ -1,0 +1,88 @@
+{
+  "status": "pass",
+  "created_utc": "2026-10-19T07:58:34.519804+00:00",
+  "parent_commit": "8c5a96e75f426dd7854cfee8e76cccd9478bbbfe",
+  "parent_source_sha256": {
+    "ceres.cpp": "3472f2667c232409a9fe824580c273f9a1e3ddc46d49f26b05ef1d351996605a",
+    "ceres.hpp": "bd785967fea79ed0df68bc0fb70f6c063c44439eac975c96357eb71bcdcaa10f"
+  },
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "7f37338cc128af74d9ebc2b221a2a7bd849b9f9608104afc55cb31a780dd0646",
+    "Source/DSP/ceres.cpp": "f08afce7f5ad3c085e1f85a7610a83eee13423f6e40cf32d36f30072e2b69a93",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "cc5f850d8c36dfec256e731db0cba1a13a535abb5e3c1113298271936f156ca5"
+  },
+  "compile_command": [
+    "c++",
+    "-std=c++17",
+    "-O3",
+    "-DNDEBUG",
+    "-I",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-_p3x8d09",
+    "/private/tmp/ceres-ring-switching-20261019/Tests/ParityDriver.cpp",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-_p3x8d09/ceres.cpp",
+    "-o",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-_p3x8d09/parent"
+  ],
+  "comparisons": [
+    {
+      "scene": "default-controls",
+      "exact": true,
+      "variants": {
+        "parent": {
+          "command": [
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-_p3x8d09/parent",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-_p3x8d09/parent.f32"
+          ],
+          "binary_sha256": "7e4ba50b06401f846b2ecaac7eb584957b37857bfa7d4fcf99ea972b5a05e1a3",
+          "audio_sha256": "678a97a19ce585aebc0a983a254635d2058133081db1091e96ec5bd846a1b490",
+          "samples": 384000
+        },
+        "candidate": {
+          "command": [
+            "/private/tmp/ceres-ring-switching-20261019/build/ceres_native_parity",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-_p3x8d09/candidate.f32"
+          ],
+          "binary_sha256": "9be52e5048d26ce40820ca6e6aa4bbc4575f5451a4be09aa315c8067b7da3cfe",
+          "audio_sha256": "678a97a19ce585aebc0a983a254635d2058133081db1091e96ec5bd846a1b490",
+          "samples": 384000
+        }
+      }
+    },
+    {
+      "scene": "active-carrier-bypassed",
+      "exact": true,
+      "variants": {
+        "parent": {
+          "command": [
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-_p3x8d09/parent",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-_p3x8d09/parent.f32",
+            "ring-bypass"
+          ],
+          "binary_sha256": "7e4ba50b06401f846b2ecaac7eb584957b37857bfa7d4fcf99ea972b5a05e1a3",
+          "audio_sha256": "bab8e1f819e19a3931e33783126d21d8f7a68d39fc237418bf28c4adf8ab856c",
+          "samples": 384000
+        },
+        "candidate": {
+          "command": [
+            "/private/tmp/ceres-ring-switching-20261019/build/ceres_native_parity",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-_p3x8d09/candidate.f32",
+            "ring-bypass"
+          ],
+          "binary_sha256": "9be52e5048d26ce40820ca6e6aa4bbc4575f5451a4be09aa315c8067b7da3cfe",
+          "audio_sha256": "bab8e1f819e19a3931e33783126d21d8f7a68d39fc237418bf28c4adf8ab856c",
+          "samples": 384000
+        }
+      }
+    }
+  ],
+  "samples_per_variant": 768000,
+  "scope": "mix0 exact dry path; active carrier rates/depths/EG, allSUB functions, note/pedal/pressure/panic/reset. Same compiler/math library. Temporary binaries/streams deleted; retained source/commands reproduce. No recording fit.",
+  "verified_file_sha256": {
+    "Tests/check_ring_switching_parent.py": "5a6a6dd33444f5b76abc08fa95af96ee41ec2ac7ee2366401bbf9b8adc231313",
+    "Tests/ParityDriver.cpp": "940cbe8f10c1cd1baaebb23059d27ccf39f616a27f843cbe556485f1c5a83427",
+    "Source/DSP/ceres.cpp": "f08afce7f5ad3c085e1f85a7610a83eee13423f6e40cf32d36f30072e2b69a93",
+    "Source/DSP/ceres.hpp": "7f37338cc128af74d9ebc2b221a2a7bd849b9f9608104afc55cb31a780dd0646"
+  }
+}

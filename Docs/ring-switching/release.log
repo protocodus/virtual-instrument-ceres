@@ -1,0 +1,23 @@
+Test project /private/tmp/ceres-ring-switching-20261019/build
+    Start 1: native_dsp_contracts
+1/9 Test #1: native_dsp_contracts ...............   Passed    6.13 sec
+    Start 2: sound_path_circuit_contracts
+2/9 Test #2: sound_path_circuit_contracts .......   Passed    1.02 sec
+    Start 3: ring_carrier_circuit_contracts
+3/9 Test #3: ring_carrier_circuit_contracts .....   Passed    0.48 sec
+    Start 4: ring_switching_circuit_contracts
+4/9 Test #4: ring_switching_circuit_contracts ...   Passed    0.92 sec
+    Start 5: voice_expression_contracts
+5/9 Test #5: voice_expression_contracts .........   Passed    0.50 sec
+    Start 6: embedded_allocation_contract
+6/9 Test #6: embedded_allocation_contract .......   Passed    0.67 sec
+    Start 7: native_embedded_audio_parity
+7/9 Test #7: native_embedded_audio_parity .......   Passed    4.00 sec
+    Start 8: active_sound_path_audio_parity
+8/9 Test #8: active_sound_path_audio_parity .....   Passed    2.68 sec
+    Start 9: expression_audio_parity
+9/9 Test #9: expression_audio_parity ............   Passed    2.66 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Total Test time (real) =  19.06 sec

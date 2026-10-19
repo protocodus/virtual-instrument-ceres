@@ -1,0 +1,33 @@
+[  9%] Building CXX object CMakeFiles/ceres.dir/Source/DSP/ceres.cpp.o
+[  9%] Building CXX object CMakeFiles/ceres_embedded.dir/Source/DSP/ceres.cpp.o
+[ 13%] Linking CXX static library libceres_embedded.a
+[ 13%] Built target ceres_embedded
+[ 22%] Building CXX object CMakeFiles/ceres_embedded_contract.dir/Tests/EmbeddedContract.cpp.o
+[ 22%] Building CXX object CMakeFiles/ceres_embedded_parity.dir/Tests/ParityDriver.cpp.o
+[ 27%] Linking CXX static library libceres.a
+[ 27%] Built target ceres
+[ 31%] Linking CXX executable ceres_embedded_contract
+[ 36%] Building CXX object CMakeFiles/ceres_render.dir/Tools/render_main.cpp.o
+[ 40%] Building CXX object CMakeFiles/ceres_tests.dir/Tests/dsp_tests.cpp.o
+[ 40%] Built target ceres_embedded_contract
+[ 45%] Building CXX object CMakeFiles/ceres_sound_path_tests.dir/Tests/SoundPathTests.cpp.o
+[ 50%] Linking CXX executable ceres_embedded_parity
+[ 50%] Built target ceres_embedded_parity
+[ 54%] Building CXX object CMakeFiles/ceres_ring_carrier_tests.dir/Tests/RingCarrierTests.cpp.o
+[ 59%] Linking CXX executable ceres_sound_path_tests
+[ 63%] Linking CXX executable ceres_render
+[ 63%] Built target ceres_sound_path_tests
+[ 63%] Built target ceres_render
+[ 68%] Building CXX object CMakeFiles/ceres_ring_switching_tests.dir/Tests/RingSwitchingTests.cpp.o
+[ 72%] Building CXX object CMakeFiles/ceres_expression_tests.dir/Tests/ExpressionTests.cpp.o
+[ 77%] Linking CXX executable ceres_ring_carrier_tests
+[ 77%] Built target ceres_ring_carrier_tests
+[ 81%] Building CXX object CMakeFiles/ceres_native_parity.dir/Tests/ParityDriver.cpp.o
+[ 86%] Linking CXX executable ceres_ring_switching_tests
+[ 86%] Built target ceres_ring_switching_tests
+[ 90%] Linking CXX executable ceres_expression_tests
+[ 90%] Built target ceres_expression_tests
+[ 95%] Linking CXX executable ceres_native_parity
+[100%] Linking CXX executable ceres_tests
+[100%] Built target ceres_native_parity
+[100%] Built target ceres_tests

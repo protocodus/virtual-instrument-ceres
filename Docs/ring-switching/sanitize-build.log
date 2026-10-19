@@ -1,0 +1,20 @@
+[ 25%] Building CXX object CMakeFiles/ceres.dir/Source/DSP/ceres.cpp.o
+[ 50%] Linking CXX static library libceres.a
+[ 50%] Built target ceres
+[ 75%] Building CXX object CMakeFiles/ceres_ring_switching_tests.dir/Tests/RingSwitchingTests.cpp.o
+[100%] Linking CXX executable ceres_ring_switching_tests
+[100%] Built target ceres_ring_switching_tests
+[ 50%] Built target ceres
+[ 75%] Building CXX object CMakeFiles/ceres_ring_carrier_tests.dir/Tests/RingCarrierTests.cpp.o
+[100%] Linking CXX executable ceres_ring_carrier_tests
+[100%] Built target ceres_ring_carrier_tests
+[ 50%] Built target ceres
+[ 75%] Building CXX object CMakeFiles/ceres_tests.dir/Tests/dsp_tests.cpp.o
+[100%] Linking CXX executable ceres_tests
+[100%] Built target ceres_tests
+[ 25%] Building CXX object CMakeFiles/ceres_embedded.dir/Source/DSP/ceres.cpp.o
+[ 50%] Linking CXX static library libceres_embedded.a
+[ 50%] Built target ceres_embedded
+[ 75%] Building CXX object CMakeFiles/ceres_embedded_contract.dir/Tests/EmbeddedContract.cpp.o
+[100%] Linking CXX executable ceres_embedded_contract
+[100%] Built target ceres_embedded_contract
