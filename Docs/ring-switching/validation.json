@@ -1,0 +1,96 @@
+{
+  "status": "pass",
+  "created_utc": "2026-10-19T08:01:00.109372+00:00",
+  "parent_commit": "8c5a96e75f426dd7854cfee8e76cccd9478bbbfe",
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "7f37338cc128af74d9ebc2b221a2a7bd849b9f9608104afc55cb31a780dd0646",
+    "Source/DSP/ceres.cpp": "f08afce7f5ad3c085e1f85a7610a83eee13423f6e40cf32d36f30072e2b69a93",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "cc5f850d8c36dfec256e731db0cba1a13a535abb5e3c1113298271936f156ca5"
+  },
+  "release_ctest_passed": 9,
+  "asan_ubsan_ctest_passed": 4,
+  "asan_options": "detect_leaks=0",
+  "parameter_keys": 57,
+  "parameter_table_byte_identical": true,
+  "parent_bypass_audio_exact_samples": 768000,
+  "native_embedded_active_parity": "Native/embedded, active-soundpath and expression384000-sample comparisons passed, including multiple active ring rates/mixes/depths.",
+  "physical_constants": {
+    "carrier_dc_volts": -0.023489437180096218,
+    "source_peak_volts": 1.5,
+    "temperature_kelvin": 298.15,
+    "two_vt_volts": 0.0513851582421717,
+    "zero_ac_switching_factor": -0.4277380604918782
+  },
+  "tests": [
+    "Independent exponential BJT current ratio and small-signal1/(2VT) derivative",
+    "Independent full6node DC KCL including signal-input returns",
+    "Production raw/passive/physical steering connection, mix0 history, notes/live controls, panic/reset",
+    "Explicit nominal DC feedthrough/no mean subtraction,0.2Hz no-crossing boundary",
+    "Actual fully wet0th/2nd/3rd carrier sidebands versus independent passive Schur plus exponential-current Fourier integral",
+    "Existing passive complex AC/physical-state trapezoids and DSP/allocation contracts"
+  ],
+  "periodic_alias": {
+    "processing_hz": 192000,
+    "reference_hz": 3072000,
+    "carrier_hz": 220,
+    "audio_product_hz": [
+      0,
+      440,
+      15000
+    ],
+    "band_hz": [
+      0,
+      24000
+    ],
+    "max_rms_difference": 4.751823758821833e-14,
+    "scope": "Stationary physical-carrier kernel and linear signal products only; excludes dynamic/full-synth/FIR/output nonlinearities. Reference above24k energy reported separately."
+  },
+  "allocation_check": "Existing embedded57-key contract passes zero post-construction new/new[] allocations.",
+  "scope": "Physically scaled matched upper-pair steering after existing passive network. Fixed25C/nominal3Vpp ideal source, zero all-IC DC loads and incremental carrier input current. No current/gain/temperature fit, normalization, new parameter, GUI, clock/envelope change or hardware-recording render. Signal-port nonlinearization/loading and absolute wet gain remain uncalibrated.",
+  "binary_sha256": {
+    "build/ceres_render": "510a879cd99acfb03ee07ea40a36f965c1367488aee263ed603cda692cf3f0de",
+    "build/libceres.a": "77167e59f8a1ac2bce45830d6aca378489954cc25c5211c1fbc18292f7a686f8",
+    "build/libceres_embedded.a": "01be1a4dd42e62faabf457861168ebc1f4e9a4046b26b10a05565b42a65dc952",
+    "build/ceres_tests": "e2d441b52dfeffc804f512d22020e4b9ec195f5b7f4421817c9d02f3fa2d74ba",
+    "build/ceres_ring_carrier_tests": "bdbacff76a57b82182eddf0da3da6f3eabf82efbd39c2025e8bb3e09cad6f9aa",
+    "build/ceres_ring_switching_tests": "9824c5fa495c365aa5d11f2d7f1db2be1fe0a5b1fda5636bf49ba79f225d0aea",
+    "build/ceres_native_parity": "9be52e5048d26ce40820ca6e6aa4bbc4575f5451a4be09aa315c8067b7da3cfe",
+    "build/ceres_embedded_parity": "b25d12d6dd1c993250243775792cc4cf055d8afb3cc27acba16651b870b1d81a"
+  },
+  "verified_file_sha256": {
+    "CMakeLists.txt": "cc5f850d8c36dfec256e731db0cba1a13a535abb5e3c1113298271936f156ca5",
+    "Source/DSP/ceres.cpp": "f08afce7f5ad3c085e1f85a7610a83eee13423f6e40cf32d36f30072e2b69a93",
+    "Source/DSP/ceres.hpp": "7f37338cc128af74d9ebc2b221a2a7bd849b9f9608104afc55cb31a780dd0646",
+    "Tests/dsp_tests.cpp": "c692a4495547fc155457e6f0433c3024d4a2064e2fae787b3320c08306a8b4c9",
+    "Tests/RingSwitchingTests.cpp": "e96db17884638b3048c76896f100608396e16f2c12ac302b8af0a51b344a4fba",
+    "Tests/RingSwitchingAlias.cpp": "35bd15c0db9ae04c448be4e12e43fd798cdaf830e9611677aee289d1b8dbb8bc",
+    "Tests/check_ring_switching_alias.py": "67e6f1fd30c74a335964ea67577c4ae7d7854f0a496b90b7c6edd304be04d9fd",
+    "Tests/check_ring_switching_parent.py": "5a6a6dd33444f5b76abc08fa95af96ee41ec2ac7ee2366401bbf9b8adc231313",
+    "Tests/record_ring_switching_validation.py": "50d62682a6a9f1e8ed2161f04233e5dabfa4ea3734570df2e5f48e787c2f7d5b",
+    "Docs/DSP_SOURCE.md": "2ac610278b9cc0b8ecb465af75b8bf9c1deffecb2cf4c92f64ebdb9c9ec2c142",
+    "Tests/RingCarrierTests.cpp": "913e2b8e37e0cf2e08afe22069db462529d4b88aa2a095d4bf60dc60f8aa4bf9",
+    "Tests/ParityDriver.cpp": "940cbe8f10c1cd1baaebb23059d27ccf39f616a27f843cbe556485f1c5a83427",
+    "Tests/EmbeddedContract.cpp": "3b47b2bc38a68320de4c5eea57540836bed57b275a610ac44123efd67827ac77",
+    "Docs/ring-switching/README.md": "883a6a9ab6578931e5075091d6c7fd9916f87f45bae4a097207bbe8e53f2ca12",
+    "Docs/ring-switching/source.patch": "f9f22ad006c21c20793368f79037e24b7dc02d085218cc73f3398ce5df786e20",
+    "Docs/ring-switching/configure.log": "496d261d82318589ce8a9d6c240f14432a53fd717f5c7a18107cf13e1160ddc2",
+    "Docs/ring-switching/build.log": "4ccbd8f797ee4bb58d1b9f20b8e4b6fc5f878f85a2d502c476d7226b78190af4",
+    "Docs/ring-switching/release.log": "ce32f43a153bf94ac756cbf4ab04a5f80f19426d6b95010af55c0f438d0940a6",
+    "Docs/ring-switching/sanitize-configure.log": "236c2c1a8df11c66beebbc648179425b674e7f9f38bc53519217ab309cddc6e1",
+    "Docs/ring-switching/sanitize-build.log": "b2760c515832e2e4329d082b8f6a9ff856ba77f6ae733fd6044022ec74f314a9",
+    "Docs/ring-switching/sanitize.log": "4eb9edf76581302907a5070aa66b61ebfe5e146f85e73a4cbe1d0618efe4f147",
+    "Docs/ring-switching/parent-parity.json": "b77f30f4baa812de60466ef5ad8012ca12d29770fec10ad82a215aeb45d26f1b",
+    "Docs/ring-switching/parent-parity.log": "8154dd5f23c72b67a91ded697bf221a60c75bef6c9276dae9b6d8d1a0a42607f",
+    "Docs/ring-switching/alias.json": "23434c1fcea20e1c4dbec197ed1edf6a52795bb06b06a1485ddbc3c3c43654ab",
+    "Docs/ring-switching/alias.log": "f9096e50398acbe38affd7d27818a44e82380e464e71aeb9cb95886c1e76c297",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/evidence.json": "d023d975ce4edaa5ee6adc32f04914b66424e486f6e0431520d0dfdf2dbba030",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/source-audit.md": "81ee1895440b7b504b374b397a0b88aaaa72baed242aedecff514b09553d7eaa",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/ElectronicSynth.pdf": "16e8eead814ba8553f70b4fceb6c1080179abfad1962207a943957bf90cdb0fc",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/fairchild-12.png": "a53bf01769e3283fbef46eb552cdc7a8461147f10753ede0e985c55ddcb5a325",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/yamaha-pwm-49.png": "fa9b257538082ee5879aff1f6377d9533e253f580f3723ff8f50121b122ef6f9",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/dc_nominal.py": "bb8eb3b5fd503518f3fd71c6abcf05fc3b6ee151f7d5d632b5ce0504aebaeff7",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/dc-nominal.json": "a15a96d9f6ee252129ccd21202c8278e8797b4fffa61b8f6985aa0ca39ab3ed4"
+  }
+}

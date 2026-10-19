@@ -973,7 +973,28 @@ void ringAudioAndFreeCarrier() {
         require(std::abs(m[i]-.5*(w[i]+d[i]))<1e-7,"Ring blend is linear before the common output rail");
     const double low=toneMagnitude(w,393,fs),high=toneMagnitude(w,487,fs);
     require(low>1 && high>1 && std::abs(low/high-1)<.02,"Balanced product produces both sum/difference sidebands");
-    require(toneMagnitude(w,440,fs)<.002*low,"Fully wet ideal ring suppresses dry carrier");
+    // Physical upper-pair steering has a nominal DC offset and therefore
+    // permits signal feedthrough/even sidebands. Independently derive the
+    // carrier amplitude from the passive Schur network, then integrate the
+    // matched-BJT current ratio rather than relaxing a suppression limit.
+    const std::complex<double> sc(0,2*(4*fs)*std::tan(pi*47/(4*fs)));
+    const auto ya=1/1000.+sc*100e-6,ys=1/390.+sc*100e-6;
+    const auto zb=1./(sc*100e-6+ya/(1.+820.*ya)+ys/(1.+1200.*ys));
+    const auto hc=(sc*100e-6)/(sc*100e-6+1/33000.+1./(100.+zb))*100./(100.+zb);
+    const double ra=1/(1/1000.+2/(470.+125000.)),rb=1/(1/33100.+1/(820.+ra));
+    const double dc=-(15*rb/(390+1200+rb))*100/33100.;
+    const double vt=1.380649e-23*298.15/1.602176634e-19;
+    std::array<std::complex<double>,4> coefficients{};
+    for(unsigned i=0;i<65536;++i) {
+        const double phase=2*pi*i/65536.,volts=dc+1.5*std::abs(hc)*std::sin(phase);
+        const double ratio=std::exp(volts/vt),steering=(ratio-1)/(ratio+1);
+        for(unsigned h=0;h<4;++h)coefficients[h]+=steering*std::polar(1.,-static_cast<double>(h)*phase)/65536.;
+    }
+    require(std::abs(toneMagnitude(w,440,fs)/low-std::abs(coefficients[0]/coefficients[1]))<2e-4,
+        "Nominal DC feedthrough matches physical BJT current-ratio oracle");
+    for(unsigned h=2;h<=3;++h)
+        require(std::abs(toneMagnitude(w,440-47*h,fs)/low-std::abs(coefficients[h]/coefficients[1]))<2e-4,
+            "Even/odd carrier sidebands match physical BJT current-ratio oracle");
     require(toneMagnitude(d,440,fs)>low && toneMagnitude(d,393,fs)<.002*low,"Dry bypass retains fundamental without ring sidebands");
     // Carrier phase is independent of note gates, allocation and mix bypass.
     ceres::Synth a(fs,5),b(fs,5);p.ringRate=37;p.ringDepth=0;p.ringMix=0;a.setPatch(p);p.ringMix=1;b.setPatch(p);
