@@ -1,0 +1,61 @@
+{
+  "source_url": "https://www.youtube.com/watch?v=d2u1QrIYvnw",
+  "creator": "AutomaticGainsay",
+  "title": "The Yamaha CS-50 Part 1: The Oscillator",
+  "publication_date": "20130107",
+  "duration_seconds": 518,
+  "format_note": "Original English audio, Opus48kHz; HLS720p video. Local analysis only; reference media not redistributed and not loaded by DSP.",
+  "dry_status": "No explicit dry-capture or unchanged-recording-gain statement in retrieved creator description. No processing is inferred absent merely because the source sounds dry.",
+  "midi_status": "No original MIDI. Notes estimated for stationary comparisons; native held gates are diagnostic reconstructions.",
+  "frame_review_seconds": [
+    45,
+    140,
+    144,
+    154,
+    164
+  ],
+  "source_reference_windows": {
+    "saw": [
+      50.3,
+      61.7
+    ],
+    "square": [
+      63.3,
+      82.7
+    ],
+    "both": [
+      143.3,
+      149.7
+    ]
+  },
+  "local_media_sha256": {
+    "automaticgainsay-oscillator.info.json": "ed3fdcde145bc9863ae2f960bf3b3af2f8812480b1d3c1147ee845b2792b4934",
+    "automaticgainsay-oscillator-audio.webm": "aa1d70ecfc5c44d6eb53dad6304c93ddfbffc9d8f05ba5e7a6e1cbbc728cee08",
+    "automaticgainsay-oscillator.mp4": "9b0263a51b8ca0f01f812a800b055c5a9c581c05deaa059b09197f2baa8e9bbb",
+    "automaticgainsay.en.vtt": "2db06ee381dbfeae62f11ec4900f0bfb3f55d4caff3dffd04d3f4af927be25b0"
+  },
+  "source_control_qualifications": [
+    "PW cap is at labeled50% end and PWMdepth at0 in inspected closeups. Electrical endpoints/taper are not measured.",
+    "Saw and square switch states are confirmed by creator explanation and visible toggles.",
+    "Filter bank remains untouched in the inspected oscillator section; absolute settings/EG/pressure/sine-level state are not fully calibrated.",
+    "Public score is conditional on unchanged capture gain and approximately steady VCA level across takes.",
+    "The41retained source windows have low short-term level movement and>98%16-harmonic energy coverage; this isolation test does not prove complete settings or dry capture."
+  ],
+  "rejected_alternatives": [
+    {
+      "source_url": "https://www.youtube.com/watch?v=Fj21t8MIS_o",
+      "creator": "Andy Whitmore",
+      "qualification": "Creator says dry.327..391s manual section visually inspected after HLS acquisition; polyphonic performances and liveVCA/PWM/filter edits do not isolate a fixed single-note waveform mixture."
+    },
+    {
+      "source_url": "https://web.archive.org/web/20070208025146/http://personal.inet.fi/private/matador/cs-50_index.html",
+      "creator": "ptk / matador",
+      "qualification": "Separate saw/square/PWM clips carry a no-external-effects claim. Waveforms clip is explicitly grouped under external effects. No controlled common-gain mixture pair."
+    },
+    {
+      "source_url": "https://www.youtube.com/watch?v=j1kM0EpneNc",
+      "creator": "synth4ever",
+      "qualification": "Creator discloses MXR stereo chorus; unsuitable for absolute dry relative-phase calibration."
+    }
+  ]
+}

@@ -543,6 +543,8 @@ void waveformRelationships() {
     // Actual rendered voices, same free-running phase and envelope. Opening
     // the filters makes their remaining 440 Hz phase rotation small. This
     // catches a wrong WSC saw inversion or an unrelated sine phase clock.
+    // Public solo/both-on recordings support constructive audio saw/pulse
+    // fundamentals; this does not infer absolute chip-pin voltage polarity.
     const auto fundamental=[](int wave) {
         ceres::Synth s(48000,321);
         auto p=sinePatch(); p.saw=wave==0; p.pulse=wave==1; p.sine=wave==2;
@@ -557,7 +559,7 @@ void waveformRelationships() {
     const auto saw=fundamental(0),pulse=fundamental(1),sine=fundamental(2);
     const auto relativePulse=saw*std::conj(pulse)/(std::abs(saw)*std::abs(pulse));
     const auto relativeSine=saw*std::conj(sine)/(std::abs(saw)*std::abs(sine));
-    require(relativePulse.real()<-.99,"WSC inverted saw and comparator pulse fundamentals have opposite polarity");
+    require(relativePulse.real()>.99,"Recorded saw/pulse audio fundamentals reinforce at nominal equal source levels");
     require(std::abs(relativeSine.real())<.15 && std::abs(relativeSine.imag())>.98,
             "Folded-triangle sine is approximately in quadrature with saw fundamental");
 }
@@ -753,7 +755,7 @@ void pwmSourceBehavior() {
         for (std::size_t i=0;i<period*4;++i) {
             require(shortReset[i].pulse==longReset[i].pulse,
                     "Conditioned WSC pulse edges must not track internal capacitor recharge slope");
-            average+=longReset[i].pulse;
+            average-=longReset[i].pulse; // Comparator logical coordinate, before empirical audio-sign calibration.
         }
         require(std::abs(average/(period*4)-(2*duty-1))<1e-10,
                 "Static comparator duty must preserve 50..90 percent range");
@@ -765,7 +767,7 @@ void pwmSourceBehavior() {
     const auto modulated=ceres::oscillatorTrace(fs,frequency,p,frames);
     std::vector<double> rising,falling;
     for (std::size_t i=1;i<frames;++i) {
-        const double before=modulated[i-1].pulse,after=modulated[i].pulse;
+        const double before=-modulated[i-1].pulse,after=-modulated[i].pulse;
         if (before<=0 && after>0)
             rising.push_back(i-after/(after-before));
         if (before>=0 && after<0)
@@ -774,18 +776,18 @@ void pwmSourceBehavior() {
     require(rising.size()>=31 && falling.size()>=31,"PWM probe must contain repeated transitions");
     for (double edge : rising)
         require(std::abs(edge-std::round(edge/period)*period)<1e-8,
-                "Positive pulse edge must remain fixed to VCO period throughout PWM");
+                "Logical comparator rising edge must remain fixed to VCO period throughout PWM");
     double smallest=period,largest=0;
     for (double edge : falling) {
         const double withinCycle=std::fmod(edge,period);
         smallest=std::min(smallest,withinCycle); largest=std::max(largest,withinCycle);
     }
-    require(largest-smallest>30,"PWM must move the falling edge substantially");
+    require(largest-smallest>30,"PWM must move the logical comparator falling edge substantially");
     p.pulseWidth=.6; p.pwmDepth=.2; p.pwmRate=.05; p.pwmPhase=0;
     const auto zeroPhase=ceres::oscillatorTrace(fs,frequency,p,period);
     p.pwmPhase=.25;
     const auto quarterPhase=ceres::oscillatorTrace(fs,frequency,p,period);
-    require(zeroPhase[125].pulse<-.9 && quarterPhase[125].pulse>.9,
+    require(-zeroPhase[125].pulse<-.9 && -quarterPhase[125].pulse>.9,
             "PWM phase offset must apply immediately to the sine modulation");
     p.pwmPhase=1;
     const auto wholePhase=ceres::oscillatorTrace(fs,frequency,p,period);

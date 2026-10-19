@@ -13,6 +13,12 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 
 ## Version history
 
+### Unreleased — 0.2.2 — waveform mixing
+
+- Corrects the relative pulse audio polarity so equal-level saw/pulse blends reinforce their fundamentals, following a public hardware-recording comparison. Shared oscillator phase and PWM timing remain unchanged.
+- Adds independent mixture regressions and broader rapid-note/envelope checks. The recording supports relative mixing balance; absolute phase, full pulse-width behavior and complete hardware calibration remain unresolved. See the [recording study](Docs/accuracy/waveform-mixing-20261019/) and [polarity validation](Docs/validation/waveform-polarity/).
+- Changes mixed-source tone and level intentionally; the Rack bank requires new output-trim calibration.
+
 ### Unreleased — 0.2.1 — rapid-note continuity
 
 - Smooths velocity expression when an audible voice is reused, avoiding an instantaneous gain or filter-expression jump. Fresh silent notes retain their immediate velocity response.

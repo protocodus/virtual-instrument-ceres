@@ -1,0 +1,78 @@
+{
+  "comparison_report_sha256": "61048382dfc2ec0ed39169c5f02a54dbddaeaafdf5ee7cbaa0b7fa62e4a750fc",
+  "script_sha256": "7f8f17b46d1ca9aff0734b89a4acc22bc72fcc25fe0990b89db69ed15176e129",
+  "renderer_sha256": "6f3e6c2f8c310158ff394b36b05917690271792c52c494f5761a94e9718d7eeb",
+  "renderer_build_identity": {
+    "Source/DSP/ceres.hpp": "dfb06576395a302c9920e186c1b080139f6700f2272006f5755b809f12c70895",
+    "Source/DSP/ceres.cpp": "712e845c3a896eafbb91f35899c50fa0f0b748465f312ce75789b5c8b3171c45",
+    "Tools/render_main.cpp": "dafd2077370a49fec8cdf04ee56349f501c6051e1cb5a5455842f602c479bcbf",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "69e53e74f06e887687b34a7f43e65ce6d8f543820c96f4eb0e6c54361934e35c"
+  },
+  "source_sha256": {
+    "Source/DSP/ceres.cpp": "712e845c3a896eafbb91f35899c50fa0f0b748465f312ce75789b5c8b3171c45",
+    "Source/DSP/ceres.hpp": "dfb06576395a302c9920e186c1b080139f6700f2272006f5755b809f12c70895",
+    "Tools/render_main.cpp": "dafd2077370a49fec8cdf04ee56349f501c6051e1cb5a5455842f602c479bcbf",
+    "CMakeLists.txt": "69e53e74f06e887687b34a7f43e65ce6d8f543820c96f4eb0e6c54361934e35c"
+  },
+  "cases": "Every candidate case from the frozen 12-case contrast: A3/D4 \u00d7 saw/square/both.",
+  "normalization": "None; exact original patches, events, rate, seed, voices and quality.",
+  "required_result": "Whole float32 WAV bytes equal to temporary-candidate witness, including attack and output tail.",
+  "rows": [
+    {
+      "note": 57,
+      "wave": "saw",
+      "expected_sha256": "a7823edfb874143f7c90507f05f60a86fd62c695012f91aab47a62082f46bad3",
+      "actual_sha256": "a7823edfb874143f7c90507f05f60a86fd62c695012f91aab47a62082f46bad3",
+      "whole_wav_byte_exact": true,
+      "max_sample_difference": 0.0,
+      "steady_window_max_difference": 0.0
+    },
+    {
+      "note": 57,
+      "wave": "square",
+      "expected_sha256": "49f043eee7fcf7029ce85036d49f4d128fe8083e8c05670d471f980e32d6ed18",
+      "actual_sha256": "49f043eee7fcf7029ce85036d49f4d128fe8083e8c05670d471f980e32d6ed18",
+      "whole_wav_byte_exact": true,
+      "max_sample_difference": 0.0,
+      "steady_window_max_difference": 0.0
+    },
+    {
+      "note": 57,
+      "wave": "both",
+      "expected_sha256": "6167c8d5913fd85c9e604c81e024ed9936c50fab1261e5fc4177603ee8918e65",
+      "actual_sha256": "6167c8d5913fd85c9e604c81e024ed9936c50fab1261e5fc4177603ee8918e65",
+      "whole_wav_byte_exact": true,
+      "max_sample_difference": 0.0,
+      "steady_window_max_difference": 0.0
+    },
+    {
+      "note": 62,
+      "wave": "saw",
+      "expected_sha256": "89783cf97fb13fd278fbc8c3fc48f0fd7f84a7d7ed005ce81da2fe7e61520e00",
+      "actual_sha256": "89783cf97fb13fd278fbc8c3fc48f0fd7f84a7d7ed005ce81da2fe7e61520e00",
+      "whole_wav_byte_exact": true,
+      "max_sample_difference": 0.0,
+      "steady_window_max_difference": 0.0
+    },
+    {
+      "note": 62,
+      "wave": "square",
+      "expected_sha256": "b599da340234053604443d2ade0bec305a9606c567ee95a78bc602a8e2bc4c4c",
+      "actual_sha256": "b599da340234053604443d2ade0bec305a9606c567ee95a78bc602a8e2bc4c4c",
+      "whole_wav_byte_exact": true,
+      "max_sample_difference": 0.0,
+      "steady_window_max_difference": 0.0
+    },
+    {
+      "note": 62,
+      "wave": "both",
+      "expected_sha256": "d22fd814bb6bcc8a49857ecb21b4ebe7d937be194c2b2571b90c7213f009ef5d",
+      "actual_sha256": "d22fd814bb6bcc8a49857ecb21b4ebe7d937be194c2b2571b90c7213f009ef5d",
+      "whole_wav_byte_exact": true,
+      "max_sample_difference": 0.0,
+      "steady_window_max_difference": 0.0
+    }
+  ],
+  "all_six_whole_wav_byte_exact": true
+}

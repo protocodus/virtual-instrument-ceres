@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "status": "pass",
+  "product_version": "0.2.2",
+  "scope": "Empirical relative pulse-audio polarity correction; logical comparator timing, shared phase and envelope law unchanged. Independent mixture regression and final-source rapid/envelope/capacitor contracts. No host or absolute hardware phase claim.",
+  "source_sha256": {
+    "Source/DSP/ceres.cpp": "712e845c3a896eafbb91f35899c50fa0f0b748465f312ce75789b5c8b3171c45",
+    "Source/DSP/ceres.hpp": "dfb06576395a302c9920e186c1b080139f6700f2272006f5755b809f12c70895",
+    "Tests/OscillatorCircuitTests.cpp": "1e2b819a3024b5d034367b1195f14ee80437560d48c2f7573af2ce72a088db93",
+    "Tests/dsp_tests.cpp": "9362831d749ab27557fb1943c122a0bb21f5c36542bbe81e06c47b47ce30493a",
+    "Tests/FastNoteEnvelopeTests.cpp": "6e44daddf3259512d15745afb530fb4767b660bed75b91c7721b563b2d362494",
+    "Tests/NoteReuseTests.cpp": "69cb82d7af23335af350e6e2811fa9f4077aa4c0814f2f7e41d8712b188ae47c",
+    "Tests/CapacitorContinuityTests.cpp": "49fc433439f8e4004ae093a4bbd53b5e9d4fbb14050a407b9869eaa0a80369de"
+  },
+  "change": {
+    "completed_audio_pulse_sign": -1,
+    "additional_oscillators": 0,
+    "phase_offset_added": false,
+    "comparator_edge_times_changed": false,
+    "pw_pwm_ranges_changed": false,
+    "envelope_law_changed": false,
+    "physical_inverter_stage_claimed": false
+  },
+  "before": {
+    "engine_commit": "f46e829bce46bea8e8400c58ce549457cd6a611e",
+    "cpp_sha256": "d1608b0048501670da9c129c4527f6af5ba78e8d278382b70a2ae28f59c0d0b4",
+    "test_source_sha256": "1e2b819a3024b5d034367b1195f14ee80437560d48c2f7573af2ce72a088db93",
+    "expected_failure_exit_code": 1,
+    "failed_independent_checks": [
+      "mixed second harmonic",
+      "production both-on level increase"
+    ],
+    "raw_pulse_saw_h1_ratio": 1.99991,
+    "raw_mix_h2_h1_db": -6.01856,
+    "raw_mix_h3_h1_db": -9.54566,
+    "raw_centered_mix_saw_rms_ratio": 0.999299,
+    "production_centered_mix_saw_rms_ratio": 0.883743
+  },
+  "after": {
+    "metrics_precision": "Rounded native regression stdout; reference-study metrics are separate.",
+    "raw_pulse_saw_h1_ratio": 1.99991,
+    "raw_mix_h2_h1_db": -15.5615,
+    "raw_mix_h3_h1_db": -9.54136,
+    "raw_centered_mix_saw_rms_ratio": 2.64471,
+    "production_centered_mix_saw_rms_ratio": 2.35103
+  },
+  "checks": {
+    "release": {
+      "passed": 5,
+      "total": 5,
+      "suites": [
+        "Ceres.oscillator_circuit_contracts",
+        "Ceres.native_dsp_contracts",
+        "Ceres.capacitor_continuity_contracts",
+        "Ceres.note_reuse_contracts",
+        "Ceres.fast_note_envelope_contracts"
+      ]
+    },
+    "asan_ubsan": {
+      "passed": 5,
+      "total": 5,
+      "suites": [
+        "Ceres.oscillator_circuit_contracts",
+        "Ceres.native_dsp_contracts",
+        "Ceres.capacitor_continuity_contracts",
+        "Ceres.note_reuse_contracts",
+        "Ceres.fast_note_envelope_contracts"
+      ]
+    },
+    "final_source_envelope_cases": 54,
+    "final_source_rapid_cv_cases": 72,
+    "final_source_single_chord_burst_cases": 432
+  },
+  "previous_f46_study_preserved_sha256": {
+    "Docs/validation/fast-notes/README.md": "f9f4967c6ea481d63e00ca883d57e617f7550477f7e312a2b4c9591410bb14b2",
+    "Docs/validation/fast-notes/validation.json": "98d8b06802d9e23c31c840c6167a39ad7a9353fad7f8ce36db435d9761bcf7a2"
+  },
+  "local_evidence_scope": "Logical local files below are retained experiment artifacts, not distributable assets and not a Recon validation.",
+  "local_evidence_sha256": {
+    "mixing-regression-before": "0a37c8e0f214fb10b628aaa22f100925cbaebd5880e1576a7741b495dcfb40bd",
+    "mixing-regression-before-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mixing-regression-before.log": "9b9664fa486c4291a1bcbf6151fe6d346557b8f3d052c229d324bc4ce3495d5c",
+    "polarity-release-tests.log": "3de6f4ad4c388d9b70d345ac0cb81b69219526eb0ea4fe9e1673dcfb03c459ef",
+    "polarity-sanitize-tests.log": "f15150ca0710164216b4e94ed96f3e4005aa1f7f25cd41474c2d3fabca042f1a",
+    "polarity-release/ceres_oscillator_circuit_tests": "c302e4bfbd9c27e5029a0d440b2b53881d1ad1cd37b419237f364cbb7cff16b7",
+    "polarity-sanitize/ceres_oscillator_circuit_tests": "a9f3b16f76b3371234b4067ef18cd7db3201919fcff6d6829fff83b17a3152c0"
+  }
+}

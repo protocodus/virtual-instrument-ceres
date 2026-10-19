@@ -22,6 +22,12 @@ struct Patch {
     // its source amplitude scales sqrt(internalFactor/4). SUB noise uses
     // its separate RC/RMS convention and the unchanged raw random sample.
     double saw = 1.0, pulse = 0.0, sine = 0.0, noise = 0.0;
+    // PW is the comparator's logical timing window (50..90%), modulated by
+    // PWM with its fixed cycle edge retained. The completed audio pulse has
+    // the opposite sign to that logical coordinate: public solo/both-on
+    // CS-50 recordings support this relative saw/pulse audio calibration.
+    // It changes neither edge time nor shared phase and does not identify an
+    // active-low hardware stage; absolute circuit phase remains uncalibrated.
     double pulseWidth = 0.5, pwmDepth = 0.0, pwmRate = 1.0;
     // Continuous sine-LFO phase offset in cycles, applied immediately by
     // setPatch. The free-running PWM clock is never reset by note events.

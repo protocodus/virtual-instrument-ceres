@@ -465,7 +465,7 @@ struct Oscillator {
         // edge. Its rising edge stays locked to the VCO period. Applying a
         // comparator to BOTH slopes of the internal recharge capacitor would
         // incorrectly move both edges; WSC uses the conditioned VCO output.
-        // Retain the documented positive pulse polarity after reset. At
+        // This is the comparator's logical timing coordinate. At
         // deep PWM where duty<recharge, this fixed-edge rule is an independent
         // WSC approximation; hidden reset/comparator compensation is unknown.
         double square = phase < duty ? 1 : -1;
@@ -482,7 +482,14 @@ struct Oscillator {
         const double sine = sineBase + .5*(resetCosine-1)*blep(resetPhase,step)
             - pi*resetSine*blamp(resetPhase,step);
         phase = wrap(phase + step);
-        return {saw, square, sine};
+        // Empirical audio-polarity calibration: public CS-50 solo/both-on
+        // recordings support constructive saw/pulse mixing at equal nominal
+        // source levels. Negate the completed pulse, including its BLEP,
+        // without moving either comparator edge, changing PW/PWM timing or
+        // introducing another oscillator. The guide's small waveform sketches
+        // do not establish an unambiguous common timing reference; this is not
+        // proof of an active-low chip output or an extra hardware inverter.
+        return {saw, -square, sine};
     }
 };
 
