@@ -1,0 +1,58 @@
+{
+  "status": "pass",
+  "parent_commit": "2ee6cf22deead7358d6b4ee7c294da955225af56",
+  "parent_source_sha256": {
+    "ceres.hpp": "e90e883a9a41a61ce596d5fc316e3cca3f0f2fa03422ea4744e61d70faa17952",
+    "ceres.cpp": "3fe87405e051b6bfade6b37324789eb1567f83e61cd8a493d4c5a1e0a6c6fa31"
+  },
+  "exact_sample_count": 768000,
+  "scope": "Default4 voices/4x; temporary parent binary/audio re-created by this script, not retained",
+  "cases": [
+    {
+      "mode": "legacy",
+      "samples": 384000,
+      "variants": {
+        "parent": {
+          "audio_sha256": "6d0e609e106af8d81d28ab389a0b5eb5b76540a9786be70f2cebcf035b0840b6",
+          "binary_sha256": "819e9e6f149eedb9cd4d9abfa71c72e47e2bb1b6a1042f3817a27b555703e538"
+        },
+        "candidate": {
+          "audio_sha256": "6d0e609e106af8d81d28ab389a0b5eb5b76540a9786be70f2cebcf035b0840b6",
+          "binary_sha256": "f2dc5b16174902f9e66c6d744a1dbeb9b1065dbff6b58163703912e8569f51c5"
+        }
+      }
+    },
+    {
+      "mode": "expression",
+      "samples": 384000,
+      "variants": {
+        "parent": {
+          "audio_sha256": "e95e0233b4b8ec86f39a77745266cc84a56e2aafe08e427ff3b70388ea9e4b84",
+          "binary_sha256": "819e9e6f149eedb9cd4d9abfa71c72e47e2bb1b6a1042f3817a27b555703e538"
+        },
+        "candidate": {
+          "audio_sha256": "e95e0233b4b8ec86f39a77745266cc84a56e2aafe08e427ff3b70388ea9e4b84",
+          "binary_sha256": "f2dc5b16174902f9e66c6d744a1dbeb9b1065dbff6b58163703912e8569f51c5"
+        }
+      }
+    }
+  ],
+  "compile_command": [
+    "c++",
+    "-std=c++17",
+    "-O3",
+    "-DNDEBUG",
+    "-I",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-parent-parity-8f55fj4y",
+    "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/Tests/ParityDriver.cpp",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-parent-parity-8f55fj4y/ceres.cpp",
+    "-o",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-parent-parity-8f55fj4y/parent"
+  ],
+  "inputs_sha256": {
+    "Source/DSP/ceres.cpp": "4b3454f9c0c05e3dc2ca85b13db778ffd597ac04a224bd34f4574679a2c0b289",
+    "Source/DSP/ceres.hpp": "773b2254cb594807de8ce9e1eed24bc21322d7fd27ad28f62ee42d5a4f93b25e",
+    "Tests/ParityDriver.cpp": "34e352d2bca9f18387610c4bd26881936c246afc5820a4c1b3a76259eb8e43b3",
+    "Tools/check_legacy_configuration.py": "0869c9f24e2ad3ef315fcb06636dcfafd55b231376587a8d5eaf8dd352c230a4"
+  }
+}

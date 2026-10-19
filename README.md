@@ -1,6 +1,6 @@
 # Ceres
 
-Ceres is a four-voice, sample-free Yamaha CS-50 research synthesizer with a reusable C++17 circuit engine. This repository also contains the existing JUCE VST3/AU/CLAP/Standalone scaffold: that plug-in still uses its separate silent placeholder engine and is **not yet connected** to the circuit synthesizer. The Reason Rack Extension consumes the shared DSP through a pinned submodule in its separate adapter repository.
+Ceres is a sample-free Yamaha CS-50 research synthesizer with a reusable C++17 circuit engine and configurable 1–16 voice polyphony. This repository also contains the existing JUCE VST3/AU/CLAP/Standalone scaffold: that plug-in still uses its separate silent placeholder engine and is **not yet connected** to the circuit synthesizer. The Reason Rack Extension consumes the shared DSP through a pinned submodule in its separate adapter repository.
 
 ![Ceres editor scaffold](Docs/screenshots/ceres.png)
 
@@ -12,6 +12,13 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 <!-- audio-demos-end -->
 
 ## Version history
+
+### Unreleased — 0.2.0 — configurable polyphony and processing quality
+
+- Adds 1–16 preallocated voices and actual 1×, 2× or 4× internal processing. The standalone default remains four voices at 4×.
+- Smooths live Ring Depth edits over 20 ms without restarting the carrier or envelope; saved/static depths start immediately at their configured value.
+- Keeps the existing four-voice, 4× audio byte-identical in the recorded parent comparison. Configuration changes require an unclocked/reset engine; adapters can defer them until idle and fade residual tails.
+- Retains nominal 31-host-sample output latency at all qualities. Lower quality trades oversampling headroom and alias rejection for CPU cost; it is not the same sound under a new label.
 
 ### Unreleased — 0.1.0 — circuit engine and existing plug-in scaffold
 
@@ -34,7 +41,7 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 
 `Source/DSP/ceres.cpp` and `ceres.hpp` implement the standalone circuit engine and its sample-by-sample API. `Source/DSP/CeresEngine.*` remains the distinct silent placeholder used by `Source/Plugin*`; this merge does not silently change the plug-in's sound, controls or saved-state contract. The native and embedded circuit libraries do not depend on JUCE, samples, hardware recordings or manuals at runtime.
 
-Product version 0.1.0 imports the canonical v0.10.0 research model and subsequent documented circuit changes. It is a reduced circuit model with provisional control calibration, not a transistor-exact recreation. No existing historical validation report is relabelled as a validation of this merged build.
+The original product version 0.1.0 imported the canonical v0.10.0 research model and subsequent documented circuit changes. It is a reduced circuit model with provisional control calibration, not a transistor-exact recreation. No existing historical validation report is relabelled as a validation of this merged build.
 
 ### Use the standalone core
 
@@ -55,9 +62,21 @@ for (unsigned frame = 0; frame < 64; ++frame)
     output[frame] = synth.process();
 ```
 
-The embedded interface has a numeric `Patch`, a C-string parameter setter, no exception path, and no allocating offline probes/preset APIs. Construction allocates the synth state. Rendering, controller changes, validated patch updates, panic and reset use existing state. Do not construct or replace a synth inside `RenderBatch`.
+The embedded interface has a numeric `Patch`, a C-string parameter setter, no exception path, and no allocating offline probes/preset APIs. Construction allocates the synth state. Rendering, controller changes, validated patch updates, panic, reset and configuration reuse existing state. Do not construct or replace a synth inside `RenderBatch`.
 
-The output is mono. All four physical voices and their capacitor states continue running when no note is held. `activeVoices()==0` does **not** imply silence: the common output bus has a roughly 0.888-second time constant. `allNotesOff()` honors the MIDI pedal; `allSoundOff()` clears audio states while preserving controllers; `reset()` also restores seeded oscillator/controller state. The FIR has nominal group delay 31 host samples, with the decimator's sampling phase affecting event alignment.
+The output is mono. All configured voices and their capacitor states continue running when no note is held. `activeVoices()==0` does **not** imply silence: the common output bus has a roughly 0.888-second time constant. `allNotesOff()` honors the MIDI pedal; `allSoundOff()` clears audio states while preserving controllers; `reset()` also restores seeded oscillator/controller state. The FIR has nominal group delay 31 host samples, with the decimator's sampling phase affecting event alignment.
+
+### Polyphony and processing quality
+
+`configure(voices, factor)` accepts 1–16 voices and factors 1, 2 or 4. It returns `false` without mutation for invalid values, after processing has started, or when notes are already assigned before the first sample. A request equal to the current configuration is a no-op. `polyphony()` and `oversamplingFactor()` report the applied configuration; the old static constants describe the four-voice, 4× defaults.
+
+Configure before sending notes, or explicitly reset first, then reapply controllers. A changed configuration resets capacitor, oscillator and controller state while retaining the patch. A live adapter should wait for physical keys, pedal and active envelopes to be released, fade the residual tail, reset/configure, restore patch/controllers and fade back in. Panic alone does not reopen configuration. This API does not silently cut held notes or allocate new voices on the audio thread.
+
+The 4× path retains its original 249-tap FIR. The 2× path has a 125-tap FIR with the same nominal group delay; 1× uses an exact 31-sample delay and no redundant low-pass. Final-of-factor sampling retains the legacy fractional decimation phase, so the modes do not promise identical transients. All oscillators, filters, envelopes and circuit states actually run at the selected internal rate. The existing frequency guards operate at that rate, so lower qualities can also limit extreme settings earlier.
+
+Additional voices are a virtual extension of the four-board model. The calibrated common bus and per-voice gain remain unchanged; no voice-count normalization or limiter is added. Larger chords can increase rail saturation and output level. Extra voices use a separate initialization stream; at the default four-voice setting the original shared noise/drift stream remains exact. See [configuration validation](Docs/validation/poly-quality/README.md).
+
+The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults `4` and `4`. Host adapters may choose and save different defaults independently of the 57 hardware/engineering patch keys.
 
 ### Ring, SUB and SUSTAIN controls
 
@@ -70,6 +89,8 @@ The output is mono. All four physical voices and their capacitor states continue
 | `ring_decay` | 0.01..10 s T60 | 0.35 | Frequency-envelope decay toward the base rate |
 | `lfo_waveform` | 0..4 | 0 | Sine, Down, Up, Square, Noise |
 | `sustain_mode` | 1..2 | 1 | I holds released key voltage; II follows the last assigned key |
+
+Live `ring_depth` changes interpolate over 20 ms in the digital control domain. This dezipper preserves the existing exponential frequency law and 220 Hz cap; it is not a newly inferred analog time constant. Startup/reset use the saved depth immediately. Repeated notifications at the same target do not prolong the transition, and a reversal starts from the current interpolated value. The change removes the immediate frequency-control step in a synthetic test; it does not prove the exact cause of a reported host crackle.
 
 The ring envelope triggers when the first physical key is pressed after all keys have been released. Additional held keys do not retrigger it, including when four-voice stealing occurs. Final key-up returns its frequency envelope toward zero through a fixed nominal release; the carrier phase keeps running. The total carrier is bounded at 220 Hz, so SPEED and DEPTH interact near that limit. This is a circuit-informed balanced-multiplier model with provisional envelope and wet-gain calibration.
 

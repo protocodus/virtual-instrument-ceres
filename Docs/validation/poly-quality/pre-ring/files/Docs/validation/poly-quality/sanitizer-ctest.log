@@ -1,0 +1,16 @@
+Test project /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize
+    Start  1: Ceres.configuration_contracts
+1/4 Test  #1: Ceres.configuration_contracts ................   Passed    0.75 sec
+    Start  3: Ceres.native_dsp_contracts
+2/4 Test  #3: Ceres.native_dsp_contracts ...................   Passed    8.68 sec
+    Start  9: Ceres.embedded_allocation_contract
+3/4 Test  #9: Ceres.embedded_allocation_contract ...........   Passed    1.26 sec
+    Start 10: Ceres.configuration_native_embedded_parity
+4/4 Test #10: Ceres.configuration_native_embedded_parity ...   Passed    3.49 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+unit    =  14.18 sec*proc (4 tests)
+
+Total Test time (real) =  14.19 sec

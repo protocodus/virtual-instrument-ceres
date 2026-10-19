@@ -76,7 +76,7 @@ void dispatch(ceres::Synth& synth,const Event& e) {
 int main(int argc,char** argv) {
  try {
     std::string eventPath,outputPath,patchPath,preset="brass_1";
-    uint64_t frames=0,seed=50; unsigned rate=48000;
+    uint64_t frames=0,seed=50; unsigned rate=48000,voices=4,oversampling=4;
     for(int i=1;i<argc;++i) {
         std::string option=argv[i];
         if(option=="--build-info") { std::cout<<ceresCompiledSources<<'\n'; return 0; }
@@ -90,13 +90,17 @@ int main(int argc,char** argv) {
         else if(option=="--rate") { auto n=uintArgument(value); if(n<8000||n>192000) throw std::runtime_error("sample rate must be 8000..192000"); rate=unsigned(n); }
         else if(option=="--frames") frames=uintArgument(value);
         else if(option=="--seed") seed=uintArgument(value);
+        else if(option=="--voices") { auto n=uintArgument(value); if(n<1||n>16)throw std::runtime_error("voices must be 1..16"); voices=unsigned(n); }
+        else if(option=="--oversampling") { auto n=uintArgument(value); if(n!=1&&n!=2&&n!=4)throw std::runtime_error("oversampling must be 1, 2 or 4"); oversampling=unsigned(n); }
         else throw std::runtime_error("unknown option: "+option);
     }
     if(eventPath.empty()||outputPath.empty()||frames==0||frames>(std::numeric_limits<uint32_t>::max()-48)/4)
-        throw std::runtime_error("usage: ceres_render --events events.tsv --output output.wav --frames N [--preset NAME --patch file.patch --rate 48000 --seed 50]");
+        throw std::runtime_error("usage: ceres_render --events events.tsv --output output.wav --frames N [--preset NAME --patch file.patch --rate 48000 --seed 50 --voices 4 --oversampling 4]");
     auto patch=ceres::preset(preset); if(!patchPath.empty()) loadPatch(patch,patchPath);
     auto events=loadEvents(eventPath,frames);
-    ceres::Synth synth(rate,seed); synth.setPatch(patch);
+    ceres::Synth synth(rate,seed);
+    if(!synth.configure(voices,oversampling))throw std::runtime_error("render configuration rejected");
+    synth.setPatch(patch);
     std::ofstream out(outputPath,std::ios::binary); if(!out) throw std::runtime_error("cannot write WAV");
     // IEEE 32-bit float, mono; fixed gain and no clip normalization.
     out.write("RIFF",4); u32(out,uint32_t(48+frames*4)); out.write("WAVEfmt ",8);
@@ -114,6 +118,7 @@ int main(int argc,char** argv) {
     out.close(); if(!out) throw std::runtime_error("WAV write failed");
     double elapsed=std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count();
     std::cout<<std::setprecision(12)<<"{\"sample_rate\":"<<rate<<",\"frames\":"<<frames<<",\"channels\":1,\"sample_format\":\"float32\",\"seed\":"<<seed
+       <<",\"voices\":"<<voices<<",\"oversampling\":"<<oversampling<<",\"nominal_latency_samples\":"<<ceres::Synth::outputLatency
        <<",\"preset\":\""<<preset<<"\",\"peak\":"<<peak<<",\"rms\":"<<std::sqrt(energy/frames)<<",\"samples_above_unity\":"<<above
        <<",\"render_seconds\":"<<elapsed<<",\"audio_seconds\":"<<double(frames)/rate<<",\"realtime_factor\":"<<(double(frames)/rate)/elapsed
        <<",\"normalization\":\"none\",\"timing_scope\":\"native offline DSP plus WAV I/O; not host deadline performance\"}\n";

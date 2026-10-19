@@ -1,0 +1,27 @@
+-- Configuring done (1.0s)
+-- Generating done (0.2s)
+-- Build files have been written to: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize
+[ 50%] Built target ceres
+[100%] Built target ceres_configuration_tests
+[ 50%] Built target ceres
+[ 75%] Building CXX object CMakeFiles/ceres_ring_depth_tests.dir/Tests/RingDepthContinuityTests.cpp.o
+[100%] Linking CXX executable ceres_ring_depth_tests
+[100%] Built target ceres_ring_depth_tests
+[ 25%] Building CXX object CMakeFiles/ceres_embedded.dir/Source/DSP/ceres.cpp.o
+[ 50%] Linking CXX static library libceres_embedded.a
+[ 50%] Built target ceres_embedded
+[ 75%] Building CXX object CMakeFiles/ceres_embedded_contract.dir/Tests/EmbeddedContract.cpp.o
+[100%] Linking CXX executable ceres_embedded_contract
+[100%] Built target ceres_embedded_contract
+[ 50%] Built target ceres
+[ 75%] Building CXX object CMakeFiles/ceres_tests.dir/Tests/dsp_tests.cpp.o
+[100%] Linking CXX executable ceres_tests
+[100%] Built target ceres_tests
+[ 50%] Built target ceres
+[ 75%] Building CXX object CMakeFiles/ceres_native_configuration_parity.dir/Tests/ConfigurationParityDriver.cpp.o
+[100%] Linking CXX executable ceres_native_configuration_parity
+[100%] Built target ceres_native_configuration_parity
+[ 50%] Built target ceres_embedded
+[ 75%] Building CXX object CMakeFiles/ceres_embedded_configuration_parity.dir/Tests/ConfigurationParityDriver.cpp.o
+[100%] Linking CXX executable ceres_embedded_configuration_parity
+[100%] Built target ceres_embedded_configuration_parity

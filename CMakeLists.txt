@@ -22,7 +22,7 @@ endif()
 
 # C is required in addition to C++: JUCE's macOS plug-in wrappers (AU and
 # Standalone) compile C/Objective-C sources with non-Xcode generators too.
-project(Ceres VERSION 0.1.0 LANGUAGES C CXX)
+project(Ceres VERSION 0.2.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -250,6 +250,9 @@ if(CERES_BUILD_TOOLS)
 endif()
 
 if(BUILD_TESTING)
+  add_executable(ceres_configuration_tests Tests/ConfigurationTests.cpp)
+  target_link_libraries(ceres_configuration_tests PRIVATE ceres)
+  add_test(NAME Ceres.configuration_contracts COMMAND ceres_configuration_tests)
   add_executable(ceres_oscillator_circuit_tests Tests/OscillatorCircuitTests.cpp)
   target_link_libraries(ceres_oscillator_circuit_tests PRIVATE ceres)
   add_test(NAME Ceres.oscillator_circuit_contracts COMMAND ceres_oscillator_circuit_tests)
@@ -262,6 +265,9 @@ if(BUILD_TESTING)
   add_executable(ceres_capacitor_tests Tests/CapacitorContinuityTests.cpp)
   target_link_libraries(ceres_capacitor_tests PRIVATE ceres)
   add_test(NAME Ceres.capacitor_continuity_contracts COMMAND ceres_capacitor_tests)
+  add_executable(ceres_ring_depth_tests Tests/RingDepthContinuityTests.cpp)
+  target_link_libraries(ceres_ring_depth_tests PRIVATE ceres)
+  add_test(NAME Ceres.ring_depth_continuity_contracts COMMAND ceres_ring_depth_tests)
   add_executable(ceres_ring_carrier_tests Tests/RingCarrierTests.cpp)
   target_link_libraries(ceres_ring_carrier_tests PRIVATE ceres)
   add_test(NAME Ceres.ring_carrier_circuit_contracts COMMAND ceres_ring_carrier_tests)
@@ -281,8 +287,21 @@ if(BUILD_TESTING)
   target_link_libraries(ceres_native_parity PRIVATE ceres)
   add_executable(ceres_embedded_parity Tests/ParityDriver.cpp)
   target_link_libraries(ceres_embedded_parity PRIVATE ceres_embedded)
+  add_executable(ceres_native_configuration_parity Tests/ConfigurationParityDriver.cpp)
+  target_link_libraries(ceres_native_configuration_parity PRIVATE ceres)
+  add_executable(ceres_embedded_configuration_parity Tests/ConfigurationParityDriver.cpp)
+  target_link_libraries(ceres_embedded_configuration_parity PRIVATE ceres_embedded)
   find_package(Python3 COMPONENTS Interpreter)
   if(Python3_Interpreter_FOUND)
+    if(CERES_BUILD_TOOLS)
+      add_test(NAME Ceres.configuration_cli_contract COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_configuration_cli.py"
+        --renderer "$<TARGET_FILE:ceres_render>")
+    endif()
+    add_test(NAME Ceres.configuration_native_embedded_parity COMMAND "${Python3_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_configuration_parity.py"
+      --native "$<TARGET_FILE:ceres_native_configuration_parity>"
+      --embedded "$<TARGET_FILE:ceres_embedded_configuration_parity>")
     add_test(NAME Ceres.native_embedded_audio_parity COMMAND "${Python3_EXECUTABLE}"
       "${CMAKE_CURRENT_SOURCE_DIR}/Tools/check_embedded.py" --build-dir "$<TARGET_FILE_DIR:ceres_native_parity>"
       --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
@@ -297,9 +316,10 @@ if(BUILD_TESTING)
       --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
   endif()
 
-  foreach(target IN ITEMS ceres_oscillator_circuit_tests ceres_tests ceres_sound_path_tests
-      ceres_capacitor_tests ceres_ring_carrier_tests ceres_ring_switching_tests ceres_expression_tests
-      ceres_embedded_contract ceres_native_parity ceres_embedded_parity)
+  foreach(target IN ITEMS ceres_configuration_tests ceres_oscillator_circuit_tests ceres_tests ceres_sound_path_tests
+      ceres_capacitor_tests ceres_ring_depth_tests ceres_ring_carrier_tests ceres_ring_switching_tests ceres_expression_tests
+      ceres_embedded_contract ceres_native_parity ceres_embedded_parity
+      ceres_native_configuration_parity ceres_embedded_configuration_parity)
     set_target_properties(${target} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
   endforeach()
     add_executable(CeresDSPTests Tests/test_dsp.cpp)
