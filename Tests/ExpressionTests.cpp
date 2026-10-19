@@ -82,17 +82,18 @@ void lifecycle() {
     require(s.voiceState()[1].keyNote==72,"Pedal-up changes key CV without copying new key velocity");
     s.noteOn(72,0);advance(s);checkVoice(s,2,.45,p);
     require(!s.voiceState()[2].held,"Zero-velocity noteOn is noteOff, not replacement velocity");
-    // Fully held allocation must steal the oldest board and overwrite only
-    // its velocity. Its oscillator/envelope capacitors are not restarted.
+    // Fully held allocation must steal the oldest board and retarget only
+    // its velocity. The consumed CV follows the5ms digital controller RC;
+    // its oscillator/envelope capacitors are not restarted.
     s.reset();s.setPatch(p);
     for(unsigned i=0;i<4;++i)s.noteOn(48+int(i)*4,.2+.15*i);
     advance(s);const auto old=s.voiceState();s.noteOn(80,.95);
     const auto assigned=s.voiceState();
     require(assigned[0].note==80 && assigned[0].oscillatorPhase==old[0].oscillatorPhase &&
             assigned[0].ampEnvelope==old[0].ampEnvelope,"Steal assigns velocity without clearing capacitor/phase state");
-    advance(s);checkVoice(s,0,.95,p);
+    advance(s);checkVoice(s,0,.95+(.2-.95)*std::exp(-16/(8000.*.005)),p);
     for(unsigned i=1;i<4;++i)checkVoice(s,i,.2+.15*i,p);
-    s.allNotesOff();advance(s);checkVoice(s,0,.95,p);
+    s.allNotesOff();advance(s);checkVoice(s,0,.95+(.2-.95)*std::exp(-32/(8000.*.005)),p);
     s.allSoundOff();for(unsigned i=0;i<100;++i)require(s.process()==0,"Panic clears audio with velocity expression");
     s.noteOn(61,.33);advance(s);
     bool found=false;for(unsigned i=0;i<4;++i)if(s.voiceState()[i].held){checkVoice(s,i,.33,p);found=true;}

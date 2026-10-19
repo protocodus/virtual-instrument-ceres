@@ -75,10 +75,31 @@ int main() {
         if(block==56){synth.reset();synth.noteOn(60,.9);}
         for(unsigned frame=0;frame<64;++frame)require(std::isfinite(synth.process()),"finite active expression render");
     }
-    require(allocations==0,"no allocations after construction across edits/render/reset");
+    for(unsigned voices:{1u,4u,16u})for(unsigned factor:{1u,2u,4u}) {
+        synth.reset();require(synth.configure(voices,factor),"realtime-safe reset configuration");
+        require(synth.polyphony()==voices && synth.oversamplingFactor()==factor,"configuration applied");
+        patch.ringMix=.7;patch.ringRate=220;patch.pwmDepth=.3;patch.filterLfo=.5;
+        synth.setPatch(patch);
+        for(unsigned i=0;i<voices;++i)synth.noteOn(40+int(i)*3,.3+.7*i/voices);
+        for(unsigned i=0;i<voices+2;++i)synth.noteOn(60,.1+.8*i/(voices+2));
+        for(unsigned frame=0;frame<64;++frame)require(std::isfinite(synth.process()),"audible velocity reuse finite");
+        synth.noteOff(60);synth.noteOff(60); // both presses have stolen owners
+        for(unsigned block=0;block<24;++block) {
+            if(block==2)require(!synth.configure(voices, factor==4?1:4),"live change rejected without allocation");
+            if(block==3 || block==4 || block==6) {
+                patch.ringDepth=block==6?1:6;synth.setPatch(patch);
+            }
+            if(block==4){synth.sustain(true);synth.allNotesOff();}
+            if(block==8)synth.sustain(false);
+            if(block==12)synth.noteOn(70,.8);
+            if(block==16)synth.allSoundOff();
+            for(unsigned frame=0;frame<64;++frame)require(std::isfinite(synth.process()),"configured render finite");
+        }
+    }
+    require(allocations==0,"no allocations after construction across edits/render/reset/configure");
     watch=false;
     for(double rate:{0.,std::numeric_limits<double>::quiet_NaN(),400000.}) {
         ceres::Synth invalid(rate,1);require(invalid.sampleRate()==48000,"invalid target rate safely defaults");
     }
-    std::printf("PASS embedded: no exceptions, numeric Patch, 576x64 frames including active expression, 57 control keys, zero post-construction new/new[] allocations\n");
+    std::printf("PASS embedded: no exceptions, numeric Patch, active expression and9 render configurations, 57 control keys, zero post-construction new/new[] allocations\n");
 }

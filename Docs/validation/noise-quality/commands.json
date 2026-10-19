@@ -1,0 +1,101 @@
+[
+  {
+    "log": "release-configure.log",
+    "command": [
+      "cmake",
+      "-S",
+      ".",
+      "-B",
+      "build-dsp",
+      "-DCERES_BUILD_PLUGIN=OFF",
+      "-DCERES_BUILD_UNIVERSAL=OFF",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DBUILD_TESTING=ON",
+      "-DCERES_SANITIZE=OFF"
+    ],
+    "environment_overrides": {}
+  },
+  {
+    "log": "release-build.log",
+    "command": [
+      "cmake",
+      "--build",
+      "build-dsp",
+      "--parallel",
+      "2"
+    ],
+    "environment_overrides": {}
+  },
+  {
+    "log": "release-ctest.log",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build-dsp",
+      "--output-on-failure",
+      "-V"
+    ],
+    "environment_overrides": {}
+  },
+  {
+    "log": "sanitizer-configure.log",
+    "command": [
+      "cmake",
+      "-S",
+      ".",
+      "-B",
+      "build-sanitize",
+      "-DCERES_BUILD_PLUGIN=OFF",
+      "-DCERES_BUILD_UNIVERSAL=OFF",
+      "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+      "-DBUILD_TESTING=ON",
+      "-DCERES_SANITIZE=ON"
+    ],
+    "environment_overrides": {}
+  },
+  {
+    "log": "sanitizer-build.log",
+    "command": [
+      "cmake",
+      "--build",
+      "build-sanitize",
+      "--parallel",
+      "2",
+      "--target",
+      "ceres_noise_quality_tests",
+      "ceres_configuration_tests",
+      "ceres_tests",
+      "ceres_embedded_contract",
+      "ceres_native_configuration_parity",
+      "ceres_embedded_configuration_parity"
+    ],
+    "environment_overrides": {}
+  },
+  {
+    "log": "sanitizer-ctest.log",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build-sanitize",
+      "--output-on-failure",
+      "-V",
+      "-R",
+      "^Ceres\\.(configuration_contracts|native_dsp_contracts|noise_quality_contracts|embedded_allocation_contract|configuration_native_embedded_parity)$"
+    ],
+    "environment_overrides": {
+      "ASAN_OPTIONS": "detect_leaks=0"
+    }
+  },
+  {
+    "log": "legacy-parity.log",
+    "command": [
+      "python3",
+      "Tools/check_legacy_configuration.py",
+      "--candidate",
+      "build-dsp/ceres_native_parity",
+      "--report",
+      "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/Docs/validation/noise-quality/legacy-parity.json"
+    ],
+    "environment_overrides": {}
+  }
+]

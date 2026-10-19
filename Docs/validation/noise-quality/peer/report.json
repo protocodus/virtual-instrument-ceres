@@ -1,0 +1,256 @@
+{
+  "status": "pass",
+  "plan_sha256": "bb291b5ac823238c9528c5585a06adbc351cbbea8d32049e9b3d037f0e66ca7d",
+  "builds": {
+    "baseline": {
+      "command": [
+        "clang++",
+        "-std=c++17",
+        "-O2",
+        "-I/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-source",
+        "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/probe.cpp",
+        "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-source/ceres.cpp",
+        "-o",
+        "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/baseline-probe"
+      ],
+      "binary_sha256": "d58fed6d9af75bf0d5693b3092b24f1879744276fbc3ce656ad914eef612ae95"
+    },
+    "candidate": {
+      "command": [
+        "clang++",
+        "-std=c++17",
+        "-O2",
+        "-I/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-source",
+        "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/probe.cpp",
+        "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-source/ceres.cpp",
+        "-o",
+        "/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001/candidate-probe"
+      ],
+      "binary_sha256": "2e4553f05c677295e3d821e3d719b1ea0e109d0fb035115c0480863b454a097f"
+    }
+  },
+  "parity": [
+    {
+      "factor": 1,
+      "profile": "saw_noise0",
+      "audio_exact_expected": true,
+      "audio_exact": true,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 1,
+      "profile": "sub_noise0",
+      "audio_exact_expected": true,
+      "audio_exact": true,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 1,
+      "profile": "drift_noise0",
+      "audio_exact_expected": true,
+      "audio_exact": true,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 1,
+      "profile": "mixed_noise",
+      "audio_exact_expected": false,
+      "audio_exact": false,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 1,
+      "profile": "noise_only",
+      "audio_exact_expected": false,
+      "audio_exact": false,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 2,
+      "profile": "saw_noise0",
+      "audio_exact_expected": true,
+      "audio_exact": true,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 2,
+      "profile": "sub_noise0",
+      "audio_exact_expected": true,
+      "audio_exact": true,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 2,
+      "profile": "drift_noise0",
+      "audio_exact_expected": true,
+      "audio_exact": true,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 2,
+      "profile": "mixed_noise",
+      "audio_exact_expected": false,
+      "audio_exact": false,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 2,
+      "profile": "noise_only",
+      "audio_exact_expected": false,
+      "audio_exact": false,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 4,
+      "profile": "saw_noise0",
+      "audio_exact_expected": true,
+      "audio_exact": true,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 4,
+      "profile": "sub_noise0",
+      "audio_exact_expected": true,
+      "audio_exact": true,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 4,
+      "profile": "drift_noise0",
+      "audio_exact_expected": true,
+      "audio_exact": true,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 4,
+      "profile": "mixed_noise",
+      "audio_exact_expected": true,
+      "audio_exact": true,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    },
+    {
+      "factor": 4,
+      "profile": "noise_only",
+      "audio_exact_expected": true,
+      "audio_exact": true,
+      "states_exact": {
+        "sub": true,
+        "frequency": true,
+        "phase": true
+      },
+      "passed": true
+    }
+  ],
+  "band_comparisons": [
+    {
+      "build": "baseline",
+      "factor": 1,
+      "relative_4x_band_db": [
+        6.144310203600776,
+        5.992242222732082
+      ],
+      "passed": null
+    },
+    {
+      "build": "baseline",
+      "factor": 2,
+      "relative_4x_band_db": [
+        3.070119081070419,
+        3.125445812503338
+      ],
+      "passed": null
+    },
+    {
+      "build": "candidate",
+      "factor": 1,
+      "relative_4x_band_db": [
+        0.12371056121396955,
+        -0.028356658242960544
+      ],
+      "passed": true
+    },
+    {
+      "build": "candidate",
+      "factor": 2,
+      "relative_4x_band_db": [
+        0.05981895362270429,
+        0.11514610276275183
+      ],
+      "passed": true
+    }
+  ],
+  "audio_bit_identity_cases": 11,
+  "state_identity_cases": 15,
+  "raw_audio_policy": "No WAVs or raw sample files retained; complete stream and each contiguous field SHA256/byte count retained. Reproduction uses retained exact sources and commands.",
+  "measurements_sha256": "9b48ec55d87a1ca63e8cb1d5eb93ac0c9440c6f580864f8708177ba10ddc64b6"
+}

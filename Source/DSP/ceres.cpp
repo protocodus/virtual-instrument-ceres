@@ -465,7 +465,7 @@ struct Oscillator {
         // edge. Its rising edge stays locked to the VCO period. Applying a
         // comparator to BOTH slopes of the internal recharge capacitor would
         // incorrectly move both edges; WSC uses the conditioned VCO output.
-        // Retain the documented positive pulse polarity after reset. At
+        // This is the comparator's logical timing coordinate. At
         // deep PWM where duty<recharge, this fixed-edge rule is an independent
         // WSC approximation; hidden reset/comparator compensation is unknown.
         double square = phase < duty ? 1 : -1;
@@ -482,7 +482,14 @@ struct Oscillator {
         const double sine = sineBase + .5*(resetCosine-1)*blep(resetPhase,step)
             - pi*resetSine*blamp(resetPhase,step);
         phase = wrap(phase + step);
-        return {saw, square, sine};
+        // Empirical audio-polarity calibration: public CS-50 solo/both-on
+        // recordings support constructive saw/pulse mixing at equal nominal
+        // source levels. Negate the completed pulse, including its BLEP,
+        // without moving either comparator edge, changing PW/PWM timing or
+        // introducing another oscillator. The guide's small waveform sketches
+        // do not establish an unambiguous common timing reference; this is not
+        // proof of an active-low chip output or an extra hardware inverter.
+        return {saw, -square, sine};
     }
 };
 
@@ -496,11 +503,14 @@ double besselI0(double x) {
     return sum;
 }
 struct Decimator {
-    static constexpr unsigned taps = 249;
-    std::array<double,taps> h{}, history{};
+    static constexpr unsigned maxTaps = 249;
+    std::array<double,maxTaps> h{}, history{};
+    const unsigned taps;
     unsigned cursor = 0;
-    Decimator() {
-        constexpr double cutoff = .1125; // 90% of output Nyquist at 4x rate
+    explicit Decimator(unsigned factor=4) : taps(62*factor+1) {
+        const double cutoff = factor==4 ? .1125 : .225;
+        // 90% of output Nyquist; same31-host-sample group delay at2x/4x.
+        // The4x coefficient generation and summation order stay unchanged.
         const double norm = besselI0(10);
         double sum = 0;
         for (unsigned i = 0; i < taps; ++i) {
@@ -510,7 +520,7 @@ struct Decimator {
             h[i] = sinc * besselI0(10*std::sqrt(std::max(0.0,1-r*r))) / norm;
             sum += h[i];
         }
-        for (auto& value : h) value /= sum;
+        for (unsigned i=0;i<taps;++i) h[i] /= sum;
     }
     void push(double x) { history[cursor] = x; cursor = (cursor+1)%taps; }
     double output() const {
@@ -523,6 +533,22 @@ struct Decimator {
         return y;
     }
     void clear() { history.fill(0); cursor = 0; }
+};
+struct OutputRate {
+    Decimator four{4}, two{2};
+    std::array<double,Synth::outputLatency+1> delay{};
+    unsigned cursor=0;
+    void push(double value,unsigned factor) {
+        if(factor==4)four.push(value);
+        else if(factor==2)two.push(value);
+        else {delay[cursor]=value;cursor=(cursor+1)%delay.size();}
+    }
+    double output(unsigned factor) const {
+        if(factor==4)return four.output();
+        if(factor==2)return two.output();
+        return delay[cursor]; // exact31-sample delay, no redundant1x low-pass
+    }
+    void clear() {four.clear();two.clear();delay.fill(0);cursor=0;}
 };
 } // namespace
 
@@ -554,7 +580,8 @@ struct Synth::Impl {
     struct Voice {
         int note = 60, keyNote = 60;
         bool held = false, pedalHeld = false;
-        double velocity = 1, drift = 0, driftTarget = 0;
+        double velocity = 1, velocityValue = 1, drift = 0, driftTarget = 0;
+        std::uint32_t pressTicket = 0;
         unsigned driftCountdown = 0;
         std::uint64_t age = 0;
         Oscillator osc;
@@ -570,8 +597,9 @@ struct Synth::Impl {
     std::uint64_t seed, age = 0;
     Random random;
     Patch patch;
-    std::array<Voice,4> voices;
-    Decimator decimator;
+    std::array<Voice,Synth::maxVoiceCount> voices;
+    unsigned voiceLimit=Synth::voiceCount, rateFactor=Synth::oversampling;
+    OutputRate decimator;
     double lfoPhase = 0, pwmPhase = 0, pressureTarget = 0, pressureValue = 0, bend = 0;
     OutputCoupling busCoupling, lineCoupling;
     double pressureCoefficient = 0, driftCoefficient = 0;
@@ -586,7 +614,7 @@ struct Synth::Impl {
     double hpResonanceAnchor=0, lpResonanceAnchor=0;
     bool hasProcessed=false;
     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
-    double outputTrimGain=1;
+    double outputTrimGain=1, audioNoiseGain=1;
     // Guide printed32: SUB-N uses22k/.1uF, independent of audio NO level.
     // This is the documented single low-pass (called pink in the prose),
     // not an invented ideal1/f filter. Normalize its unknown limiter level
@@ -595,6 +623,8 @@ struct Synth::Impl {
     Envelope ringEnvelope;
     std::array<double,4> ringCoefficients{};
     double ringPhase = 0, ringCarrier = 0, ringFrequency = 30;
+    double ringDepthValue = 0, ringDepthIncrement = 0;
+    unsigned ringDepthRemaining = 0;
     double ringCoupledCarrier=0;
     double ringSwitchGain=ringSteering(ringDifferentialDc);
     RingCarrierCoupling ringCarrierCoupling;
@@ -602,8 +632,12 @@ struct Synth::Impl {
     int lastAssignedKey = 60;
     bool pedal = false;
     // Physical-key ledger is independent of four-board allocation/stealing
-    // and MIDI damper. Repeated presses use FIFO-compatible counts.
+    // and MIDI damper. Per-pitch FIFO tickets retain stolen-press ownership
+    // without an unbounded event queue. Outstanding count is at most UINT32_MAX,
+    // so modulo-2^32 tickets are unique among outstanding presses. Matching uses
+    // equality only, never a signed comparison/subtraction across wraparound.
     std::array<std::uint32_t,128> physicalKeys{};
+    std::array<std::uint32_t,128> firstPress{}, nextPress{};
     std::size_t physicalKeyPresses = 0;
     explicit Impl(double sampleRate, std::uint64_t seedValue)
         : fs(sampleRate), internalFs(sampleRate*4), seed(seedValue), random(seedValue) {
@@ -616,6 +650,16 @@ struct Synth::Impl {
             throw std::invalid_argument("Sample rate must be finite and within 8000..384000 Hz");
 #endif
         }
+        configureRate();
+        reset();
+    }
+    void configureRate() {
+        internalFs=fs*rateFactor;
+        // Discrete white-noise PSD is variance/internalFs. Preserve the
+        // legacy4x density at this host rate: variance scales by factor/4.
+        // Audio NO only; SUB-N has its own RC/RMS convention below and
+        // must continue to receive the original shared random sample.
+        audioNoiseGain=std::sqrt(rateFactor/4.0);
         pressureCoefficient = 1-std::exp(-1/(internalFs*.005));
         driftCoefficient = 1-std::exp(-1/(internalFs*.3));
         qControlCoefficient=-std::expm1(-1/(internalFs*qControlTau));
@@ -623,7 +667,6 @@ struct Synth::Impl {
         subNoiseGain=.25*std::sqrt(3*(1+subNoiseG)/subNoiseG);
         ringCarrierCoupling.configure(internalFs);
         updateCoefficients();
-        reset();
     }
     void updateCoefficients() {
         outputTrimGain=std::pow(10,patch.outputTrimDb/20);
@@ -647,25 +690,33 @@ struct Synth::Impl {
     }
     void followFreeKeys() {
         if (patch.sustainMode==2)
-            for (auto& voice : voices)
-                if (!voice.held && !voice.pedalHeld) voice.keyNote=lastAssignedKey;
+            for (unsigned i=0;i<voiceLimit;++i)
+                if (!voices[i].held && !voices[i].pedalHeld) voices[i].keyNote=lastAssignedKey;
     }
-    void keyOn(int note) {
+    bool keyOn(int note,std::uint32_t& ticket) {
         const bool wasEmpty=physicalKeyPresses==0;
-        auto& count=physicalKeys[static_cast<std::size_t>(note)];
-        if (count<std::numeric_limits<std::uint32_t>::max() &&
-            physicalKeyPresses<std::numeric_limits<std::size_t>::max()) { ++count; ++physicalKeyPresses; }
+        const auto pitch=static_cast<std::size_t>(note);
+        auto& count=physicalKeys[pitch];
+        // An unledgered key must never allocate a voice or trigger the ring EG.
+        if (count==std::numeric_limits<std::uint32_t>::max() ||
+            physicalKeyPresses==std::numeric_limits<std::size_t>::max()) return false;
+        ticket=nextPress[pitch]++;
+        ++count; ++physicalKeyPresses;
         if (wasEmpty) ringEnvelope.on();
+        return true;
     }
-    void keyOff(int note) {
-        auto& count=physicalKeys[static_cast<std::size_t>(note)];
-        if (count) {
-            --count; --physicalKeyPresses;
-            if (!physicalKeyPresses) ringEnvelope.off();
-        }
+    bool keyOff(int note,std::uint32_t& ticket) {
+        const auto pitch=static_cast<std::size_t>(note);
+        auto& count=physicalKeys[pitch];
+        if (!count) return false;
+        ticket=firstPress[pitch]++;
+        --count; --physicalKeyPresses;
+        if (!physicalKeyPresses) ringEnvelope.off();
+        return true;
     }
     void keysOff() {
-        physicalKeys.fill(0); physicalKeyPresses=0; ringEnvelope.off();
+        physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
+        physicalKeyPresses=0; ringEnvelope.off();
     }
     void reset() {
         random = Random(seed);
@@ -673,9 +724,11 @@ struct Synth::Impl {
         age = 0; lfoPhase = 0; pwmPhase = 0; lastSub=0;
         pressureTarget = pressureValue = bend = 0;
         pedal = false; busCoupling={}; lineCoupling={};
-        physicalKeys.fill(0); physicalKeyPresses=0; lastAssignedKey=60;
+        physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
+        physicalKeyPresses=0; lastAssignedKey=60;
         subNoiseMemory=0; ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={};
+        ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
         ringCarrierCoupling.clear();ringCoupledCarrier=0;
         ringSwitchGain=ringSteering(ringDifferentialDc);
         qVoltageOffset=0;
@@ -684,11 +737,17 @@ struct Synth::Impl {
         effectiveHpResonance=patch.hpResonance; effectiveLpResonance=patch.lpResonance;
         commonVcaGain=patch.ampLevel;
         decimator.clear();
-        for (auto& voice : voices) {
-            voice.osc.phase = random.unit();
+        // Preserve the original four-board random initialization and shared
+        // audio/drift stream exactly. Extra virtual boards never consume that
+        // stream during setup; they use a separate deterministic seed stream.
+        Random extra(seed^0x9e3779b97f4a7c15ULL);
+        for (unsigned i=0;i<voices.size();++i) {
+            auto& voice=voices[i];
+            auto& initialRandom=i<Synth::voiceCount ? random : extra;
+            voice.osc.phase = initialRandom.unit();
             voice.filter.voltage = patch.filterInitial;
-            voice.driftTarget = random.bipolar();
-            voice.driftCountdown = static_cast<unsigned>(internalFs * (.1 + random.unit()*.5));
+            voice.driftTarget = initialRandom.bipolar();
+            voice.driftCountdown = static_cast<unsigned>(internalFs * (.1 + initialRandom.unit()*.5));
         }
     }
     double sample() {
@@ -696,6 +755,7 @@ struct Synth::Impl {
         const double dt = 1 / internalFs;
         pressureValue += (pressureTarget-pressureValue) * pressureCoefficient;
         const double noise = random.bipolar(); // one shared physical noise source
+        const double audioNoise=rateFactor==4 ? noise : noise*audioNoiseGain;
         const double subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
         subNoiseMemory=2*subNoise-subNoiseMemory;
         const double lfo = subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
@@ -722,13 +782,19 @@ struct Synth::Impl {
         lfoPhase = wrap(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrap(pwmPhase + patch.pwmRate*dt);
         double mixed = 0;
-        for (unsigned i = 0; i < voices.size(); ++i) {
+        for (unsigned i = 0; i < voiceLimit; ++i) {
             auto& v = voices[i];
             // Velocity is stored per physical board on note assignment. Do
             // not replace it when a released board follows another key CV.
             // Channel pressure keeps smoothing in either mode, so switching
             // back retains its ordinary controller history.
-            const double expression=patch.expressionSource==1 ? v.velocity : pressureValue;
+            // Modern MIDI velocity is not a physical CS-50 control. Reusing an
+            // audible board must not step its VCA gain or expression CV while
+            // its capacitor/oscillator histories remain connected. Use the
+            // existing 5ms controller RC clock; silent assignments precharge in
+            // noteOn. This digital adaptation does not slew the keyboard CV.
+            v.velocityValue+=(v.velocity-v.velocityValue)*pressureCoefficient;
+            const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
             if (v.driftCountdown-- == 0) {
                 v.driftTarget = random.bipolar();
                 v.driftCountdown = static_cast<unsigned>(internalFs * (.2 + random.unit()*.5));
@@ -764,7 +830,7 @@ struct Synth::Impl {
                 : std::exp2(keyOctaves+filterEnvelope*patch.lpEnvelopeScale
                     + expression*patch.pressureFilter+lfo*patch.filterLfo
                     + patch.brilliance*lpBrillianceScale);
-            const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*noise;
+            const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*audioNoise;
             const double hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor);
             const double lpFrequency=modulatedFilterFrequency(patch.lpCutoff,lpFactor);
 #if !defined(CERES_EMBEDDED_TARGET)
@@ -779,13 +845,17 @@ struct Synth::Impl {
             const double beforeVca=v.commonCoupling.process(summed,outputCouplingTau[1],internalFs);
             // IG00151 gain is LINEAR in envelope CV (guide pp.40–41). The
             // optional velocity term is zero in factory-derived presets.
-            const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocity);
+            const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocityValue);
             const double pressureGain = 1-patch.pressureVolume*(1-expression);
             mixed += beforeVca * ampEnvelope * velocityGain * pressureGain * commonVcaGain;
         }
         // Output rail saturation is a deliberately mild, uncalibrated op-amp
         // approximation; no hidden peak normalization or dynamics processor.
-        // Four equal 4.7uF/1k voice branches into 47k: common-bus transfer,
+        // Four equal4.7uF/1k branches into47k define this calibrated bus.
+        // Extra voices are a virtual extension: retain the same bus/gain,
+        // rather than inventing a new physical load or dividing by voice count.
+        // More simultaneous voices can therefore increase rail saturation.
+        // Common-bus transfer,
         // with previous overall midband gain retained as a calibration choice.
         const double bus=busCoupling.process(mixed,outputCouplingTau[2],internalFs);
         // One global processor, after the voice bus and before expression/
@@ -795,7 +865,14 @@ struct Synth::Impl {
         // 10uF into10k (Guide differs): retain that physical RC at tau=.1s.
         const double ringControl=ringEnvelope.advance(0,1,0,.01,0,
             ringCoefficients[0],0,ringCoefficients[1],ringCoefficients[2]);
-        ringFrequency=clamp(patch.ringRate*std::exp2(patch.ringDepth*ringControl),.2,220);
+        // Digital control dezippering only: retain the physical EG trajectory,
+        // free carrier phase and frequency cap. Static configured patches use
+        // the exact target, including at startup; no invented analog RC.
+        if (ringDepthRemaining) {
+            if (--ringDepthRemaining==0) ringDepthValue=patch.ringDepth;
+            else ringDepthValue+=ringDepthIncrement;
+        }
+        ringFrequency=clamp(patch.ringRate*std::exp2(ringDepthValue*ringControl),.2,220);
         ringCarrier=std::sin(2*pi*ringPhase);
         ringPhase=wrap(ringPhase+ringFrequency*dt);
         // Keep this free-running passive network connected even at mix0.
@@ -822,6 +899,7 @@ Synth& Synth::operator=(Synth&&) noexcept = default;
 void Synth::setPatch(const Patch& patch) {
     const Patch validated = validatePatch(patch);
     const bool openingKeyHold=impl_->patch.sustainMode!=2 && validated.sustainMode==2;
+    const bool changingRingDepth=impl_->patch.ringDepth!=validated.ringDepth;
     impl_->patch = validated;
     impl_->updateCoefficients();
     if (openingKeyHold) impl_->followFreeKeys();
@@ -829,47 +907,66 @@ void Synth::setPatch(const Patch& patch) {
     // anchors/IL. Once even silence has been processed, preset recall only
     // changes targets; it cannot erase continuously connected charge.
     if (!impl_->hasProcessed) {
+        impl_->ringDepthValue=validated.ringDepth;
+        impl_->ringDepthIncrement=0; impl_->ringDepthRemaining=0;
         impl_->hpResonanceAnchor=validated.hpResonance;
         impl_->lpResonanceAnchor=validated.lpResonance;
         impl_->effectiveHpResonance=validated.hpResonance;
         impl_->effectiveLpResonance=validated.lpResonance;
         for (auto& voice : impl_->voices)
             if (voice.filter.stage == Envelope::Idle) voice.filter.voltage = validated.filterInitial;
+    } else if (changingRingDepth) {
+        // Retarget from the actual interpolated value. Repeated patch writes
+        // with the same target do not prolong the finite20ms transition.
+        impl_->ringDepthRemaining=std::max(1u,static_cast<unsigned>(std::ceil(impl_->internalFs*.020)));
+        impl_->ringDepthIncrement=(validated.ringDepth-impl_->ringDepthValue)/impl_->ringDepthRemaining;
     }
 }
 void Synth::noteOn(int note, double velocity) {
     if (note < 0 || note > 127 || !std::isfinite(velocity)) return;
     if (velocity <= 0) { noteOff(note); return; }
     auto& state = *impl_;
-    state.keyOn(note);
+    std::uint32_t ticket=0;
+    if (!state.keyOn(note,ticket)) return;
     state.lastAssignedKey=note;
     Impl::Voice* selected = nullptr;
     // Use an idle voice first, then the quietest released voice, then oldest
     // held voice. Repeated same-note presses can occupy separate voices.
-    for (auto& voice : state.voices)
+    for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it) {
+        auto& voice=*it;
         if (voice.amp.stage == Envelope::Idle && (!selected || voice.age < selected->age)) selected = &voice;
+    }
     if (!selected)
-        for (auto& voice : state.voices)
+        for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it) {
+            auto& voice=*it;
             if (!voice.held && !voice.pedalHeld && (!selected || voice.amp.voltage < selected->amp.voltage)) selected = &voice;
+        }
     if (!selected)
-        selected = &*std::min_element(state.voices.begin(),state.voices.end(),
+        selected = &*std::min_element(state.voices.begin(),state.voices.begin()+state.voiceLimit,
             [](const auto& a,const auto& b) { return a.age < b.age; });
     // I/II changes the held keyboard voltage of released physical boards;
     // it does not re-gate their VCF/VCA or reset any oscillator/filter state.
     state.followFreeKeys();
+    const bool silent=selected->amp.stage==Envelope::Idle || selected->amp.voltage==0;
     selected->note = selected->keyNote = note;
     selected->velocity = clamp(velocity,0,1);
+    if (silent) selected->velocityValue=selected->velocity;
+    selected->pressTicket=ticket;
     selected->held = true; selected->pedalHeld = false;
     selected->age = ++state.age;
     selected->amp.on(); selected->filter.on();
 }
 void Synth::noteOff(int note) {
     if (note<0 || note>127) return;
-    impl_->keyOff(note);
-    // FIFO note-off for overlapping repeated MIDI notes.
+    std::uint32_t ticket=0;
+    if (!impl_->keyOff(note,ticket)) return;
+    // Consume the oldest physical press even when its voice was stolen. Its
+    // eventual note-off cannot release a newer same-pitch replacement.
     Impl::Voice* selected = nullptr;
-    for (auto& voice : impl_->voices)
-        if (voice.note == note && voice.held && (!selected || voice.age < selected->age)) selected = &voice;
+    for (auto it=impl_->voices.begin();it!=impl_->voices.begin()+impl_->voiceLimit;++it) {
+        auto& voice=*it;
+        if (voice.note == note && voice.held && voice.pressTicket==ticket) { selected=&voice; break; }
+    }
     if (selected) {
         selected->held = false;
         selected->pedalHeld = impl_->pedal;
@@ -917,14 +1014,24 @@ void Synth::allSoundOff() {
     impl_->busCoupling={}; impl_->lineCoupling={};
 }
 void Synth::reset() { impl_->reset(); }
+bool Synth::configure(unsigned voices,unsigned factor) noexcept {
+    if(voices<1 || voices>maxVoiceCount || (factor!=1 && factor!=2 && factor!=4))return false;
+    if(voices==impl_->voiceLimit && factor==impl_->rateFactor)return true;
+    if(impl_->hasProcessed || impl_->physicalKeyPresses || activeVoices())return false;
+    impl_->voiceLimit=voices;impl_->rateFactor=factor;
+    impl_->configureRate();impl_->reset();
+    return true;
+}
+unsigned Synth::polyphony() const noexcept {return impl_->voiceLimit;}
+unsigned Synth::oversamplingFactor() const noexcept {return impl_->rateFactor;}
 std::size_t Synth::activeVoices() const {
-    return static_cast<std::size_t>(std::count_if(impl_->voices.begin(),impl_->voices.end(),
+    return static_cast<std::size_t>(std::count_if(impl_->voices.begin(),impl_->voices.begin()+impl_->voiceLimit,
         [](const auto& v) { return v.amp.stage != Envelope::Idle; }));
 }
 double Synth::sampleRate() const { return impl_->fs; }
 float Synth::process() {
-    for (unsigned i = 0; i < oversampling; ++i) impl_->decimator.push(impl_->sample());
-    const double output=impl_->decimator.output();
+    for (unsigned i = 0; i < impl_->rateFactor; ++i) impl_->decimator.push(impl_->sample(),impl_->rateFactor);
+    const double output=impl_->decimator.output(impl_->rateFactor);
     // Post-circuit/post-FIR utility gain: no change to analog state, timing,
     // nonlinear operating level or default sound. No output limiter is added.
     return static_cast<float>(impl_->patch.outputTrimDb==0 ? output : output*impl_->outputTrimGain);
@@ -940,14 +1047,34 @@ std::array<Synth::VoiceState,Synth::voiceCount> Synth::voiceState() const {
     }
     return result;
 }
+std::array<Synth::VoiceState,Synth::maxVoiceCount> Synth::allVoiceState() const {
+    std::array<VoiceState,maxVoiceCount> result{};
+    for(unsigned i=0;i<maxVoiceCount;++i) {
+        const auto& v=impl_->voices[i];
+        result[i]={v.note,v.keyNote,v.held,v.pedalHeld,v.amp.voltage,v.filter.voltage,v.osc.phase,
+            v.oscillatorFrequency,v.hpFrequency,v.lpFrequency};
+    }
+    return result;
+}
 Synth::ModulationState Synth::modulationState() const {
     return {impl_->lastSub,impl_->ringEnvelope.voltage,impl_->ringFrequency,
-        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier,impl_->ringSwitchGain};
+        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier,impl_->ringSwitchGain,impl_->ringDepthValue};
 }
 Synth::SoundPathState Synth::soundPathState() const {
     return {impl_->qVoltageOffset,impl_->effectiveHpResonance,
         impl_->effectiveLpResonance,impl_->commonVcaGain,
         impl_->hpResonanceAnchor,impl_->lpResonanceAnchor,impl_->hasProcessed};
+}
+std::vector<double> outputRateImpulse(unsigned factor,std::size_t hostFrames,unsigned inputSubframe) {
+    if((factor!=1 && factor!=2 && factor!=4) || inputSubframe>=factor)
+        throw std::invalid_argument("Invalid output-rate factor/subframe");
+    OutputRate output;
+    std::vector<double> result(hostFrames);
+    for(std::size_t frame=0;frame<hostFrames;++frame) {
+        for(unsigned sub=0;sub<factor;++sub)output.push(frame==0 && sub==inputSubframe ? 1.:0.,factor);
+        result[frame]=output.output(factor);
+    }
+    return result;
 }
 std::vector<double> ringCarrierResponse(double fs,const std::vector<double>& input) {
     if(!std::isfinite(fs)||fs<100||fs>1536000)

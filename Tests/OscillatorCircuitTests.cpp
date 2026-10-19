@@ -1,5 +1,6 @@
 #include "ceres.hpp"
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <complex>
 #include <iostream>
@@ -105,9 +106,84 @@ void extrapolationAndRate() {
                     std::abs(x.saw)<2&&std::abs(x.sine)<2&&std::abs(x.pulse)<2,"Extreme CV and rate guards must remain finite/bounded");
         }
 }
+
+// Public CS-50 oscillator demonstration: AutomaticGainsay, d2u1QrIYvnw.
+// Comparable solo and both-on examples support constructive saw/pulse mixing:
+// solo pulse/saw H1 is about2, while both-on H2/H1 is around-16dB rather
+// than the old cancellation model's-6dB. These deliberately broad intervals
+// encode that independent mixture behavior, not the oscillator implementation
+// or an alleged transistor-level polarity proof. Recording-chain/panel
+// uncertainty is documented in Docs/accuracy/waveform-mixing-20261019/.
+void recordedMixtureRelationship() {
+    constexpr double fs=1048576,frequency=256;
+    constexpr std::size_t count=4096;
+    ceres::Patch p;p.pulseWidth=.5;p.pwmDepth=0;
+    const auto trace=ceres::oscillatorTrace(fs,frequency,p,count,.137);
+    std::array<C,3> saw{},pulse{},mixed{};
+    double sawMean=0,mixedMean=0,sawSquares=0,mixedSquares=0;
+    for(std::size_t i=0;i<count;++i) {
+        const double s=trace[i].saw,q=trace[i].pulse,m=s+q;
+        sawMean+=s;mixedMean+=m;sawSquares+=s*s;mixedSquares+=m*m;
+        for(unsigned h=0;h<3;++h) {
+            const auto basis=std::polar(1.0,-2*pi*(h+1)*i/count);
+            saw[h]+=s*basis;pulse[h]+=q*basis;mixed[h]+=m*basis;
+        }
+    }
+    const double soloRatio=std::abs(pulse[0])/std::abs(saw[0]);
+    const double secondDb=20*std::log10(std::abs(mixed[1])/std::abs(mixed[0]));
+    const double thirdDb=20*std::log10(std::abs(mixed[2])/std::abs(mixed[0]));
+    const double sawVariance=sawSquares/count-std::pow(sawMean/count,2);
+    const double mixedVariance=mixedSquares/count-std::pow(mixedMean/count,2);
+    const double rmsRatio=std::sqrt(mixedVariance/sawVariance);
+    std::cout<<"Raw mixture: pulse/saw H1="<<soloRatio<<", H2/H1="<<secondDb
+             <<"dB, H3/H1="<<thirdDb<<"dB, centered RMS ratio="<<rmsRatio<<'\n';
+    check(soloRatio>1.9&&soloRatio<2.1,"Equal-Vpp solo sources retain the recorded approximate2:1 fundamental ratio");
+    check(secondDb>-17&&secondDb<-14,"Both-on second harmonic must match constructive public-recording relationship");
+    check(thirdDb>-11&&thirdDb<-8,"Both-on third harmonic retains the independently observed odd-harmonic ratio");
+    check(rmsRatio>2.5&&rmsRatio<2.8,"Both-on RMS must increase with constructive equal-level mixing");
+}
+
+double productionRms(bool saw,bool pulse) {
+    ceres::Synth synth(48000,321);
+    ceres::Patch p;p.saw=saw;p.pulse=pulse;p.sine=p.noise=0;
+    p.pulseWidth=.5;p.pwmDepth=0;p.keyTrack=0;
+    p.hpCutoff=5;p.lpCutoff=20000;p.hpResonance=p.lpResonance=0;
+    p.filterInitial=p.filterPeak=0;
+    p.ampAttack=p.ampDecay=.001;p.ampSustain=1;
+    p.drive=.05;p.volume=.1;
+    synth.setPatch(p);synth.noteOn(69);
+    for(unsigned i=0;i<48000;++i)check(std::isfinite(synth.process()),"Finite open-filter settling audio");
+    double sum=0,squares=0;
+    // Exactly44 periods of440Hz. All three runs use the same seeded phase,
+    // filter settings, envelope and output gain; enabling both sources retains
+    // the physical extra mixer load instead of normalizing it away.
+    constexpr unsigned frames=4800;
+    for(unsigned i=0;i<frames;++i) {
+        const double value=synth.process();
+        check(std::isfinite(value),"Finite open-filter production mixture");
+        sum+=value;squares+=value*value;
+    }
+    return std::sqrt(squares/frames-std::pow(sum/frames,2));
+}
+void productionMixtureRelationship() {
+    const double saw=productionRms(true,false),pulse=productionRms(false,true),both=productionRms(true,true);
+    const double ratio=both/saw;
+    std::cout<<"Production mixture: solo saw="<<saw<<", solo pulse="<<pulse
+             <<", both="<<both<<", centered both/saw RMS="<<ratio<<'\n';
+    check(saw>0&&pulse>saw,"Solo production sources must remain audible at their physical source levels");
+    // Public comparable-note examples are around2.35..2.47. A broad bound
+    // accommodates the model's uncalibrated analog transfer while rejecting
+    // the former approximately0.89 cancellation. This is not an audio match
+    // or a fitted recording gain; no peak/RMS normalization is applied.
+    check(ratio>2.2&&ratio<2.6,"Production both-on mix must retain the recording-supported level increase after source loading");
+}
 }
 int main() {
     try {nominalTiming();conditionedWaveforms();extrapolationAndRate();
-        std::cout<<"PASS nominal VCO timing, conditioned current slope, WSC shared fold, Fourier/DC/edge and high-CV bounds\n";return 0;
+        bool failed=false;
+        for(const auto run:std::array<void(*)(),2>{{recordedMixtureRelationship,productionMixtureRelationship}})
+            try {run();}catch(const std::exception& e){std::cerr<<e.what()<<'\n';failed=true;}
+        if(failed)return 1;
+        std::cout<<"PASS nominal VCO timing, conditioned current slope, WSC shared fold, Fourier/DC/edge, public mixture relationships and high-CV bounds\n";return 0;
     }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }

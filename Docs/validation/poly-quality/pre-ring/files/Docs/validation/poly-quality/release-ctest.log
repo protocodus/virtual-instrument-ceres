@@ -1,0 +1,46 @@
+Test project /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-dsp
+      Start  1: Ceres.configuration_contracts
+ 1/18 Test  #1: Ceres.configuration_contracts ................   Passed    0.17 sec
+      Start  2: Ceres.oscillator_circuit_contracts
+ 2/18 Test  #2: Ceres.oscillator_circuit_contracts ...........   Passed    0.01 sec
+      Start  3: Ceres.native_dsp_contracts
+ 3/18 Test  #3: Ceres.native_dsp_contracts ...................   Passed    6.44 sec
+      Start  4: Ceres.sound_path_circuit_contracts
+ 4/18 Test  #4: Ceres.sound_path_circuit_contracts ...........   Passed    0.74 sec
+      Start  5: Ceres.capacitor_continuity_contracts
+ 5/18 Test  #5: Ceres.capacitor_continuity_contracts .........   Passed    0.38 sec
+      Start  6: Ceres.ring_carrier_circuit_contracts
+ 6/18 Test  #6: Ceres.ring_carrier_circuit_contracts .........   Passed    0.06 sec
+      Start  7: Ceres.ring_switching_circuit_contracts
+ 7/18 Test  #7: Ceres.ring_switching_circuit_contracts .......   Passed    0.45 sec
+      Start  8: Ceres.voice_expression_contracts
+ 8/18 Test  #8: Ceres.voice_expression_contracts .............   Passed    0.10 sec
+      Start  9: Ceres.embedded_allocation_contract
+ 9/18 Test  #9: Ceres.embedded_allocation_contract ...........   Passed    0.17 sec
+      Start 10: Ceres.configuration_cli_contract
+10/18 Test #10: Ceres.configuration_cli_contract .............   Passed    0.21 sec
+      Start 11: Ceres.configuration_native_embedded_parity
+11/18 Test #11: Ceres.configuration_native_embedded_parity ...   Passed    1.52 sec
+      Start 12: Ceres.native_embedded_audio_parity
+12/18 Test #12: Ceres.native_embedded_audio_parity ...........   Passed    2.77 sec
+      Start 13: Ceres.active_sound_path_audio_parity
+13/18 Test #13: Ceres.active_sound_path_audio_parity .........   Passed    2.74 sec
+      Start 14: Ceres.expression_audio_parity
+14/18 Test #14: Ceres.expression_audio_parity ................   Passed    2.71 sec
+      Start 15: Ceres.capacitor_native_embedded_parity
+15/18 Test #15: Ceres.capacitor_native_embedded_parity .......   Passed    2.69 sec
+      Start 16: Ceres.DSP
+16/18 Test #16: Ceres.DSP ....................................   Passed    0.00 sec
+      Start 17: Ceres.DspFuzz
+17/18 Test #17: Ceres.DspFuzz ................................   Passed    0.01 sec
+      Start 18: Ceres.AudioDemos
+18/18 Test #18: Ceres.AudioDemos .............................   Passed   22.09 sec
+
+100% tests passed, 0 tests failed out of 18
+
+Label Time Summary:
+audio    =  22.09 sec*proc (1 test)
+fuzz     =   0.01 sec*proc (1 test)
+unit     =  21.17 sec*proc (16 tests)
+
+Total Test time (real) =  43.28 sec

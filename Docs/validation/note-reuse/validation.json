@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "status": "pass",
+  "product_version": "0.2.1",
+  "scope": "Modern MIDI adaptation only: 5ms RC velocity continuity on audible board reuse and physical repeated-press FIFO ownership after stealing. No circuit state resets or keyboard CV slew. No host/CPU-under-run/hardware-fidelity claim.",
+  "source_sha256": {
+    "CMakeLists.txt": "21257e4ca4455120dc58ef4100882e03b780144a27eaec40bee7c062187b0706",
+    "Source/DSP/ceres.cpp": "d1608b0048501670da9c129c4527f6af5ba78e8d278382b70a2ae28f59c0d0b4",
+    "Source/DSP/ceres.hpp": "9ea1121863c508594ee5b0ba8c427759f507f8317593a84f487e1cbbd21b69f2",
+    "Tests/NoteReuseTests.cpp": "69cb82d7af23335af350e6e2811fa9f4077aa4c0814f2f7e41d8712b188ae47c",
+    "Tests/ExpressionTests.cpp": "4a4d0eb113305a7bae51d2b2dffe93b45d7b7bf97dc94d030d859e76be3f7424",
+    "Tests/EmbeddedContract.cpp": "672b4d7b5d6b27911a9fdff8ee6333eb1f1002d6c52b45a699eb07fad3f0429a",
+    "Tests/ConfigurationParityDriver.cpp": "72dcc9c0800bcdb9e4aacb7bf78eb29b535beca97c1773eb70b1112f75a370d5",
+    "Tests/check_configuration_parity.py": "25d8ef00c48b1bc5307616aba499d0596be629c4570af2fcffaa7e584e37b904",
+    "Tools/measure_note_reuse.cpp": "675bc7265b4cda2a2d74ed4f3b3b6e8256f5bd23879e14c616ade78c9ad73dd0"
+  },
+  "baseline": {
+    "commit": "82a1424e53e29252d314b40d16c88292644a3003",
+    "source_sha256": {
+      "Source/DSP/ceres.cpp": "2414c0944a2bd979fc88030e8745bc288747be6829f24f4fd0b49f29e69070a5",
+      "Source/DSP/ceres.hpp": "4ee7758c0401bf7a61f10b08f33baa93debb0fdcb32e73b287359db0669eb2a1",
+      "Tools/measure_note_reuse.cpp": "675bc7265b4cda2a2d74ed4f3b3b6e8256f5bd23879e14c616ade78c9ad73dd0"
+    },
+    "corrected_regression_expected_failure": {
+      "actual": 0.9,
+      "expected": 0.21728306158016725,
+      "sample_rate": 8000,
+      "phase": "baseline-regression-004"
+    }
+  },
+  "policy": {
+    "velocity_target": "latched per board",
+    "velocity_consumed": "5ms RC using existing sample-rate-converted pressureCoefficient",
+    "silent_assignment": "precharge if amp Idle or voltage exactly zero",
+    "consumers": [
+      "velocity-selected volume/filter/vibrato",
+      "legacy velocitySensitivity"
+    ],
+    "fifo": "Per-pitch uint32 first/next serials and count, plus per-board press ticket. Outstanding <= UINT32_MAX; equality matching only; no signed ordering; overflow note-on refused before allocation."
+  },
+  "checks": {
+    "release": {
+      "passed": 21,
+      "total": 21,
+      "version_reconfigured_before_final_run": true
+    },
+    "asan_ubsan": {
+      "passed": 5,
+      "total": 5,
+      "names": [
+        "configuration_contracts",
+        "voice_expression_contracts",
+        "note_reuse_contracts",
+        "embedded_allocation_contract",
+        "configuration_native_embedded_parity"
+      ]
+    },
+    "configuration_native_embedded": {
+      "exact_samples": 184320,
+      "rates": [
+        44100,
+        48000,
+        88200,
+        96000,
+        192000
+      ],
+      "voices": [
+        1,
+        4,
+        16
+      ],
+      "factors": [
+        1,
+        2,
+        4
+      ],
+      "includes": [
+        "repeated pitch allocation overflow",
+        "stolen press note-offs",
+        "pedal",
+        "audible velocity retarget"
+      ]
+    },
+    "embedded_allocations_after_construction": 0,
+    "focus_rc_rates": [
+      8000,
+      48000,
+      96000
+    ],
+    "independent_velocity_max_error": 8.66e-15
+  },
+  "counterfactual": {
+    "seed": 50,
+    "sample_rate": 48000,
+    "voices": 4,
+    "factors": [
+      1,
+      4
+    ],
+    "pairs_each_engine": 40,
+    "all_pre_assignment_prefixes_exact_between_revisions": true,
+    "whole_event_payloads_exact_between_revisions": 16,
+    "stock_ablation_warning": "Initial40pair stock label inherits screenshot minus10centtune; not exact factory Bloom. Eight-pair exact-stock-002 baseline continuation sets tune0 separately and preserves initial evidence.",
+    "first_causal_1x_same_pitch": [
+      {
+        "case": "no-ring-1x-held-same",
+        "before_abs": 0.013248622417449951,
+        "after_abs": 5.492568016052246e-05,
+        "reduction_db": 47.64790558724986
+      },
+      {
+        "case": "no-ring-1x-released-same",
+        "before_abs": 0.015607431530952454,
+        "after_abs": 6.648898124694824e-05,
+        "reduction_db": 47.41163519388606
+      },
+      {
+        "case": "screenshot-1x-held-same",
+        "before_abs": 0.011602126061916351,
+        "after_abs": 4.808604717254639e-05,
+        "reduction_db": 47.650370036133324
+      },
+      {
+        "case": "screenshot-1x-released-same",
+        "before_abs": 0.013568863272666931,
+        "after_abs": 5.777925252914429e-05,
+        "reduction_db": 47.41543094150625
+      }
+    ],
+    "max_derivative_difference_240": [
+      {
+        "case": "screenshot-1x-held-same",
+        "before": 0.011602126061916351,
+        "after": 0.004867527633905411
+      },
+      {
+        "case": "screenshot-4x-held-same",
+        "before": 0.011888973414897919,
+        "after": 0.005637660622596741
+      }
+    ],
+    "limits": [
+      "Displayed rounded screenshot values approximate a modified Bloom; exact user MIDI/preset unavailable.",
+      "Different-pitch output differences contain intended waveform/filter changes.",
+      "240sample derivative windows contain intended gain/timbre changes during the RC transition.",
+      "First different FIR tap at4x is not useful for measuring a step; nominal group-delay center remains31samples.",
+      "No claim that every user audible glitch is reproduced or eliminated."
+    ]
+  },
+  "local_evidence_availability": "Logical filenames/hashes below refer to an external local archive, not distributable checkout files. Audio payloads, SDK files and PDF manuals are excluded.",
+  "local_evidence_sha256": {
+    "plan.json": "578a2c205790f9a026fef7afeca618b6c45cd22150d0a0d8b77bdd3cfa602d0d",
+    "report.json": "32e255aeb5eec5a140dcb65508d6664ce23d13f6b3b4293127d42958787f4eb4",
+    "states.log": "e2c013fc749e64b5e281b47eee3c71fa92e3f801cac7ec27f3aac32c28c8a25f",
+    "audit.cpp": "675bc7265b4cda2a2d74ed4f3b3b6e8256f5bd23879e14c616ade78c9ad73dd0",
+    "audit": "a17212cd8723e58909ed6eeac7d40c49ba7027380f2ce5d834c660113ae86fad",
+    "analyze.py": "e54c7f2c568bb8ddb10deb7346159451030b6344edeecf5bbfd1b3ac59976561",
+    "comparison-003.json": "d5a0280ff8dae425f38ab4b0097f0a4297584dcdc8fdceaf5924561312991ae0",
+    "exact-stock-002/plan.json": "ba52da4e75b3a820d9469719f6d3863ad041794244b62046fda8f5b10497ce80",
+    "exact-stock-002/report.json": "2825c66b2e628adf2e658117b9e50aeab37baae974657174df09c62be21af274",
+    "exact-stock-002/audit.cpp": "1a46ffb3bb2e121059c371d7f2b219bee4e1d84550aa7ab4c699deda0dd2b6ce",
+    "candidate-003/plan.json": "6e89a5faa2f2938eb5f28063f2fe0ff622a4a8bed939ef3bcadb09c855028d87",
+    "candidate-003/report.json": "350d19f1b0ed2d05de3f6721f93b94f9a5be1d3f41574457ec8288029856545a",
+    "candidate-003/baseline-prefix-parity.json": "04a162dc74e1d9b23ced03e099f18d453e674232a8dc6f021e638363528cddff",
+    "candidate-003/states.log": "e2c013fc749e64b5e281b47eee3c71fa92e3f801cac7ec27f3aac32c28c8a25f",
+    "baseline-regression-004/plan.json": "894539eb841889abc4eb2bd0c1df99705b80726d254e3ed22aff29d2303a616f",
+    "baseline-regression-004/result.log": "b4aab74d42ee57b5f718e8b57919d0f069d063a8de16b2b7dc8fb0e7678f44d0",
+    "note-reuse-before.log": "b4aab74d42ee57b5f718e8b57919d0f069d063a8de16b2b7dc8fb0e7678f44d0",
+    "note-reuse-after.log": "f9c4fd6dd5651b4ba2483ac627e78da437931bc630f2318e5d3d6101bd8438e9",
+    "note-reuse-after-002.log": "ec4ca641484fbb024d5eebf889cce7dc5e80c132c3fb931795c8b9134c345b46",
+    "ctest-release.log": "1fb41dcce93081cb587371befb007c4d6365d7c6919d63d20d747daa6499677a",
+    "ctest-release-final.log": "8d94e5306e5a46c14d1ffe8da36e9f3997d51d630152750c970d11140b3368a0",
+    "ctest-sanitize.log": "d4e15e1e6f8eb0a22407881e2acf45280e6fa83710ce922e49f0217ab71b851a",
+    "cmake-configure.log": "a0615834b8cd845a4ca00ae391d5fc12ea4e2400f209f98c0553b63f39b9e900",
+    "cmake-reconfigure-version.log": "3b9af2c92a61c0e89d8af8a775f5923739b9f06cac435399c9a82803304d2078",
+    "cmake-rebuild-version.log": "f1e55475a9d393636d2b97ed9a6dcd5a216c18b08c56ffd02ce70432d6475607",
+    "sanitize-configure.log": "b2847883e246e86937868e4e4e234d2f79ab84b03454a008339ad905bbf617f5",
+    "sanitize-build.log": "1ed9e09aa34530a1605d4768eca0af36215831bb6f2878209d847636762dcf46",
+    "independent-fixed-checks-001/plan.json": "ce09850bb59a30961373a371650a3435d016e2bd9cb2615243525f5b31dbe6e6",
+    "independent-fixed-checks-001/result.json": "84537aa9dbab05ca43c9a8f5e14a8577f1f93abd4b0486ef6d78c717eeaffcd9",
+    "independent-fixed-checks-001/check.cpp": "f6a920f738146f689b3a459e27e0e537aef9b3794e17761793873511585ac5a5",
+    "independent-fixed-checks-001/result.txt": "d2cd00ff55fbfd4281530e2b9f7a068a68d29af5515ba679522325048ceecd16",
+    "final-release-binary/ceres_note_reuse_tests": "95c52ea9c1b67d6245fce49e75ef199ef94900bc4604d12b818d3683d290f7e4",
+    "final-release-binary/ceres_expression_tests": "ee1d4612274c226d50abab1f587a8a8a6a4e17600c4b775547923682eec543d5",
+    "final-release-binary/ceres_embedded_contract": "3390ea6aafe07efc6f75ec99805e4b43f089649122d33153b8ba3645c90891b4",
+    "final-release-binary/ceres_native_configuration_parity": "0d2c959945ea0eb36aba9b75b389bb9d516fac5dd723e4b1f6f993d117055ffb",
+    "final-release-binary/ceres_embedded_configuration_parity": "0f4c27f800afbabf7e36251b0cde1feae7c9aafc4270eddaf0f7030f5cbeef6f",
+    "final-release-binary/ceres_render": "a486a8572ef405d41d8a0e8907bba3c85a9ca57ae754bc63556be82ccf69b370"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "status": "pass",
+  "cases": [
+    {
+      "voices": 1,
+      "factor": 1,
+      "sha256": "2326368dbafe1deb88a7262ac452cdf91b9e2e7f6d627119e01eaeccb2cd7ff9",
+      "peak": 0.0769286379218
+    },
+    {
+      "voices": 1,
+      "factor": 2,
+      "sha256": "7416c85ca67b4fd1dafd3baf62c261f4fc5fedc063a7bb325c90140a568b76ef",
+      "peak": 0.0838591679931
+    },
+    {
+      "voices": 1,
+      "factor": 4,
+      "sha256": "113952e5557249e3e6639b61067ead40e092ecf5eaa0f2a155552d42ab42facd",
+      "peak": 0.0886537507176
+    },
+    {
+      "voices": 4,
+      "factor": 1,
+      "sha256": "2b210a399883805438b7133a79759ee72f89f933ea2ebccc7c164ed0aa08321f",
+      "peak": 0.218127787113
+    },
+    {
+      "voices": 4,
+      "factor": 2,
+      "sha256": "3a610bbb5424263cabce6203abdd808beb22c4c82ab17cdc3e6c22b2dfb52421",
+      "peak": 0.224504306912
+    },
+    {
+      "voices": 4,
+      "factor": 4,
+      "sha256": "5d253e79d142162360b75698f70cf71a23a7685a2bd4ecfa40713c0cb5adaad3",
+      "peak": 0.228986784816
+    },
+    {
+      "voices": 16,
+      "factor": 1,
+      "sha256": "fc401332fdee593d49893b73b3e3e99dc8f435760a216168d77a0178c633561f",
+      "peak": 0.361027747393
+    },
+    {
+      "voices": 16,
+      "factor": 2,
+      "sha256": "11fedba0ee7b63199cc6dea453d9cb81b358dfc02f33ecabfc320cc8d7f9fc08",
+      "peak": 0.364925980568
+    },
+    {
+      "voices": 16,
+      "factor": 4,
+      "sha256": "ae725bf55d8d4c9c98447bc39fddcfbca88d18cc67b493f3948f04b4eb73e568",
+      "peak": 0.359845727682
+    }
+  ],
+  "explicit_default_exact": true,
+  "invalid_rejections": 7
+}

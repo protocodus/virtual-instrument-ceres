@@ -1,0 +1,22 @@
+[ 50%] Built target ceres
+[ 75%] Building CXX object CMakeFiles/ceres_noise_quality_tests.dir/Tests/NoiseQualityTests.cpp.o
+[100%] Linking CXX executable ceres_noise_quality_tests
+[100%] Built target ceres_noise_quality_tests
+[ 50%] Built target ceres
+[ 75%] Building CXX object CMakeFiles/ceres_configuration_tests.dir/Tests/ConfigurationTests.cpp.o
+[100%] Linking CXX executable ceres_configuration_tests
+[100%] Built target ceres_configuration_tests
+[ 50%] Built target ceres
+[100%] Built target ceres_tests
+[ 50%] Built target ceres_embedded
+[ 75%] Building CXX object CMakeFiles/ceres_embedded_contract.dir/Tests/EmbeddedContract.cpp.o
+[100%] Linking CXX executable ceres_embedded_contract
+[100%] Built target ceres_embedded_contract
+[ 50%] Built target ceres
+[ 75%] Building CXX object CMakeFiles/ceres_native_configuration_parity.dir/Tests/ConfigurationParityDriver.cpp.o
+[100%] Linking CXX executable ceres_native_configuration_parity
+[100%] Built target ceres_native_configuration_parity
+[ 50%] Built target ceres_embedded
+[ 75%] Building CXX object CMakeFiles/ceres_embedded_configuration_parity.dir/Tests/ConfigurationParityDriver.cpp.o
+[100%] Linking CXX executable ceres_embedded_configuration_parity
+[100%] Built target ceres_embedded_configuration_parity

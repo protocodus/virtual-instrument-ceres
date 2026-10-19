@@ -1,0 +1,31 @@
+{
+  "status": "pass",
+  "sample_count": 184320,
+  "rates": [
+    44100,
+    48000,
+    88200,
+    96000,
+    192000
+  ],
+  "polyphony": [
+    1,
+    4,
+    16
+  ],
+  "oversampling": [
+    1,
+    2,
+    4
+  ],
+  "variants": {
+    "native": {
+      "binary_sha256": "0a181064776b1386eaacfa2cee472d3f964c2ccdd4044c0de46ba15af2eaeedb",
+      "audio_sha256": "a0f20b8fad2c1d207cab91604adf459d2e88b600e43a6b1841da8123cc4e3b0b"
+    },
+    "embedded": {
+      "binary_sha256": "a5d2d4bd0f9fb9698d0ad865048673dde75e9dea8687e53e38f4a8124be506d3",
+      "audio_sha256": "a0f20b8fad2c1d207cab91604adf459d2e88b600e43a6b1841da8123cc4e3b0b"
+    }
+  }
+}

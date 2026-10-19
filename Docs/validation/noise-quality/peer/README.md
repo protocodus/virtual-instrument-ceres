@@ -1,0 +1,5 @@
+# Preserved independent review
+
+These seven authored files are byte-exact copies from the independent review at `/Users/vojta/Dev/reason-rack-extension/diagnostics/ceres-noise-quality-20261019/independent-001`. Original absolute paths, hashes and reports are deliberately retained. No binary, audio or SDK file is included. The source snapshots named by that report remain in the original diagnostic directory; their exact bytes are also recoverable from parent commit `652e3722eb40f67001f0467103f9f31a957ec363` and this change's committed `Source/DSP/` files.
+
+`run.py` is preserved as executed, including its original core path and refusal to overwrite an existing plan. A new reproduction requires a new empty directory containing `run.py` and `probe.cpp`, NumPy1.26.4/SciPy1.14.1, and the specified canonical checkout; any relocation or later core revision creates a new declaration rather than rewriting this result. The preset inventory is a historical review input, not a shipped DSP preset definition or a claim that this public repository contains the separate Rack bank.

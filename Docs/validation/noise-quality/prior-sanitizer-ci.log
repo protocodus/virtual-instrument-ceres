@@ -1,0 +1,277 @@
+﻿2026-10-19T16:27:39.6372493Z Current runner version: '2.337.0'
+2026-10-19T16:27:39.6396671Z ##[group]Runner Image Provisioner
+2026-10-19T16:27:39.6397482Z Hosted Compute Agent
+2026-10-19T16:27:39.6398122Z Version: 20261015.610
+2026-10-19T16:27:39.6398925Z Commit: 267fdb4e8bbec4ab5ea31367f3a00d5c480c7656
+2026-10-19T16:27:39.6399625Z Build Date: 2026-10-14T17:06:54Z
+2026-10-19T16:27:39.6400302Z Worker ID: {7a5069dc-2d6b-48f0-9d29-1ae07e7059ae}
+2026-10-19T16:27:39.6400947Z Region: westus3
+2026-10-19T16:27:39.6401469Z Cloud: Azure
+2026-10-19T16:27:39.6401979Z ##[endgroup]
+2026-10-19T16:27:39.6403411Z ##[group]Operating System
+2026-10-19T16:27:39.6404042Z Ubuntu
+2026-10-19T16:27:39.6404505Z 24.04.5
+2026-10-19T16:27:39.6404999Z LTS
+2026-10-19T16:27:39.6405472Z ##[endgroup]
+2026-10-19T16:27:39.6405991Z ##[group]Runner Image
+2026-10-19T16:27:39.6406563Z Image: ubuntu-24.04
+2026-10-19T16:27:39.6407076Z Version: 20261018.339.1
+2026-10-19T16:27:39.6408257Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261018.339/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-19T16:27:39.6409981Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261018.339
+2026-10-19T16:27:39.6410901Z ##[endgroup]
+2026-10-19T16:27:39.6411955Z ##[group]GITHUB_TOKEN Permissions
+2026-10-19T16:27:39.6414035Z Contents: read
+2026-10-19T16:27:39.6414599Z Metadata: read
+2026-10-19T16:27:39.6415104Z ##[endgroup]
+2026-10-19T16:27:39.6417233Z Secret source: Actions
+2026-10-19T16:27:39.6418094Z Cache mode: write
+2026-10-19T16:27:39.6419087Z Prepare workflow directory
+2026-10-19T16:27:39.6915730Z Prepare all required actions
+2026-10-19T16:27:39.6965548Z Getting action download info
+2026-10-19T16:27:40.0155080Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-19T16:27:40.1410097Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-19T16:27:40.3080475Z Complete job name: Unit and fuzz tiers under ASan + UBSan, C++17 DSP
+2026-10-19T16:27:40.3915129Z ##[group]Run actions/checkout@v4
+2026-10-19T16:27:40.3915918Z with:
+2026-10-19T16:27:40.3916354Z   persist-credentials: false
+2026-10-19T16:27:40.3916888Z   repository: protocodus/virtual-instrument-ceres
+2026-10-19T16:27:40.3920851Z   token: ***
+2026-10-19T16:27:40.3921239Z   ssh-strict: true
+2026-10-19T16:27:40.3921639Z   ssh-user: git
+2026-10-19T16:27:40.3922011Z   clean: true
+2026-10-19T16:27:40.3922411Z   sparse-checkout-cone-mode: true
+2026-10-19T16:27:40.3922887Z   fetch-depth: 1
+2026-10-19T16:27:40.3923288Z   fetch-tags: false
+2026-10-19T16:27:40.3923685Z   show-progress: true
+2026-10-19T16:27:40.3924088Z   lfs: false
+2026-10-19T16:27:40.3924460Z   submodules: false
+2026-10-19T16:27:40.3924862Z   set-safe-directory: true
+2026-10-19T16:27:40.3925322Z   allow-unsafe-pr-checkout: false
+2026-10-19T16:27:40.3926041Z env:
+2026-10-19T16:27:40.3926416Z   BUILD_NUMBER: 8
+2026-10-19T16:27:40.3926879Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+2026-10-19T16:27:40.3927548Z   UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+2026-10-19T16:27:40.3928121Z ##[endgroup]
+2026-10-19T16:27:40.4961620Z Syncing repository: protocodus/virtual-instrument-ceres
+2026-10-19T16:27:40.4964528Z ##[group]Getting Git version info
+2026-10-19T16:27:40.4965661Z Working directory is '/home/runner/work/virtual-instrument-ceres/virtual-instrument-ceres'
+2026-10-19T16:27:40.4967047Z [command]/usr/bin/git version
+2026-10-19T16:27:40.5033283Z git version 2.55.0
+2026-10-19T16:27:40.5054864Z ##[endgroup]
+2026-10-19T16:27:40.5071903Z Temporarily overriding HOME='/home/runner/work/_temp/5cab4dfb-1520-40d7-a635-92e581617858' before making global git config changes
+2026-10-19T16:27:40.5075080Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T16:27:40.5078862Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/virtual-instrument-ceres/virtual-instrument-ceres
+2026-10-19T16:27:40.5135260Z Deleting the contents of '/home/runner/work/virtual-instrument-ceres/virtual-instrument-ceres'
+2026-10-19T16:27:40.5140125Z ##[group]Initializing the repository
+2026-10-19T16:27:40.5146013Z [command]/usr/bin/git init /home/runner/work/virtual-instrument-ceres/virtual-instrument-ceres
+2026-10-19T16:27:40.5253747Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-19T16:27:40.5255669Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-19T16:27:40.5257415Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-19T16:27:40.5258842Z hint: call:
+2026-10-19T16:27:40.5259588Z hint:
+2026-10-19T16:27:40.5260502Z hint: 	git config --global init.defaultBranch <name>
+2026-10-19T16:27:40.5261630Z hint:
+2026-10-19T16:27:40.5262612Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-19T16:27:40.5264145Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-19T16:27:40.5265559Z hint:
+2026-10-19T16:27:40.5266367Z hint: 	git branch -m <name>
+2026-10-19T16:27:40.5267301Z hint:
+2026-10-19T16:27:40.5268378Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-19T16:27:40.5276423Z Initialized empty Git repository in /home/runner/work/virtual-instrument-ceres/virtual-instrument-ceres/.git/
+2026-10-19T16:27:40.5289438Z [command]/usr/bin/git remote add origin https://github.com/protocodus/virtual-instrument-ceres
+2026-10-19T16:27:40.5338098Z ##[endgroup]
+2026-10-19T16:27:40.5339889Z ##[group]Disabling automatic garbage collection
+2026-10-19T16:27:40.5341734Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-19T16:27:40.5376914Z ##[endgroup]
+2026-10-19T16:27:40.5378706Z ##[group]Setting up auth
+2026-10-19T16:27:40.5383418Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T16:27:40.5426707Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T16:27:40.5783580Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T16:27:40.5820728Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T16:27:40.6057408Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T16:27:40.6098429Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-19T16:27:40.6295497Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-19T16:27:40.6334405Z ##[endgroup]
+2026-10-19T16:27:40.6335770Z ##[group]Fetching the repository
+2026-10-19T16:27:40.6345899Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +a63179c92a784bccb8a953281bb9c5d8f6057b3f:refs/remotes/pull/3/merge
+2026-10-19T16:27:41.6319868Z From https://github.com/protocodus/virtual-instrument-ceres
+2026-10-19T16:27:41.6322962Z  * [new ref]         a63179c92a784bccb8a953281bb9c5d8f6057b3f -> pull/3/merge
+2026-10-19T16:27:41.6330035Z ##[endgroup]
+2026-10-19T16:27:41.6332786Z ##[group]Determining the checkout info
+2026-10-19T16:27:41.6341408Z ##[endgroup]
+2026-10-19T16:27:41.6342605Z [command]/usr/bin/git sparse-checkout disable
+2026-10-19T16:27:41.6382271Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-19T16:27:41.6411552Z ##[group]Checking out the ref
+2026-10-19T16:27:41.6415190Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/3/merge
+2026-10-19T16:27:41.7826584Z Note: switching to 'refs/remotes/pull/3/merge'.
+2026-10-19T16:27:41.7827736Z 
+2026-10-19T16:27:41.7828730Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-19T16:27:41.7830805Z changes and commit them, and you can discard any commits you make in this
+2026-10-19T16:27:41.7833006Z state without impacting any branches by switching back to a branch.
+2026-10-19T16:27:41.7834138Z 
+2026-10-19T16:27:41.7834956Z If you want to create a new branch to retain commits you create, you may
+2026-10-19T16:27:41.7837579Z do so (now or later) by using -c with the switch command. Example:
+2026-10-19T16:27:41.7839308Z 
+2026-10-19T16:27:41.7839996Z   git switch -c <new-branch-name>
+2026-10-19T16:27:41.7841128Z 
+2026-10-19T16:27:41.7842024Z Or undo this operation with:
+2026-10-19T16:27:41.7843309Z 
+2026-10-19T16:27:41.7844134Z   git switch -
+2026-10-19T16:27:41.7845112Z 
+2026-10-19T16:27:41.7846663Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-19T16:27:41.7849091Z 
+2026-10-19T16:27:41.7851450Z HEAD is now at a63179c Merge 652e3722eb40f67001f0467103f9f31a957ec363 into 2ee6cf22deead7358d6b4ee7c294da955225af56
+2026-10-19T16:27:41.7859225Z ##[endgroup]
+2026-10-19T16:27:41.7892362Z [command]/usr/bin/git log -1 --format=%H
+2026-10-19T16:27:41.7918892Z a63179c92a784bccb8a953281bb9c5d8f6057b3f
+2026-10-19T16:27:41.7929303Z ##[group]Removing auth
+2026-10-19T16:27:41.7934452Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T16:27:41.7967356Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T16:27:41.8161929Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T16:27:41.8188427Z http.https://github.com/.extraheader
+2026-10-19T16:27:41.8194607Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-19T16:27:41.8230389Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T16:27:41.8425655Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T16:27:41.8464078Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-19T16:27:41.8663939Z ##[endgroup]
+2026-10-19T16:27:41.8907100Z ##[group]Run cmake -S . -B build-sanitize -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCERES_BUILD_PLUGIN=OFF -DCERES_ENABLE_SANITIZERS=ON -DBUILD_TESTING=ON
+2026-10-19T16:27:41.8911745Z [36;1mcmake -S . -B build-sanitize -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCERES_BUILD_PLUGIN=OFF -DCERES_ENABLE_SANITIZERS=ON -DBUILD_TESTING=ON[0m
+2026-10-19T16:27:41.9042510Z shell: /usr/bin/bash -e {0}
+2026-10-19T16:27:41.9043672Z env:
+2026-10-19T16:27:41.9044533Z   BUILD_NUMBER: 8
+2026-10-19T16:27:41.9045593Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+2026-10-19T16:27:41.9047043Z   UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+2026-10-19T16:27:41.9048358Z ##[endgroup]
+2026-10-19T16:27:46.4209911Z -- The C compiler identification is GNU 13.3.0
+2026-10-19T16:27:50.4904695Z -- The CXX compiler identification is GNU 13.3.0
+2026-10-19T16:27:50.9930960Z -- Detecting C compiler ABI info
+2026-10-19T16:27:51.9395553Z -- Detecting C compiler ABI info - done
+2026-10-19T16:27:51.9554971Z -- Check for working C compiler: /usr/bin/cc - skipped
+2026-10-19T16:27:51.9823053Z -- Detecting C compile features
+2026-10-19T16:27:52.0131353Z -- Detecting C compile features - done
+2026-10-19T16:27:52.1501451Z -- Detecting CXX compiler ABI info
+2026-10-19T16:27:52.4527311Z -- Detecting CXX compiler ABI info - done
+2026-10-19T16:27:52.4683847Z -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2026-10-19T16:27:52.4687130Z -- Detecting CXX compile features
+2026-10-19T16:27:52.4694200Z -- Detecting CXX compile features - done
+2026-10-19T16:27:52.7683315Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-10-19T16:27:52.8513209Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2026-10-19T16:27:52.9057879Z -- Found Threads: TRUE
+2026-10-19T16:27:53.1647450Z -- Found Python3: /usr/bin/python3.12 (found version "3.12.3") found components: Interpreter
+2026-10-19T16:27:53.2885897Z -- Configuring done (8.5s)
+2026-10-19T16:27:53.3507165Z -- Generating done (0.1s)
+2026-10-19T16:27:53.3510682Z -- Build files have been written to: /home/runner/work/virtual-instrument-ceres/virtual-instrument-ceres/build-sanitize
+2026-10-19T16:27:53.3870448Z ##[group]Run cmake --build build-sanitize --parallel 2
+2026-10-19T16:27:53.3870893Z [36;1mcmake --build build-sanitize --parallel 2[0m
+2026-10-19T16:27:53.3906465Z shell: /usr/bin/bash -e {0}
+2026-10-19T16:27:53.3906753Z env:
+2026-10-19T16:27:53.3906973Z   BUILD_NUMBER: 8
+2026-10-19T16:27:53.3907215Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+2026-10-19T16:27:53.3907551Z   UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+2026-10-19T16:27:53.3907876Z ##[endgroup]
+2026-10-19T16:27:53.4152097Z [  4%] Building CXX object CMakeFiles/CeresDSP.dir/Source/DSP/CeresEngine.cpp.o
+2026-10-19T16:27:53.4152959Z [  4%] Building CXX object CMakeFiles/CeresDSPCxx17.dir/Source/DSP/CeresEngine.cpp.o
+2026-10-19T16:27:56.1865083Z [  4%] Built target CeresDSPCxx17
+2026-10-19T16:27:56.1889753Z [  6%] Linking CXX static library libCeresDSP.a
+2026-10-19T16:27:56.1935726Z [  9%] Building CXX object CMakeFiles/ceres.dir/Source/DSP/ceres.cpp.o
+2026-10-19T16:28:01.7302363Z [ 11%] Linking CXX static library libceres.a
+2026-10-19T16:28:04.2656819Z [ 11%] Built target CeresDSP
+2026-10-19T16:28:04.2678060Z [ 11%] Built target ceres
+2026-10-19T16:28:04.2724033Z [ 13%] Building CXX object CMakeFiles/ceres_embedded.dir/Source/DSP/ceres.cpp.o
+2026-10-19T16:28:04.2740990Z [ 16%] Building CXX object CMakeFiles/CeresDSPTests.dir/Tests/test_dsp.cpp.o
+2026-10-19T16:28:04.6869816Z [ 18%] Linking CXX executable CeresDSPTests
+2026-10-19T16:28:05.4461898Z [ 18%] Built target CeresDSPTests
+2026-10-19T16:28:05.4523034Z [ 20%] Building CXX object CMakeFiles/CeresDspFuzz.dir/Tests/DspFuzz.cpp.o
+2026-10-19T16:28:06.0548299Z [ 23%] Linking CXX static library libceres_embedded.a
+2026-10-19T16:28:06.1316137Z [ 23%] Built target ceres_embedded
+2026-10-19T16:28:06.1379106Z [ 25%] Building CXX object CMakeFiles/ceres_render.dir/Tools/render_main.cpp.o
+2026-10-19T16:28:07.0359320Z [ 27%] Linking CXX executable CeresDspFuzz
+2026-10-19T16:28:07.1000963Z [ 27%] Built target CeresDspFuzz
+2026-10-19T16:28:07.1065453Z [ 30%] Building CXX object CMakeFiles/RenderCeresPresetDemos.dir/Tools/RenderPresetDemos.cpp.o
+2026-10-19T16:28:08.4125557Z [ 32%] Linking CXX executable ceres_render
+2026-10-19T16:28:08.4826938Z [ 32%] Built target ceres_render
+2026-10-19T16:28:08.4890065Z [ 34%] Building CXX object CMakeFiles/ceres_configuration_tests.dir/Tests/ConfigurationTests.cpp.o
+2026-10-19T16:28:09.4892541Z [ 37%] Linking CXX executable ceres_configuration_tests
+2026-10-19T16:28:09.5566386Z [ 37%] Built target ceres_configuration_tests
+2026-10-19T16:28:09.5628153Z [ 39%] Building CXX object CMakeFiles/ceres_oscillator_circuit_tests.dir/Tests/OscillatorCircuitTests.cpp.o
+2026-10-19T16:28:10.9861694Z [ 41%] Linking CXX executable ceres_oscillator_circuit_tests
+2026-10-19T16:28:11.0560752Z [ 41%] Built target ceres_oscillator_circuit_tests
+2026-10-19T16:28:11.0627214Z [ 44%] Building CXX object CMakeFiles/ceres_tests.dir/Tests/dsp_tests.cpp.o
+2026-10-19T16:28:13.1358391Z [ 46%] Linking CXX executable RenderCeresPresetDemos
+2026-10-19T16:28:13.2232323Z [ 46%] Built target RenderCeresPresetDemos
+2026-10-19T16:28:13.2299223Z [ 48%] Building CXX object CMakeFiles/ceres_sound_path_tests.dir/Tests/SoundPathTests.cpp.o
+2026-10-19T16:28:14.4502259Z [ 51%] Linking CXX executable ceres_sound_path_tests
+2026-10-19T16:28:14.5177501Z [ 51%] Built target ceres_sound_path_tests
+2026-10-19T16:28:14.5242143Z [ 53%] Building CXX object CMakeFiles/ceres_capacitor_tests.dir/Tests/CapacitorContinuityTests.cpp.o
+2026-10-19T16:28:15.4722721Z [ 55%] Linking CXX executable ceres_capacitor_tests
+2026-10-19T16:28:15.5413475Z [ 55%] Built target ceres_capacitor_tests
+2026-10-19T16:28:15.5479736Z [ 58%] Building CXX object CMakeFiles/ceres_ring_depth_tests.dir/Tests/RingDepthContinuityTests.cpp.o
+2026-10-19T16:28:16.1628279Z [ 60%] Linking CXX executable ceres_ring_depth_tests
+2026-10-19T16:28:16.2308113Z [ 60%] Built target ceres_ring_depth_tests
+2026-10-19T16:28:16.2374475Z [ 62%] Building CXX object CMakeFiles/ceres_ring_carrier_tests.dir/Tests/RingCarrierTests.cpp.o
+2026-10-19T16:28:17.3064265Z [ 65%] Linking CXX executable ceres_tests
+2026-10-19T16:28:17.3866606Z [ 65%] Built target ceres_tests
+2026-10-19T16:28:17.3935338Z [ 67%] Building CXX object CMakeFiles/ceres_ring_switching_tests.dir/Tests/RingSwitchingTests.cpp.o
+2026-10-19T16:28:17.8365161Z [ 69%] Linking CXX executable ceres_ring_carrier_tests
+2026-10-19T16:28:17.9086376Z [ 69%] Built target ceres_ring_carrier_tests
+2026-10-19T16:28:17.9153025Z [ 72%] Building CXX object CMakeFiles/ceres_expression_tests.dir/Tests/ExpressionTests.cpp.o
+2026-10-19T16:28:18.3095549Z [ 74%] Linking CXX executable ceres_ring_switching_tests
+2026-10-19T16:28:18.3808026Z [ 74%] Built target ceres_ring_switching_tests
+2026-10-19T16:28:18.3875297Z [ 76%] Building CXX object CMakeFiles/ceres_embedded_contract.dir/Tests/EmbeddedContract.cpp.o
+2026-10-19T16:28:18.5775399Z /home/runner/work/virtual-instrument-ceres/virtual-instrument-ceres/Tests/EmbeddedContract.cpp: In function ‘int main()’:
+2026-10-19T16:28:18.5778080Z /home/runner/work/virtual-instrument-ceres/virtual-instrument-ceres/Tests/EmbeddedContract.cpp:77:35: error: deducing from brace-enclosed initializer list requires ‘#include <initializer_list>’
+2026-10-19T16:28:18.5779664Z     4 | #include <cstdlib>
+2026-10-19T16:28:18.5780076Z   +++ |+#include <initializer_list>
+2026-10-19T16:28:18.5780519Z     5 | #include <limits>
+2026-10-19T16:28:18.5780878Z ......
+2026-10-19T16:28:18.5781398Z    77 |     for(unsigned voices:{1u,4u,16u})for(unsigned factor:{1u,2u,4u}) {
+2026-10-19T16:28:18.5782344Z       |                                   ^
+2026-10-19T16:28:18.5784372Z /home/runner/work/virtual-instrument-ceres/virtual-instrument-ceres/Tests/EmbeddedContract.cpp:77:66: error: deducing from brace-enclosed initializer list requires ‘#include <initializer_list>’
+2026-10-19T16:28:18.5786133Z    77 |     for(unsigned voices:{1u,4u,16u})for(unsigned factor:{1u,2u,4u}) {
+2026-10-19T16:28:18.5787126Z       |                                                                  ^
+2026-10-19T16:28:18.5789251Z /home/runner/work/virtual-instrument-ceres/virtual-instrument-ceres/Tests/EmbeddedContract.cpp:97:73: error: deducing from brace-enclosed initializer list requires ‘#include <initializer_list>’
+2026-10-19T16:28:18.5796990Z    97 |     for(double rate:{0.,std::numeric_limits<double>::quiet_NaN(),400000.}) {
+2026-10-19T16:28:18.5810268Z       |                                                                         ^
+2026-10-19T16:28:18.6078033Z gmake[2]: *** [CMakeFiles/ceres_embedded_contract.dir/build.make:79: CMakeFiles/ceres_embedded_contract.dir/Tests/EmbeddedContract.cpp.o] Error 1
+2026-10-19T16:28:18.6079766Z gmake[1]: *** [CMakeFiles/Makefile2:1554: CMakeFiles/ceres_embedded_contract.dir/all] Error 2
+2026-10-19T16:28:18.6080448Z gmake[1]: *** Waiting for unfinished jobs....
+2026-10-19T16:28:19.1093779Z [ 79%] Linking CXX executable ceres_expression_tests
+2026-10-19T16:28:19.1806422Z [ 79%] Built target ceres_expression_tests
+2026-10-19T16:28:19.1811217Z gmake: *** [Makefile:101: all] Error 2
+2026-10-19T16:28:19.1831661Z ##[error]Process completed with exit code 2.
+2026-10-19T16:28:19.1942580Z ##[group]Run actions/upload-artifact@v4
+2026-10-19T16:28:19.1942871Z with:
+2026-10-19T16:28:19.1943092Z   name: ci-fuzz-reproducers-ceres-build-8
+2026-10-19T16:28:19.1943460Z   path: build-fuzz/crash-*
+build-fuzz/timeout-*
+build-fuzz/oom-*
+
+2026-10-19T16:28:19.1943815Z   if-no-files-found: ignore
+2026-10-19T16:28:19.1944044Z   retention-days: 7
+2026-10-19T16:28:19.1944245Z   compression-level: 6
+2026-10-19T16:28:19.1944455Z   overwrite: false
+2026-10-19T16:28:19.1944662Z   include-hidden-files: false
+2026-10-19T16:28:19.1945034Z env:
+2026-10-19T16:28:19.1945213Z   BUILD_NUMBER: 8
+2026-10-19T16:28:19.1945436Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+2026-10-19T16:28:19.1945753Z   UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+2026-10-19T16:28:19.1946039Z ##[endgroup]
+2026-10-19T16:28:19.3680464Z (node:2790) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T16:28:19.3681198Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T16:28:19.3699250Z No files were found with the provided path: build-fuzz/crash-*
+2026-10-19T16:28:19.3699721Z build-fuzz/timeout-*
+2026-10-19T16:28:19.3699979Z build-fuzz/oom-*. No artifacts will be uploaded.
+2026-10-19T16:28:19.4016022Z Post job cleanup.
+2026-10-19T16:28:19.4919133Z [command]/usr/bin/git version
+2026-10-19T16:28:19.4961366Z git version 2.55.0
+2026-10-19T16:28:19.4996694Z Temporarily overriding HOME='/home/runner/work/_temp/67a92057-9bd4-4db5-ba80-05a509dcc4c6' before making global git config changes
+2026-10-19T16:28:19.4998361Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T16:28:19.5003525Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/virtual-instrument-ceres/virtual-instrument-ceres
+2026-10-19T16:28:19.5046823Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T16:28:19.5086659Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T16:28:19.5315840Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T16:28:19.5352383Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T16:28:19.5587707Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T16:28:19.5624195Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-19T16:28:19.6028325Z Cleaning up orphan processes
+2026-10-19T16:28:19.6345405Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -1,0 +1,148 @@
+UpdateCTestConfiguration  from :/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize/DartConfiguration.tcl
+Parse Config file:/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize/DartConfiguration.tcl
+Test project /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+    Start  1: Ceres.configuration_contracts
+
+1: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize/ceres_configuration_tests
+1: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize
+1: Test timeout computed to be: 1500
+1: PASS configuration: 1/4/16 voices, real1/2/4x clocks, lifecycle and independent output-filter delay/response
+1/5 Test  #1: Ceres.configuration_contracts ................   Passed    1.00 sec
+test 2
+    Start  2: Ceres.noise_quality_contracts
+
+2: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize/ceres_noise_quality_tests
+2: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize
+2: Test timeout computed to be: 1500
+2: NOISE_POWER,48000,1,0,1.3398112187830535e-07
+2: NOISE_POWER,48000,1,1,2.5767793916398796e-07
+2: NOISE_POWER,48000,1,2,3.0810421889882866e-07
+2: NOISE_POWER,48000,2,0,1.3322556397093876e-07
+2: NOISE_POWER,48000,2,1,2.6301439347920981e-07
+2: NOISE_POWER,48000,2,2,3.0670374328380129e-07
+2: NOISE_POWER,48000,4,0,1.3067724312036077e-07
+2: NOISE_POWER,48000,4,1,2.5751198516236905e-07
+2: NOISE_POWER,48000,4,2,3.0416113399686468e-07
+2: NOISE_DELTA_DB,48000,1,0,0.10843646344537383
+2: NOISE_DELTA_DB,48000,1,1,0.0027979161176303704
+2: NOISE_DELTA_DB,48000,1,2,0.055939264967475456
+2: NOISE_DELTA_DB,48000,2,0,0.0838760372410009
+2: NOISE_DELTA_DB,48000,2,1,0.091820690848224085
+2: NOISE_DELTA_DB,48000,2,2,0.036153578344993331
+2: NOISE_POWER,96000,1,0,6.7637106688560203e-08
+2: NOISE_POWER,96000,1,1,1.3127695147545529e-07
+2: NOISE_POWER,96000,1,2,1.5216795140155272e-07
+2: NOISE_POWER,96000,2,0,6.817912780296569e-08
+2: NOISE_POWER,96000,2,1,1.2765371554751639e-07
+2: NOISE_POWER,96000,2,2,1.5580915357821999e-07
+2: NOISE_POWER,96000,4,0,6.4582732769689149e-08
+2: NOISE_POWER,96000,4,1,1.2351666733964789e-07
+2: NOISE_POWER,96000,4,2,1.5115683483045182e-07
+2: NOISE_DELTA_DB,96000,1,0,0.20068603601064311
+2: NOISE_DELTA_DB,96000,1,1,0.26462917689319526
+2: NOISE_DELTA_DB,96000,1,2,0.028954044893206788
+2: NOISE_DELTA_DB,96000,2,0,0.23535023203431663
+2: NOISE_DELTA_DB,96000,2,1,0.14307894848976496
+2: NOISE_DELTA_DB,96000,2,2,0.13165178932220178
+2: PASS noise quality: full-engine stationary band powers at48/96k, independent FFT normalization
+2/5 Test  #2: Ceres.noise_quality_contracts ................   Passed    2.41 sec
+test 4
+    Start  4: Ceres.native_dsp_contracts
+
+4: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize/ceres_tests
+4: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize
+4: Test timeout computed to be: 1500
+4: PASS ring/SUB/Sustain mode ranges and validation
+4: PASS SUB shapes, sourced noise pole, destinations and separate PWM
+4: PASS ring RC timing, key ledger, legato/retrigger, bounds and panic
+4: PASS global ring sidebands, dry bypass, free carrier and reset
+4: PASS Sustain I/II live key CV, shared VCO/filters, state continuity and MIDI pedal adaptation
+4: PASS parameter ranges and constructor validation
+4: PASS physical source/Q capacitor transfer, four source loads, DC rejection, Q and slope
+4: PASS production cascade physical voltages, passive mixer, fixed Q current and VCA calibration
+4: PASS keyboard/envelope gm scaling with fixed feed conductance
+4: PASS shared master PITCH, independent oscillator routes, fixed feed floor and nominal range
+4: PASS deterministic seed and reset
+4: PASS four output coupling RC transfers, decay and diagnostic validation
+4: PASS output capacitor allocation/idle/panic lifecycle and dry-line polarity
+4: PASS four voices, stealing, repeated notes and release tails
+4: PASS sustain, CC123 behavior and controller-preserving panic
+4: PASS shared global release bounds, independent RC trajectories and held-note invariance
+4: PASS global release production equivalence and live capacitor-state continuity
+4: PASS global release versus MIDI pedal, panic and reset lifecycle
+4: PASS hardware velocity behavior and sample-rate pitch invariance
+4: PASS WSC saw/pulse polarity and folded-sine phase
+4: PASS RC attack curvature, fixed duration, linear limit and retrigger charge
+4: PASS optional saturating-current attack ODE, exact solution, limits and retrigger
+4: PASS factory five-RC envelope trajectories and engineering T60 compatibility
+4: PASS factory HP/LP envelope resistor ratios and engineering-patch compatibility
+4: PASS fixed PWM reset edge, duty, phase offset and sourced speed calibration
+4: PASS extreme finite output and all factory presets
+3/5 Test  #4: Ceres.native_dsp_contracts ...................   Passed    8.37 sec
+test 11
+    Start 11: Ceres.embedded_allocation_contract
+
+11: Test command: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize/ceres_embedded_contract
+11: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize
+11: Test timeout computed to be: 1500
+11: PASS embedded: no exceptions, numeric Patch, active expression and9 render configurations, 57 control keys, zero post-construction new/new[] allocations
+4/5 Test #11: Ceres.embedded_allocation_contract ...........   Passed    0.65 sec
+test 13
+    Start 13: Ceres.configuration_native_embedded_parity
+
+13: Test command: /opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14 "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/Tests/check_configuration_parity.py" "--native" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize/ceres_native_configuration_parity" "--embedded" "/Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize/ceres_embedded_configuration_parity"
+13: Working Directory: /Users/vojta/Dev/virtual-instrument-ceres-poly-quality-20261019/build-sanitize
+13: Test timeout computed to be: 1500
+13: {
+13:   "status": "pass",
+13:   "sample_count": 184320,
+13:   "rates": [
+13:     44100,
+13:     48000,
+13:     88200,
+13:     96000,
+13:     192000
+13:   ],
+13:   "polyphony": [
+13:     1,
+13:     4,
+13:     16
+13:   ],
+13:   "oversampling": [
+13:     1,
+13:     2,
+13:     4
+13:   ],
+13:   "variants": {
+13:     "native": {
+13:       "binary_sha256": "79a7523aea6477a932a491debfabbabaa0eff424c8209554613b55cc598d8ac3",
+13:       "audio_sha256": "75855ec9796e3a173dd09a7f176ace6ba2519301b26272843fab006525e51d52"
+13:     },
+13:     "embedded": {
+13:       "binary_sha256": "f4fcee15473b964e311e49603ddbe5050867af5e33490be3012bb22da5a603b6",
+13:       "audio_sha256": "75855ec9796e3a173dd09a7f176ace6ba2519301b26272843fab006525e51d52"
+13:     }
+13:   }
+13: }
+5/5 Test #13: Ceres.configuration_native_embedded_parity ...   Passed    3.06 sec
+
+The following tests passed:
+	Ceres.configuration_contracts
+	Ceres.noise_quality_contracts
+	Ceres.native_dsp_contracts
+	Ceres.embedded_allocation_contract
+	Ceres.configuration_native_embedded_parity
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+unit    =  15.48 sec*proc (5 tests)
+
+Total Test time (real) =  15.49 sec

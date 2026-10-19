@@ -18,7 +18,16 @@ struct Patch {
 #if !defined(CERES_EMBEDDED_TARGET)
     std::string name = "init";
 #endif
+    // Audio noise keeps the legacy4x in-band density at a fixed host rate:
+    // its source amplitude scales sqrt(internalFactor/4). SUB noise uses
+    // its separate RC/RMS convention and the unchanged raw random sample.
     double saw = 1.0, pulse = 0.0, sine = 0.0, noise = 0.0;
+    // PW is the comparator's logical timing window (50..90%), modulated by
+    // PWM with its fixed cycle edge retained. The completed audio pulse has
+    // the opposite sign to that logical coordinate: public solo/both-on
+    // CS-50 recordings support this relative saw/pulse audio calibration.
+    // It changes neither edge time nor shared phase and does not identify an
+    // active-low hardware stage; absolute circuit phase remains uncalibrated.
     double pulseWidth = 0.5, pwmDepth = 0.0, pwmRate = 1.0;
     // Continuous sine-LFO phase offset in cycles, applied immediately by
     // setPatch. The free-running PWM clock is never reset by note events.
@@ -110,6 +119,9 @@ struct Patch {
     // key-up uses a fixed nominal .46781044s T60 return, independent of MIDI
     // pedal/globalRelease. Retrigger retains capacitor charge, not phase reset.
     // mix=0 preserves the previous signal path exactly; carrier phase is free.
+    // Live digital Depth edits interpolate over20ms without restarting the EG
+    // or carrier. Startup/reset precharge the saved value. This dezipper is a
+    // DAW-control policy, not a measured component or physical timing law.
     double ringMix = 0.0, ringRate = 30.0, ringDepth = 0.0;
     double ringAttack = 0.01, ringDecay = 0.35;
     double pressureVolume = 0.0, pressureFilter = 0.0, pressureVibrato = 0.0;
@@ -117,7 +129,12 @@ struct Patch {
     // (legacy/default), 1=each board's latched note-on velocity. The three
     // pressure* depths above consume this selected value. Velocity remains
     // unchanged through release, pedal and Sustain II pitch-following; only
-    // assigning/retriggering a board replaces it. Switching sources is live
+    // assigning/retriggering a board replaces its target. On an audible board,
+    // the consumed velocity follows that target with a 5ms digital controller
+    // RC to avoid a gain/CV step. Silent/zero-envelope assignments precharge
+    // immediately; keyboard pitch, physical EGs and phase are never slewed or
+    // reset by this adaptation. The same value feeds velocitySensitivity.
+    // Switching sources is live
     // without regating/resetting circuit state. This is not a CS-50 circuit.
     double expressionSource = 0.0;
     // Independent legacy velocity-to-gain depth, multiplicative with the
@@ -168,6 +185,18 @@ public:
     // Restores seeded oscillator phases, controllers and configured capacitor
     // initial conditions; permits pre-clock configuration again.
     void reset();
+    // Virtual voice-count / numerical-quality configuration, independent of
+    // Patch and its hardware controls. Valid voices 1..16, factors 1/2/4.
+    // Changing configuration is accepted only before any process() since
+    // construction/reset, with no assigned/gated notes. It resets electrical
+    // state and controllers; set the patch/controllers afterwards. A request
+    // equal to the current configuration is always a harmless no-op.
+    // Invalid/live requests return false, with no mutation or allocation.
+    // Adapters should defer changes until idle and fade residual output tails
+    // before reset/configure. activeVoices()==0 alone does not mean silence.
+    bool configure(unsigned voices, unsigned factor) noexcept;
+    unsigned polyphony() const noexcept;
+    unsigned oversamplingFactor() const noexcept;
     float process();
     // Counts active amplitude envelopes, not residual output capacitor tails.
     // The common output bus has a .8883s time constant and keeps running at zero.
@@ -175,8 +204,12 @@ public:
     double sampleRate() const;
     static constexpr unsigned voiceCount = 4;
     static constexpr unsigned oversampling = 4;
-    // FIR group delay is 124 internal samples = 31 host samples. The
-    // decimator's final-of-four sampling phase affects event alignment.
+    static constexpr unsigned maxVoiceCount = 16;
+    // Default constants above retain source compatibility. Actual configuration
+    // is available through the getters. Every quality has nominal group delay
+    // 31 host samples: direct delay at1x, FIR125 at2x, original FIR249 at4x.
+    // Final-of-factor decimation preserves the legacy fractional sampling phase;
+    // qualities do not promise sample-identical transients or alias behavior.
     static constexpr unsigned outputLatency = 31;
 #if !defined(CERES_EMBEDDED_TARGET)
     // Read-only native diagnostics; excluded from the embedded ABI. Values
@@ -194,6 +227,7 @@ public:
         std::size_t physicalKeyPresses;
         double ringCoupledCarrier;
         double ringSwitchGain; // matched upper-pair steering, includes nominal DC bias
+        double ringDepth; // actual interpolated digital Depth coordinate
     };
     struct SoundPathState {
         double resonanceVoltageOffset, hpResonance, lpResonance;
@@ -202,6 +236,8 @@ public:
         bool hasProcessed;
     };
     std::array<VoiceState,voiceCount> voiceState() const;
+    // Includes inactive preallocated slots. Only [0,polyphony()) is clocked.
+    std::array<VoiceState,maxVoiceCount> allVoiceState() const;
     ModulationState modulationState() const;
     SoundPathState soundPathState() const;
 #endif
@@ -212,6 +248,10 @@ private:
 
 #if !defined(CERES_EMBEDDED_TARGET)
 // Allocating measurement APIs belong to offline research/native tests only.
+// Internal-rate impulse through the exact selected output stage. The returned
+// host-rate stream uses production final-of-factor sampling and zero history.
+std::vector<double> outputRateImpulse(unsigned factor, std::size_t hostFrames,
+    unsigned inputSubframe = 0);
 // Exact production passive carrier network, zero initial incremental charge.
 // Ideal source, four100uF caps, zero incremental IC current; returns pin7-pin8.
 std::vector<double> ringCarrierResponse(double sampleRate,const std::vector<double>& input);

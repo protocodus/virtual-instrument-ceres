@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "declared_utc": "2026-10-19T18:26:28.181768+00:00",
+  "purpose": "Determine whether public CS-50 recordings identify same-voice waveform mixing polarity, relative phase and cancellation strength in production Ceres; not a waveform-only magnitude fit.",
+  "prior_exposure": "Existing project reports and source metadata read before this declaration. PTK isolated dry saw/square and Whitmore preset excerpts are reused development references; no new waveform-mixture audio inspected before declaration.",
+  "candidate_order": [
+    "Whitmore original video 327..391 seconds (creator labels dry; Panel/Sine/Oscillator chapters)",
+    "PTK archived creator page separate saw/square/PWM clips (isolation-only, not mixture eligible)",
+    "additional creator hardware demonstrations if first source fails"
+  ],
+  "eligibility": {
+    "strict_mixing": "Same physical note held across an isolated-to-mixture switch, stationary identifiable saw/pulse/PW/sine levels, no modulation or filtering changes, no external effects; uninterrupted shared recording chain. Gate need only remain on through each steady window. Equivalent separate notes require known controls and demonstrated unchanged gain and envelope steady state.",
+    "conditional_mixing": "Visible isolated-to-mixture change but uncertain exact panel control law or recording chain. Can establish qualitative coherence/cancellation or spectral family only; cannot calibrate exact slider cancellation curve.",
+    "ineligible": "Unknown mixture status, multiple notes, spoken voice/music over tone, chorus/delay/reverb, simultaneous filter/modulation/pulse width/envelope/gain change, or separate unrelated clips without common gain evidence."
+  },
+  "measurement": {
+    "windows": "Choose stationary 100..300ms windows by video/event isolation before comparing model spectra; include all eligible windows, report exclusions with reasons. Where no strict segment exists return unidentifiable rather than selecting a convenient tonal fit.",
+    "harmonics": "Estimate f0 with bounded spectral peak, fit complex Fourier coefficients using same-frequency least squares or Hann projection, compare relative-harmonic phase phi_h - h*phi_1 invariant to whole-wave time alignment. Do not phase-align or normalize individual source branches separately.",
+    "level": "Report raw steady RMS/peak and harmonic coefficients. At most one constant recording-chain gain selected on isolated baseline and held on mixtures. Unknown envelope/level changes invalidate a calibrated gain comparison.",
+    "model": "Render production Synth using explicit patch, note/event sequence, sample rate, quality and seed; no surrogate/source replacement. Test original hardware switch endpoints and separately a Ceres continuous pulse sweep as synthetic behavior, explicitly not hardware verified.",
+    "acceptance": "An eligible mixture must distinguish production branch polarities/relative phase and predict mixture absolute level/harmonic changes under held gain. No numerical accuracy claim when control uncertainty prevents that comparison.",
+    "no_fit": "Do not fit DSP phase/gain/filter parameters to choose a favorable mixture score. Any nuisance pitch estimate records limits; no independent per-variant normalization, EQ, time stretch or phase rotation."
+  },
+  "evidence_hygiene": "Reference audio/video local ignored diagnostics only, not committed and never used at DSP runtime; preserve source URL, creator statement, SHA256 and acquisition/decode command."
+}

@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "status": "pass",
+  "scope": "Follow-up validation of existing f46 MIDI corrections against installed-b11 engine. No new DSP source or envelope policy change; no claim that every audible glitch is reproduced or every host is underrun-free.",
+  "engine_commit": "f46e829bce46bea8e8400c58ce549457cd6a611e",
+  "installed_baseline_engine_commit": "2ee6cf22deead7358d6b4ee7c294da955225af56",
+  "source_sha256": {
+    "CMakeLists.txt": "59500a9ac95d83a1b48d7d5ddb3d3ffdca9c519948bb1bc0a5db54100523a4d0",
+    "Source/DSP/ceres.cpp": "d1608b0048501670da9c129c4527f6af5ba78e8d278382b70a2ae28f59c0d0b4",
+    "Source/DSP/ceres.hpp": "9ea1121863c508594ee5b0ba8c427759f507f8317593a84f487e1cbbd21b69f2",
+    "Tests/FastNoteEnvelopeTests.cpp": "6e44daddf3259512d15745afb530fb4767b660bed75b91c7721b563b2d362494",
+    "Tools/measure_fast_notes.cpp": "10bf34ac5ef96c54bb20f05c2d6e8e7c570945c861cf24a8fdd1a3ba50cf48e6"
+  },
+  "witness": {
+    "b11": {
+      "exit_code": 2,
+      "stderr": "",
+      "metrics": {
+        "sample_rate": 48000,
+        "voices": 4,
+        "factor": 4,
+        "assignment_preserves_oscillator_and_eg_charge": true,
+        "first_host_sample_velocity_cv": 0.9,
+        "expected_continuous_velocity_cv": 0.2029105987084231,
+        "continuous_velocity_error": 0.6970894012915769,
+        "remaining_same_pitch_held_owners_after_stale_off": 2,
+        "expected_remaining_same_pitch_held_owners": 3,
+        "attack_first_48k_sample_0_1ms": 0.6238514388650331,
+        "attack_first_48k_sample_1ms": 0.0925874466057341
+      }
+    },
+    "current": {
+      "exit_code": 0,
+      "stderr": "",
+      "metrics": {
+        "sample_rate": 48000,
+        "voices": 4,
+        "factor": 4,
+        "assignment_preserves_oscillator_and_eg_charge": true,
+        "first_host_sample_velocity_cv": 0.20291059870842287,
+        "expected_continuous_velocity_cv": 0.2029105987084231,
+        "continuous_velocity_error": 2.220446049250313e-16,
+        "remaining_same_pitch_held_owners_after_stale_off": 3,
+        "expected_remaining_same_pitch_held_owners": 3,
+        "attack_first_48k_sample_0_1ms": 0.6238514388650331,
+        "attack_first_48k_sample_1ms": 0.0925874466057341
+      }
+    }
+  },
+  "checks": {
+    "release_fast_note_envelope_suite": "pass",
+    "asan_ubsan": {
+      "passed": 3,
+      "total": 3,
+      "suites": [
+        "Ceres.capacitor_continuity_contracts",
+        "Ceres.note_reuse_contracts",
+        "Ceres.fast_note_envelope_contracts"
+      ]
+    },
+    "closed_form_envelope_cases": 54,
+    "closed_form_envelope_points": 162,
+    "rapid_retarget_cases": 72,
+    "burst_cases": 432,
+    "dsp_source_changed": false
+  },
+  "evidence_scope": "Logical local archive files below are not shipped and contain no public recordings. Evidence is local experiment output, not a Recon validation claim.",
+  "local_evidence_sha256": {
+    "measure-b11.json": "6c7a2a0502d08fa8b81a194c476ba6656bcb88b880dd51788301bc23d13b841e",
+    "measure-current.json": "294e10629fae514e989ffaa3b16502ff07813414695c8f878132eaed7b89ccab",
+    "baseline-witness-check.json": "a8ea7d081a9f0ef407d38f15bcb1af01387f9575a17886840a0ed29ddeed1daa",
+    "release-build.log": "44a5ed3be92456ae7d874c89dfb53b9c74e3009f603f1870af7b038451836603",
+    "release-tests.log": "f4fc535c911e1e8c387cfb9f73580166454f99bcaae4667068df88b2c43084a7",
+    "sanitize-build/Testing/Temporary/LastTest.log": "67ac781eedc706d8ca03f62d6b5493ff42651bcf41e44749f69339c842e12a93"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "status": "pass",
+  "product_version": "0.2.0",
+  "parent_commit": "2ee6cf22deead7358d6b4ee7c294da955225af56",
+  "release_ctest_passed": 18,
+  "targeted_asan_ubsan_passed": 4,
+  "legacy_exact_samples": 768000,
+  "configured_native_embedded_exact_samples": 184320,
+  "patch_key_count_unchanged": 57,
+  "postconstruction_allocations_observed": 0,
+  "configured_voices": [
+    1,
+    4,
+    16
+  ],
+  "configured_factors": [
+    1,
+    2,
+    4
+  ],
+  "timing_limit": "Native single-engine16voice4x has64/1000 thread-CPU overruns; all wall misses retained; no host/Double guarantee.",
+  "build_identity": {
+    "Source/DSP/ceres.hpp": "773b2254cb594807de8ce9e1eed24bc21322d7fd27ad28f62ee42d5a4f93b25e",
+    "Source/DSP/ceres.cpp": "4b3454f9c0c05e3dc2ca85b13db778ffd597ac04a224bd34f4574679a2c0b289",
+    "Tools/render_main.cpp": "dafd2077370a49fec8cdf04ee56349f501c6051e1cb5a5455842f602c479bcbf",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "e3693e10875e4777c17ec50c0980e7620b292987fa5b8086abdb52a5d5990eca"
+  },
+  "binary_sha256": {
+    "ceres_render": "79d98108c22c85298f1efe716ee696a8c89aa37520a2ae24d6475879f66afbd4",
+    "ceres_configuration_tests": "040d4090e65fbf638af66b39f433f9c97fe5abf365f5ce4c5e320fab6532f39c",
+    "ceres_embedded_contract": "21b45252adc25ded438e5e135f989a6eff07bc5967192ae10ee1ed0d2d0d493b",
+    "ceres_native_configuration_parity": "0a181064776b1386eaacfa2cee472d3f964c2ccdd4044c0de46ba15af2eaeedb",
+    "ceres_embedded_configuration_parity": "a5d2d4bd0f9fb9698d0ad865048673dde75e9dea8687e53e38f4a8124be506d3"
+  },
+  "verified_file_sha256": {
+    "CMakeLists.txt": "e3693e10875e4777c17ec50c0980e7620b292987fa5b8086abdb52a5d5990eca",
+    "Docs/DSP_SOURCE.md": "c3cbddcdfeb6e485ef93cd9d35781402109b552fbb907c1400f447ffd416e3da",
+    "Docs/validation/poly-quality/README.md": "5404379b9ff149e629f7680882f52934c96d1f1fda29683d88ffde99ed8a8eec",
+    "Docs/validation/poly-quality/cli.json": "5bfc4530227f2c42e93adfdf8989617806629654e8aaa371c244d1cd85d3743b",
+    "Docs/validation/poly-quality/cli.log": "5bfc4530227f2c42e93adfdf8989617806629654e8aaa371c244d1cd85d3743b",
+    "Docs/validation/poly-quality/configured-parity.json": "660203d0d333adc3efbbbf5232b1e561fdf6b9a14ce7300eabe044c3aa554750",
+    "Docs/validation/poly-quality/configured-parity.log": "660203d0d333adc3efbbbf5232b1e561fdf6b9a14ce7300eabe044c3aa554750",
+    "Docs/validation/poly-quality/legacy-parity.json": "9dc050d14eed7f09afa6fc8eeccdc4c3f00da21e0f7a482e9f81abd9e650b7b4",
+    "Docs/validation/poly-quality/legacy-parity.log": "9dc050d14eed7f09afa6fc8eeccdc4c3f00da21e0f7a482e9f81abd9e650b7b4",
+    "Docs/validation/poly-quality/performance.json": "baa19fce674417b2ded0cbf05dc342ffa73b8f19163e1817a04dceb3e1f705b2",
+    "Docs/validation/poly-quality/performance.log": "baa19fce674417b2ded0cbf05dc342ffa73b8f19163e1817a04dceb3e1f705b2",
+    "Docs/validation/poly-quality/release-build.log": "06186695b39e1ed9b4a5a8f70df0afdeedccb6000d6fe5f77e17d2a27e01c6c6",
+    "Docs/validation/poly-quality/release-ctest.log": "ee713603f8387a8bed489d5f12048af2521b297ce89984ba65cd4b4b38101f1a",
+    "Docs/validation/poly-quality/sanitizer-build.log": "32fa8bd7b1896d4cb5e5cc3dad32adab773546dd48b765bc9a8233cdba05fbee",
+    "Docs/validation/poly-quality/sanitizer-ctest.log": "3a07d75202b4bc7b4bcba360c7da13745daa07c38a3c8d52249f85859de3406f",
+    "README.md": "cfdb7956cf63bdb7a80e2360d5ccf1898e915fae0babe99de71825bd37c5ddc7",
+    "Source/DSP/ceres.cpp": "4b3454f9c0c05e3dc2ca85b13db778ffd597ac04a224bd34f4574679a2c0b289",
+    "Source/DSP/ceres.hpp": "773b2254cb594807de8ce9e1eed24bc21322d7fd27ad28f62ee42d5a4f93b25e",
+    "Tests/ConfigurationParityDriver.cpp": "7f5403cf10749740d0e43e9dbf72a28f0e6855e7fbcc3aba59134f13e5c495b8",
+    "Tests/ConfigurationTests.cpp": "a2173273c5eb10d49dd27c4ce5aa90cc6346ad84a63dcb8d2118d976ee70266d",
+    "Tests/EmbeddedContract.cpp": "45fd285b6967c79e8ef09c583715cf35e9e6ba4d1831110dfe97631f284019a0",
+    "Tests/check_configuration_cli.py": "c0322ef117e2c81d07083cd86d8db9ab235f6ed788b460bad6eece9e7e1a06b5",
+    "Tests/check_configuration_parity.py": "25d8ef00c48b1bc5307616aba499d0596be629c4570af2fcffaa7e584e37b904",
+    "Tools/benchmark_configuration.cpp": "b8cea1124e16d5e43d65787d170627b4e54905e6f94cadc5ebfbad04cd1c7efe",
+    "Tools/benchmark_configuration.py": "c6fffc0f7fd98f05f46742d1aa36262bf12e9279fe8108c1ee551f3f5e06b3a6",
+    "Tools/check_legacy_configuration.py": "0869c9f24e2ad3ef315fcb06636dcfafd55b231376587a8d5eaf8dd352c230a4",
+    "Tools/record_configuration_validation.py": "828a488c958cdf4e03fb58a876773760c2fa4dc503e97f7d2315dfac365af217",
+    "Tools/render_main.cpp": "dafd2077370a49fec8cdf04ee56349f501c6051e1cb5a5455842f602c479bcbf"
+  },
+  "scope": "Local native/C++17 embedded validation; no Rack SDK or host validation, no calibration/recording fits. JUCE scaffold unchanged."
+}
