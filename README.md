@@ -192,4 +192,13 @@ On multi-configuration generators add `--config Release` to the build and `-C Re
 
 ## Licensing
 
-Ceres's source code is MIT-licensed; see [LICENSE](LICENSE). The plug-in builds with JUCE (AGPLv3 or a commercial JUCE licence) and clap-juce-extensions; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). No Reason/Jukebox SDK, third-party hardware capture, firmware or ROM data is part of the standalone runtime.
+Ceres's source is available under the [PolyForm Noncommercial License
+1.0.0](LICENSE): you may read, study, change and share it for any non-commercial
+purpose, but not sell it or use it commercially. Official Protocodus builds
+carry an additional permission in the same file to use them for any purpose,
+including making music commercially. Commits made before this licence change
+were published under MIT and remain so. The plug-in builds with JUCE (official
+builds use a commercial JUCE 8 Starter licence) and clap-juce-extensions; see
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). No Reason/Jukebox SDK,
+third-party hardware capture, firmware or ROM data is part of the standalone
+runtime.
