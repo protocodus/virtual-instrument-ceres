@@ -181,8 +181,11 @@ public:
         double oscillatorFrequency, hpFrequency, lpFrequency;
     };
     struct ModulationState {
+        // ringCarrier is the unchanged raw free-running oscillator sine.
+        // ringCoupledCarrier is pin7-pin8 after the passive carrier network.
         double sub, ringEnvelope, ringFrequency, ringCarrier;
         std::size_t physicalKeyPresses;
+        double ringCoupledCarrier;
     };
     struct SoundPathState {
         double resonanceVoltageOffset, hpResonance, lpResonance;
@@ -199,6 +202,9 @@ private:
 
 #if !defined(CERES_EMBEDDED_TARGET)
 // Allocating measurement APIs belong to offline research/native tests only.
+// Exact production passive carrier network, zero initial incremental charge.
+// Ideal source, four100uF caps, zero incremental IC current; returns pin7-pin8.
+std::vector<double> ringCarrierResponse(double sampleRate,const std::vector<double>& input);
 // Normalized output-coupling sections at their actual processing rate
 // (4*hostRate in production), without the final line inversion or rail.
 // Stages: 0=CP3 filtered branch, 1=CP4 common voice, 2=four-voice bus,

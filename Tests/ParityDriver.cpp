@@ -51,6 +51,7 @@ int main(int argc,char** argv) {
                !ceres::setParameter(patch,"lfo_waveform",scene%5) ||
                !ceres::setParameter(patch,"sustain_mode",1+scene%2))return 6;
         }
+        if(argc==3 && std::strcmp(argv[2],"ring-bypass")==0)patch.ringMix=0;
         if(soundPathControls) {
             if(!ceres::setParameter(patch,"brilliance",-15+scene*30./7) ||
                !ceres::setParameter(patch,"resonance_offset",-10+scene*20./7) ||
