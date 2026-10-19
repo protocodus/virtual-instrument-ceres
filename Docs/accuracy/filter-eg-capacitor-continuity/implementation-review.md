@@ -1,0 +1,31 @@
+# Independent Q and EG implementation review
+
+19 October 2026. Read-only review of `/tmp/ceres-audible-circuits-20261019` against immutable parent `d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43`. **Pass within the reduced model's declared assumptions.** No remaining implementation blocker was found. No DSP edits, builds, synth execution, audio decoding, target measurements or fits were performed by this reviewer.
+
+The reviewed CPP is SHA-256 `f3403b7855b97f2043d19b7a5ed2fd27778993da2af33351a90cb55880705188`; HPP is `a41e4266ad826a22da6c3078b1ac181c012a33a70cbd58c2326060ede53f1cc3`. The independent source audit remains unchanged at `source-audit.md`, SHA-256 `4febb599e7b01dfdfdf8276a4749c4454f58b0a044986ec71547f29807f84028`. Exact reviewed files and observed test receipts are bound in `implementation-review.json`.
+
+The two anchor RC updates implement the same 1.1 s coefficient already used by the common Q offset. Their linear combination has the intended single-pole stage response; there is no second cascade pole on the common term. The original common-offset update and final clamp arithmetic remain intact. When a stage anchor stays at its configured value, its update is zero. A patch change updates the target without replacing stored state after processing starts.
+
+`hasProcessed` is set in the internal sample function, so even silent processing closes the setup exception. Pre-clock patch configuration precharges the two anchor states and idle filter IL. Reset restores the current patch's anchor/IL convention and resets the clock flag; it retains the previous zero common-offset initialization. Panic leaves the clock flag and all Q coordinates untouched while explicitly clearing envelope/audio states as before. A patch change after panic therefore remains live. Neither note allocation nor retrigger resets Q.
+
+Removing the Idle early assignment lets Idle pass through the existing release return equation while keeping its bookkeeping state. Ordinary release and attack equations are otherwise unchanged. A filter envelope subsequently triggered from Idle starts from its retained voltage. The settled amplitude and ring Idle targets remain zero. The code explicitly retains the physical post-settling rate limitation rather than claiming that the guide identifies a new time constant.
+
+The new tests compare combined Q coordinates against closed-form KCL, including simultaneous edits, reversal, independence, silent processing, reset, panic and preset recall. The test's absolute-looking voltage coordinate is explicitly labeled an affine compatibility coordinate; it is not a recovered chip voltage or preset bus calibration. The idle tests cover all four boards, ordinary release retirement, a live IL reversal, delayed note-on, effective global release, reset and panic. Native/embedded parity additionally exercises live Q/IL changes.
+
+Two documentation issues found during review were corrected before these hashes were bound: the old public comment claiming stage resonance edits remained immediate, and the test wording that could have implied physical identification of its affine coordinate. Neither required a new DSP equation.
+
+The implementing agent's stored Release log reports **9/9 tests passed**; its sanitizer log reports **3/3 selected tests passed**. Its parent comparison records **882,688 byte-identical float samples per version** across static manual Q/IL, the existing moving common Q offset with static anchors, and all native factory/init patches. The comparison's current source bindings were independently checked. These are reviewed stored execution results, not an independent rerun; the comparison producer documents that its temporary binaries and raw float streams are deleted, leaving hashes, source identities and reproduction commands. Static parity is scoped to these deterministic cases and compiler/math environment.
+
+## Listening scenes agreed before rendering
+
+The root will freeze and run the actual driver and full parameter manifest. These are the agreed fixed scenes, each compared against parent `d5e0b2d` with no VCO change, normalization, fit or per-version gain adjustment:
+
+- **LP-Q step:** 48 kHz, seed1, saw only, key tracking and modulation off; HP30 Hz/r0, LP1046.5022612023944 Hz/r0.2, zero filter EG depth. C4 begins at0; LP resonance changes to0.8 at1 s; key-off6.5 s; duration7.5 s. The fourth saw harmonic is near the nominal LP peak, exposing the slow Q transition at an ordinary setting.
+- **LP static control:** the same final LP resonance0.8 configured before processing, with no runtime patch edit. Require exact parent/candidate sample identity.
+- **HP-Q step:** same Q scene, but HP261.6255653 Hz/r0.2→0.8 at1 s and LP8000 Hz/r0. The fundamental exposes the independent HP-anchor transition; note and duration are unchanged.
+- **Idle IL then note:** HP30 Hz/r0, LP3000 Hz/r0.2, HP EG depth0, LP depth `.65*39/47`, initial/peak0, filter A0.25/D0.35/R1 s. Process silence through0.5 s; change IL to−5 at0.5 s; C4 begins0.55 s and ends1.2 s; duration2 s. The retained state immediately before note-on is approximately−1.46027 rather than−5, changing the first attack while the oscillator and amp schedule stay fixed.
+- **IL static control:** configure final IL−5 before processing; retain the same note times, with no runtime patch edit. Require exact parent/candidate sample identity.
+
+All use the agreed common drive1, volume0.55, output trim0 dB, amp A0.01/D0.3/S1/R0.2, and zero ring/SUB/pressure/velocity/drift effects. The full root-owned scene manifest must explicitly freeze remaining values. The IL listening scene is a first note after an idle edit, not a literal same-board retrigger; the separate native retired-board test covers prior playback and allocation.
+
+The source audit predicts audible potential, but this review does not substitute for hearing or measuring the resulting fixed demos. Parent/candidate differences must be reported at their original gains, with finite/peak checks and predeclared windows. Static controls must remain exact. The stiff-source/zero-pin-current Q limit, provisional VQ/damping calibration and uncertain physical post-settling EG rate remain limitations after the implementation passes.

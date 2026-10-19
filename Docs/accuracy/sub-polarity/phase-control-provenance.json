@@ -1,0 +1,33 @@
+{
+  "purpose": "Research-only pure-AM phase-equivalence control, no fitting or production default change",
+  "source_candidate": "/tmp/ceres-sub-polarity-20261018",
+  "only_change": {
+    "before": "age = 0; lfoPhase = 0; pwmPhase = 0; lastSub=0;",
+    "after": "age = 0; lfoPhase = .5; pwmPhase = 0; lastSub=0;"
+  },
+  "copied_input_sha256": {
+    "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+    "Source/DSP/ceres.cpp": "cc2ee3cdcf7dfab7ebc60071627a2557520f6cdbadd2a590796629a9aad8fd10",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d"
+  },
+  "phase_variant_cpp_sha256": "1be4882c53596c4a5bee77a1c30b2e3f1a7106796e07b4fefac615991e1383cd",
+  "build_testing": false,
+  "binary_sha256": "843456fee2e717f5bc12a538ef6b3e0155af03807e8f5f26b9fad0ba7630bf7c",
+  "compiled_input_sha256": {
+    "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+    "Source/DSP/ceres.cpp": "1be4882c53596c4a5bee77a1c30b2e3f1a7106796e07b4fefac615991e1383cd",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d"
+  },
+  "build_info": {
+    "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+    "Source/DSP/ceres.cpp": "1be4882c53596c4a5bee77a1c30b2e3f1a7106796e07b4fefac615991e1383cd",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d"
+  },
+  "source_difference_check": "pass: only reset SUB phase 0 to .5; PWM unchanged; all other compiled inputs exact"
+}

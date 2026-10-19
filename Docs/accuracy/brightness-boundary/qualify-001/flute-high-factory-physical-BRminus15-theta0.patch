@@ -1,0 +1,7 @@
+# Frozen shared dark-endpoint hypothesis; existing timing/source/Q/gain retained.
+octave=-1
+calibration_network=1
+calibration_hp_bias=0
+calibration_lp_bias=0
+calibration_alpha=1
+brilliance=-15

@@ -1,0 +1,53 @@
+{
+  "status": "pass",
+  "created_utc": "2026-10-19T07:43:58.405765+00:00",
+  "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "a41e4266ad826a22da6c3078b1ac181c012a33a70cbd58c2326060ede53f1cc3",
+    "Source/DSP/ceres.cpp": "f3403b7855b97f2043d19b7a5ed2fd27778993da2af33351a90cb55880705188",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "e6ea10b6b159cac1fc5c4909b5b335987912e79cf2920b5ae499e7ff5bff0601"
+  },
+  "release_ctest_passed": 9,
+  "asan_ubsan_ctest_passed": 3,
+  "asan_options": "detect_leaks=0",
+  "embedded_keys": 57,
+  "parameter_table_byte_identical": true,
+  "parent_audio_exact_samples": 882688,
+  "live_native_embedded_exact_samples": 384000,
+  "scope": "Q-anchor and idle-EG continuity only; no oscillator/parameter/UI changes, public recording renders, or audio fitting.",
+  "runtime_allocation_contract": "Existing embedded test passed with all57 keys and active controls; zero post-construction new/new[] allocations.",
+  "binary_sha256": {
+    "build/ceres_render": "2bc701b3d7b8403b13f9b6159744f0d6ae7fd37478f0cf376249760771ba9c6e",
+    "build/libceres.a": "09de7c5ad8858b7e142ff47433e60346d6244cbfa7b4acc0f43ebe076cf85203",
+    "build/libceres_embedded.a": "172792d0fc4ec8039b84e29fbb9080819b31e503bd1215217a050ba34e1d9027",
+    "build/ceres_capacitor_tests": "3ab4f69756e2a296e399855937d8f4f9278cddea7c0ddc76db309e7a56a7faf5",
+    "build/ceres_native_parity": "f1d01c1a212eedf6d9e29b7a8daa9452a88e40b070d931e18e91e32aa980250c",
+    "build/ceres_embedded_parity": "b42754b67b940b3729266cb7962609b75bcf5654cb78cc27ba141a2b3d6bee6b"
+  },
+  "verified_file_sha256": {
+    "CMakeLists.txt": "e6ea10b6b159cac1fc5c4909b5b335987912e79cf2920b5ae499e7ff5bff0601",
+    "Source/DSP/ceres.cpp": "f3403b7855b97f2043d19b7a5ed2fd27778993da2af33351a90cb55880705188",
+    "Source/DSP/ceres.hpp": "a41e4266ad826a22da6c3078b1ac181c012a33a70cbd58c2326060ede53f1cc3",
+    "Tests/CapacitorContinuityTests.cpp": "49fc433439f8e4004ae093a4bbd53b5e9d4fbb14050a407b9869eaa0a80369de",
+    "Tests/CapacitorStaticDriver.cpp": "35f400fa007ac77015e1f83b756ed509e7ac018a6eecb41d85ed651a22dcceb4",
+    "Tests/ParityDriver.cpp": "8039150294df6e1d1a660897f55b07dc7ebd7f1ac3ffe50f305b41ee55edc0ff",
+    "Tests/check_capacitor_parity.py": "8563addea43dea365b33b0dca7db6c7b92c525d0bef140288b4074cde09f42fb",
+    "Tests/check_capacitor_parent_parity.py": "f51b17acf51cf0476f8c80f0f5b67f47b38a1703f5b4d4b993ad3ee3e256eb5e",
+    "Tests/record_capacitor_validation.py": "b18da3af3b5ec018f5356aacb59b83fedacb883687dc5a857b20ec8ca8c9287d",
+    "Docs/capacitor-continuity/README.md": "d7b8d20eec2bb36d1dfacb7fc31aa238b58b695c428505ee9ed7dbf78ac64ff8",
+    "Docs/capacitor-continuity/source.patch": "a55a7fb9560774750fbccb8b5f782aa05d956daa4fd4456e2245dba784a3ce01",
+    "Docs/capacitor-continuity/release.log": "2e3d14a87ea2e64a5271cbbde334245370de97a94df79d7525e4044406dcb7de",
+    "Docs/capacitor-continuity/build.log": "010ced73a9e2cdcf3598838781c047988bf75c65f3515e5ac3edcd93739369a5",
+    "Docs/capacitor-continuity/sanitize.log": "b67cdf96fbe70cc5b2d7e1ebe5132ae73c6d203dce07870388cc0a514e5ca569",
+    "Docs/capacitor-continuity/sanitize-build.log": "d09ed2271d07d86ca2609f209b6d1a40325eca05a61b27a75a364f5b9c3fca3a",
+    "Docs/capacitor-continuity/parent-parity.json": "102004e1e1fde5e4ad9e4f4c65a2d08f16fb7b0c28ff36f8b2c85088a97d6201",
+    "Docs/capacitor-continuity/parent-parity.log": "fc95eef3e2c093a8fa87c13fd2fe8f5a3a6aadeae344448da32ba951cbd1221e",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/filter-eg-capacitor-continuity/source-audit.md": "4febb599e7b01dfdfdf8276a4749c4454f58b0a044986ec71547f29807f84028",
+    "/tmp/ceres-cs50-1x8LGd/research/service1.pdf": "c3a4b0d4e27e9af90c88258d03a1c09c5d080ea162e562d9bf267fc8ffbbadc1",
+    "/tmp/ceres-cs50-1x8LGd/research/service2.pdf": "1102e55b949378e7776555bca1a4d73105ca2d76d6fcf3aa4c2b103566201cfc",
+    "/tmp/ceres-cs50-1x8LGd/research/yamaha-ic-guide.pdf": "d728bfa1b5dc4575414f8d2bca4a13aef95008f7f2ae21b6e2e9cc28f8c2ee09",
+    "/tmp/ceres-cs50-1x8LGd/research/cs-servicing-guide.pdf": "2738f7ddc46f0bedbab38dcad8e2c112c41b3e6ca34670d471d0cb8c0dbde633"
+  }
+}

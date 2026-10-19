@@ -1,0 +1,24 @@
+# Public dry-clip fit; original settings and MIDI unknown.
+saw=1
+pulse=0
+sine=0
+noise=0
+filter_initial=0
+filter_peak=0
+amp_attack=1.1316029748
+amp_decay=12
+amp_sustain=0.207983730231
+amp_release=3.07287265652
+volume=0.5
+tune_cents=24.6931516528
+hp_cutoff=29.4992900538
+lp_cutoff=15908.9797287
+hp_resonance=0
+lp_resonance=0
+drive=0.0507236261897
+pulse_width=0.5
+voice_spread_cents=0
+drift_cents=0
+pwm_depth=0
+amp_attack_headroom=0.01
+amp_attack_saturation=0.492156946224

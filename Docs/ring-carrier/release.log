@@ -1,0 +1,21 @@
+Test project /private/tmp/ceres-ring-carrier-20261019/build
+    Start 1: native_dsp_contracts
+1/8 Test #1: native_dsp_contracts .............   Passed    6.32 sec
+    Start 2: sound_path_circuit_contracts
+2/8 Test #2: sound_path_circuit_contracts .....   Passed    0.97 sec
+    Start 3: ring_carrier_circuit_contracts
+3/8 Test #3: ring_carrier_circuit_contracts ...   Passed    0.40 sec
+    Start 4: voice_expression_contracts
+4/8 Test #4: voice_expression_contracts .......   Passed    0.43 sec
+    Start 5: embedded_allocation_contract
+5/8 Test #5: embedded_allocation_contract .....   Passed    0.58 sec
+    Start 6: native_embedded_audio_parity
+6/8 Test #6: native_embedded_audio_parity .....   Passed    3.39 sec
+    Start 7: active_sound_path_audio_parity
+7/8 Test #7: active_sound_path_audio_parity ...   Passed    2.70 sec
+    Start 8: expression_audio_parity
+8/8 Test #8: expression_audio_parity ..........   Passed    2.69 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Total Test time (real) =  17.47 sec

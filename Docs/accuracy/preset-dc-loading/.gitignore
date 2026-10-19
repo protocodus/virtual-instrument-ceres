@@ -1,0 +1,3 @@
+# Local benchmark audio and retained renderer identity; never synthesizer assets.
+*.wav
+identity/

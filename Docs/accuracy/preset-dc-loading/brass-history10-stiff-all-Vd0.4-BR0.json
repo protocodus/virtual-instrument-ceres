@@ -1,0 +1,332 @@
+{
+  "id": "brass-history10-stiff-all-Vd0.4-BR0",
+  "kind": "stiff",
+  "audio": "Docs/accuracy/preset-dc-loading/brass-history10-stiff-all-Vd0.4-BR0.wav",
+  "audio_sha256": "fd8569ae7ea20f3270194146b5b6c763f2dbd6836a0a58522b0059b4db91e0be",
+  "command": [
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/identity/ceres_render",
+    "--preset",
+    "brass1",
+    "--patch",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/brass-history10-stiff-all-Vd0.4-BR0.patch",
+    "--events",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--48.events.tsv",
+    "--output",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/brass-history10-stiff-all-Vd0.4-BR0.wav",
+    "--rate",
+    "48000",
+    "--frames",
+    "96800",
+    "--seed",
+    "50"
+  ],
+  "statistics": {
+    "sample_rate": 48000,
+    "frames": 96800,
+    "channels": 1,
+    "sample_format": "float32",
+    "seed": 50,
+    "preset": "brass1",
+    "peak": 0.237391024828,
+    "rms": 0.020629756971,
+    "samples_above_unity": 0,
+    "render_seconds": 0.338998167,
+    "audio_seconds": 2.01666666667,
+    "realtime_factor": 5.94890138939,
+    "normalization": "none",
+    "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+  },
+  "log": "Docs/accuracy/preset-dc-loading/brass-history10-stiff-all-Vd0.4-BR0.log",
+  "log_sha256": "e7d20278dc9c0ed9bdd378595d93c8e7612ae1a0e3389cbc08cfbccb0ca3d2f4",
+  "metrics": {
+    "spectral_score": {
+      "six_cell_mean_ratio_MAE_db": 4.147323718202792,
+      "cells": [
+        {
+          "note": 57,
+          "phase": "early",
+          "partial_frame_count": 48,
+          "ratio_MAE_db": 3.2012576281134564,
+          "native_weak_partial_frames": 0
+        },
+        {
+          "note": 57,
+          "phase": "release",
+          "partial_frame_count": 34,
+          "ratio_MAE_db": 6.861717657816394,
+          "native_weak_partial_frames": 0
+        },
+        {
+          "note": 60,
+          "phase": "early",
+          "partial_frame_count": 60,
+          "ratio_MAE_db": 4.1035761714744305,
+          "native_weak_partial_frames": 0
+        },
+        {
+          "note": 60,
+          "phase": "release",
+          "partial_frame_count": 67,
+          "ratio_MAE_db": 5.54706717924241,
+          "native_weak_partial_frames": 0
+        },
+        {
+          "note": 64,
+          "phase": "early",
+          "partial_frame_count": 24,
+          "ratio_MAE_db": 1.5049202545393658,
+          "native_weak_partial_frames": 0
+        },
+        {
+          "note": 64,
+          "phase": "release",
+          "partial_frame_count": 10,
+          "ratio_MAE_db": 3.6654034180306967,
+          "native_weak_partial_frames": 0
+        }
+      ],
+      "total_native_weak_partial_frames": 0
+    },
+    "tail_metrics": {
+      "source_seconds": [
+        137.08,
+        137.65
+      ],
+      "sampling_step_ms": 2,
+      "floor_below_early_source_median_db": 40,
+      "source_floor_amplitudes": [
+        0.00038720679557906256,
+        0.00044527650299608937,
+        0.0004267192135901807
+      ],
+      "per_note_floored_RMS_db": [
+        3.81629568425737,
+        6.298494455166202,
+        3.3821073033124565
+      ],
+      "A3_C4_joint_floored_RMS_db": 5.207453559631658,
+      "E4_floored_RMS_db": 3.3821073033124565,
+      "per_note_source_above_floor_RMS_db": [
+        5.123236689728202,
+        6.9169445992771665,
+        5.837606035778712
+      ],
+      "source_above_floor_sample_counts": [
+        155,
+        217,
+        96
+      ],
+      "per_note_mean_error_db": [
+        0.4498634177135815,
+        4.197124150651733,
+        -1.384367469560885
+      ]
+    },
+    "C4_higher_ratios": [
+      {
+        "numerator": 3,
+        "denominator": 2,
+        "windows": [
+          {
+            "window": "upper_lobe_1",
+            "records": [
+              {
+                "source_seconds": 137.16000000000003,
+                "source_ratio_db": -0.09397203881783765,
+                "native_ratio_db": -3.4735536982521555,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              },
+              {
+                "source_seconds": 137.18,
+                "source_ratio_db": 0.2895349720817247,
+                "native_ratio_db": -3.468124469355047,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              },
+              {
+                "source_seconds": 137.20000000000002,
+                "source_ratio_db": 0.5473225929312419,
+                "native_ratio_db": -3.4669609999882534,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              },
+              {
+                "source_seconds": 137.22000000000003,
+                "source_ratio_db": 0.6507931043270532,
+                "native_ratio_db": -3.46569715902511,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              }
+            ],
+            "source_median_db": 0.4184287825064833,
+            "native_median_db": -3.46754273467165,
+            "native_weak_frames": 0
+          },
+          {
+            "window": "upper_lobe_2",
+            "records": [
+              {
+                "source_seconds": 137.32000000000002,
+                "source_ratio_db": -10.151374141577698,
+                "native_ratio_db": -3.4586641336642234,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              },
+              {
+                "source_seconds": 137.34,
+                "source_ratio_db": -11.070086745633297,
+                "native_ratio_db": -3.4625048179992843,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              },
+              {
+                "source_seconds": 137.36,
+                "source_ratio_db": -11.838056889606477,
+                "native_ratio_db": -3.4622694272726804,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              },
+              {
+                "source_seconds": 137.38000000000002,
+                "source_ratio_db": -12.47410846776108,
+                "native_ratio_db": -3.4574002286011076,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              }
+            ],
+            "source_median_db": -11.454071817619887,
+            "native_median_db": -3.460466780468452,
+            "native_weak_frames": 0
+          }
+        ],
+        "source_change_db": -11.87250060012637,
+        "native_change_db": 0.007075954203198176,
+        "change_error_db": 11.879576554329569
+      },
+      {
+        "numerator": 4,
+        "denominator": 2,
+        "windows": [
+          {
+            "window": "upper_lobe_1",
+            "records": [
+              {
+                "source_seconds": 137.16000000000003,
+                "source_ratio_db": -2.5485276401375856,
+                "native_ratio_db": -5.937443229541575,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              },
+              {
+                "source_seconds": 137.18,
+                "source_ratio_db": -3.3706161246653044,
+                "native_ratio_db": -5.929351545066713,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              },
+              {
+                "source_seconds": 137.20000000000002,
+                "source_ratio_db": -4.439924544514013,
+                "native_ratio_db": -5.930100227983939,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              },
+              {
+                "source_seconds": 137.22000000000003,
+                "source_ratio_db": -5.841251865022614,
+                "native_ratio_db": -5.926740080629496,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              }
+            ],
+            "source_median_db": -3.905270334589659,
+            "native_median_db": -5.9297258865253255,
+            "native_weak_frames": 0
+          },
+          {
+            "window": "upper_lobe_2",
+            "records": [
+              {
+                "source_seconds": 137.32000000000002,
+                "source_ratio_db": -20.543383460101655,
+                "native_ratio_db": -5.919760104227678,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              },
+              {
+                "source_seconds": 137.34,
+                "source_ratio_db": -21.32532774704614,
+                "native_ratio_db": -5.9163585439701505,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              },
+              {
+                "source_seconds": 137.36,
+                "source_ratio_db": -21.97738993251749,
+                "native_ratio_db": -5.918805973358722,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              },
+              {
+                "source_seconds": 137.38000000000002,
+                "source_ratio_db": -22.465372579208914,
+                "native_ratio_db": -5.917903427745241,
+                "native_weak_Hh_H2": [
+                  false,
+                  false
+                ]
+              }
+            ],
+            "source_median_db": -21.651358839781814,
+            "native_median_db": -5.918354700551982,
+            "native_weak_frames": 0
+          }
+        ],
+        "source_change_db": -17.746088505192155,
+        "native_change_db": 0.011371185973343856,
+        "change_error_db": 17.7574596911655
+      }
+    ],
+    "source_valid_partial_records": 243
+  },
+  "signal": {
+    "finite": true,
+    "peak": 0.23739102482795715,
+    "rms": 0.020629756970979417,
+    "energy": 41.196809275586034,
+    "samples_above_unity": 0
+  },
+  "baseline_bytes_identical": false,
+  "max_sample_difference": 0.20489789359271526
+}

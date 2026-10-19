@@ -1,0 +1,150 @@
+{
+  "plan_sha256": "dc2ce7da6a3b16fe5012ad69ac0162236498e624271b3eb07bd5026905b7e978",
+  "driver_sha256": "27f3f42b60d6a9d49686330eeeb1206477c623b4d8dbd75d205d0bcfb6225854",
+  "variants": {
+    "parent": {
+      "source": "/tmp/ceres-sub-polarity-20261018",
+      "commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+      "compiled_source_sha256": {
+        "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+        "Source/DSP/ceres.cpp": "cc2ee3cdcf7dfab7ebc60071627a2557520f6cdbadd2a590796629a9aad8fd10",
+        "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+        "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+        "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d"
+      },
+      "library_sha256": "7cacbc62517def782ea5076cb0ccb69c1f753a5ec5f6ad97d395d6d0b70ff9bd",
+      "binary_sha256": "ab5a76e06958aaf8a579fb363e6b04e66fe430a921ce2f6805dd799e8643a1e7",
+      "compile": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-I/tmp/ceres-sub-polarity-20261018/Source/DSP",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator_demo.cpp",
+        "/tmp/ceres-sub-polarity-20261018/build/libceres.a",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/parent-demo"
+      ]
+    },
+    "oscillator": {
+      "source": "/tmp/ceres-vco-conditioning-20261019",
+      "commit": "d30b76d2d46d69a9338113d8d2ecb45cb4172ff1",
+      "compiled_source_sha256": {
+        "Source/DSP/ceres.hpp": "8554b963f92c02930ef433c27a2239e3fa07e0425141a12171506b9a74d2d5f3",
+        "Source/DSP/ceres.cpp": "adb699e99a3cf70e07f37f63cf2ea2eba28652d46a7a24d51db5d53d8f8ec070",
+        "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+        "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+        "CMakeLists.txt": "9fca47449aaf206305bd2436b6cc673dc133bd18fddda5440a0864251bc69845"
+      },
+      "library_sha256": "6c7cf60c32c713f10b9d9baa060d6caf3cd7595dd5bf6461e9384380a44e8e54",
+      "binary_sha256": "0daec88da6715b34c8fee5bc752de61e8dd58b9451e999e7cad38fa292c76144",
+      "compile": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-I/tmp/ceres-vco-conditioning-20261019/Source/DSP",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator_demo.cpp",
+        "/tmp/ceres-vco-conditioning-20261019/build-audible-release/libceres.a",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/oscillator-demo"
+      ]
+    }
+  },
+  "renders": {
+    "parent-saw": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/parent-demo",
+        "saw",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/parent-saw.wav"
+      ],
+      "wav_sha256": "4ca033e4f3e5a1d4656ba59afc97a65e46508f9f0df03e10064d3cd71a423670",
+      "stats": {
+        "wave": "saw",
+        "frames": 192000,
+        "reset_us": 6,
+        "peak": 0.0382602,
+        "rms": 0.0157888,
+        "normalization": "none"
+      }
+    },
+    "parent-sine": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/parent-demo",
+        "sine",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/parent-sine.wav"
+      ],
+      "wav_sha256": "69af9c4869b712038905455a3fb93b22fff6bae85a8d6dcdb345e0e049a57525",
+      "stats": {
+        "wave": "sine",
+        "frames": 192000,
+        "reset_us": 6,
+        "peak": 0.0451144,
+        "rms": 0.0256916,
+        "normalization": "none"
+      }
+    },
+    "parent-pulse": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/parent-demo",
+        "pulse",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/parent-pulse.wav"
+      ],
+      "wav_sha256": "123f178a451edcf62b79be0e99e662fb7a0fa80edb73c2d53ebe0a6ace5f412f",
+      "stats": {
+        "wave": "pulse",
+        "frames": 192000,
+        "reset_us": 6,
+        "peak": 0.0426134,
+        "rms": 0.0276893,
+        "normalization": "none"
+      }
+    },
+    "oscillator-saw": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/oscillator-demo",
+        "saw",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/oscillator-saw.wav"
+      ],
+      "wav_sha256": "d9c808083232f44ae1e7e695e477eb81902a8177964f395377ba03524533ca34",
+      "stats": {
+        "wave": "saw",
+        "frames": 192000,
+        "reset_us": 59.7286,
+        "peak": 0.0391219,
+        "rms": 0.0162246,
+        "normalization": "none"
+      }
+    },
+    "oscillator-sine": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/oscillator-demo",
+        "sine",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/oscillator-sine.wav"
+      ],
+      "wav_sha256": "ecfba22adc1905a3e12959902ffe4957b7fae6f59688c8b90d0bf254457b57c7",
+      "stats": {
+        "wave": "sine",
+        "frames": 192000,
+        "reset_us": 59.7286,
+        "peak": 0.0480024,
+        "rms": 0.026284,
+        "normalization": "none"
+      }
+    },
+    "oscillator-pulse": {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/oscillator-demo",
+        "pulse",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/oscillator-pulse.wav"
+      ],
+      "wav_sha256": "123f178a451edcf62b79be0e99e662fb7a0fa80edb73c2d53ebe0a6ace5f412f",
+      "stats": {
+        "wave": "pulse",
+        "frames": 192000,
+        "reset_us": 59.7286,
+        "peak": 0.0426134,
+        "rms": 0.0276893,
+        "normalization": "none"
+      }
+    }
+  }
+}

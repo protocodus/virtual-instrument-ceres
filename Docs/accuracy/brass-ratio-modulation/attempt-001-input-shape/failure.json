@@ -1,0 +1,9 @@
+{
+  "stage": "source input shape assertion before pitch/model estimates",
+  "files": {
+    "plan.json": "9feaf015792eede359858891e47216730f415bfeead01fa33defbc4cef1853d0",
+    "implementation.json": "84de8d07339a313fa07d46e9ebae0683a7dc2615ae637184af251a2b068b56f8",
+    "run.log": "6116875543cea4ef1c90631e3e0b5dae4be802f9815fb2f0b165d186f10f7578",
+    "brass_ratio_modulation.py": "b83e2013f7df68eff729db4211bd47b72e6eb652a1e52eff8e3bc2888c876cac"
+  }
+}

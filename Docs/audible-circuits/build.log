@@ -1,0 +1,36 @@
+[  8%] Building CXX object CMakeFiles/ceres_embedded.dir/Source/DSP/ceres.cpp.o
+[  8%] Building CXX object CMakeFiles/ceres.dir/Source/DSP/ceres.cpp.o
+[ 12%] Linking CXX static library libceres_embedded.a
+[ 12%] Built target ceres_embedded
+[ 20%] Building CXX object CMakeFiles/ceres_embedded_contract.dir/Tests/EmbeddedContract.cpp.o
+[ 20%] Building CXX object CMakeFiles/ceres_embedded_parity.dir/Tests/ParityDriver.cpp.o
+[ 25%] Linking CXX static library libceres.a
+[ 29%] Linking CXX executable ceres_embedded_contract
+[ 29%] Built target ceres
+[ 33%] Building CXX object CMakeFiles/ceres_oscillator_circuit_tests.dir/Tests/OscillatorCircuitTests.cpp.o
+[ 37%] Building CXX object CMakeFiles/ceres_sound_path_tests.dir/Tests/SoundPathTests.cpp.o
+[ 41%] Building CXX object CMakeFiles/ceres_render.dir/Tools/render_main.cpp.o
+[ 45%] Building CXX object CMakeFiles/ceres_tests.dir/Tests/dsp_tests.cpp.o
+[ 45%] Built target ceres_embedded_contract
+[ 50%] Building CXX object CMakeFiles/ceres_capacitor_tests.dir/Tests/CapacitorContinuityTests.cpp.o
+[ 54%] Linking CXX executable ceres_embedded_parity
+[ 54%] Built target ceres_embedded_parity
+[ 58%] Building CXX object CMakeFiles/ceres_ring_carrier_tests.dir/Tests/RingCarrierTests.cpp.o
+[ 62%] Linking CXX executable ceres_oscillator_circuit_tests
+[ 66%] Linking CXX executable ceres_capacitor_tests
+[ 70%] Linking CXX executable ceres_sound_path_tests
+[ 70%] Built target ceres_oscillator_circuit_tests
+[ 75%] Building CXX object CMakeFiles/ceres_expression_tests.dir/Tests/ExpressionTests.cpp.o
+[ 75%] Built target ceres_capacitor_tests
+[ 75%] Built target ceres_sound_path_tests
+[ 79%] Building CXX object CMakeFiles/ceres_native_parity.dir/Tests/ParityDriver.cpp.o
+[ 83%] Linking CXX executable ceres_render
+[ 83%] Built target ceres_render
+[ 87%] Linking CXX executable ceres_ring_carrier_tests
+[ 87%] Built target ceres_ring_carrier_tests
+[ 91%] Linking CXX executable ceres_native_parity
+[ 95%] Linking CXX executable ceres_expression_tests
+[ 95%] Built target ceres_native_parity
+[ 95%] Built target ceres_expression_tests
+[100%] Linking CXX executable ceres_tests
+[100%] Built target ceres_tests

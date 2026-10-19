@@ -1,0 +1,15 @@
+Test project /private/tmp/ceres-audible-integrated-20261019/build-sanitize
+    Start  1: oscillator_circuit_contracts
+1/5 Test  #1: oscillator_circuit_contracts .......   Passed    0.48 sec
+    Start  4: capacitor_continuity_contracts
+2/5 Test  #4: capacitor_continuity_contracts .....   Passed    2.90 sec
+    Start  5: ring_carrier_circuit_contracts
+3/5 Test  #5: ring_carrier_circuit_contracts .....   Passed    2.53 sec
+    Start  7: embedded_allocation_contract
+4/5 Test  #7: embedded_allocation_contract .......   Passed    1.33 sec
+    Start 11: capacitor_native_embedded_parity
+5/5 Test #11: capacitor_native_embedded_parity ...   Passed   20.30 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =  27.54 sec

@@ -1,0 +1,12 @@
+{
+  "coordinate_assumptions": "Ordinary retrigger resets stage to Attack and retains u0; peak1, sustain.524, no closure offset; all times unchanged.",
+  "input_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/flute-history/amp_memory_bound.py": "91f73a6ae1096ea1b8e42b391cf5e8f03e709b555a7a0614b64e25d4cb821104",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/plan.json": "3482bca5ed0305c2a384125d05da73d19c17ed3c7f699e8cde262c045151071a",
+    "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-envelope-age.json": "36b35a1f8f92119dcb818b35e930c0c56739a2425d0acea05ce774fb40e87fb4",
+    "/tmp/ceres-cs50-1x8LGd/research/factory-preset-cv.json": "b3fc75ff7902af799e5dba6dca93c614883d6c1676f0dab28b123ba16c667cea",
+    "/tmp/ceres-pitch-route-20261019/Source/DSP/ceres.cpp": "7b0bfc9b9ff2377390ca43ebc4491bf804d53e83ebcff273dfa20cbcfd780306"
+  },
+  "operation": "Closed-form endpoint bound over u0 in[0,1]; fixed two gate ages from existing battery, no grid or model/audio evaluation.",
+  "status": "declared_before_calculation"
+}

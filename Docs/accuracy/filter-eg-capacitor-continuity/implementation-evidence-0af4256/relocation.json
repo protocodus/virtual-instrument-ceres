@@ -1,0 +1,18 @@
+{
+  "commit": "0af42568862c540709610fa2488151b582f0e771",
+  "files": {
+    "Docs/capacitor-continuity/validation.json": {
+      "archived_path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/filter-eg-capacitor-continuity/implementation-evidence-0af4256/validation.json",
+      "sha256": "88fe19b07fefec4b412bec4df54437e9b6526b6cb06c484eb8084a6b7f3d546a"
+    },
+    "Docs/capacitor-continuity/source.patch": {
+      "archived_path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/filter-eg-capacitor-continuity/implementation-evidence-0af4256/source.patch",
+      "sha256": "d28fc7fd53245a46caa8c5e5a35d2180ed512702d72396cd868b0179d34169c8"
+    },
+    "Tests/record_capacitor_validation.py": {
+      "archived_path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/filter-eg-capacitor-continuity/implementation-evidence-0af4256/record_capacitor_validation.py",
+      "sha256": "410afbf100cdae49d3acf139fa8de269a43e746ae962cfa38dd750586f25240c"
+    }
+  },
+  "scope": "Exact git bytes preserved for immutable pre-recorder-fix independent review; no change to old review."
+}

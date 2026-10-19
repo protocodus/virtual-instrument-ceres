@@ -1,0 +1,32 @@
+{
+  "commit": "d30b76d2d46d69a9338113d8d2ecb45cb4172ff1",
+  "conclusion": "No remaining blocker within the declared conditioned-output approximation; no hardware calibration or improved recording-agreement claim.",
+  "observed_release_passes": 8,
+  "observed_selected_sanitizer_passes": 3,
+  "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "scope": "Independent read-only code, algebra, source-note and stored-test receipt review. No builds, model execution, audio decoding, fitting or target measurement by reviewer.",
+  "status": "pass",
+  "verified_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/evidence.json": "afa33dd2d74d3352167a00d28d00d1134ab173cfcba52f738cf647a146f3286f",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/oscillator-implementation-review.md": "b984949d02fc6ed99970d66e4ead68c677f6fb288cdb73d3ee6202bfa3592da7",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/source-review.md": "ebc209139290d3e25690248e842907cc3442f781c432d541c95c66dafff80002",
+    "/tmp/ceres-cs50-1x8LGd/experiments/vco-conditioning-01/benchmark-plan.json": "a08770e0fd0b945fc6f8c465596d52b58cdda697488b0f57ae6aaa327371fd90",
+    "/tmp/ceres-cs50-1x8LGd/research/vco-conditioning-followup.md": "a6365c02f7cf6a2b95063a126de7cebf3dc3cc5133695dd39e69697e8407ed93",
+    "/tmp/ceres-vco-conditioning-20261019/CMakeLists.txt": "9fca47449aaf206305bd2436b6cc673dc133bd18fddda5440a0864251bc69845",
+    "/tmp/ceres-vco-conditioning-20261019/Docs/DSP_SOURCE.md": "ff916c0201c99a36b4874874ef5d1b5950752c1074ef6171d1dcb8deedbc7171",
+    "/tmp/ceres-vco-conditioning-20261019/Docs/oscillator-conditioning/README.md": "4931d01e9c631ce2a3890fee9c52e6a7af0b1b41623998d2e6f161a59287bf7b",
+    "/tmp/ceres-vco-conditioning-20261019/Docs/oscillator-conditioning/release.log": "aa9702aedf970747d44c989036bbd1650bec96e7100f43776412c003551f7167",
+    "/tmp/ceres-vco-conditioning-20261019/Docs/oscillator-conditioning/sanitize.log": "a30dc021344bbfc6ec1b8ec597b8eaf408cef807dc9538cf8294a89b4a9dc800",
+    "/tmp/ceres-vco-conditioning-20261019/Docs/oscillator-conditioning/validation.json": "636282d90bf2e96035f505a1cbcf950d0c5d37660ad72da74ee085ccf5dd9d69",
+    "/tmp/ceres-vco-conditioning-20261019/Source/DSP/ceres.cpp": "adb699e99a3cf70e07f37f63cf2ea2eba28652d46a7a24d51db5d53d8f8ec070",
+    "/tmp/ceres-vco-conditioning-20261019/Source/DSP/ceres.hpp": "8554b963f92c02930ef433c27a2239e3fa07e0425141a12171506b9a74d2d5f3",
+    "/tmp/ceres-vco-conditioning-20261019/Tests/OscillatorCircuitTests.cpp": "0be7127f3dbe1acb0c8039ba16b9bc0c4d5b07e9abbe8c043c8b5a42354198a3",
+    "/tmp/ceres-vco-conditioning-20261019/Tests/dsp_tests.cpp": "6af9938a6969144df9b057530527d761d72254f9ab6b129a11dad3259681b5f8",
+    "/tmp/ceres-vco-conditioning-20261019/Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "/tmp/ceres-vco-conditioning-20261019/Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "/tmp/ceres-vco-conditioning-20261019/build-audible-release/ceres_oscillator_circuit_tests": "8f87999cdb2b592e90087ef99c2f80ca8c8dd0cf5b602c4c4f941a3af444447b",
+    "/tmp/ceres-vco-conditioning-20261019/build-audible-release/ceres_render": "6006bed74b3ab0b059e3903a4b85cb3b95499cad7a07d4141f03fd1bd969856c",
+    "/tmp/ceres-vco-conditioning-20261019/build-audible-release/libceres.a": "6c7cf60c32c713f10b9d9baa060d6caf3cd7595dd5bf6461e9384380a44e8e54",
+    "/tmp/ceres-vco-conditioning-20261019/build-audible-release/libceres_embedded.a": "cb29ba6140da796fb050efca13f5a1c497b18e0e6aa7fdceb6016836a051368b"
+  }
+}

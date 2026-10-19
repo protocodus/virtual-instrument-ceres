@@ -1,0 +1,105 @@
+{
+  "plan_sha256": "707eea93a0cf868b4c337143369c2984509481724f86e5866018116e06d3dba8",
+  "script_sha256": "af06780de9a7c7e3c3a3d09ac3b793b39a69962ceeab9cca44b1c73aaaf31db9",
+  "source_sha256": "cb765eee0f7eb6d0b0c9b4052b4d25f3dec21d94ac16e44302147d37c8fa4104",
+  "measurements": [
+    {
+      "id": "sub",
+      "seconds": [
+        740,
+        780
+      ],
+      "chapter": "Sculpting Sub-Oscillator Modulation",
+      "excerpt": "Docs/accuracy/active-source/sub-audio.wav",
+      "excerpt_sha256": "a603753884f1a6bb42d9bad62aea9935481910c00b1cfb20fa4c4d43fa4a23d0",
+      "rms": 0.09393661425090769,
+      "centroid_Hz_p10_p50_p90": [
+        126.06567635902907,
+        161.0792501116494,
+        300.8873448701839
+      ],
+      "spectral_flatness_p10_p50_p90": [
+        7.182932961797523e-05,
+        0.0011881286273357481,
+        0.00579702759170803
+      ],
+      "role": "Descriptive overview; speech, live control movement, polyphony and processing not separated."
+    },
+    {
+      "id": "resonant-noise",
+      "seconds": [
+        900,
+        928
+      ],
+      "chapter": "Wind - Open Close Filter with 4 Oscillators - full Resonance",
+      "excerpt": "Docs/accuracy/active-source/resonant-noise-audio.wav",
+      "excerpt_sha256": "2abc1d1b9f7c3fef8798114af337bbd4bafcf74058e728bba46ef8911c3ff652",
+      "rms": 0.13848571148096286,
+      "centroid_Hz_p10_p50_p90": [
+        107.02059128064484,
+        471.49751214342587,
+        2333.447533224137
+      ],
+      "spectral_flatness_p10_p50_p90": [
+        1.208519259312212e-05,
+        0.0007390533765004119,
+        0.3849908379963928
+      ],
+      "role": "Descriptive overview; speech, live control movement, polyphony and processing not separated."
+    },
+    {
+      "id": "no-resonance",
+      "seconds": [
+        950,
+        970
+      ],
+      "chapter": "Filter open - no Resonance",
+      "excerpt": "Docs/accuracy/active-source/no-resonance-audio.wav",
+      "excerpt_sha256": "2427eb35eae3ad45ed17ef876b871b7ee8ecb81f596f758a741f82b24bb59c84",
+      "rms": 0.11952075814883852,
+      "centroid_Hz_p10_p50_p90": [
+        115.09298423500992,
+        489.0919056112025,
+        1782.0998431643616
+      ],
+      "spectral_flatness_p10_p50_p90": [
+        3.8764804897466166e-05,
+        0.003268064615448802,
+        0.28808577738139396
+      ],
+      "role": "Descriptive overview; speech, live control movement, polyphony and processing not separated."
+    }
+  ],
+  "artifact_sha256": {
+    "Docs/accuracy/active-source-overview.png": "9705bf27991ef0f5d4b084f59220df2840b59d9754f85fdb91d20ed7ea09feb6",
+    "Docs/accuracy/active-source/sub-audio.wav": "a603753884f1a6bb42d9bad62aea9935481910c00b1cfb20fa4c4d43fa4a23d0",
+    "Docs/accuracy/active-source/resonant-noise-audio.wav": "2abc1d1b9f7c3fef8798114af337bbd4bafcf74058e728bba46ef8911c3ff652",
+    "Docs/accuracy/active-source/no-resonance-audio.wav": "2427eb35eae3ad45ed17ef876b871b7ee8ecb81f596f758a741f82b24bb59c84",
+    "Docs/accuracy/active-source/whitmore-resonance-900-970.webm": "03b63104f0e7e0205743cca78aed4dc305045c0b620f41c35d84e9c4a60dc454",
+    "Docs/accuracy/active-source/frame-901.png": "e2619673d1cd61a3c329735c5e2e66aa2986864a1b29256179c7823c0eff4786",
+    "Docs/accuracy/active-source/frame-908.png": "938aff124305d0ac97511ebd9f3f93e6f80e810b1e0f00d8a3a51f807e7bdd2c",
+    "Docs/accuracy/active-source/frame-915.png": "59bf0af88c278a7f7e7ee5bf1254dba9622528b3462ced58bc5c82501a1bbb52",
+    "Docs/accuracy/active-source/frame-922.png": "e27309bdd948c259852d3cac0f739364d7bf76dc5cfeffbc33dba305cca1d44b",
+    "Docs/accuracy/active-source/frame-929.png": "b256124f814143e1da4d4ab1884949310272b5307a4c19f3ed4bd003fec2a16a",
+    "Docs/accuracy/active-source/frame-936.png": "a36feba90f86c166b4c7d2826a77387fed76ed982d3f0286bd2b63b3074d6b0e",
+    "Docs/accuracy/active-source/frame-943.png": "093e14bb7a2002471abf16f998482a1f1806b416917163929497a1534d5ef2c8",
+    "Docs/accuracy/active-source/frame-950.png": "e938a9d67b7495c4dfd56b585552ade6211f7ecd737e69bab25ad3d7724dff73",
+    "Docs/accuracy/active-source/frame-957.png": "e80ec6ee377e861190411bb0e2d2793ed5e1e3e727ba098a800d4c5bce5259eb",
+    "Docs/accuracy/active-source/frame-964.png": "d19e70e4d487573df5545ad934943cbfec7f94dd2f844dc6db099a6b57b070fb",
+    "Docs/accuracy/active-source/whitmore-resonance-900-970-contact.png": "7786a3c2175c193f4f34b414560b2b4bd1a23650e3da6707cc0d2bb742a531b5",
+    "Docs/accuracy/active-source/whitmore-sub-740-780.webm": "443308102db182e82a784846725a7149815e67879e677621ba6b25f3dbb54153",
+    "Docs/accuracy/active-source/frame-741.png": "258a8e1a7690b1a57be6a5bd00d7975779d062f369e7a236808ba3c2a8ee3c63",
+    "Docs/accuracy/active-source/frame-748.png": "e421f6202c3e8a365d50d45f14ce122fa9a10aca56c7bdb8cea703d0a2b24854",
+    "Docs/accuracy/active-source/frame-755.png": "70e65a4a1cfe3987ac1f8ceaabe0c4dc1f3db08867b237500d66fe1a7978591c",
+    "Docs/accuracy/active-source/frame-762.png": "b8d88c71eba3ec5bd6ac0a372ba8e45c13fcc0e73cd5163735b6793fe229555f",
+    "Docs/accuracy/active-source/frame-769.png": "83047a10e313960fdfedad994b7938aa47e4234661e01899cb1379c0882ea698",
+    "Docs/accuracy/active-source/frame-777.png": "76afa2c93843cbcfb6e592971ac98b58d620d0a23e3315942716babfccd8b6e5",
+    "Docs/accuracy/active-source/whitmore-sub-740-780-contact.png": "64828edc6b2f5e5edfd6a92f44ff600108c1136c181ad597bf1b151cf9472649"
+  },
+  "native_calls": 0,
+  "parameter_fits": 0,
+  "strict_eligible": false,
+  "original_MIDI_available": false,
+  "timing": "Video requested timestamps have25fps sampling and possible section/keyframe/AV alignment uncertainty; not sample-exact contact timing.",
+  "verdict": "Manual VCF sweep/resonance movement is visible in900..970s; this is not a confirmed isolated global RES or BR sweep. SUB route findings require reading the accompanying visual note. No new accuracy target selected."
+}

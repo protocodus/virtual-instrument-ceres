@@ -1,0 +1,22 @@
+{
+  "instrument": "Ceres standalone circuit research presets",
+  "sample_rate": 48000,
+  "block_frames": 256,
+  "seed": 20261017,
+  "demos": [
+    {"number": 1, "preset": "init", "file": "01-init.mp3", "seconds": 12, "peak_dbfs": -11.0859942},
+    {"number": 2, "preset": "string1", "file": "02-string1.mp3", "seconds": 12, "peak_dbfs": -9.51880859},
+    {"number": 3, "preset": "string2", "file": "03-string2.mp3", "seconds": 12, "peak_dbfs": -13.4446383},
+    {"number": 4, "preset": "brass1", "file": "04-brass1.mp3", "seconds": 12, "peak_dbfs": -13.597515},
+    {"number": 5, "preset": "brass2", "file": "05-brass2.mp3", "seconds": 12, "peak_dbfs": -14.7960624},
+    {"number": 6, "preset": "flute", "file": "06-flute.mp3", "seconds": 12, "peak_dbfs": -9.41998282},
+    {"number": 7, "preset": "electric_piano", "file": "07-electric-piano.mp3", "seconds": 12, "peak_dbfs": -10.7986205},
+    {"number": 8, "preset": "clavichord", "file": "08-clavichord.mp3", "seconds": 12, "peak_dbfs": -16.5091063},
+    {"number": 9, "preset": "harpsichord", "file": "09-harpsichord.mp3", "seconds": 12, "peak_dbfs": -12.8436922},
+    {"number": 10, "preset": "guitar1", "file": "10-guitar1.mp3", "seconds": 12, "peak_dbfs": -10.2157477},
+    {"number": 11, "preset": "guitar2", "file": "11-guitar2.mp3", "seconds": 12, "peak_dbfs": -12.4383265},
+    {"number": 12, "preset": "funky1", "file": "12-funky1.mp3", "seconds": 12, "peak_dbfs": -12.5300237},
+    {"number": 13, "preset": "funky2", "file": "13-funky2.mp3", "seconds": 12, "peak_dbfs": -8.25808503},
+    {"number": 14, "preset": "funky3", "file": "14-funky3.mp3", "seconds": 12, "peak_dbfs": -10.0593814}
+  ]
+}

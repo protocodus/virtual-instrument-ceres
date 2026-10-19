@@ -1,0 +1,29 @@
+{
+  "status": "isolated_candidate_validated",
+  "base_commit": "55869df8ba728e25a6b5792aa07dfd55f134439c",
+  "candidate_worktree": "/tmp/ceres-sub-polarity-20261018",
+  "production_checkout_changed": false,
+  "rack_binary_changed": false,
+  "reason": "Primary-source relative SUB polarity: same selected source must raise cutoff and common VCA gain together. Mean/depth normalization remains provisional.",
+  "recording_fit_or_gate_change": false,
+  "release_tests_passed": 7,
+  "sanitizer_tests_passed": 7,
+  "zero_tremolo_exact_samples": 384000,
+  "input_sha256": {
+    "/tmp/ceres-sub-polarity-20261018/Source/DSP/ceres.cpp": "cc2ee3cdcf7dfab7ebc60071627a2557520f6cdbadd2a590796629a9aad8fd10",
+    "/tmp/ceres-sub-polarity-20261018/Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+    "/tmp/ceres-sub-polarity-20261018/Tests/SoundPathTests.cpp": "151351db9ba0d8499a17dcaea1321024c01ca1a59df14a1edce80ea6a0efecbb",
+    "/tmp/ceres-sub-polarity-20261018/build/ceres_render": "42640ded137b2bf9c2a821db7ccf6db7cd7874cdfd75c26b9934d1c438d905c6",
+    "/tmp/ceres-sub-polarity-phasepi-20261018/Source/DSP/ceres.cpp": "1be4882c53596c4a5bee77a1c30b2e3f1a7106796e07b4fefac615991e1383cd",
+    "/tmp/ceres-sub-polarity-phasepi-20261018/build/ceres_render": "843456fee2e717f5bc12a538ef6b3e0155af03807e8f5f26b9fad0ba7630bf7c"
+  },
+  "retained_files_sha256": {
+    "zero-tremolo.json": "e59780ba74e5fd65d6c12c11031a0aac62565817023f4a758dbbb7bac5616e46",
+    "candidate.patch": "dcc28b7becde0a2f8666a2810d70ac63cab46c6f0f2f6690f98e59185b5f9c28",
+    "candidate-validation.md": "a0c7deab6934edfb9b68198b7bd9010f7720eeb2e0839fa8ad40ef2d8e49ef05",
+    "sanitize-tests.log": "a7d8b0f1bdc51d5008df8656d942b4381991f8491fe6c09fa828426759ff4700",
+    "phase-control-provenance.json": "8d777a35676914f09e7661b3bf95c0668f83f29d3e49517e4e9fb52b4a1be405",
+    "release-tests.log": "3117c4d235134b3f49b5ff9057d24c5927e8f5e81e4135bfbdef7a6da5ad39ce"
+  },
+  "next": "Report both unchanged-start-phase and algebraic half-cycle clock controls with the original frozen battery. Phase control is research-only, not a recovered hardware phase or production change."
+}

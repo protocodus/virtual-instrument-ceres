@@ -1,0 +1,26 @@
+{
+  "id": "flute-high-effective-compensated-disabled",
+  "kind": "disabled",
+  "original_id": "flute-high-effective-compensated",
+  "audio": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/flute-high-effective-compensated-disabled.wav",
+  "audio_sha256": "cf5a3acb608b6f9e53ff0d5ec26f3f2fc14f7e3e242d1574ba2ff466caf202d9",
+  "statistics": {
+    "sample_rate": 48000,
+    "frames": 154800,
+    "channels": 1,
+    "sample_format": "float32",
+    "seed": 50,
+    "preset": "flute",
+    "peak": 0.131648078561,
+    "rms": 0.0515869677156,
+    "samples_above_unity": 0,
+    "render_seconds": 0.611161333,
+    "audio_seconds": 3.225,
+    "realtime_factor": 5.27683906992,
+    "normalization": "none",
+    "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+  },
+  "peak": 0.13164807856082916,
+  "log_sha256": "1480b4be8523d8cd9be41272ac7f00a31c4f6484406b19a974cd3329dbe19616",
+  "byte_exact_to_frozen": true
+}

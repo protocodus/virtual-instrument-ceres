@@ -1,0 +1,215 @@
+{
+  "schema": "ceres-soundpath-source-audit-v1",
+  "date": "2026-10-18",
+  "scope": "No keyboard/pressure/pedal/external-input implementation; source-backed incremental soundpath hypotheses, no hardware calibration claim",
+  "baseline_repository": "/Users/vojta/Dev/virtual-instrument-ceres",
+  "baseline_commit": "10e17fd9ecdc0a5a0354bad4c5a53780885a5503",
+  "baseline_source_sha256": {
+    "Source/DSP/ceres.hpp": "01ce1d02f39ad3f4db28ea5fa281ea82eb2163c15d4fb838d7944f6220701b9c",
+    "Source/DSP/ceres.cpp": "ac10943cc36eca7605101a22cc5d0947f59f08bbff806c324ec2cb652bd13908",
+    "Docs/DSP_SOURCE.md": "31e8c8f013e02f2ace185a15fbddc7b51bd5a4c43c0c2d6c6cf5717d621a2d36"
+  },
+  "primary_documents": [
+    {
+      "local_path": "/tmp/ceres-cs50-1x8LGd/research/service1.pdf",
+      "sha256": "c3a4b0d4e27e9af90c88258d03a1c09c5d080ea162e562d9bf267fc8ffbbadc1",
+      "url": "https://bama.edebris.com/download/yamaha/cs-50/Yamaha%20CS-50%20Service%20Manual%201%20of%202%20%28%208.5%20x%2011%20-%20Double%20Sided%20%29.pdf",
+      "pages": [
+        {
+          "pdf": 8,
+          "printed": 14,
+          "claim": "R7 source resistances and four-voice fanout"
+        },
+        {
+          "pdf": 9,
+          "printed": 19,
+          "claim": "Vf and Vq coordinates/endpoints; separate Q adjustment"
+        }
+      ]
+    },
+    {
+      "local_path": "/tmp/ceres-cs50-1x8LGd/research/service2.pdf",
+      "sha256": "1102e55b949378e7776555bca1a4d73105ca2d76d6fcf3aa4c2b103566201cfc",
+      "url": "https://bama.edebris.com/download/yamaha/cs-50/Yamaha%20CS-50%20Service%20Manual%202%20of%202%20%28%2011%20x%2017%20-%20Double%20Sided%20%29.pdf",
+      "pages": [
+        {
+          "pdf": 8,
+          "printed": 10,
+          "claim": "T71 nominal preset matrix"
+        },
+        {
+          "pdf": 12,
+          "printed": 16,
+          "claim": "M pin4 rank/control capacitors and pin7 Q10uF; VCA order"
+        },
+        {
+          "pdf": 16,
+          "printed": 22,
+          "claim": "PRA output/ring/expression routing"
+        },
+        {
+          "pdf": 20,
+          "printed": 26,
+          "claim": "PN2 BR/RES physical potentiometers"
+        },
+        {
+          "pdf": 21,
+          "printed": 27,
+          "claim": "PN3 selected SUB and B10k depth controls"
+        }
+      ]
+    },
+    {
+      "local_path": "/tmp/ceres-cs50-1x8LGd/research/cs-servicing-guide.pdf",
+      "sha256": "2738f7ddc46f0bedbab38dcad8e2c112c41b3e6ca34670d471d0cb8c0dbde633",
+      "url": "https://rcarchives.com/m/YamahaCSSeriesSynthesizerServicingGuidePOSTED.pdf",
+      "pages": [
+        {
+          "pdf": 11,
+          "printed": 2,
+          "claim": "PANEL1 controls figure"
+        },
+        {
+          "pdf": 14,
+          "printed": 5,
+          "claim": "Global BR/RES function"
+        },
+        {
+          "pdf": 16,
+          "printed": 7,
+          "claim": "SUB destination controls"
+        },
+        {
+          "pdf": 37,
+          "printed": 28,
+          "claim": "VCO charge law and output conditioning"
+        },
+        {
+          "pdf": 48,
+          "printed": 39,
+          "claim": "Common-level/AM VCA precedes separate envelope VCA"
+        },
+        {
+          "pdf": 64,
+          "printed": 55,
+          "claim": "SUB calibration and3Vpp"
+        },
+        {
+          "pdf": 68,
+          "printed": 59,
+          "claim": "Mixer tests at explicit dummyload"
+        },
+        {
+          "pdf": 69,
+          "printed": 60,
+          "claim": "Q and VCA mixer tests"
+        }
+      ]
+    },
+    {
+      "local_path": "/tmp/ceres-cs50-1x8LGd/research/yamaha-ic-guide.pdf",
+      "sha256": "d728bfa1b5dc4575414f8d2bca4a13aef95008f7f2ae21b6e2e9cc28f8c2ee09",
+      "url": "https://bama.edebris.com/download/yamaha/ic_guide/Yamaha%20IC%20Guide%20Book.pdf",
+      "pages": [
+        {
+          "pdf": 37,
+          "printed": "2-5",
+          "claim": "IG00156 abstract Q control block; no identified input law"
+        }
+      ]
+    }
+  ],
+  "cached_primary_images": {
+    "/tmp/ceres-cs50-1x8LGd/research/service1-08.png": "07c59b3a2dd9d1d7f5bff25a0635491da2dace85f2791cfaaa8465858b586668",
+    "/tmp/ceres-cs50-1x8LGd/research/global-resonance-pin7-endpoints.png": "d970bb24d5adc35f3d722f6753c044252c93fd6b2f9640dbe77a3a334adef6c0",
+    "/tmp/ceres-cs50-1x8LGd/research/q-m-filter-full.png": "027b5dad4c0c126b36f94911c0f517f40136fc6636e7ff37334842cc4f2570dc",
+    "/tmp/ceres-cs50-1x8LGd/research/q-m-rank-table.png": "7299af97b5a07bec425a1a6ddb3d33b95b8ad775181452e7fe6e8c464a76118c",
+    "/tmp/ceres-cs50-1x8LGd/research/pitch-modulation-global-controls.png": "c9cbb89014b0b6b27ae653c45d3b8feb40b08bc957d277ec348578cae5bcfcfb",
+    "/tmp/ceres-cs50-1x8LGd/research/pitch-modulation-pn3.png": "b0a67cefec328cfcf1b803aa152265cb015ab9e1db83b2ce5d717ad64a7dd791",
+    "/tmp/ceres-cs50-1x8LGd/research/output-coupling-m-vca56.png": "c55eff817b8fd39e57aa19d88b42c90bc53889372f728c3f5bbaa5e8e4f23db5"
+  },
+  "prior_audits_and_adverse_results": {
+    "/tmp/ceres-cs50-1x8LGd/research/pitch-modulation-routing.md": "362dac857bb5227366b8869259dbc34aeb545731241b5da57361896f41b6e655",
+    "/tmp/ceres-cs50-1x8LGd/research/global-resonance-loading.md": "34d14e4c46e4527b65f83deb58af2220053850e254c4965010ff99e86891e41f",
+    "/tmp/ceres-cs50-1x8LGd/research/resonance-control-dynamics.md": "6f73f0a769bc5268af1b9228751338204e84d158e9e7deedbb8e16be55479911",
+    "/tmp/ceres-cs50-1x8LGd/research/brilliance-shared-bus-check.md": "90baf174c023382eeffb2a1bfd621964b303746a3d089925983abbdae0cb20e4",
+    "/tmp/ceres-cs50-1x8LGd/research/lp-bus-coupling-source.md": "b5f12526171f981b75d2f90911a3f4317b39555e3d3b9d79ccb8b0adb221e21c",
+    "/tmp/ceres-cs50-1x8LGd/research/q-control-loading-followup.md": "1ab19f61e46faead883cb37612703a5f80e93dfb57d29d74850f1743239b0bb9",
+    "/tmp/ceres-cs50-1x8LGd/research/vco-conditioning-followup.md": "a6365c02f7cf6a2b95063a126de7cebf3dc3cc5133695dd39e69697e8407ed93",
+    "/tmp/ceres-cs50-1x8LGd/research/output-coupling-audit.md": "639ceca451cb7d97a005489db939f7366d5cfb0a79e2790ff95fce669f8053a0",
+    "/tmp/ceres-cs50-1x8LGd/reports/filter-placement-checkpoint.md": "7ed3d7ab441f220ae5753d019fbb2f393ef801eb85df994f15f636a4d4991eeb",
+    "/tmp/ceres-cs50-1x8LGd/reports/lp-half-octave-q-transfer-study.md": "e709e0ffd73c2ba645d8eced24ca3fd8adf84d47cd2cc8d5740ff8dce72772c4",
+    "/tmp/ceres-cs50-1x8LGd/BENCHMARK.md": "34f125994855a35afb16cd07567c493225afa9414055d8c3f89bfe9e427a74f2"
+  },
+  "web_verification": {
+    "archive_listing": "https://bama.edebris.com/manuals/yamaha/cs-50/",
+    "listing_open_succeeded": true,
+    "direct_pdf_web_tool_opens_succeeded": false,
+    "content_source": "Previously acquired and hash-verified local scans; no PDF copied into repository"
+  },
+  "components": {
+    "voice_count": 4,
+    "cutoff_preset_branch_ohms": 39000,
+    "brilliance_HP_LP_ohms": [
+      680000,
+      220000
+    ],
+    "SUB_HP_LP_ohms": [
+      150000,
+      47000
+    ],
+    "cutoff_capacitance_F": 1e-08,
+    "HP_rank_A_B_C_ohms": [
+      2700,
+      2200,
+      1800
+    ],
+    "LP_rank_A_B_C_ohms": [
+      3000,
+      2400,
+      2000
+    ],
+    "Q_each_preset_and_RES_branch_ohms": 220000,
+    "Q_each_pin7_capacitance_F": 1e-05,
+    "BR_total_pot_ohms": 100000,
+    "BR_end_volts": [
+      -15,
+      15
+    ],
+    "BR_fixed_center_tap_volts": 0,
+    "RES_total_pot_ohms": 100000,
+    "RES_end_volts": [
+      0,
+      10
+    ],
+    "SUB_depth_pot_ohms": 10000,
+    "LC_SUB_LEVEL_touch_branch_ohms": [
+      120000,
+      270000,
+      150000
+    ]
+  },
+  "conditional_minimal_model": {
+    "manual_preset_sources": "stiff; Rth=0 is declared limit, not inferred factory source",
+    "shared_sources": "actual loaded/stiff node voltage offsets; fixed impedance, no lever taper",
+    "Q_incremental_chip_conductance_S": 0,
+    "Q_increment_time_constant_s": 1.1,
+    "Q_increment_DC_ratio": 0.5,
+    "provisional_manual_octave_slopes": [
+      0.7,
+      0.65
+    ],
+    "provisional_reference_damping_per_Vq": 0.18,
+    "Q_coordinate": "Existing effective resonance is baseline; never silently reinterpreted as measured raw/pin7 volts",
+    "changing_pot_resistance": "Not modeled; requires baseline DC backfeed terms",
+    "existing_preset_Q_changes": "Remain outside global-increment-only state model",
+    "SUB_semantics": "filter_lfo remains LP octaves; HP ratio(.7/.65)*(47/150)",
+    "common_VCA": "Additive LC engineering normalization; level before ampEG/bus/ring; mastervolume remains downstream"
+  },
+  "authored_artifacts": {
+    "sound-path-gap-audit.md": "943fcfc38950f90afdb5fb25377b3ad39312f2dcd4a294499e58b72e4a8d9551",
+    "soundpath/check_networks.py": "39563d686b4c420fd071d2d80a5f9cd262ea81b0cf3c7e9e58e1751634750dda",
+    "soundpath/nodal-checks.json": "81f820390041bd193b2b0681be27a59e6d32260dccbb770d2c89e65a9e04b4bb"
+  },
+  "no_new_audio_or_optimization": true
+}

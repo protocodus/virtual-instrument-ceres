@@ -1,0 +1,50 @@
+{
+  "status": "pass",
+  "baseline_commit": "55869df8ba728e25a6b5792aa07dfd55f134439c",
+  "scope": "Exact old-versus-candidate float32 audio, existing ParityDriver expression mode with only tremolo .71 replaced by0; four rates44100/48000/96000/192000, eight scenes,384000 samples. Active SUB filter/vibrato, allfive SUB waves, ring, noise, expression, edits, stolen/repeated notes, pedal, releases, panic/reset remain exercised.",
+  "driver_sha256": "fe9d91bed5682436ba9e51936b67e3b8fbe9e7b32fe6e6e065ced4fde26d6ed9",
+  "original_driver_sha256": "ab9016cc0eadb561ff7b8e97fa7fc10bc83e261704f44fccabeae5d79d6775ea",
+  "script_sha256": "ed58187163d069d4248b82d1a543020235140f46d2ceae7436332eda942a011b",
+  "variants": {
+    "baseline": {
+      "source_sha256": {
+        "ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+        "ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8"
+      },
+      "compile_command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-I/private/tmp/ceres-sub-polarity-20261018/build/zero-tremolo/baseline",
+        "/private/tmp/ceres-sub-polarity-20261018/build/zero-tremolo/ParityDriver.cpp",
+        "/private/tmp/ceres-sub-polarity-20261018/build/zero-tremolo/baseline/ceres.cpp",
+        "-o",
+        "/private/tmp/ceres-sub-polarity-20261018/build/zero-tremolo/baseline/parity"
+      ],
+      "binary_sha256": "7833c374d5d655904982a9ec92c51de7171c105fea04f19ea02147692a219c7d",
+      "audio_sha256": "8c6f8bc0bc337c29c60b2e5a04a1ed98b6ca529791fde1f79fe101e4ab67d4cc",
+      "audio_bytes": 1536000
+    },
+    "candidate": {
+      "source_sha256": {
+        "ceres.cpp": "cc2ee3cdcf7dfab7ebc60071627a2557520f6cdbadd2a590796629a9aad8fd10",
+        "ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8"
+      },
+      "compile_command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-I/private/tmp/ceres-sub-polarity-20261018/build/zero-tremolo/candidate",
+        "/private/tmp/ceres-sub-polarity-20261018/build/zero-tremolo/ParityDriver.cpp",
+        "/private/tmp/ceres-sub-polarity-20261018/build/zero-tremolo/candidate/ceres.cpp",
+        "-o",
+        "/private/tmp/ceres-sub-polarity-20261018/build/zero-tremolo/candidate/parity"
+      ],
+      "binary_sha256": "3e833e74c02fb2f1af29ab2c23ceae0798663f985fa4e6b96add1ede54906e41",
+      "audio_sha256": "8c6f8bc0bc337c29c60b2e5a04a1ed98b6ca529791fde1f79fe101e4ab67d4cc",
+      "audio_bytes": 1536000
+    }
+  }
+}

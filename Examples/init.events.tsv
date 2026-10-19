@@ -1,0 +1,9 @@
+# frame type note value
+0 on 60 1
+24000 on 64 1
+48000 on 67 1
+72000 on 72 1
+96000 off 60 0
+96000 off 64 0
+96000 off 67 0
+96000 off 72 0

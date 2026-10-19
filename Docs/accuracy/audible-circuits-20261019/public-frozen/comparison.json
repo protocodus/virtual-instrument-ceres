@@ -1,0 +1,2845 @@
+{
+  "status": "protocol_and_integrity_pass",
+  "declaration_sha256": "34bd7b5e340a5b999002fe95cc5154db9f171931c29f83560cdcc94300c6ff57",
+  "frozen_plan_sha256": "3482bca5ed0305c2a384125d05da73d19c17ed3c7f699e8cde262c045151071a",
+  "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "parent_report_sha256": "eaff14756079317de2b4e2dbdf9766cfa107c373d0ec7d3dafdab6ddf515c95c",
+  "candidate_report_sha256": "7d7a44e309f50fe64b1ef4181f33c70fa5c87db746388a8491b5ee80c35964ed",
+  "candidate_identity_sha256": "0ad675d34176a6b430dbe307714d7b544ddb533f326258c4715031ad393968c5",
+  "parent_binary_sha256": "42640ded137b2bf9c2a821db7ccf6db7cd7874cdfd75c26b9934d1c438d905c6",
+  "candidate_binary_sha256": "59964a09832bb14772976e5dd53e2b61f5f65de6278d46767948800669dc3a3a",
+  "candidate_compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "e90e883a9a41a61ce596d5fc316e3cca3f0f2fa03422ea4744e61d70faa17952",
+    "Source/DSP/ceres.cpp": "3fe87405e051b6bfade6b37324789eb1567f83e61cd8a493d4c5a1e0a6c6fa31",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "3d922bcfbe24bf253e6338ab32a9348830cb0ef21cd8f74607c8ed06c5151b6d"
+  },
+  "parent_and_candidate_metrics_recomputed": true,
+  "render_count": 8,
+  "parameter_fits": 0,
+  "gain_fits": 0,
+  "original_hardware_MIDI": false,
+  "strict_eligible": false,
+  "cases": [
+    {
+      "id": "flute-high-factory-physical",
+      "classification": "raw_factory_physical_flute",
+      "settings_status": "Named factory Flute and physical note/transpose visually supported; unknown globals, pressure, exact gates and voice count. Effective family is a prior high-window fit, not hardware settings.",
+      "midi_status": "Source-pitch following synthetic fresh held gate; physical notes 88/84, octave -1. Bends also affect filter key tracking.",
+      "recording_gain": 2.2187598696129043,
+      "parent_metrics": {
+        "frame_count": 45,
+        "harmonics": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "median_harmonic_MAE_db": 21.840789995040122,
+        "trajectory_ratio_MAE_db": 21.771714936721967,
+        "trajectory_ratio_MSE_db2": 579.3764262098371,
+        "held_gain_RMS_error_db": 0.6675532026014503,
+        "source_RMS_slope_db_per_s": -0.2890567467391627,
+        "native_RMS_slope_db_per_s": -1.5126547352609683,
+        "source_median_f0": 670.3014452315061,
+        "native_median_f0": 670.474929592898,
+        "median_pitch_error_cents": 0.12125115160240742
+      },
+      "candidate_metrics": {
+        "frame_count": 45,
+        "harmonics": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "median_harmonic_MAE_db": 21.97132575058184,
+        "trajectory_ratio_MAE_db": 21.904167872070122,
+        "trajectory_ratio_MSE_db2": 586.7861615905243,
+        "held_gain_RMS_error_db": 0.6594893370516621,
+        "source_RMS_slope_db_per_s": -0.2890567467391627,
+        "native_RMS_slope_db_per_s": -1.5120208952348408,
+        "source_median_f0": 670.3014452315061,
+        "native_median_f0": 670.4749554705837,
+        "median_pitch_error_cents": 0.12130090500970067
+      },
+      "summary_parent": {
+        "median_harmonic_MAE_db": 21.840789995040122,
+        "trajectory_ratio_MAE_db": 21.771714936721967,
+        "held_gain_RMS_error_db": 0.6675532026014503,
+        "median_pitch_error_cents": 0.12125115160240742,
+        "RMS_slope_error_abs_db_per_s": 1.2235979885218056
+      },
+      "summary_candidate": {
+        "median_harmonic_MAE_db": 21.97132575058184,
+        "trajectory_ratio_MAE_db": 21.904167872070122,
+        "held_gain_RMS_error_db": 0.6594893370516621,
+        "median_pitch_error_cents": 0.12130090500970067,
+        "RMS_slope_error_abs_db_per_s": 1.2229641484956781
+      },
+      "summary_delta_candidate_minus_parent": {
+        "median_harmonic_MAE_db": 0.13053575554171815,
+        "trajectory_ratio_MAE_db": 0.13245293534815517,
+        "held_gain_RMS_error_db": -0.008063865549788218,
+        "median_pitch_error_cents": 4.975340729325428e-05,
+        "RMS_slope_error_abs_db_per_s": -0.0006338400261274302
+      },
+      "parent_signal": {
+        "finite": true,
+        "peak": 0.14263524115085602,
+        "rms": 0.03286046475452211,
+        "energy": 167.15461027311775,
+        "samples_above_unity": 0
+      },
+      "candidate_signal": {
+        "finite": true,
+        "peak": 0.1468062549829483,
+        "rms": 0.03296951292052996,
+        "energy": 168.26586348719033,
+        "samples_above_unity": 0
+      },
+      "parent_audio_sha256": "0672f265c4fdbf9f8050fcff18a6447bc5c362d9e521c97d6440084504b55f9b",
+      "candidate_audio_sha256": "405d45f15aeca9b53abf43f4774deee076411f57fe71689c93ea0231dd7322f6"
+    },
+    {
+      "id": "flute-high-effective-compensated",
+      "classification": "previously_fitted_effective_flute",
+      "settings_status": "Named factory Flute and physical note/transpose visually supported; unknown globals, pressure, exact gates and voice count. Effective family is a prior high-window fit, not hardware settings.",
+      "midi_status": "Source-pitch following synthetic fresh held gate; physical notes 88/84, octave -1. Bends also affect filter key tracking.",
+      "recording_gain": 1.4257361547253915,
+      "parent_metrics": {
+        "frame_count": 45,
+        "harmonics": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "median_harmonic_MAE_db": 0.731331635114398,
+        "trajectory_ratio_MAE_db": 0.9336398054313935,
+        "trajectory_ratio_MSE_db2": 1.0943147546951304,
+        "held_gain_RMS_error_db": 0.02974878589591373,
+        "source_RMS_slope_db_per_s": -0.2890567467391627,
+        "native_RMS_slope_db_per_s": -0.2891194390123263,
+        "source_median_f0": 670.3014452315061,
+        "native_median_f0": 670.4674584760702,
+        "median_pitch_error_cents": 0.10160202283174866
+      },
+      "candidate_metrics": {
+        "frame_count": 45,
+        "harmonics": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "median_harmonic_MAE_db": 0.8442897118889915,
+        "trajectory_ratio_MAE_db": 1.0538088702544595,
+        "trajectory_ratio_MSE_db2": 1.380823160600032,
+        "held_gain_RMS_error_db": 0.03831803516665239,
+        "source_RMS_slope_db_per_s": -0.2890567467391627,
+        "native_RMS_slope_db_per_s": -0.29040537056249416,
+        "source_median_f0": 670.3014452315061,
+        "native_median_f0": 670.4674789529578,
+        "median_pitch_error_cents": 0.10164025142707897
+      },
+      "summary_parent": {
+        "median_harmonic_MAE_db": 0.731331635114398,
+        "trajectory_ratio_MAE_db": 0.9336398054313935,
+        "held_gain_RMS_error_db": 0.02974878589591373,
+        "median_pitch_error_cents": 0.10160202283174866,
+        "RMS_slope_error_abs_db_per_s": 6.269227316357817e-05
+      },
+      "summary_candidate": {
+        "median_harmonic_MAE_db": 0.8442897118889915,
+        "trajectory_ratio_MAE_db": 1.0538088702544595,
+        "held_gain_RMS_error_db": 0.03831803516665239,
+        "median_pitch_error_cents": 0.10164025142707897,
+        "RMS_slope_error_abs_db_per_s": 0.0013486238233314518
+      },
+      "summary_delta_candidate_minus_parent": {
+        "median_harmonic_MAE_db": 0.11295807677459346,
+        "trajectory_ratio_MAE_db": 0.120169064823066,
+        "held_gain_RMS_error_db": 0.008569249270738658,
+        "median_pitch_error_cents": 3.8228595330314086e-05,
+        "RMS_slope_error_abs_db_per_s": 0.0012859315501678736
+      },
+      "parent_signal": {
+        "finite": true,
+        "peak": 0.13164807856082916,
+        "rms": 0.051586967715556334,
+        "energy": 411.95611885568974,
+        "samples_above_unity": 0
+      },
+      "candidate_signal": {
+        "finite": true,
+        "peak": 0.13128413259983063,
+        "rms": 0.05144508167712916,
+        "energy": 409.6931271730528,
+        "samples_above_unity": 0
+      },
+      "parent_audio_sha256": "cf5a3acb608b6f9e53ff0d5ec26f3f2fc14f7e3e242d1574ba2ff466caf202d9",
+      "candidate_audio_sha256": "766c219bbdebb833a5b54bc9d26d7c8f0a2e45ee6a2bcf9eba9332dc2ead26c3"
+    },
+    {
+      "id": "flute-lower-factory-physical",
+      "classification": "raw_factory_physical_flute",
+      "settings_status": "Named factory Flute and physical note/transpose visually supported; unknown globals, pressure, exact gates and voice count. Effective family is a prior high-window fit, not hardware settings.",
+      "midi_status": "Source-pitch following synthetic fresh held gate; physical notes 88/84, octave -1. Bends also affect filter key tracking.",
+      "recording_gain": 2.2187598696129043,
+      "parent_metrics": {
+        "frame_count": 27,
+        "harmonics": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "median_harmonic_MAE_db": 19.165209624052867,
+        "trajectory_ratio_MAE_db": 19.01826147230534,
+        "trajectory_ratio_MSE_db2": 468.0505985904968,
+        "held_gain_RMS_error_db": 0.38794795735707804,
+        "source_RMS_slope_db_per_s": -0.5428031510121784,
+        "native_RMS_slope_db_per_s": -1.6907154336290027,
+        "source_median_f0": 530.4468608648979,
+        "native_median_f0": 530.3263631259093,
+        "median_pitch_error_cents": 0.022611421522827736
+      },
+      "candidate_metrics": {
+        "frame_count": 27,
+        "harmonics": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "median_harmonic_MAE_db": 19.23512053018534,
+        "trajectory_ratio_MAE_db": 19.086651275324055,
+        "trajectory_ratio_MSE_db2": 471.71452798076456,
+        "held_gain_RMS_error_db": 0.39301763256096905,
+        "source_RMS_slope_db_per_s": -0.5428031510121784,
+        "native_RMS_slope_db_per_s": -1.690420040924831,
+        "source_median_f0": 530.4468608648979,
+        "native_median_f0": 530.3263373748863,
+        "median_pitch_error_cents": 0.022647457679820144
+      },
+      "summary_parent": {
+        "median_harmonic_MAE_db": 19.165209624052867,
+        "trajectory_ratio_MAE_db": 19.01826147230534,
+        "held_gain_RMS_error_db": 0.38794795735707804,
+        "median_pitch_error_cents": 0.022611421522827736,
+        "RMS_slope_error_abs_db_per_s": 1.1479122826168244
+      },
+      "summary_candidate": {
+        "median_harmonic_MAE_db": 19.23512053018534,
+        "trajectory_ratio_MAE_db": 19.086651275324055,
+        "held_gain_RMS_error_db": 0.39301763256096905,
+        "median_pitch_error_cents": 0.022647457679820144,
+        "RMS_slope_error_abs_db_per_s": 1.1476168899126526
+      },
+      "summary_delta_candidate_minus_parent": {
+        "median_harmonic_MAE_db": 0.06991090613247408,
+        "trajectory_ratio_MAE_db": 0.06838980301871445,
+        "held_gain_RMS_error_db": 0.005069675203891011,
+        "median_pitch_error_cents": 3.6036156992408364e-05,
+        "RMS_slope_error_abs_db_per_s": -0.00029539270417178187
+      },
+      "parent_signal": {
+        "finite": true,
+        "peak": 0.144936665892601,
+        "rms": 0.03233664645276743,
+        "energy": 124.43338575354194,
+        "samples_above_unity": 0
+      },
+      "candidate_signal": {
+        "finite": true,
+        "peak": 0.14800122380256653,
+        "rms": 0.03238661725439417,
+        "energy": 124.81826428473207,
+        "samples_above_unity": 0
+      },
+      "parent_audio_sha256": "7497eeb7b4a268532d2279e3ac085abbd7a18886f4d48032ecedaba0c1bc29ec",
+      "candidate_audio_sha256": "60b99617d98044dcb03dca7dde58096d20b78b574714463fe55ca61fb337b353"
+    },
+    {
+      "id": "flute-lower-effective-compensated",
+      "classification": "previously_fitted_effective_flute",
+      "settings_status": "Named factory Flute and physical note/transpose visually supported; unknown globals, pressure, exact gates and voice count. Effective family is a prior high-window fit, not hardware settings.",
+      "midi_status": "Source-pitch following synthetic fresh held gate; physical notes 88/84, octave -1. Bends also affect filter key tracking.",
+      "recording_gain": 1.4257361547253915,
+      "parent_metrics": {
+        "frame_count": 27,
+        "harmonics": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "median_harmonic_MAE_db": 0.931824849825972,
+        "trajectory_ratio_MAE_db": 1.0838642299200258,
+        "trajectory_ratio_MSE_db2": 1.520575001418543,
+        "held_gain_RMS_error_db": 0.22429916120817678,
+        "source_RMS_slope_db_per_s": -0.5428031510121784,
+        "native_RMS_slope_db_per_s": -0.39976454402625883,
+        "source_median_f0": 530.4468608648979,
+        "native_median_f0": 530.3226851194473,
+        "median_pitch_error_cents": 0.007829931054207378
+      },
+      "candidate_metrics": {
+        "frame_count": 27,
+        "harmonics": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "median_harmonic_MAE_db": 0.8571806043934473,
+        "trajectory_ratio_MAE_db": 1.0115139066260845,
+        "trajectory_ratio_MSE_db2": 1.4133155231729249,
+        "held_gain_RMS_error_db": 0.24487774241025848,
+        "source_RMS_slope_db_per_s": -0.5428031510121784,
+        "native_RMS_slope_db_per_s": -0.40119785293719396,
+        "source_median_f0": 530.4468608648979,
+        "native_median_f0": 530.3226571602111,
+        "median_pitch_error_cents": 0.00785669476720064
+      },
+      "summary_parent": {
+        "median_harmonic_MAE_db": 0.931824849825972,
+        "trajectory_ratio_MAE_db": 1.0838642299200258,
+        "held_gain_RMS_error_db": 0.22429916120817678,
+        "median_pitch_error_cents": 0.007829931054207378,
+        "RMS_slope_error_abs_db_per_s": 0.14303860698591953
+      },
+      "summary_candidate": {
+        "median_harmonic_MAE_db": 0.8571806043934473,
+        "trajectory_ratio_MAE_db": 1.0115139066260845,
+        "held_gain_RMS_error_db": 0.24487774241025848,
+        "median_pitch_error_cents": 0.00785669476720064,
+        "RMS_slope_error_abs_db_per_s": 0.1416052980749844
+      },
+      "summary_delta_candidate_minus_parent": {
+        "median_harmonic_MAE_db": -0.07464424543252468,
+        "trajectory_ratio_MAE_db": -0.07235032329394131,
+        "held_gain_RMS_error_db": 0.020578581202081697,
+        "median_pitch_error_cents": 2.676371299326248e-05,
+        "RMS_slope_error_abs_db_per_s": -0.0014333089109351271
+      },
+      "parent_signal": {
+        "finite": true,
+        "peak": 0.12951351702213287,
+        "rms": 0.048453695411920544,
+        "energy": 279.3835112894692,
+        "samples_above_unity": 0
+      },
+      "candidate_signal": {
+        "finite": true,
+        "peak": 0.12913735210895538,
+        "rms": 0.04833313956984888,
+        "energy": 277.99499330074053,
+        "samples_above_unity": 0
+      },
+      "parent_audio_sha256": "117bb8264841fbe70aac3ac1059765594cdbf2877d7b450b01ac4608c67ea002",
+      "candidate_audio_sha256": "6f753bba27b99a334b149b245eb73b624f0aa9205fe26497c4de92a9ade0ee8a"
+    },
+    {
+      "id": "brass-history20",
+      "classification": "conditional_effective_brass",
+      "settings_status": "Named Brass I; BR -15 boundary, common AM and global release are conditional effective controls; actual control voltages and modulation route unknown.",
+      "midi_status": "Reused fixed chord gate hypothesis 20, not original MIDI; physical chord+octave correction retained.",
+      "recording_gain": 1.2183595407585435,
+      "parent_metrics": {
+        "spectral_score": {
+          "six_cell_mean_ratio_MAE_db": 3.62613504756184,
+          "cells": [
+            {
+              "note": 57,
+              "phase": "early",
+              "partial_frame_count": 48,
+              "ratio_MAE_db": 2.9410148622462553,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 57,
+              "phase": "release",
+              "partial_frame_count": 34,
+              "ratio_MAE_db": 4.928656968129175,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "early",
+              "partial_frame_count": 60,
+              "ratio_MAE_db": 2.9080041833796844,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "release",
+              "partial_frame_count": 67,
+              "ratio_MAE_db": 4.292472479445433,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "early",
+              "partial_frame_count": 24,
+              "ratio_MAE_db": 2.8037592992524694,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "release",
+              "partial_frame_count": 10,
+              "ratio_MAE_db": 3.8829024929180207,
+              "native_weak_partial_frames": 1
+            }
+          ],
+          "total_native_weak_partial_frames": 1
+        },
+        "tail_metrics": {
+          "source_seconds": [
+            137.08,
+            137.65
+          ],
+          "sampling_step_ms": 2,
+          "floor_below_early_source_median_db": 40,
+          "source_floor_amplitudes": [
+            0.00038720679557906256,
+            0.00044527650299608937,
+            0.0004267192135901807
+          ],
+          "per_note_floored_RMS_db": [
+            8.879355213435655,
+            9.071499233621678,
+            8.459239606353853
+          ],
+          "A3_C4_joint_floored_RMS_db": 8.975941381046496,
+          "E4_floored_RMS_db": 8.459239606353853,
+          "per_note_source_above_floor_RMS_db": [
+            11.716892644639882,
+            10.063234362171123,
+            14.268739894034898
+          ],
+          "source_above_floor_sample_counts": [
+            155,
+            217,
+            96
+          ],
+          "per_note_mean_error_db": [
+            -0.8692366457133583,
+            2.9632865337917353,
+            -2.316967550348555
+          ]
+        },
+        "C4_higher_ratios": [
+          {
+            "numerator": 3,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -0.09397203881783765,
+                    "native_ratio_db": -3.401947175378691,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": 0.2895349720817247,
+                    "native_ratio_db": -3.404350991492146,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": 0.5473225929312419,
+                    "native_ratio_db": -3.4280287573750696,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": 0.6507931043270532,
+                    "native_ratio_db": -3.40333421180887,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": 0.4184287825064833,
+                "native_median_db": -3.403842601650508,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -10.151374141577698,
+                    "native_ratio_db": -3.4352795832537435,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -11.070086745633297,
+                    "native_ratio_db": -3.5232629475284383,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -11.838056889606477,
+                    "native_ratio_db": -4.116016830076601,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -12.47410846776108,
+                    "native_ratio_db": -4.973264473839767,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -11.454071817619887,
+                "native_median_db": -3.81963988880252,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -11.87250060012637,
+            "native_change_db": -0.4157972871520119,
+            "change_error_db": 11.456703312974359
+          },
+          {
+            "numerator": 4,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -2.5485276401375856,
+                    "native_ratio_db": -5.951437310603577,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": -3.3706161246653044,
+                    "native_ratio_db": -5.957504675021053,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": -4.439924544514013,
+                    "native_ratio_db": -6.056449114630732,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": -5.841251865022614,
+                    "native_ratio_db": -6.099169477784234,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -3.905270334589659,
+                "native_median_db": -6.006976894825893,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -20.543383460101655,
+                    "native_ratio_db": -6.257642943227857,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -21.32532774704614,
+                    "native_ratio_db": -6.517765287869452,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -21.97738993251749,
+                    "native_ratio_db": -8.0132872626856,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -22.465372579208914,
+                    "native_ratio_db": -10.284457465740424,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -21.651358839781814,
+                "native_median_db": -7.265526275277526,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -17.746088505192155,
+            "native_change_db": -1.2585493804516323,
+            "change_error_db": 16.487539124740522
+          }
+        ],
+        "source_valid_partial_records": 243
+      },
+      "candidate_metrics": {
+        "spectral_score": {
+          "six_cell_mean_ratio_MAE_db": 3.6237994139082024,
+          "cells": [
+            {
+              "note": 57,
+              "phase": "early",
+              "partial_frame_count": 48,
+              "ratio_MAE_db": 2.9390153728668804,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 57,
+              "phase": "release",
+              "partial_frame_count": 34,
+              "ratio_MAE_db": 4.932646198379406,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "early",
+              "partial_frame_count": 60,
+              "ratio_MAE_db": 2.906544058017689,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "release",
+              "partial_frame_count": 67,
+              "ratio_MAE_db": 4.297063946510485,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "early",
+              "partial_frame_count": 24,
+              "ratio_MAE_db": 2.792228117330444,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "release",
+              "partial_frame_count": 10,
+              "ratio_MAE_db": 3.875298790344309,
+              "native_weak_partial_frames": 1
+            }
+          ],
+          "total_native_weak_partial_frames": 1
+        },
+        "tail_metrics": {
+          "source_seconds": [
+            137.08,
+            137.65
+          ],
+          "sampling_step_ms": 2,
+          "floor_below_early_source_median_db": 40,
+          "source_floor_amplitudes": [
+            0.00038720679557906256,
+            0.00044527650299608937,
+            0.0004267192135901807
+          ],
+          "per_note_floored_RMS_db": [
+            8.88011604389468,
+            9.068218145356637,
+            8.4626868674859
+          ],
+          "A3_C4_joint_floored_RMS_db": 8.974659917924773,
+          "E4_floored_RMS_db": 8.4626868674859,
+          "per_note_source_above_floor_RMS_db": [
+            11.718797249135607,
+            10.06045898505894,
+            14.27592048008892
+          ],
+          "source_above_floor_sample_counts": [
+            155,
+            217,
+            96
+          ],
+          "per_note_mean_error_db": [
+            -0.8746770767833969,
+            2.954126489644401,
+            -2.322053218828328
+          ]
+        },
+        "C4_higher_ratios": [
+          {
+            "numerator": 3,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -0.09397203881783765,
+                    "native_ratio_db": -3.3995401732725865,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": 0.2895349720817247,
+                    "native_ratio_db": -3.401955033261258,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": 0.5473225929312419,
+                    "native_ratio_db": -3.425638110663013,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": 0.6507931043270532,
+                    "native_ratio_db": -3.4009376384714898,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": 0.4184287825064833,
+                "native_median_db": -3.401446335866374,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -10.151374141577698,
+                    "native_ratio_db": -3.4328753659977114,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -11.070086745633297,
+                    "native_ratio_db": -3.5208534978483486,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -11.838056889606477,
+                    "native_ratio_db": -4.113596192053542,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -12.47410846776108,
+                    "native_ratio_db": -4.970828755386025,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -11.454071817619887,
+                "native_median_db": -3.817224844950945,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -11.87250060012637,
+            "native_change_db": -0.41577850908457137,
+            "change_error_db": 11.456722091041799
+          },
+          {
+            "numerator": 4,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -2.5485276401375856,
+                    "native_ratio_db": -5.945693420892382,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": -3.3706161246653044,
+                    "native_ratio_db": -5.951770062586483,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": -4.439924544514013,
+                    "native_ratio_db": -6.0507275436261985,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": -5.841251865022614,
+                    "native_ratio_db": -6.0934533600867855,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -3.905270334589659,
+                "native_median_db": -6.001248803106341,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -20.543383460101655,
+                    "native_ratio_db": -6.25192084547948,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -21.32532774704614,
+                    "native_ratio_db": -6.512039400826795,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -21.97738993251749,
+                    "native_ratio_db": -8.007536219900777,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -22.465372579208914,
+                    "native_ratio_db": -10.278643154733535,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -21.651358839781814,
+                "native_median_db": -7.259787810363786,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -17.746088505192155,
+            "native_change_db": -1.2585390072574452,
+            "change_error_db": 16.487549497934708
+          }
+        ],
+        "source_valid_partial_records": 243
+      },
+      "summary_parent": {
+        "six_cell_mean_ratio_MAE_db": 3.62613504756184,
+        "native_weak_partial_frames": 1,
+        "note57/early/ratio_MAE_db": 2.9410148622462553,
+        "note57/release/ratio_MAE_db": 4.928656968129175,
+        "note60/early/ratio_MAE_db": 2.9080041833796844,
+        "note60/release/ratio_MAE_db": 4.292472479445433,
+        "note64/early/ratio_MAE_db": 2.8037592992524694,
+        "note64/release/ratio_MAE_db": 3.8829024929180207,
+        "note57/tail_floored_RMS_db": 8.879355213435655,
+        "note60/tail_floored_RMS_db": 9.071499233621678,
+        "note64/tail_floored_RMS_db": 8.459239606353853,
+        "C4_H3_H2_change_error_abs_db": 11.456703312974359,
+        "C4_H4_H2_change_error_abs_db": 16.487539124740522
+      },
+      "summary_candidate": {
+        "six_cell_mean_ratio_MAE_db": 3.6237994139082024,
+        "native_weak_partial_frames": 1,
+        "note57/early/ratio_MAE_db": 2.9390153728668804,
+        "note57/release/ratio_MAE_db": 4.932646198379406,
+        "note60/early/ratio_MAE_db": 2.906544058017689,
+        "note60/release/ratio_MAE_db": 4.297063946510485,
+        "note64/early/ratio_MAE_db": 2.792228117330444,
+        "note64/release/ratio_MAE_db": 3.875298790344309,
+        "note57/tail_floored_RMS_db": 8.88011604389468,
+        "note60/tail_floored_RMS_db": 9.068218145356637,
+        "note64/tail_floored_RMS_db": 8.4626868674859,
+        "C4_H3_H2_change_error_abs_db": 11.456722091041799,
+        "C4_H4_H2_change_error_abs_db": 16.487549497934708
+      },
+      "summary_delta_candidate_minus_parent": {
+        "six_cell_mean_ratio_MAE_db": -0.0023356336536375366,
+        "native_weak_partial_frames": 0,
+        "note57/early/ratio_MAE_db": -0.001999489379374886,
+        "note57/release/ratio_MAE_db": 0.003989230250231124,
+        "note60/early/ratio_MAE_db": -0.001460125361995246,
+        "note60/release/ratio_MAE_db": 0.0045914670650519795,
+        "note64/early/ratio_MAE_db": -0.01153118192202518,
+        "note64/release/ratio_MAE_db": -0.007603702573711679,
+        "note57/tail_floored_RMS_db": 0.0007608304590238646,
+        "note60/tail_floored_RMS_db": -0.003281088265040921,
+        "note64/tail_floored_RMS_db": 0.0034472611320470747,
+        "C4_H3_H2_change_error_abs_db": 1.8778067440550217e-05,
+        "C4_H4_H2_change_error_abs_db": 1.0373194186286128e-05
+      },
+      "parent_signal": {
+        "finite": true,
+        "peak": 0.19374841451644897,
+        "rms": 0.02049899089861798,
+        "energy": 40.676195177005084,
+        "samples_above_unity": 0
+      },
+      "candidate_signal": {
+        "finite": true,
+        "peak": 0.19349147379398346,
+        "rms": 0.02047562765130002,
+        "energy": 40.583528522781215,
+        "samples_above_unity": 0
+      },
+      "parent_audio_sha256": "4a10b16c8c7a82dd2dbd38f49c611d51ae9e71022b8b8be98f487f94dfa4e1a5",
+      "candidate_audio_sha256": "e992df17a7fe50f300b0b58af4d3a4734e8ad8ffab835871dac233914440b3f0"
+    },
+    {
+      "id": "brass-history10",
+      "classification": "conditional_effective_brass",
+      "settings_status": "Named Brass I; BR -15 boundary, common AM and global release are conditional effective controls; actual control voltages and modulation route unknown.",
+      "midi_status": "Reused fixed chord gate hypothesis 10, not original MIDI; physical chord+octave correction retained.",
+      "recording_gain": 1.2183595407585435,
+      "parent_metrics": {
+        "spectral_score": {
+          "six_cell_mean_ratio_MAE_db": 3.6346425345331657,
+          "cells": [
+            {
+              "note": 57,
+              "phase": "early",
+              "partial_frame_count": 48,
+              "ratio_MAE_db": 2.942509316323319,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 57,
+              "phase": "release",
+              "partial_frame_count": 34,
+              "ratio_MAE_db": 5.759386125776527,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "early",
+              "partial_frame_count": 60,
+              "ratio_MAE_db": 2.9079043594841294,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "release",
+              "partial_frame_count": 67,
+              "ratio_MAE_db": 4.496148862811796,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "early",
+              "partial_frame_count": 24,
+              "ratio_MAE_db": 2.432353064590973,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "release",
+              "partial_frame_count": 10,
+              "ratio_MAE_db": 3.2695534782122473,
+              "native_weak_partial_frames": 0
+            }
+          ],
+          "total_native_weak_partial_frames": 0
+        },
+        "tail_metrics": {
+          "source_seconds": [
+            137.08,
+            137.65
+          ],
+          "sampling_step_ms": 2,
+          "floor_below_early_source_median_db": 40,
+          "source_floor_amplitudes": [
+            0.00038720679557906256,
+            0.00044527650299608937,
+            0.0004267192135901807
+          ],
+          "per_note_floored_RMS_db": [
+            9.559430816390355,
+            10.643829711945749,
+            7.253543124708735
+          ],
+          "A3_C4_joint_floored_RMS_db": 10.116170927536087,
+          "E4_floored_RMS_db": 7.253543124708735,
+          "per_note_source_above_floor_RMS_db": [
+            12.307298791845952,
+            12.134710220041601,
+            12.45644952182308
+          ],
+          "source_above_floor_sample_counts": [
+            155,
+            217,
+            96
+          ],
+          "per_note_mean_error_db": [
+            1.5952628863130893,
+            4.747853352492643,
+            -0.7057391671338161
+          ]
+        },
+        "C4_higher_ratios": [
+          {
+            "numerator": 3,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -0.09397203881783765,
+                    "native_ratio_db": -3.3632345059457385,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": 0.2895349720817247,
+                    "native_ratio_db": -3.3605024998428097,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": 0.5473225929312419,
+                    "native_ratio_db": -3.3884464160574437,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": 0.6507931043270532,
+                    "native_ratio_db": -3.3747225020407754,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": 0.4184287825064833,
+                "native_median_db": -3.368978503993257,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -10.151374141577698,
+                    "native_ratio_db": -3.4212746155136466,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -11.070086745633297,
+                    "native_ratio_db": -3.422433231469051,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -11.838056889606477,
+                    "native_ratio_db": -3.452842451295337,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -12.47410846776108,
+                    "native_ratio_db": -3.5000793850603076,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -11.454071817619887,
+                "native_median_db": -3.4376378413821937,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -11.87250060012637,
+            "native_change_db": -0.06865933738893659,
+            "change_error_db": 11.803841262737434
+          },
+          {
+            "numerator": 4,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -2.5485276401375856,
+                    "native_ratio_db": -5.952698847872391,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": -3.3706161246653044,
+                    "native_ratio_db": -5.980279306733911,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": -4.439924544514013,
+                    "native_ratio_db": -6.066951116339942,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": -5.841251865022614,
+                    "native_ratio_db": -6.108359428084293,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -3.905270334589659,
+                "native_median_db": -6.023615211536926,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -20.543383460101655,
+                    "native_ratio_db": -6.24543500516798,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -21.32532774704614,
+                    "native_ratio_db": -6.303500449119353,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -21.97738993251749,
+                    "native_ratio_db": -6.434775324787589,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -22.465372579208914,
+                    "native_ratio_db": -6.529394921145194,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -21.651358839781814,
+                "native_median_db": -6.369137886953471,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -17.746088505192155,
+            "native_change_db": -0.3455226754165448,
+            "change_error_db": 17.40056582977561
+          }
+        ],
+        "source_valid_partial_records": 243
+      },
+      "candidate_metrics": {
+        "spectral_score": {
+          "six_cell_mean_ratio_MAE_db": 3.634170780693761,
+          "cells": [
+            {
+              "note": 57,
+              "phase": "early",
+              "partial_frame_count": 48,
+              "ratio_MAE_db": 2.940509216863742,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 57,
+              "phase": "release",
+              "partial_frame_count": 34,
+              "ratio_MAE_db": 5.763356296288127,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "early",
+              "partial_frame_count": 60,
+              "ratio_MAE_db": 2.9064492494853034,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "release",
+              "partial_frame_count": 67,
+              "ratio_MAE_db": 4.50072357396971,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "early",
+              "partial_frame_count": 24,
+              "ratio_MAE_db": 2.4208516365489925,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "release",
+              "partial_frame_count": 10,
+              "ratio_MAE_db": 3.2731347110066906,
+              "native_weak_partial_frames": 0
+            }
+          ],
+          "total_native_weak_partial_frames": 0
+        },
+        "tail_metrics": {
+          "source_seconds": [
+            137.08,
+            137.65
+          ],
+          "sampling_step_ms": 2,
+          "floor_below_early_source_median_db": 40,
+          "source_floor_amplitudes": [
+            0.00038720679557906256,
+            0.00044527650299608937,
+            0.0004267192135901807
+          ],
+          "per_note_floored_RMS_db": [
+            9.557784916927282,
+            10.639341520422752,
+            7.254766814595819
+          ],
+          "A3_C4_joint_floored_RMS_db": 10.113032198762996,
+          "E4_floored_RMS_db": 7.254766814595819,
+          "per_note_source_above_floor_RMS_db": [
+            12.306205687628784,
+            12.129923820784292,
+            12.458993787200868
+          ],
+          "source_above_floor_sample_counts": [
+            155,
+            217,
+            96
+          ],
+          "per_note_mean_error_db": [
+            1.5897402581994857,
+            4.739223930948673,
+            -0.7105157574077965
+          ]
+        },
+        "C4_higher_ratios": [
+          {
+            "numerator": 3,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -0.09397203881783765,
+                    "native_ratio_db": -3.3609161752248617,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": 0.2895349720817247,
+                    "native_ratio_db": -3.3581561356471745,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": 0.5473225929312419,
+                    "native_ratio_db": -3.3860546396276407,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": 0.6507931043270532,
+                    "native_ratio_db": -3.3723062248126903,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": 0.4184287825064833,
+                "native_median_db": -3.366611200018776,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -10.151374141577698,
+                    "native_ratio_db": -3.418867088222339,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -11.070086745633297,
+                    "native_ratio_db": -3.4200342153577425,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -11.838056889606477,
+                    "native_ratio_db": -3.4504421785009347,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -12.47410846776108,
+                    "native_ratio_db": -3.497683372047564,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -11.454071817619887,
+                "native_median_db": -3.4352381969293386,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -11.87250060012637,
+            "native_change_db": -0.06862699691056262,
+            "change_error_db": 11.803873603215807
+          },
+          {
+            "numerator": 4,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -2.5485276401375856,
+                    "native_ratio_db": -5.946854185590482,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": -3.3706161246653044,
+                    "native_ratio_db": -5.974475190462888,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": -4.439924544514013,
+                    "native_ratio_db": -6.061221336288823,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": -5.841251865022614,
+                    "native_ratio_db": -6.102608661951575,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -3.905270334589659,
+                "native_median_db": -6.017848263375855,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -20.543383460101655,
+                    "native_ratio_db": -6.239725471143373,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -21.32532774704614,
+                    "native_ratio_db": -6.297775676412747,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -21.97738993251749,
+                    "native_ratio_db": -6.429049750039933,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -22.465372579208914,
+                    "native_ratio_db": -6.523676970350714,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -21.651358839781814,
+                "native_median_db": -6.3634127132263405,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -17.746088505192155,
+            "native_change_db": -0.3455644498504853,
+            "change_error_db": 17.40052405534167
+          }
+        ],
+        "source_valid_partial_records": 243
+      },
+      "summary_parent": {
+        "six_cell_mean_ratio_MAE_db": 3.6346425345331657,
+        "native_weak_partial_frames": 0,
+        "note57/early/ratio_MAE_db": 2.942509316323319,
+        "note57/release/ratio_MAE_db": 5.759386125776527,
+        "note60/early/ratio_MAE_db": 2.9079043594841294,
+        "note60/release/ratio_MAE_db": 4.496148862811796,
+        "note64/early/ratio_MAE_db": 2.432353064590973,
+        "note64/release/ratio_MAE_db": 3.2695534782122473,
+        "note57/tail_floored_RMS_db": 9.559430816390355,
+        "note60/tail_floored_RMS_db": 10.643829711945749,
+        "note64/tail_floored_RMS_db": 7.253543124708735,
+        "C4_H3_H2_change_error_abs_db": 11.803841262737434,
+        "C4_H4_H2_change_error_abs_db": 17.40056582977561
+      },
+      "summary_candidate": {
+        "six_cell_mean_ratio_MAE_db": 3.634170780693761,
+        "native_weak_partial_frames": 0,
+        "note57/early/ratio_MAE_db": 2.940509216863742,
+        "note57/release/ratio_MAE_db": 5.763356296288127,
+        "note60/early/ratio_MAE_db": 2.9064492494853034,
+        "note60/release/ratio_MAE_db": 4.50072357396971,
+        "note64/early/ratio_MAE_db": 2.4208516365489925,
+        "note64/release/ratio_MAE_db": 3.2731347110066906,
+        "note57/tail_floored_RMS_db": 9.557784916927282,
+        "note60/tail_floored_RMS_db": 10.639341520422752,
+        "note64/tail_floored_RMS_db": 7.254766814595819,
+        "C4_H3_H2_change_error_abs_db": 11.803873603215807,
+        "C4_H4_H2_change_error_abs_db": 17.40052405534167
+      },
+      "summary_delta_candidate_minus_parent": {
+        "six_cell_mean_ratio_MAE_db": -0.0004717538394047871,
+        "native_weak_partial_frames": 0,
+        "note57/early/ratio_MAE_db": -0.0020000994595767985,
+        "note57/release/ratio_MAE_db": 0.003970170511600202,
+        "note60/early/ratio_MAE_db": -0.0014551099988260319,
+        "note60/release/ratio_MAE_db": 0.004574711157913747,
+        "note64/early/ratio_MAE_db": -0.01150142804198051,
+        "note64/release/ratio_MAE_db": 0.003581232794443334,
+        "note57/tail_floored_RMS_db": -0.0016458994630728085,
+        "note60/tail_floored_RMS_db": -0.004488191522996843,
+        "note64/tail_floored_RMS_db": 0.0012236898870838786,
+        "C4_H3_H2_change_error_abs_db": 3.234047837352705e-05,
+        "C4_H4_H2_change_error_abs_db": -4.177443393871272e-05
+      },
+      "parent_signal": {
+        "finite": true,
+        "peak": 0.19374841451644897,
+        "rms": 0.022274810745765847,
+        "energy": 48.028984355937574,
+        "samples_above_unity": 0
+      },
+      "candidate_signal": {
+        "finite": true,
+        "peak": 0.19349147379398346,
+        "rms": 0.022249404955978956,
+        "energy": 47.919486822649645,
+        "samples_above_unity": 0
+      },
+      "parent_audio_sha256": "b54968b0705ead350d4fe7b7d5e351984bca06f0eb013c619af5caae7a907107",
+      "candidate_audio_sha256": "10dfe3d9a66c81adc8c51c6233fdee79afdb1fe673939d6573989a842e93b910"
+    },
+    {
+      "id": "dry-sawtooth",
+      "classification": "previously_fitted_dry_waveform",
+      "settings_status": "Named waveform, dry creator context; all effective oscillator/filter/envelope values previously fitted. No known factory preset or complete hardware settings.",
+      "midi_status": "Inferred monophonic pitch/onset and estimated gate, not original MIDI.",
+      "recording_gain": 2.60310051474971,
+      "parent_metrics": {
+        "windows": [
+          {
+            "name": "early",
+            "all_H2_H32": {
+              "frame_count": 11,
+              "harmonics": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32
+              ],
+              "median_harmonic_MAE_db": 0.16161675284446253,
+              "trajectory_ratio_MAE_db": 0.2673100622617109,
+              "trajectory_ratio_MSE_db2": 0.12303121660504196,
+              "held_gain_RMS_error_db": 0.19610994383153688,
+              "source_RMS_slope_db_per_s": 30.346048293574825,
+              "native_RMS_slope_db_per_s": 30.761101483290297,
+              "source_median_f0": 177.00815125545233,
+              "native_median_f0": 177.12233817043537,
+              "median_pitch_error_cents": 1.1173137211470905
+            },
+            "odd_H3_H31": {
+              "frame_count": 11,
+              "harmonics": [
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+                25,
+                27,
+                29,
+                31
+              ],
+              "median_harmonic_MAE_db": 0.16121570434052745,
+              "trajectory_ratio_MAE_db": 0.2832006860196039,
+              "trajectory_ratio_MSE_db2": 0.13995195065969357,
+              "held_gain_RMS_error_db": 0.19610994383153688,
+              "source_RMS_slope_db_per_s": 30.346048293574825,
+              "native_RMS_slope_db_per_s": 30.761101483290297,
+              "source_median_f0": 177.00815125545233,
+              "native_median_f0": 177.12233817043537,
+              "median_pitch_error_cents": 1.1173137211470905
+            }
+          },
+          {
+            "name": "prior_train",
+            "all_H2_H32": {
+              "frame_count": 11,
+              "harmonics": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32
+              ],
+              "median_harmonic_MAE_db": 0.3239610506394807,
+              "trajectory_ratio_MAE_db": 0.36842262387318475,
+              "trajectory_ratio_MSE_db2": 0.20750260952534402,
+              "held_gain_RMS_error_db": 0.25674276302292937,
+              "source_RMS_slope_db_per_s": 5.630881579270474,
+              "native_RMS_slope_db_per_s": 4.301129906627239,
+              "source_median_f0": 177.12633069605573,
+              "native_median_f0": 177.1224165849801,
+              "median_pitch_error_cents": -0.038815265846300157
+            },
+            "odd_H3_H31": {
+              "frame_count": 11,
+              "harmonics": [
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+                25,
+                27,
+                29,
+                31
+              ],
+              "median_harmonic_MAE_db": 0.3268075776521608,
+              "trajectory_ratio_MAE_db": 0.3654883712939783,
+              "trajectory_ratio_MSE_db2": 0.19398243958390063,
+              "held_gain_RMS_error_db": 0.25674276302292937,
+              "source_RMS_slope_db_per_s": 5.630881579270474,
+              "native_RMS_slope_db_per_s": 4.301129906627239,
+              "source_median_f0": 177.12633069605573,
+              "native_median_f0": 177.1224165849801,
+              "median_pitch_error_cents": -0.038815265846300157
+            }
+          },
+          {
+            "name": "late",
+            "all_H2_H32": {
+              "frame_count": 11,
+              "harmonics": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32
+              ],
+              "median_harmonic_MAE_db": 0.3151461554597318,
+              "trajectory_ratio_MAE_db": 0.3929130861139728,
+              "trajectory_ratio_MSE_db2": 0.22941066071925065,
+              "held_gain_RMS_error_db": 0.2897250775864949,
+              "source_RMS_slope_db_per_s": -0.9697719050377227,
+              "native_RMS_slope_db_per_s": 0.5488752390577005,
+              "source_median_f0": 176.92019111737812,
+              "native_median_f0": 177.12250533942725,
+              "median_pitch_error_cents": 1.9778754626965038
+            },
+            "odd_H3_H31": {
+              "frame_count": 11,
+              "harmonics": [
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+                25,
+                27,
+                29,
+                31
+              ],
+              "median_harmonic_MAE_db": 0.27067651234925,
+              "trajectory_ratio_MAE_db": 0.3670744080925038,
+              "trajectory_ratio_MSE_db2": 0.19847962366488514,
+              "held_gain_RMS_error_db": 0.2897250775864949,
+              "source_RMS_slope_db_per_s": -0.9697719050377227,
+              "native_RMS_slope_db_per_s": 0.5488752390577005,
+              "source_median_f0": 176.92019111737812,
+              "native_median_f0": 177.12250533942725,
+              "median_pitch_error_cents": 1.9778754626965038
+            }
+          }
+        ]
+      },
+      "candidate_metrics": {
+        "windows": [
+          {
+            "name": "early",
+            "all_H2_H32": {
+              "frame_count": 11,
+              "harmonics": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32
+              ],
+              "median_harmonic_MAE_db": 0.15359891246424845,
+              "trajectory_ratio_MAE_db": 0.2597487060237185,
+              "trajectory_ratio_MSE_db2": 0.11477611280634124,
+              "held_gain_RMS_error_db": 0.1897999165891136,
+              "source_RMS_slope_db_per_s": 30.346048293574825,
+              "native_RMS_slope_db_per_s": 30.760526430087268,
+              "source_median_f0": 177.00815125545233,
+              "native_median_f0": 177.1223377702389,
+              "median_pitch_error_cents": 1.1173081142825854
+            },
+            "odd_H3_H31": {
+              "frame_count": 11,
+              "harmonics": [
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+                25,
+                27,
+                29,
+                31
+              ],
+              "median_harmonic_MAE_db": 0.16242375249481106,
+              "trajectory_ratio_MAE_db": 0.2761343135075872,
+              "trajectory_ratio_MSE_db2": 0.13160756753536187,
+              "held_gain_RMS_error_db": 0.1897999165891136,
+              "source_RMS_slope_db_per_s": 30.346048293574825,
+              "native_RMS_slope_db_per_s": 30.760526430087268,
+              "source_median_f0": 177.00815125545233,
+              "native_median_f0": 177.1223377702389,
+              "median_pitch_error_cents": 1.1173081142825854
+            }
+          },
+          {
+            "name": "prior_train",
+            "all_H2_H32": {
+              "frame_count": 11,
+              "harmonics": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32
+              ],
+              "median_harmonic_MAE_db": 0.343769164645453,
+              "trajectory_ratio_MAE_db": 0.38016549404631517,
+              "trajectory_ratio_MSE_db2": 0.21495014743460367,
+              "held_gain_RMS_error_db": 0.26269806092408843,
+              "source_RMS_slope_db_per_s": 5.630881579270474,
+              "native_RMS_slope_db_per_s": 4.301863928896344,
+              "source_median_f0": 177.12633069605573,
+              "native_median_f0": 177.1224160956822,
+              "median_pitch_error_cents": -0.03881056826115447
+            },
+            "odd_H3_H31": {
+              "frame_count": 11,
+              "harmonics": [
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+                25,
+                27,
+                29,
+                31
+              ],
+              "median_harmonic_MAE_db": 0.35815026662181826,
+              "trajectory_ratio_MAE_db": 0.38558073981142016,
+              "trajectory_ratio_MSE_db2": 0.2139573730922648,
+              "held_gain_RMS_error_db": 0.26269806092408843,
+              "source_RMS_slope_db_per_s": 5.630881579270474,
+              "native_RMS_slope_db_per_s": 4.301863928896344,
+              "source_median_f0": 177.12633069605573,
+              "native_median_f0": 177.1224160956822,
+              "median_pitch_error_cents": -0.03881056826115447
+            }
+          },
+          {
+            "name": "late",
+            "all_H2_H32": {
+              "frame_count": 11,
+              "harmonics": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32
+              ],
+              "median_harmonic_MAE_db": 0.32013462132241555,
+              "trajectory_ratio_MAE_db": 0.39636038061175016,
+              "trajectory_ratio_MSE_db2": 0.23311999031175348,
+              "held_gain_RMS_error_db": 0.28389565410735584,
+              "source_RMS_slope_db_per_s": -0.9697719050377227,
+              "native_RMS_slope_db_per_s": 0.5492475192745807,
+              "source_median_f0": 176.92019111737812,
+              "native_median_f0": 177.12250594239975,
+              "median_pitch_error_cents": 1.9778706573539973
+            },
+            "odd_H3_H31": {
+              "frame_count": 11,
+              "harmonics": [
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+                25,
+                27,
+                29,
+                31
+              ],
+              "median_harmonic_MAE_db": 0.29941827285682454,
+              "trajectory_ratio_MAE_db": 0.38204033054992853,
+              "trajectory_ratio_MSE_db2": 0.2146496052556258,
+              "held_gain_RMS_error_db": 0.28389565410735584,
+              "source_RMS_slope_db_per_s": -0.9697719050377227,
+              "native_RMS_slope_db_per_s": 0.5492475192745807,
+              "source_median_f0": 176.92019111737812,
+              "native_median_f0": 177.12250594239975,
+              "median_pitch_error_cents": 1.9778706573539973
+            }
+          }
+        ]
+      },
+      "summary_parent": {
+        "early/all_H2_H32/trajectory_ratio_MAE_db": 0.2673100622617109,
+        "early/odd_H3_H31/trajectory_ratio_MAE_db": 0.2832006860196039,
+        "early/held_gain_RMS_error_db": 0.19610994383153688,
+        "prior_train/all_H2_H32/trajectory_ratio_MAE_db": 0.36842262387318475,
+        "prior_train/odd_H3_H31/trajectory_ratio_MAE_db": 0.3654883712939783,
+        "prior_train/held_gain_RMS_error_db": 0.25674276302292937,
+        "late/all_H2_H32/trajectory_ratio_MAE_db": 0.3929130861139728,
+        "late/odd_H3_H31/trajectory_ratio_MAE_db": 0.3670744080925038,
+        "late/held_gain_RMS_error_db": 0.2897250775864949
+      },
+      "summary_candidate": {
+        "early/all_H2_H32/trajectory_ratio_MAE_db": 0.2597487060237185,
+        "early/odd_H3_H31/trajectory_ratio_MAE_db": 0.2761343135075872,
+        "early/held_gain_RMS_error_db": 0.1897999165891136,
+        "prior_train/all_H2_H32/trajectory_ratio_MAE_db": 0.38016549404631517,
+        "prior_train/odd_H3_H31/trajectory_ratio_MAE_db": 0.38558073981142016,
+        "prior_train/held_gain_RMS_error_db": 0.26269806092408843,
+        "late/all_H2_H32/trajectory_ratio_MAE_db": 0.39636038061175016,
+        "late/odd_H3_H31/trajectory_ratio_MAE_db": 0.38204033054992853,
+        "late/held_gain_RMS_error_db": 0.28389565410735584
+      },
+      "summary_delta_candidate_minus_parent": {
+        "early/all_H2_H32/trajectory_ratio_MAE_db": -0.007561356237992367,
+        "early/odd_H3_H31/trajectory_ratio_MAE_db": -0.007066372512016694,
+        "early/held_gain_RMS_error_db": -0.006310027242423272,
+        "prior_train/all_H2_H32/trajectory_ratio_MAE_db": 0.011742870173130415,
+        "prior_train/odd_H3_H31/trajectory_ratio_MAE_db": 0.02009236851744184,
+        "prior_train/held_gain_RMS_error_db": 0.005955297901159062,
+        "late/all_H2_H32/trajectory_ratio_MAE_db": 0.0034472944977773645,
+        "late/odd_H3_H31/trajectory_ratio_MAE_db": 0.01496592245742473,
+        "late/held_gain_RMS_error_db": -0.005829423479139062
+      },
+      "parent_signal": {
+        "finite": true,
+        "peak": 0.09148343652486801,
+        "rms": 0.024763703332767156,
+        "energy": 89.96490806792058,
+        "samples_above_unity": 0
+      },
+      "candidate_signal": {
+        "finite": true,
+        "peak": 0.09157466888427734,
+        "rms": 0.02474535462091953,
+        "energy": 89.83163812902109,
+        "samples_above_unity": 0
+      },
+      "parent_audio_sha256": "8d0ec15f02c949e531601f7d931b7bd5ddc05af57e0ceb95ecc11413d1a2a6f9",
+      "candidate_audio_sha256": "e653ae47545349e8832939b877db224af3f04f1027c230f989e62fdfc7ff8daa"
+    },
+    {
+      "id": "dry-square",
+      "classification": "previously_fitted_dry_waveform",
+      "settings_status": "Named waveform, dry creator context; all effective oscillator/filter/envelope values previously fitted. No known factory preset or complete hardware settings.",
+      "midi_status": "Inferred monophonic pitch/onset and estimated gate, not original MIDI.",
+      "recording_gain": 1.7162306558852893,
+      "parent_metrics": {
+        "windows": [
+          {
+            "name": "early",
+            "all_H2_H32": {
+              "frame_count": 11,
+              "harmonics": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32
+              ],
+              "median_harmonic_MAE_db": 0.7960471942526361,
+              "trajectory_ratio_MAE_db": 0.9099920794025661,
+              "trajectory_ratio_MSE_db2": 2.5816190619785675,
+              "held_gain_RMS_error_db": 0.39209266793071806,
+              "source_RMS_slope_db_per_s": 29.947316866092407,
+              "native_RMS_slope_db_per_s": 32.706190630230395,
+              "source_median_f0": 177.65206707581467,
+              "native_median_f0": 177.7671220735692,
+              "median_pitch_error_cents": 1.1208449741645345
+            },
+            "odd_H3_H31": {
+              "frame_count": 11,
+              "harmonics": [
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+                25,
+                27,
+                29,
+                31
+              ],
+              "median_harmonic_MAE_db": 0.8952616724099295,
+              "trajectory_ratio_MAE_db": 1.0699494669321044,
+              "trajectory_ratio_MSE_db2": 4.239079459761568,
+              "held_gain_RMS_error_db": 0.39209266793071806,
+              "source_RMS_slope_db_per_s": 29.947316866092407,
+              "native_RMS_slope_db_per_s": 32.706190630230395,
+              "source_median_f0": 177.65206707581467,
+              "native_median_f0": 177.7671220735692,
+              "median_pitch_error_cents": 1.1208449741645345
+            }
+          },
+          {
+            "name": "prior_train",
+            "all_H2_H32": {
+              "frame_count": 11,
+              "harmonics": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32
+              ],
+              "median_harmonic_MAE_db": 1.0767166130208599,
+              "trajectory_ratio_MAE_db": 1.0823122317668112,
+              "trajectory_ratio_MSE_db2": 2.1230573626066973,
+              "held_gain_RMS_error_db": 0.27103361539000426,
+              "source_RMS_slope_db_per_s": 13.51670538745535,
+              "native_RMS_slope_db_per_s": 12.970270621091686,
+              "source_median_f0": 177.77281882942762,
+              "native_median_f0": 177.76698221825768,
+              "median_pitch_error_cents": -0.056984190662057406
+            },
+            "odd_H3_H31": {
+              "frame_count": 11,
+              "harmonics": [
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+                25,
+                27,
+                29,
+                31
+              ],
+              "median_harmonic_MAE_db": 1.3928982399892826,
+              "trajectory_ratio_MAE_db": 1.3904160877111402,
+              "trajectory_ratio_MSE_db2": 3.3157745470464217,
+              "held_gain_RMS_error_db": 0.27103361539000426,
+              "source_RMS_slope_db_per_s": 13.51670538745535,
+              "native_RMS_slope_db_per_s": 12.970270621091686,
+              "source_median_f0": 177.77281882942762,
+              "native_median_f0": 177.76698221825768,
+              "median_pitch_error_cents": -0.056984190662057406
+            }
+          },
+          {
+            "name": "late",
+            "all_H2_H32": {
+              "frame_count": 11,
+              "harmonics": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32
+              ],
+              "median_harmonic_MAE_db": 2.297770090737088,
+              "trajectory_ratio_MAE_db": 2.2925889888305413,
+              "trajectory_ratio_MSE_db2": 6.400407516403233,
+              "held_gain_RMS_error_db": 0.06477887314952918,
+              "source_RMS_slope_db_per_s": -3.2187119015207215,
+              "native_RMS_slope_db_per_s": -2.3687084366520503,
+              "source_median_f0": 177.54240106314253,
+              "native_median_f0": 177.76734741190444,
+              "median_pitch_error_cents": 2.1923269748457583
+            },
+            "odd_H3_H31": {
+              "frame_count": 11,
+              "harmonics": [
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+                25,
+                27,
+                29,
+                31
+              ],
+              "median_harmonic_MAE_db": 2.5893564026516245,
+              "trajectory_ratio_MAE_db": 2.576775226355303,
+              "trajectory_ratio_MSE_db2": 8.184356333621597,
+              "held_gain_RMS_error_db": 0.06477887314952918,
+              "source_RMS_slope_db_per_s": -3.2187119015207215,
+              "native_RMS_slope_db_per_s": -2.3687084366520503,
+              "source_median_f0": 177.54240106314253,
+              "native_median_f0": 177.76734741190444,
+              "median_pitch_error_cents": 2.1923269748457583
+            }
+          }
+        ]
+      },
+      "candidate_metrics": {
+        "windows": [
+          {
+            "name": "early",
+            "all_H2_H32": {
+              "frame_count": 11,
+              "harmonics": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32
+              ],
+              "median_harmonic_MAE_db": 0.7960471942526361,
+              "trajectory_ratio_MAE_db": 0.9099920794025661,
+              "trajectory_ratio_MSE_db2": 2.5816190619785675,
+              "held_gain_RMS_error_db": 0.39209266793071806,
+              "source_RMS_slope_db_per_s": 29.947316866092407,
+              "native_RMS_slope_db_per_s": 32.706190630230395,
+              "source_median_f0": 177.65206707581467,
+              "native_median_f0": 177.7671220735692,
+              "median_pitch_error_cents": 1.1208449741645345
+            },
+            "odd_H3_H31": {
+              "frame_count": 11,
+              "harmonics": [
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+                25,
+                27,
+                29,
+                31
+              ],
+              "median_harmonic_MAE_db": 0.8952616724099295,
+              "trajectory_ratio_MAE_db": 1.0699494669321044,
+              "trajectory_ratio_MSE_db2": 4.239079459761568,
+              "held_gain_RMS_error_db": 0.39209266793071806,
+              "source_RMS_slope_db_per_s": 29.947316866092407,
+              "native_RMS_slope_db_per_s": 32.706190630230395,
+              "source_median_f0": 177.65206707581467,
+              "native_median_f0": 177.7671220735692,
+              "median_pitch_error_cents": 1.1208449741645345
+            }
+          },
+          {
+            "name": "prior_train",
+            "all_H2_H32": {
+              "frame_count": 11,
+              "harmonics": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32
+              ],
+              "median_harmonic_MAE_db": 1.0767166130208599,
+              "trajectory_ratio_MAE_db": 1.0823122317668112,
+              "trajectory_ratio_MSE_db2": 2.1230573626066973,
+              "held_gain_RMS_error_db": 0.27103361539000426,
+              "source_RMS_slope_db_per_s": 13.51670538745535,
+              "native_RMS_slope_db_per_s": 12.970270621091686,
+              "source_median_f0": 177.77281882942762,
+              "native_median_f0": 177.76698221825768,
+              "median_pitch_error_cents": -0.056984190662057406
+            },
+            "odd_H3_H31": {
+              "frame_count": 11,
+              "harmonics": [
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+                25,
+                27,
+                29,
+                31
+              ],
+              "median_harmonic_MAE_db": 1.3928982399892826,
+              "trajectory_ratio_MAE_db": 1.3904160877111402,
+              "trajectory_ratio_MSE_db2": 3.3157745470464217,
+              "held_gain_RMS_error_db": 0.27103361539000426,
+              "source_RMS_slope_db_per_s": 13.51670538745535,
+              "native_RMS_slope_db_per_s": 12.970270621091686,
+              "source_median_f0": 177.77281882942762,
+              "native_median_f0": 177.76698221825768,
+              "median_pitch_error_cents": -0.056984190662057406
+            }
+          },
+          {
+            "name": "late",
+            "all_H2_H32": {
+              "frame_count": 11,
+              "harmonics": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32
+              ],
+              "median_harmonic_MAE_db": 2.297770090737088,
+              "trajectory_ratio_MAE_db": 2.2925889888305413,
+              "trajectory_ratio_MSE_db2": 6.400407516403233,
+              "held_gain_RMS_error_db": 0.06477887314952918,
+              "source_RMS_slope_db_per_s": -3.2187119015207215,
+              "native_RMS_slope_db_per_s": -2.3687084366520503,
+              "source_median_f0": 177.54240106314253,
+              "native_median_f0": 177.76734741190444,
+              "median_pitch_error_cents": 2.1923269748457583
+            },
+            "odd_H3_H31": {
+              "frame_count": 11,
+              "harmonics": [
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+                25,
+                27,
+                29,
+                31
+              ],
+              "median_harmonic_MAE_db": 2.5893564026516245,
+              "trajectory_ratio_MAE_db": 2.576775226355303,
+              "trajectory_ratio_MSE_db2": 8.184356333621597,
+              "held_gain_RMS_error_db": 0.06477887314952918,
+              "source_RMS_slope_db_per_s": -3.2187119015207215,
+              "native_RMS_slope_db_per_s": -2.3687084366520503,
+              "source_median_f0": 177.54240106314253,
+              "native_median_f0": 177.76734741190444,
+              "median_pitch_error_cents": 2.1923269748457583
+            }
+          }
+        ]
+      },
+      "summary_parent": {
+        "early/all_H2_H32/trajectory_ratio_MAE_db": 0.9099920794025661,
+        "early/odd_H3_H31/trajectory_ratio_MAE_db": 1.0699494669321044,
+        "early/held_gain_RMS_error_db": 0.39209266793071806,
+        "prior_train/all_H2_H32/trajectory_ratio_MAE_db": 1.0823122317668112,
+        "prior_train/odd_H3_H31/trajectory_ratio_MAE_db": 1.3904160877111402,
+        "prior_train/held_gain_RMS_error_db": 0.27103361539000426,
+        "late/all_H2_H32/trajectory_ratio_MAE_db": 2.2925889888305413,
+        "late/odd_H3_H31/trajectory_ratio_MAE_db": 2.576775226355303,
+        "late/held_gain_RMS_error_db": 0.06477887314952918
+      },
+      "summary_candidate": {
+        "early/all_H2_H32/trajectory_ratio_MAE_db": 0.9099920794025661,
+        "early/odd_H3_H31/trajectory_ratio_MAE_db": 1.0699494669321044,
+        "early/held_gain_RMS_error_db": 0.39209266793071806,
+        "prior_train/all_H2_H32/trajectory_ratio_MAE_db": 1.0823122317668112,
+        "prior_train/odd_H3_H31/trajectory_ratio_MAE_db": 1.3904160877111402,
+        "prior_train/held_gain_RMS_error_db": 0.27103361539000426,
+        "late/all_H2_H32/trajectory_ratio_MAE_db": 2.2925889888305413,
+        "late/odd_H3_H31/trajectory_ratio_MAE_db": 2.576775226355303,
+        "late/held_gain_RMS_error_db": 0.06477887314952918
+      },
+      "summary_delta_candidate_minus_parent": {
+        "early/all_H2_H32/trajectory_ratio_MAE_db": 0.0,
+        "early/odd_H3_H31/trajectory_ratio_MAE_db": 0.0,
+        "early/held_gain_RMS_error_db": 0.0,
+        "prior_train/all_H2_H32/trajectory_ratio_MAE_db": 0.0,
+        "prior_train/odd_H3_H31/trajectory_ratio_MAE_db": 0.0,
+        "prior_train/held_gain_RMS_error_db": 0.0,
+        "late/all_H2_H32/trajectory_ratio_MAE_db": 0.0,
+        "late/odd_H3_H31/trajectory_ratio_MAE_db": 0.0,
+        "late/held_gain_RMS_error_db": 0.0
+      },
+      "parent_signal": {
+        "finite": true,
+        "peak": 0.1070135161280632,
+        "rms": 0.03610451043832057,
+        "energy": 253.3434617757857,
+        "samples_above_unity": 0
+      },
+      "candidate_signal": {
+        "finite": true,
+        "peak": 0.1070135161280632,
+        "rms": 0.03610451043832057,
+        "energy": 253.3434617757857,
+        "samples_above_unity": 0
+      },
+      "parent_audio_sha256": "9654d20841422ba9f016ea9e63794538a8d5b68b7af8ae31158ab77c0ed9fbe2",
+      "candidate_audio_sha256": "9654d20841422ba9f016ea9e63794538a8d5b68b7af8ae31158ab77c0ed9fbe2"
+    }
+  ],
+  "listening": {
+    "path": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen/listening-hardware-parent-candidate.wav",
+    "sha256": "a9b533a4167688bd869212a6076759ad2242d4a476fed1c1de44dc8af26ba4b8",
+    "sample_rate": 48000,
+    "frames": 2664765,
+    "common_playback_gain": 1.0,
+    "segments": [
+      {
+        "case": "flute-high-factory-physical",
+        "kind": "hardware",
+        "start_frame": 0,
+        "frames": 91200
+      },
+      {
+        "case": "flute-high-factory-physical",
+        "kind": "d5e0_parent",
+        "start_frame": 103200,
+        "frames": 91200
+      },
+      {
+        "case": "flute-high-factory-physical",
+        "kind": "candidate",
+        "start_frame": 206400,
+        "frames": 91200
+      },
+      {
+        "case": "flute-high-effective-compensated",
+        "kind": "hardware",
+        "start_frame": 309600,
+        "frames": 91200
+      },
+      {
+        "case": "flute-high-effective-compensated",
+        "kind": "d5e0_parent",
+        "start_frame": 412800,
+        "frames": 91200
+      },
+      {
+        "case": "flute-high-effective-compensated",
+        "kind": "candidate",
+        "start_frame": 516000,
+        "frames": 91200
+      },
+      {
+        "case": "flute-lower-factory-physical",
+        "kind": "hardware",
+        "start_frame": 619200,
+        "frames": 57600
+      },
+      {
+        "case": "flute-lower-factory-physical",
+        "kind": "d5e0_parent",
+        "start_frame": 688800,
+        "frames": 57600
+      },
+      {
+        "case": "flute-lower-factory-physical",
+        "kind": "candidate",
+        "start_frame": 758400,
+        "frames": 57600
+      },
+      {
+        "case": "flute-lower-effective-compensated",
+        "kind": "hardware",
+        "start_frame": 828000,
+        "frames": 57600
+      },
+      {
+        "case": "flute-lower-effective-compensated",
+        "kind": "d5e0_parent",
+        "start_frame": 897600,
+        "frames": 57600
+      },
+      {
+        "case": "flute-lower-effective-compensated",
+        "kind": "candidate",
+        "start_frame": 967200,
+        "frames": 57600
+      },
+      {
+        "case": "brass-history20",
+        "kind": "hardware",
+        "start_frame": 1036800,
+        "frames": 76800
+      },
+      {
+        "case": "brass-history20",
+        "kind": "d5e0_parent",
+        "start_frame": 1125600,
+        "frames": 76800
+      },
+      {
+        "case": "brass-history20",
+        "kind": "candidate",
+        "start_frame": 1214400,
+        "frames": 76800
+      },
+      {
+        "case": "brass-history10",
+        "kind": "hardware",
+        "start_frame": 1303200,
+        "frames": 76800
+      },
+      {
+        "case": "brass-history10",
+        "kind": "d5e0_parent",
+        "start_frame": 1392000,
+        "frames": 76800
+      },
+      {
+        "case": "brass-history10",
+        "kind": "candidate",
+        "start_frame": 1480800,
+        "frames": 76800
+      },
+      {
+        "case": "dry-sawtooth",
+        "kind": "hardware",
+        "start_frame": 1569600,
+        "frames": 146704
+      },
+      {
+        "case": "dry-sawtooth",
+        "kind": "d5e0_parent",
+        "start_frame": 1728304,
+        "frames": 146704
+      },
+      {
+        "case": "dry-sawtooth",
+        "kind": "candidate",
+        "start_frame": 1887008,
+        "frames": 146704
+      },
+      {
+        "case": "dry-square",
+        "kind": "hardware",
+        "start_frame": 2045712,
+        "frames": 194351
+      },
+      {
+        "case": "dry-square",
+        "kind": "d5e0_parent",
+        "start_frame": 2252063,
+        "frames": 194351
+      },
+      {
+        "case": "dry-square",
+        "kind": "candidate",
+        "start_frame": 2458414,
+        "frames": 194351
+      }
+    ],
+    "individual_normalization": false
+  },
+  "limits": [
+    "All recordings and windows are reused development evidence, no untouched known-settings holdout.",
+    "Audio references are offline analysis/listening only; synthesis uses no sample assets.",
+    "No controls, gain, gate, source eligibility, or masking may be fitted by this battery.",
+    "Neutral global controls and filter_lfo=0 do not verify newly added control paths.",
+    "Public creator audio copyright remains with the creator; local analysis excerpts are not a redistribution license.",
+    "The two raw factory Flute cases are separate from six previously fitted or conditional effective cases.",
+    "Raw factory means unmodified named Flute preset plus declared octave correction; globals, touch, exact gate and voice allocation are unknown.",
+    "All eight cases use inferred MIDI and reused development recordings; none is a known-settings independent hardware holdout.",
+    "All eight cases have ring mix zero. This battery cannot validate the new audible ring-switching path.",
+    "Executable success means protocol/integrity completion, not proof of hardware accuracy or an improvement verdict.",
+    "Listening artifact is local analysis material, not a source-audio redistribution license."
+  ]
+}

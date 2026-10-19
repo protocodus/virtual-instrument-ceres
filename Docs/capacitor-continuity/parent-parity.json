@@ -1,0 +1,139 @@
+{
+  "status": "pass",
+  "created_utc": "2026-10-19T07:32:12.781444+00:00",
+  "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "parent_source_sha256": {
+    "ceres.cpp": "cc2ee3cdcf7dfab7ebc60071627a2557520f6cdbadd2a590796629a9aad8fd10",
+    "ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8"
+  },
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "a41e4266ad826a22da6c3078b1ac181c012a33a70cbd58c2326060ede53f1cc3",
+    "Source/DSP/ceres.cpp": "f3403b7855b97f2043d19b7a5ed2fd27778993da2af33351a90cb55880705188",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "e6ea10b6b159cac1fc5c4909b5b335987912e79cf2920b5ae499e7ff5bff0601"
+  },
+  "compile_commands": [
+    [
+      "c++",
+      "-std=c++17",
+      "-O3",
+      "-DNDEBUG",
+      "-I",
+      "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n",
+      "/private/tmp/ceres-audible-circuits-20261019/Tests/ParityDriver.cpp",
+      "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/ceres.cpp",
+      "-o",
+      "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/parent"
+    ],
+    [
+      "c++",
+      "-std=c++17",
+      "-O3",
+      "-DNDEBUG",
+      "-I",
+      "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n",
+      "/private/tmp/ceres-audible-circuits-20261019/Tests/CapacitorStaticDriver.cpp",
+      "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/ceres.cpp",
+      "-o",
+      "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/parent-factory"
+    ],
+    [
+      "c++",
+      "-std=c++17",
+      "-O3",
+      "-DNDEBUG",
+      "-I",
+      "/private/tmp/ceres-audible-circuits-20261019/Source/DSP",
+      "/private/tmp/ceres-audible-circuits-20261019/Tests/CapacitorStaticDriver.cpp",
+      "/private/tmp/ceres-audible-circuits-20261019/build/libceres.a",
+      "-o",
+      "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/candidate-factory"
+    ]
+  ],
+  "comparisons": [
+    {
+      "scene": "manual-static-q-il",
+      "exact": true,
+      "variants": {
+        "parent": {
+          "command": [
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/parent",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/parent.f32"
+          ],
+          "binary_sha256": "f972638126f523e12dbbfccf87c5d28de57b0e647a1f2f436bf8e713a19943cf",
+          "samples": 384000,
+          "audio_sha256": "678a97a19ce585aebc0a983a254635d2058133081db1091e96ec5bd846a1b490"
+        },
+        "candidate": {
+          "command": [
+            "/private/tmp/ceres-audible-circuits-20261019/build/ceres_native_parity",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/candidate.f32"
+          ],
+          "binary_sha256": "f1d01c1a212eedf6d9e29b7a8daa9452a88e40b070d931e18e91e32aa980250c",
+          "samples": 384000,
+          "audio_sha256": "678a97a19ce585aebc0a983a254635d2058133081db1091e96ec5bd846a1b490"
+        }
+      }
+    },
+    {
+      "scene": "active-global-q-static-anchors",
+      "exact": true,
+      "variants": {
+        "parent": {
+          "command": [
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/parent",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/parent.f32",
+            "soundpath"
+          ],
+          "binary_sha256": "f972638126f523e12dbbfccf87c5d28de57b0e647a1f2f436bf8e713a19943cf",
+          "samples": 384000,
+          "audio_sha256": "4cb0618df780d21980d931c3bf897c677123f75df7158e65da29ec54260abd47"
+        },
+        "candidate": {
+          "command": [
+            "/private/tmp/ceres-audible-circuits-20261019/build/ceres_native_parity",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/candidate.f32",
+            "soundpath"
+          ],
+          "binary_sha256": "f1d01c1a212eedf6d9e29b7a8daa9452a88e40b070d931e18e91e32aa980250c",
+          "samples": 384000,
+          "audio_sha256": "4cb0618df780d21980d931c3bf897c677123f75df7158e65da29ec54260abd47"
+        }
+      }
+    },
+    {
+      "scene": "all-14-factory-and-init",
+      "exact": true,
+      "variants": {
+        "parent": {
+          "command": [
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/parent-factory",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/parent.f32"
+          ],
+          "binary_sha256": "ffc7339ba4bf288483c57e29dbe69710ea28e0069913150b7d80c37cce5d6b5a",
+          "samples": 114688,
+          "audio_sha256": "6dfb70dceb776c34b546b01dbe5bdc784f40e07e6299165c91e1012adb34a6f4"
+        },
+        "candidate": {
+          "command": [
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/candidate-factory",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-capacitor-parent-u_p1m96n/candidate.f32"
+          ],
+          "binary_sha256": "9b03cda35a9cc94102f629e5b7b1a0c8e31fa40b1f3d0ec5eeadc07eee321fbd",
+          "samples": 114688,
+          "audio_sha256": "6dfb70dceb776c34b546b01dbe5bdc784f40e07e6299165c91e1012adb34a6f4"
+        }
+      }
+    }
+  ],
+  "total_samples_per_variant": 882688,
+  "scope": "Same compiler/math library; static Q anchors/IL, including dynamic old global offset. No hardware recording or fitting. Temporary binaries/float streams are deleted; source and commands reproduce the check.",
+  "verified_file_sha256": {
+    "Tests/check_capacitor_parent_parity.py": "f51b17acf51cf0476f8c80f0f5b67f47b38a1703f5b4d4b993ad3ee3e256eb5e",
+    "Tests/ParityDriver.cpp": "8039150294df6e1d1a660897f55b07dc7ebd7f1ac3ffe50f305b41ee55edc0ff",
+    "Tests/CapacitorStaticDriver.cpp": "35f400fa007ac77015e1f83b756ed509e7ac018a6eecb41d85ed651a22dcceb4",
+    "Source/DSP/ceres.cpp": "f3403b7855b97f2043d19b7a5ed2fd27778993da2af33351a90cb55880705188",
+    "Source/DSP/ceres.hpp": "a41e4266ad826a22da6c3078b1ac181c012a33a70cbd58c2326060ede53f1cc3"
+  }
+}

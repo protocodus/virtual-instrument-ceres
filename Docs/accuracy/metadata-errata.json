@@ -1,0 +1,43 @@
+{
+  "scope": "Provenance-only correction. Frozen plan/run bytes and all audio, controls, measurements remain unchanged. These entries supersede plan.cases source_url/creator fields.",
+  "plan_sha256": "3482bca5ed0305c2a384125d05da73d19c17ed3c7f699e8cde262c045151071a",
+  "corrections": [
+    {
+      "case": "dry-sawtooth",
+      "original_incorrect_source_url": "https://www.polynominal.com/yamaha-cs50/",
+      "correct_reference_provenance": {
+        "hardware_model": "Yamaha CS-50",
+        "source_url": "https://web.archive.org/web/20070208025146/http://personal.inet.fi/private/matador/cs-50_index.html",
+        "recording_creator": "ptk / matador site; real-name attribution not independently established",
+        "preset": "sawtooth waveform demonstration; factory preset not specified",
+        "settings_status": "incomplete",
+        "midi_status": "inferred_not_original",
+        "effects_status": "dry_creator_claim",
+        "effects": "Primary creator page says no external effects for Square, Square & PWM and Sawtooth. Recording chain and encoding remain unknown.",
+        "exact_comparison_eligible": false
+      },
+      "reference_sha256": "27319ed76c3b98e6ed394b8395d66b96846e2305a9ffe42c14fda63adf9588c9"
+    },
+    {
+      "case": "dry-square",
+      "original_incorrect_source_url": "https://www.polynominal.com/yamaha-cs50/",
+      "correct_reference_provenance": {
+        "hardware_model": "Yamaha CS-50",
+        "source_url": "https://web.archive.org/web/20070208025146/http://personal.inet.fi/private/matador/cs-50_index.html",
+        "recording_creator": "ptk / matador site; real-name attribution not independently established",
+        "preset": "square waveform demonstration; factory preset not specified",
+        "settings_status": "incomplete",
+        "midi_status": "inferred_not_original",
+        "effects_status": "dry_creator_claim",
+        "effects": "Primary creator page says no external effects for Square, Square & PWM and Sawtooth. Recording chain and encoding remain unknown.",
+        "exact_comparison_eligible": false
+      },
+      "reference_sha256": "2059f16fa8e924c2257a721622790d33b14a8e7c6a3d434bfbf29cb7b1269ee1"
+    }
+  ],
+  "input_sha256": {
+    "Docs/accuracy/inputs/references/ptk_cs50_sawtooth_inferred.json": "a4e44184e25404d4baa2f0dbcd823c8950bd57d4e7470fd3a583264d5b6a8eae",
+    "Docs/accuracy/inputs/references/ptk_cs50_square_inferred.json": "b76c2d90a2222327bd4f80e3bd12c4243fe5a09ccab7cb1452fb1c389b47c968"
+  },
+  "requires_rerender": false
+}

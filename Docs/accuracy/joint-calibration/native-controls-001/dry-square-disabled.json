@@ -1,0 +1,26 @@
+{
+  "id": "dry-square-disabled",
+  "kind": "disabled",
+  "original_id": "dry-square",
+  "audio": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/dry-square-disabled.wav",
+  "audio_sha256": "9654d20841422ba9f016ea9e63794538a8d5b68b7af8ae31158ab77c0ed9fbe2",
+  "statistics": {
+    "sample_rate": 48000,
+    "frames": 194351,
+    "channels": 1,
+    "sample_format": "float32",
+    "seed": 50,
+    "preset": "init",
+    "peak": 0.107013516128,
+    "rms": 0.0361045104383,
+    "samples_above_unity": 0,
+    "render_seconds": 0.728789083,
+    "audio_seconds": 4.04897916667,
+    "realtime_factor": 5.55576264946,
+    "normalization": "none",
+    "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+  },
+  "peak": 0.1070135161280632,
+  "log_sha256": "8d93617c9eb6d656f035568dcca1b38f3853abfd69509e4cf94528fa09464fcd",
+  "byte_exact_to_frozen": true
+}

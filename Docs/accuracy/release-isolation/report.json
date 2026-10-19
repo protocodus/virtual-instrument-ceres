@@ -1,0 +1,2746 @@
+{
+  "status": "pass",
+  "plan_sha256": "77bd6c133475875ccd42184e02344d9d5a57dec540a25443150cf8aad917263d",
+  "cases": [
+    {
+      "id": "brass-history20-filterR-1",
+      "history": 20,
+      "release_factor": 1.0,
+      "audio": "Docs/accuracy/release-isolation/brass-history20-filterR-1.wav",
+      "audio_sha256": "cd4218382d4f09f37b7961e1294a9830aac5831e14c6ac7c8f2585af98e6e73b",
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/identity/ceres_render",
+        "--events",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--96.events.tsv",
+        "--output",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history20-filterR-1.wav",
+        "--preset",
+        "brass1",
+        "--patch",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history20-filterR-1.patch",
+        "--rate",
+        "48000",
+        "--frames",
+        "96800",
+        "--seed",
+        "50"
+      ],
+      "statistics": {
+        "sample_rate": 48000,
+        "frames": 96800,
+        "channels": 1,
+        "sample_format": "float32",
+        "seed": 50,
+        "preset": "brass1",
+        "peak": 0.196948692203,
+        "rms": 0.0190512087539,
+        "samples_above_unity": 0,
+        "render_seconds": 0.338381833,
+        "audio_seconds": 2.01666666667,
+        "realtime_factor": 5.95973681207,
+        "normalization": "none",
+        "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+      },
+      "log": "Docs/accuracy/release-isolation/brass-history20-filterR-1.log",
+      "log_sha256": "347324ad959a0977660c3b009346dabfc9c25aab5fcd9ed9b5f2b7b64afef7ca",
+      "metrics": {
+        "spectral_score": {
+          "six_cell_mean_ratio_MAE_db": 3.5100264177039215,
+          "cells": [
+            {
+              "note": 57,
+              "phase": "early",
+              "partial_frame_count": 48,
+              "ratio_MAE_db": 2.863599718866247,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 57,
+              "phase": "release",
+              "partial_frame_count": 34,
+              "ratio_MAE_db": 4.791598961471699,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "early",
+              "partial_frame_count": 60,
+              "ratio_MAE_db": 2.9378836770635703,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "release",
+              "partial_frame_count": 67,
+              "ratio_MAE_db": 4.348737043904654,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "early",
+              "partial_frame_count": 24,
+              "ratio_MAE_db": 2.4725149779477174,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "release",
+              "partial_frame_count": 10,
+              "ratio_MAE_db": 3.6458241269696443,
+              "native_weak_partial_frames": 3
+            }
+          ],
+          "total_native_weak_partial_frames": 3
+        },
+        "tail_metrics": {
+          "source_seconds": [
+            137.08,
+            137.65
+          ],
+          "sampling_step_ms": 2,
+          "floor_below_early_source_median_db": 40,
+          "source_floor_amplitudes": [
+            0.00038720679557906256,
+            0.00044527650299608937,
+            0.0004267192135901807
+          ],
+          "per_note_floored_RMS_db": [
+            4.017539584796391,
+            4.656124940884954,
+            5.94759682524414
+          ],
+          "A3_C4_joint_floored_RMS_db": 4.3485700972007395,
+          "E4_floored_RMS_db": 5.94759682524414,
+          "per_note_source_above_floor_RMS_db": [
+            5.398771025016134,
+            4.764051673827608,
+            10.186842869817093
+          ],
+          "source_above_floor_sample_counts": [
+            155,
+            217,
+            96
+          ],
+          "per_note_mean_error_db": [
+            -1.4408253256082106,
+            2.402283179116968,
+            -3.0837037490825376
+          ]
+        },
+        "C4_higher_ratios": [
+          {
+            "numerator": 3,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -0.09397203881783765,
+                    "native_ratio_db": -3.418126314055046,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": 0.2895349720817247,
+                    "native_ratio_db": -3.4018938484651007,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": 0.5473225929312419,
+                    "native_ratio_db": -3.395193557289242,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": 0.6507931043270532,
+                    "native_ratio_db": -3.3900547944046804,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": 0.4184287825064833,
+                "native_median_db": -3.3985437028771717,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -10.151374141577698,
+                    "native_ratio_db": -3.576229461008449,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -11.070086745633297,
+                    "native_ratio_db": -3.6953252073538896,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -11.838056889606477,
+                    "native_ratio_db": -3.865918320487104,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -12.47410846776108,
+                    "native_ratio_db": -4.11940525192109,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -11.454071817619887,
+                "native_median_db": -3.7806217639204966,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -11.87250060012637,
+            "native_change_db": -0.382078061043325,
+            "change_error_db": 11.490422539083045
+          },
+          {
+            "numerator": 4,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -2.5485276401375856,
+                    "native_ratio_db": -5.974403698419467,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": -3.3706161246653044,
+                    "native_ratio_db": -5.998547217077096,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": -4.439924544514013,
+                    "native_ratio_db": -6.024777595709789,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": -5.841251865022614,
+                    "native_ratio_db": -6.047354497155926,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -3.905270334589659,
+                "native_median_db": -6.011662406393443,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -20.543383460101655,
+                    "native_ratio_db": -6.77373953010425,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -21.32532774704614,
+                    "native_ratio_db": -7.142605367885546,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -21.97738993251749,
+                    "native_ratio_db": -7.672161769977517,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -22.465372579208914,
+                    "native_ratio_db": -8.393457458193433,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -21.651358839781814,
+                "native_median_db": -7.4073835689315315,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -17.746088505192155,
+            "native_change_db": -1.3957211625380888,
+            "change_error_db": 16.350367342654067
+          }
+        ],
+        "source_valid_partial_records": 243
+      },
+      "signal": {
+        "finite": true,
+        "peak": 0.19694869220256805,
+        "rms": 0.0190512087538904,
+        "energy": 35.13342012248123,
+        "samples_above_unity": 0
+      },
+      "prefix_samples_identical": true,
+      "baseline_bytes_identical": true,
+      "max_sample_difference": 0.0
+    },
+    {
+      "id": "brass-history20-filterR-0.5",
+      "history": 20,
+      "release_factor": 0.5,
+      "audio": "Docs/accuracy/release-isolation/brass-history20-filterR-0.5.wav",
+      "audio_sha256": "0ffed9b5370fc8e38e420262f0891441f1ccc649645a2d2a0b273b7f6ad860b1",
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/identity/ceres_render",
+        "--events",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--96.events.tsv",
+        "--output",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history20-filterR-0.5.wav",
+        "--preset",
+        "brass1",
+        "--patch",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history20-filterR-0.5.patch",
+        "--rate",
+        "48000",
+        "--frames",
+        "96800",
+        "--seed",
+        "50"
+      ],
+      "statistics": {
+        "sample_rate": 48000,
+        "frames": 96800,
+        "channels": 1,
+        "sample_format": "float32",
+        "seed": 50,
+        "preset": "brass1",
+        "peak": 0.196948692203,
+        "rms": 0.0190515925322,
+        "samples_above_unity": 0,
+        "render_seconds": 0.338870542,
+        "audio_seconds": 2.01666666667,
+        "realtime_factor": 5.9511418572,
+        "normalization": "none",
+        "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+      },
+      "log": "Docs/accuracy/release-isolation/brass-history20-filterR-0.5.log",
+      "log_sha256": "241216315e819b36819fa413c7d4dcbbe3bfcc1a6d29dfa93670e88c16a43539",
+      "metrics": {
+        "spectral_score": {
+          "six_cell_mean_ratio_MAE_db": 3.718461689524929,
+          "cells": [
+            {
+              "note": 57,
+              "phase": "early",
+              "partial_frame_count": 48,
+              "ratio_MAE_db": 2.863271974707811,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 57,
+              "phase": "release",
+              "partial_frame_count": 34,
+              "ratio_MAE_db": 3.9976655995411248,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "early",
+              "partial_frame_count": 60,
+              "ratio_MAE_db": 2.9384844332363644,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "release",
+              "partial_frame_count": 67,
+              "ratio_MAE_db": 4.180923168252677,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "early",
+              "partial_frame_count": 24,
+              "ratio_MAE_db": 2.6537567204112045,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "release",
+              "partial_frame_count": 10,
+              "ratio_MAE_db": 5.676668241000391,
+              "native_weak_partial_frames": 3
+            }
+          ],
+          "total_native_weak_partial_frames": 3
+        },
+        "tail_metrics": {
+          "source_seconds": [
+            137.08,
+            137.65
+          ],
+          "sampling_step_ms": 2,
+          "floor_below_early_source_median_db": 40,
+          "source_floor_amplitudes": [
+            0.00038720679557906256,
+            0.00044527650299608937,
+            0.0004267192135901807
+          ],
+          "per_note_floored_RMS_db": [
+            4.027149545164327,
+            4.673125131284811,
+            5.901174255931237
+          ],
+          "A3_C4_joint_floored_RMS_db": 4.362111412593844,
+          "E4_floored_RMS_db": 5.901174255931237,
+          "per_note_source_above_floor_RMS_db": [
+            5.411592790292075,
+            4.783142016134729,
+            10.11303772911827
+          ],
+          "source_above_floor_sample_counts": [
+            155,
+            217,
+            96
+          ],
+          "per_note_mean_error_db": [
+            -1.4205317838220963,
+            2.4296153489033347,
+            -3.066151037037005
+          ]
+        },
+        "C4_higher_ratios": [
+          {
+            "numerator": 3,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -0.09397203881783765,
+                    "native_ratio_db": -3.4238410608066765,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": 0.2895349720817247,
+                    "native_ratio_db": -3.404632751618663,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": 0.5473225929312419,
+                    "native_ratio_db": -3.395914377051591,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": 0.6507931043270532,
+                    "native_ratio_db": -3.389937755202581,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": 0.4184287825064833,
+                "native_median_db": -3.4002735643351274,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -10.151374141577698,
+                    "native_ratio_db": -3.803766814499991,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -11.070086745633297,
+                    "native_ratio_db": -4.08516293656066,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -11.838056889606477,
+                    "native_ratio_db": -4.46769400472088,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -12.47410846776108,
+                    "native_ratio_db": -5.0102190152912325,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -11.454071817619887,
+                "native_median_db": -4.27642847064077,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -11.87250060012637,
+            "native_change_db": -0.8761549063056426,
+            "change_error_db": 10.996345693820729
+          },
+          {
+            "numerator": 4,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -2.5485276401375856,
+                    "native_ratio_db": -5.9427030892022685,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": -3.3706161246653044,
+                    "native_ratio_db": -5.986138081211012,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": -4.439924544514013,
+                    "native_ratio_db": -6.023036154073271,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": -5.841251865022614,
+                    "native_ratio_db": -6.0481289150186495,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -3.905270334589659,
+                "native_median_db": -6.004587117642141,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -20.543383460101655,
+                    "native_ratio_db": -7.28141040733088,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -21.32532774704614,
+                    "native_ratio_db": -7.9834916592447875,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -21.97738993251749,
+                    "native_ratio_db": -8.924663266253924,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -22.465372579208914,
+                    "native_ratio_db": -10.197686772143443,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -21.651358839781814,
+                "native_median_db": -8.454077462749357,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -17.746088505192155,
+            "native_change_db": -2.4494903451072156,
+            "change_error_db": 15.29659816008494
+          }
+        ],
+        "source_valid_partial_records": 243
+      },
+      "signal": {
+        "finite": true,
+        "peak": 0.19694869220256805,
+        "rms": 0.019051592532165786,
+        "energy": 35.13483563153015,
+        "samples_above_unity": 0
+      },
+      "prefix_samples_identical": true,
+      "baseline_bytes_identical": false,
+      "max_sample_difference": 0.012857704423367977
+    },
+    {
+      "id": "brass-history20-filterR-0.25",
+      "history": 20,
+      "release_factor": 0.25,
+      "audio": "Docs/accuracy/release-isolation/brass-history20-filterR-0.25.wav",
+      "audio_sha256": "51d171497a142150ee67dc6a6794bef5764a12b5c53e9a699bfb2f70b9c5fc45",
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/identity/ceres_render",
+        "--events",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--96.events.tsv",
+        "--output",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history20-filterR-0.25.wav",
+        "--preset",
+        "brass1",
+        "--patch",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history20-filterR-0.25.patch",
+        "--rate",
+        "48000",
+        "--frames",
+        "96800",
+        "--seed",
+        "50"
+      ],
+      "statistics": {
+        "sample_rate": 48000,
+        "frames": 96800,
+        "channels": 1,
+        "sample_format": "float32",
+        "seed": 50,
+        "preset": "brass1",
+        "peak": 0.196948692203,
+        "rms": 0.0190483839758,
+        "samples_above_unity": 0,
+        "render_seconds": 0.339157916,
+        "audio_seconds": 2.01666666667,
+        "realtime_factor": 5.94609935823,
+        "normalization": "none",
+        "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+      },
+      "log": "Docs/accuracy/release-isolation/brass-history20-filterR-0.25.log",
+      "log_sha256": "e4fa60f4634d48d06eafa6f30c6286ff53153bab7313a98f9cdb0cbeaa9ce7b5",
+      "metrics": {
+        "spectral_score": {
+          "six_cell_mean_ratio_MAE_db": 3.817532428302801,
+          "cells": [
+            {
+              "note": 57,
+              "phase": "early",
+              "partial_frame_count": 48,
+              "ratio_MAE_db": 2.862739723891472,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 57,
+              "phase": "release",
+              "partial_frame_count": 34,
+              "ratio_MAE_db": 3.202480940636993,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "early",
+              "partial_frame_count": 60,
+              "ratio_MAE_db": 2.940227104634695,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "release",
+              "partial_frame_count": 67,
+              "ratio_MAE_db": 3.9882152107814255,
+              "native_weak_partial_frames": 1
+            },
+            {
+              "note": 64,
+              "phase": "early",
+              "partial_frame_count": 24,
+              "ratio_MAE_db": 2.927623261478304,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "release",
+              "partial_frame_count": 10,
+              "ratio_MAE_db": 6.983908328393918,
+              "native_weak_partial_frames": 3
+            }
+          ],
+          "total_native_weak_partial_frames": 4
+        },
+        "tail_metrics": {
+          "source_seconds": [
+            137.08,
+            137.65
+          ],
+          "sampling_step_ms": 2,
+          "floor_below_early_source_median_db": 40,
+          "source_floor_amplitudes": [
+            0.00038720679557906256,
+            0.00044527650299608937,
+            0.0004267192135901807
+          ],
+          "per_note_floored_RMS_db": [
+            4.104462450420591,
+            4.686914696335769,
+            5.881780305432638
+          ],
+          "A3_C4_joint_floored_RMS_db": 4.405325264815348,
+          "E4_floored_RMS_db": 5.881780305432638,
+          "per_note_source_above_floor_RMS_db": [
+            5.518009966475468,
+            4.800770752075608,
+            10.088050371985686
+          ],
+          "source_above_floor_sample_counts": [
+            155,
+            217,
+            96
+          ],
+          "per_note_mean_error_db": [
+            -1.426521268724729,
+            2.4443167996342092,
+            -3.0680367999795934
+          ]
+        },
+        "C4_higher_ratios": [
+          {
+            "numerator": 3,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -0.09397203881783765,
+                    "native_ratio_db": -3.4354636899563844,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": 0.2895349720817247,
+                    "native_ratio_db": -3.4098034680782154,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": 0.5473225929312419,
+                    "native_ratio_db": -3.3971474174234455,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": 0.6507931043270532,
+                    "native_ratio_db": -3.3897885292938135,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": 0.4184287825064833,
+                "native_median_db": -3.4034754427508305,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -10.151374141577698,
+                    "native_ratio_db": -4.2085868113265565,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -11.070086745633297,
+                    "native_ratio_db": -4.710927069674863,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -11.838056889606477,
+                    "native_ratio_db": -5.351744836698192,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -12.47410846776108,
+                    "native_ratio_db": -6.147378260571202,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -11.454071817619887,
+                "native_median_db": -5.031335953186527,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -11.87250060012637,
+            "native_change_db": -1.627860510435697,
+            "change_error_db": 10.244640089690673
+          },
+          {
+            "numerator": 4,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -2.5485276401375856,
+                    "native_ratio_db": -5.821272521487931,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": -3.3706161246653044,
+                    "native_ratio_db": -5.915741063338976,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": -4.439924544514013,
+                    "native_ratio_db": -5.996450133166152,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": -5.841251865022614,
+                    "native_ratio_db": -6.045089813711853,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -3.905270334589659,
+                "native_median_db": -5.956095598252564,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -20.543383460101655,
+                    "native_ratio_db": -7.9531457173860245,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -21.32532774704614,
+                    "native_ratio_db": -9.022701991004036,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -21.97738993251749,
+                    "native_ratio_db": -10.422204450029088,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -22.465372579208914,
+                    "native_ratio_db": -12.144667659957015,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -21.651358839781814,
+                "native_median_db": -9.722453220516563,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -17.746088505192155,
+            "native_change_db": -3.7663576222639987,
+            "change_error_db": 13.979730882928155
+          }
+        ],
+        "source_valid_partial_records": 243
+      },
+      "signal": {
+        "finite": true,
+        "peak": 0.19694869220256805,
+        "rms": 0.019048383975839914,
+        "energy": 35.12300222641217,
+        "samples_above_unity": 0
+      },
+      "prefix_samples_identical": true,
+      "baseline_bytes_identical": false,
+      "max_sample_difference": 0.027586564421653748
+    },
+    {
+      "id": "brass-history20-filterR-0.1",
+      "history": 20,
+      "release_factor": 0.1,
+      "audio": "Docs/accuracy/release-isolation/brass-history20-filterR-0.1.wav",
+      "audio_sha256": "0bcfb97b4bb61f3a029e6a6c7e588133e9d1e791e8b9e9a74ccf15c5a10ecbc6",
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/identity/ceres_render",
+        "--events",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--96.events.tsv",
+        "--output",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history20-filterR-0.1.wav",
+        "--preset",
+        "brass1",
+        "--patch",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history20-filterR-0.1.patch",
+        "--rate",
+        "48000",
+        "--frames",
+        "96800",
+        "--seed",
+        "50"
+      ],
+      "statistics": {
+        "sample_rate": 48000,
+        "frames": 96800,
+        "channels": 1,
+        "sample_format": "float32",
+        "seed": 50,
+        "preset": "brass1",
+        "peak": 0.196948692203,
+        "rms": 0.0190361562224,
+        "samples_above_unity": 0,
+        "render_seconds": 0.33703,
+        "audio_seconds": 2.01666666667,
+        "realtime_factor": 5.98364141669,
+        "normalization": "none",
+        "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+      },
+      "log": "Docs/accuracy/release-isolation/brass-history20-filterR-0.1.log",
+      "log_sha256": "a3851ee3eeed1d8a78433d7f88e2cc3ecc1ee9bd0a89987cbbdf51114d8bc0a3",
+      "metrics": {
+        "spectral_score": {
+          "six_cell_mean_ratio_MAE_db": 4.015465905540964,
+          "cells": [
+            {
+              "note": 57,
+              "phase": "early",
+              "partial_frame_count": 48,
+              "ratio_MAE_db": 2.8631559109772415,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 57,
+              "phase": "release",
+              "partial_frame_count": 34,
+              "ratio_MAE_db": 3.047057978277838,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "early",
+              "partial_frame_count": 60,
+              "ratio_MAE_db": 2.95147024333093,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "release",
+              "partial_frame_count": 67,
+              "ratio_MAE_db": 3.9297366889840553,
+              "native_weak_partial_frames": 1
+            },
+            {
+              "note": 64,
+              "phase": "early",
+              "partial_frame_count": 24,
+              "ratio_MAE_db": 3.320146447675752,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "release",
+              "partial_frame_count": 10,
+              "ratio_MAE_db": 7.981228163999964,
+              "native_weak_partial_frames": 4
+            }
+          ],
+          "total_native_weak_partial_frames": 5
+        },
+        "tail_metrics": {
+          "source_seconds": [
+            137.08,
+            137.65
+          ],
+          "sampling_step_ms": 2,
+          "floor_below_early_source_median_db": 40,
+          "source_floor_amplitudes": [
+            0.00038720679557906256,
+            0.00044527650299608937,
+            0.0004267192135901807
+          ],
+          "per_note_floored_RMS_db": [
+            4.451636811153172,
+            4.697469301787053,
+            5.870227188711771
+          ],
+          "A3_C4_joint_floored_RMS_db": 4.576204111468682,
+          "E4_floored_RMS_db": 5.870227188711771,
+          "per_note_source_above_floor_RMS_db": [
+            5.996085394677919,
+            4.814332403215974,
+            10.067852076492223
+          ],
+          "source_above_floor_sample_counts": [
+            155,
+            217,
+            96
+          ],
+          "per_note_mean_error_db": [
+            -1.5074552961123966,
+            2.454082514003983,
+            -3.060182673887991
+          ]
+        },
+        "C4_higher_ratios": [
+          {
+            "numerator": 3,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -0.09397203881783765,
+                    "native_ratio_db": -3.5398135166002627,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": 0.2895349720817247,
+                    "native_ratio_db": -3.4655043496220577,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": 0.5473225929312419,
+                    "native_ratio_db": -3.419363098243686,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": 0.6507931043270532,
+                    "native_ratio_db": -3.3962034546176363,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": 0.4184287825064833,
+                "native_median_db": -3.4424337239328717,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -10.151374141577698,
+                    "native_ratio_db": -4.821045543284458,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -11.070086745633297,
+                    "native_ratio_db": -5.561592477784582,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -11.838056889606477,
+                    "native_ratio_db": -6.408875867352258,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -12.47410846776108,
+                    "native_ratio_db": -7.120865351168078,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -11.454071817619887,
+                "native_median_db": -5.98523417256842,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -11.87250060012637,
+            "native_change_db": -2.5428004486355484,
+            "change_error_db": 9.329700151490822
+          },
+          {
+            "numerator": 4,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -2.5485276401375856,
+                    "native_ratio_db": -5.710407992439407,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": -3.3706161246653044,
+                    "native_ratio_db": -5.839455104501443,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": -4.439924544514013,
+                    "native_ratio_db": -5.960269809965569,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": -5.841251865022614,
+                    "native_ratio_db": -6.03112707204065,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -3.905270334589659,
+                "native_median_db": -5.899862457233506,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -20.543383460101655,
+                    "native_ratio_db": -8.776587176124984,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -21.32532774704614,
+                    "native_ratio_db": -10.212687134409038,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -21.97738993251749,
+                    "native_ratio_db": -12.03868020700222,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -22.465372579208914,
+                    "native_ratio_db": -13.744660074268287,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -21.651358839781814,
+                "native_median_db": -11.125683670705628,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -17.746088505192155,
+            "native_change_db": -5.2258212134721225,
+            "change_error_db": 12.520267291720032
+          }
+        ],
+        "source_valid_partial_records": 243
+      },
+      "signal": {
+        "finite": true,
+        "peak": 0.19694869220256805,
+        "rms": 0.019036156222388117,
+        "energy": 35.07792359240245,
+        "samples_above_unity": 0
+      },
+      "prefix_samples_identical": true,
+      "baseline_bytes_identical": false,
+      "max_sample_difference": 0.047808537259697914
+    },
+    {
+      "id": "brass-history10-filterR-1",
+      "history": 10,
+      "release_factor": 1.0,
+      "audio": "Docs/accuracy/release-isolation/brass-history10-filterR-1.wav",
+      "audio_sha256": "5bb646f7ccfad9feda3bd6d27a4ba26a2222f3fe5c1a05f1570af75f776669f0",
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/identity/ceres_render",
+        "--events",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--48.events.tsv",
+        "--output",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history10-filterR-1.wav",
+        "--preset",
+        "brass1",
+        "--patch",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history10-filterR-1.patch",
+        "--rate",
+        "48000",
+        "--frames",
+        "96800",
+        "--seed",
+        "50"
+      ],
+      "statistics": {
+        "sample_rate": 48000,
+        "frames": 96800,
+        "channels": 1,
+        "sample_format": "float32",
+        "seed": 50,
+        "preset": "brass1",
+        "peak": 0.196948692203,
+        "rms": 0.0204251122518,
+        "samples_above_unity": 0,
+        "render_seconds": 0.338739041,
+        "audio_seconds": 2.01666666667,
+        "realtime_factor": 5.95345213446,
+        "normalization": "none",
+        "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+      },
+      "log": "Docs/accuracy/release-isolation/brass-history10-filterR-1.log",
+      "log_sha256": "cdd3b03b67d00102894742b65bc8ef45b714e7383a84500ddb8bf22ced3782b1",
+      "metrics": {
+        "spectral_score": {
+          "six_cell_mean_ratio_MAE_db": 3.5144553820337543,
+          "cells": [
+            {
+              "note": 57,
+              "phase": "early",
+              "partial_frame_count": 48,
+              "ratio_MAE_db": 2.8651627812962084,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 57,
+              "phase": "release",
+              "partial_frame_count": 34,
+              "ratio_MAE_db": 5.780463564809201,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "early",
+              "partial_frame_count": 60,
+              "ratio_MAE_db": 2.937334463805627,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "release",
+              "partial_frame_count": 67,
+              "ratio_MAE_db": 4.514576297857409,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "early",
+              "partial_frame_count": 24,
+              "ratio_MAE_db": 2.2877388928063573,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "release",
+              "partial_frame_count": 10,
+              "ratio_MAE_db": 2.7014562916277236,
+              "native_weak_partial_frames": 0
+            }
+          ],
+          "total_native_weak_partial_frames": 0
+        },
+        "tail_metrics": {
+          "source_seconds": [
+            137.08,
+            137.65
+          ],
+          "sampling_step_ms": 2,
+          "floor_below_early_source_median_db": 40,
+          "source_floor_amplitudes": [
+            0.00038720679557906256,
+            0.00044527650299608937,
+            0.0004267192135901807
+          ],
+          "per_note_floored_RMS_db": [
+            3.8453170871598026,
+            6.6556538508087835,
+            3.135497765399057
+          ],
+          "A3_C4_joint_floored_RMS_db": 5.435264100418164,
+          "E4_floored_RMS_db": 3.135497765399057,
+          "per_note_source_above_floor_RMS_db": [
+            5.152239082944192,
+            7.294076417082022,
+            5.411951496198049
+          ],
+          "source_above_floor_sample_counts": [
+            155,
+            217,
+            96
+          ],
+          "per_note_mean_error_db": [
+            0.7454776612562517,
+            4.602286351499255,
+            -1.2171401323257083
+          ]
+        },
+        "C4_higher_ratios": [
+          {
+            "numerator": 3,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -0.09397203881783765,
+                    "native_ratio_db": -3.3876429305843314,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": 0.2895349720817247,
+                    "native_ratio_db": -3.3892610519217303,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": 0.5473225929312419,
+                    "native_ratio_db": -3.39170614886922,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": 0.6507931043270532,
+                    "native_ratio_db": -3.394312504597503,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": 0.4184287825064833,
+                "native_median_db": -3.3904836003954752,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -10.151374141577698,
+                    "native_ratio_db": -3.436506655337122,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -11.070086745633297,
+                    "native_ratio_db": -3.4430206709403732,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -11.838056889606477,
+                    "native_ratio_db": -3.448449839242977,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -12.47410846776108,
+                    "native_ratio_db": -3.457715704646655,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -11.454071817619887,
+                "native_median_db": -3.445735255091675,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -11.87250060012637,
+            "native_change_db": -0.05525165469619964,
+            "change_error_db": 11.81724894543017
+          },
+          {
+            "numerator": 4,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -2.5485276401375856,
+                    "native_ratio_db": -5.99386101308263,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": -3.3706161246653044,
+                    "native_ratio_db": -6.010495905779361,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": -4.439924544514013,
+                    "native_ratio_db": -6.030977028230325,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": -5.841251865022614,
+                    "native_ratio_db": -6.048765233290597,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -3.905270334589659,
+                "native_median_db": -6.020736467004843,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -20.543383460101655,
+                    "native_ratio_db": -6.3123198834593195,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -21.32532774704614,
+                    "native_ratio_db": -6.339771667532535,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -21.97738993251749,
+                    "native_ratio_db": -6.367100098193289,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -22.465372579208914,
+                    "native_ratio_db": -6.395830822168996,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -21.651358839781814,
+                "native_median_db": -6.353435882862912,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -17.746088505192155,
+            "native_change_db": -0.3326994158580687,
+            "change_error_db": 17.413389089334085
+          }
+        ],
+        "source_valid_partial_records": 243
+      },
+      "signal": {
+        "finite": true,
+        "peak": 0.19694869220256805,
+        "rms": 0.020425112251776185,
+        "energy": 40.38352837617326,
+        "samples_above_unity": 0
+      },
+      "prefix_samples_identical": true,
+      "baseline_bytes_identical": true,
+      "max_sample_difference": 0.0
+    },
+    {
+      "id": "brass-history10-filterR-0.5",
+      "history": 10,
+      "release_factor": 0.5,
+      "audio": "Docs/accuracy/release-isolation/brass-history10-filterR-0.5.wav",
+      "audio_sha256": "e9180b7006d73b2ecc4c83c4910eeac074d63d54015dae21f8380e53cff84bcb",
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/identity/ceres_render",
+        "--events",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--48.events.tsv",
+        "--output",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history10-filterR-0.5.wav",
+        "--preset",
+        "brass1",
+        "--patch",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history10-filterR-0.5.patch",
+        "--rate",
+        "48000",
+        "--frames",
+        "96800",
+        "--seed",
+        "50"
+      ],
+      "statistics": {
+        "sample_rate": 48000,
+        "frames": 96800,
+        "channels": 1,
+        "sample_format": "float32",
+        "seed": 50,
+        "preset": "brass1",
+        "peak": 0.196948692203,
+        "rms": 0.0204186223317,
+        "samples_above_unity": 0,
+        "render_seconds": 0.338705292,
+        "audio_seconds": 2.01666666667,
+        "realtime_factor": 5.95404534355,
+        "normalization": "none",
+        "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+      },
+      "log": "Docs/accuracy/release-isolation/brass-history10-filterR-0.5.log",
+      "log_sha256": "3a65073c9b32649329247b37e7c873d5939e7fc9c3ec393e3bebf604d110a115",
+      "metrics": {
+        "spectral_score": {
+          "six_cell_mean_ratio_MAE_db": 3.4798339858606284,
+          "cells": [
+            {
+              "note": 57,
+              "phase": "early",
+              "partial_frame_count": 48,
+              "ratio_MAE_db": 2.8651625034233086,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 57,
+              "phase": "release",
+              "partial_frame_count": 34,
+              "ratio_MAE_db": 5.792522505215504,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "early",
+              "partial_frame_count": 60,
+              "ratio_MAE_db": 2.937337421640917,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "release",
+              "partial_frame_count": 67,
+              "ratio_MAE_db": 4.506202854613791,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "early",
+              "partial_frame_count": 24,
+              "ratio_MAE_db": 2.2883721869747964,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "release",
+              "partial_frame_count": 10,
+              "ratio_MAE_db": 2.48940644329545,
+              "native_weak_partial_frames": 0
+            }
+          ],
+          "total_native_weak_partial_frames": 0
+        },
+        "tail_metrics": {
+          "source_seconds": [
+            137.08,
+            137.65
+          ],
+          "sampling_step_ms": 2,
+          "floor_below_early_source_median_db": 40,
+          "source_floor_amplitudes": [
+            0.00038720679557906256,
+            0.00044527650299608937,
+            0.0004267192135901807
+          ],
+          "per_note_floored_RMS_db": [
+            3.836971608195935,
+            6.666828293772867,
+            3.109755123652903
+          ],
+          "A3_C4_joint_floored_RMS_db": 5.439161269017134,
+          "E4_floored_RMS_db": 3.109755123652903,
+          "per_note_source_above_floor_RMS_db": [
+            5.139672159876159,
+            7.305763892744618,
+            5.3675190204196905
+          ],
+          "source_above_floor_sample_counts": [
+            155,
+            217,
+            96
+          ],
+          "per_note_mean_error_db": [
+            0.7613594769244401,
+            4.614518420101229,
+            -1.2013174829853757
+          ]
+        },
+        "C4_higher_ratios": [
+          {
+            "numerator": 3,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -0.09397203881783765,
+                    "native_ratio_db": -3.3870766217999004,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": 0.2895349720817247,
+                    "native_ratio_db": -3.389099492158053,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": 0.5473225929312419,
+                    "native_ratio_db": -3.391727079921068,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": 0.6507931043270532,
+                    "native_ratio_db": -3.3942663878872086,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": 0.4184287825064833,
+                "native_median_db": -3.3904132860395606,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -10.151374141577698,
+                    "native_ratio_db": -3.4365062008474503,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -11.070086745633297,
+                    "native_ratio_db": -3.4430197117468126,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -11.838056889606477,
+                    "native_ratio_db": -3.448437158097932,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -12.47410846776108,
+                    "native_ratio_db": -3.4619164025492792,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -11.454071817619887,
+                "native_median_db": -3.4457284349223722,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -11.87250060012637,
+            "native_change_db": -0.05531514888281164,
+            "change_error_db": 11.817185451243558
+          },
+          {
+            "numerator": 4,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -2.5485276401375856,
+                    "native_ratio_db": -5.991397515504628,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": -3.3706161246653044,
+                    "native_ratio_db": -6.010817224045417,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": -4.439924544514013,
+                    "native_ratio_db": -6.031279386021735,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": -5.841251865022614,
+                    "native_ratio_db": -6.048600325756941,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -3.905270334589659,
+                "native_median_db": -6.021048305033576,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -20.543383460101655,
+                    "native_ratio_db": -6.312342281618263,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -21.32532774704614,
+                    "native_ratio_db": -6.339754794796335,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -21.97738993251749,
+                    "native_ratio_db": -6.36705727741277,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -22.465372579208914,
+                    "native_ratio_db": -6.399995981840121,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -21.651358839781814,
+                "native_median_db": -6.353406036104552,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -17.746088505192155,
+            "native_change_db": -0.3323577310709762,
+            "change_error_db": 17.413730774121177
+          }
+        ],
+        "source_valid_partial_records": 243
+      },
+      "signal": {
+        "finite": true,
+        "peak": 0.19694869220256805,
+        "rms": 0.020418622331707544,
+        "energy": 40.3578693511309,
+        "samples_above_unity": 0
+      },
+      "prefix_samples_identical": true,
+      "baseline_bytes_identical": false,
+      "max_sample_difference": 0.007059233263134956
+    },
+    {
+      "id": "brass-history10-filterR-0.25",
+      "history": 10,
+      "release_factor": 0.25,
+      "audio": "Docs/accuracy/release-isolation/brass-history10-filterR-0.25.wav",
+      "audio_sha256": "d5d7e29a4e22df1a68902b35d9beadf07b776a5f9edeed441a25938925f7a8ec",
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/identity/ceres_render",
+        "--events",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--48.events.tsv",
+        "--output",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history10-filterR-0.25.wav",
+        "--preset",
+        "brass1",
+        "--patch",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history10-filterR-0.25.patch",
+        "--rate",
+        "48000",
+        "--frames",
+        "96800",
+        "--seed",
+        "50"
+      ],
+      "statistics": {
+        "sample_rate": 48000,
+        "frames": 96800,
+        "channels": 1,
+        "sample_format": "float32",
+        "seed": 50,
+        "preset": "brass1",
+        "peak": 0.196948692203,
+        "rms": 0.0204139265136,
+        "samples_above_unity": 0,
+        "render_seconds": 0.339022,
+        "audio_seconds": 2.01666666667,
+        "realtime_factor": 5.94848318595,
+        "normalization": "none",
+        "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+      },
+      "log": "Docs/accuracy/release-isolation/brass-history10-filterR-0.25.log",
+      "log_sha256": "692faf9c09ca157456a9c32c8e65d85d5562cbfd84d424e7340e1bcb341a3507",
+      "metrics": {
+        "spectral_score": {
+          "six_cell_mean_ratio_MAE_db": 3.4675802691393667,
+          "cells": [
+            {
+              "note": 57,
+              "phase": "early",
+              "partial_frame_count": 48,
+              "ratio_MAE_db": 2.8651626138750523,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 57,
+              "phase": "release",
+              "partial_frame_count": 34,
+              "ratio_MAE_db": 5.802824799646981,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "early",
+              "partial_frame_count": 60,
+              "ratio_MAE_db": 2.9373423701691497,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "release",
+              "partial_frame_count": 67,
+              "ratio_MAE_db": 4.499027254093997,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "early",
+              "partial_frame_count": 24,
+              "ratio_MAE_db": 2.2888023887327176,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "release",
+              "partial_frame_count": 10,
+              "ratio_MAE_db": 2.412322188318302,
+              "native_weak_partial_frames": 0
+            }
+          ],
+          "total_native_weak_partial_frames": 0
+        },
+        "tail_metrics": {
+          "source_seconds": [
+            137.08,
+            137.65
+          ],
+          "sampling_step_ms": 2,
+          "floor_below_early_source_median_db": 40,
+          "source_floor_amplitudes": [
+            0.00038720679557906256,
+            0.00044527650299608937,
+            0.0004267192135901807
+          ],
+          "per_note_floored_RMS_db": [
+            3.8405553035872297,
+            6.671425303179997,
+            3.1019412978018583
+          ],
+          "A3_C4_joint_floored_RMS_db": 5.443242628058311,
+          "E4_floored_RMS_db": 3.1019412978018583,
+          "per_note_source_above_floor_RMS_db": [
+            5.141535182052694,
+            7.311107599863989,
+            5.35403215177247
+          ],
+          "source_above_floor_sample_counts": [
+            155,
+            217,
+            96
+          ],
+          "per_note_mean_error_db": [
+            0.7717281396760912,
+            4.619706632878714,
+            -1.193023303749414
+          ]
+        },
+        "C4_higher_ratios": [
+          {
+            "numerator": 3,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -0.09397203881783765,
+                    "native_ratio_db": -3.390055749578319,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": 0.2895349720817247,
+                    "native_ratio_db": -3.3887882683164827,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": 0.5473225929312419,
+                    "native_ratio_db": -3.3917607756707895,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": 0.6507931043270532,
+                    "native_ratio_db": -3.3899977355720767,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": 0.4184287825064833,
+                "native_median_db": -3.3900267425751975,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -10.151374141577698,
+                    "native_ratio_db": -3.436522335067298,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -11.070086745633297,
+                    "native_ratio_db": -3.443017110182944,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -11.838056889606477,
+                    "native_ratio_db": -3.4484102570286232,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -12.47410846776108,
+                    "native_ratio_db": -3.461850716573553,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -11.454071817619887,
+                "native_median_db": -3.4457136836057836,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -11.87250060012637,
+            "native_change_db": -0.055686941030586024,
+            "change_error_db": 11.816813659095784
+          },
+          {
+            "numerator": 4,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -2.5485276401375856,
+                    "native_ratio_db": -5.98978874610986,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": -3.3706161246653044,
+                    "native_ratio_db": -6.010529625843346,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": -4.439924544514013,
+                    "native_ratio_db": -6.03161110962625,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": -5.841251865022614,
+                    "native_ratio_db": -6.05152420133225,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -3.905270334589659,
+                "native_median_db": -6.021070367734798,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -20.543383460101655,
+                    "native_ratio_db": -6.312437265111517,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -21.32532774704614,
+                    "native_ratio_db": -6.339740509611276,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -21.97738993251749,
+                    "native_ratio_db": -6.367000308743838,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -22.465372579208914,
+                    "native_ratio_db": -6.396361755395152,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -21.651358839781814,
+                "native_median_db": -6.353370409177557,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -17.746088505192155,
+            "native_change_db": -0.3323000414427586,
+            "change_error_db": 17.4137884637494
+          }
+        ],
+        "source_valid_partial_records": 243
+      },
+      "signal": {
+        "finite": true,
+        "peak": 0.19694869220256805,
+        "rms": 0.020413926513550847,
+        "energy": 40.33930870382332,
+        "samples_above_unity": 0
+      },
+      "prefix_samples_identical": true,
+      "baseline_bytes_identical": false,
+      "max_sample_difference": 0.013116542715579271
+    },
+    {
+      "id": "brass-history10-filterR-0.1",
+      "history": 10,
+      "release_factor": 0.1,
+      "audio": "Docs/accuracy/release-isolation/brass-history10-filterR-0.1.wav",
+      "audio_sha256": "1f26aba1e41a3337aaca672096b51d18a79f0a1f380f6beca1cd473287b7daeb",
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/identity/ceres_render",
+        "--events",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--48.events.tsv",
+        "--output",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history10-filterR-0.1.wav",
+        "--preset",
+        "brass1",
+        "--patch",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/release-isolation/brass-history10-filterR-0.1.patch",
+        "--rate",
+        "48000",
+        "--frames",
+        "96800",
+        "--seed",
+        "50"
+      ],
+      "statistics": {
+        "sample_rate": 48000,
+        "frames": 96800,
+        "channels": 1,
+        "sample_format": "float32",
+        "seed": 50,
+        "preset": "brass1",
+        "peak": 0.196948692203,
+        "rms": 0.020411006995,
+        "samples_above_unity": 0,
+        "render_seconds": 0.336965625,
+        "audio_seconds": 2.01666666667,
+        "realtime_factor": 5.98478455085,
+        "normalization": "none",
+        "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+      },
+      "log": "Docs/accuracy/release-isolation/brass-history10-filterR-0.1.log",
+      "log_sha256": "2f02567ad1f09d4defe14f6ecf13ec3baadc706369f2f1c77e91e57ef7ea4702",
+      "metrics": {
+        "spectral_score": {
+          "six_cell_mean_ratio_MAE_db": 3.489557425859008,
+          "cells": [
+            {
+              "note": 57,
+              "phase": "early",
+              "partial_frame_count": 48,
+              "ratio_MAE_db": 2.8651600371925654,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 57,
+              "phase": "release",
+              "partial_frame_count": 34,
+              "ratio_MAE_db": 5.8058288072634925,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "early",
+              "partial_frame_count": 60,
+              "ratio_MAE_db": 2.937272829740944,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 60,
+              "phase": "release",
+              "partial_frame_count": 67,
+              "ratio_MAE_db": 4.49282155379652,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "early",
+              "partial_frame_count": 24,
+              "ratio_MAE_db": 2.288845599175668,
+              "native_weak_partial_frames": 0
+            },
+            {
+              "note": 64,
+              "phase": "release",
+              "partial_frame_count": 10,
+              "ratio_MAE_db": 2.5474157279848564,
+              "native_weak_partial_frames": 0
+            }
+          ],
+          "total_native_weak_partial_frames": 0
+        },
+        "tail_metrics": {
+          "source_seconds": [
+            137.08,
+            137.65
+          ],
+          "sampling_step_ms": 2,
+          "floor_below_early_source_median_db": 40,
+          "source_floor_amplitudes": [
+            0.00038720679557906256,
+            0.00044527650299608937,
+            0.0004267192135901807
+          ],
+          "per_note_floored_RMS_db": [
+            3.8511459436847018,
+            6.674351092494204,
+            3.09973780634175
+          ],
+          "A3_C4_joint_floored_RMS_db": 5.448774522103006,
+          "E4_floored_RMS_db": 3.09973780634175,
+          "per_note_source_above_floor_RMS_db": [
+            5.147858259992668,
+            7.314976500614142,
+            5.350228867638133
+          ],
+          "source_above_floor_sample_counts": [
+            155,
+            217,
+            96
+          ],
+          "per_note_mean_error_db": [
+            0.7905072080200374,
+            4.621043126418571,
+            -1.1881111439636947
+          ]
+        },
+        "C4_higher_ratios": [
+          {
+            "numerator": 3,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -0.09397203881783765,
+                    "native_ratio_db": -3.3810986432596764,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": 0.2895349720817247,
+                    "native_ratio_db": -3.3864442891172337,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": 0.5473225929312419,
+                    "native_ratio_db": -3.391609227679775,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": 0.6507931043270532,
+                    "native_ratio_db": -3.389668024880536,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": 0.4184287825064833,
+                "native_median_db": -3.3880561569988847,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -10.151374141577698,
+                    "native_ratio_db": -3.436487694489177,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -11.070086745633297,
+                    "native_ratio_db": -3.4430220253405914,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -11.838056889606477,
+                    "native_ratio_db": -3.44837246020792,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -12.47410846776108,
+                    "native_ratio_db": -3.456980125790883,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -11.454071817619887,
+                "native_median_db": -3.445697242774256,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -11.87250060012637,
+            "native_change_db": -0.05764108577537108,
+            "change_error_db": 11.814859514351
+          },
+          {
+            "numerator": 4,
+            "denominator": 2,
+            "windows": [
+              {
+                "window": "upper_lobe_1",
+                "records": [
+                  {
+                    "source_seconds": 137.16000000000003,
+                    "source_ratio_db": -2.5485276401375856,
+                    "native_ratio_db": -5.969179565697521,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.18,
+                    "source_ratio_db": -3.3706161246653044,
+                    "native_ratio_db": -6.008116222152802,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.20000000000002,
+                    "source_ratio_db": -4.439924544514013,
+                    "native_ratio_db": -6.031854069864645,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.22000000000003,
+                    "source_ratio_db": -5.841251865022614,
+                    "native_ratio_db": -6.051093711268995,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -3.905270334589659,
+                "native_median_db": -6.0199851460087235,
+                "native_weak_frames": 0
+              },
+              {
+                "window": "upper_lobe_2",
+                "records": [
+                  {
+                    "source_seconds": 137.32000000000002,
+                    "source_ratio_db": -20.543383460101655,
+                    "native_ratio_db": -6.312435024966775,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.34,
+                    "source_ratio_db": -21.32532774704614,
+                    "native_ratio_db": -6.339747058353239,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.36,
+                    "source_ratio_db": -21.97738993251749,
+                    "native_ratio_db": -6.36694531763772,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  },
+                  {
+                    "source_seconds": 137.38000000000002,
+                    "source_ratio_db": -22.465372579208914,
+                    "native_ratio_db": -6.396618384196105,
+                    "native_weak_Hh_H2": [
+                      false,
+                      false
+                    ]
+                  }
+                ],
+                "source_median_db": -21.651358839781814,
+                "native_median_db": -6.353346187995479,
+                "native_weak_frames": 0
+              }
+            ],
+            "source_change_db": -17.746088505192155,
+            "native_change_db": -0.3333610419867554,
+            "change_error_db": 17.4127274632054
+          }
+        ],
+        "source_valid_partial_records": 243
+      },
+      "signal": {
+        "finite": true,
+        "peak": 0.19694869220256805,
+        "rms": 0.0204110069950033,
+        "energy": 40.32777119404714,
+        "samples_above_unity": 0
+      },
+      "prefix_samples_identical": true,
+      "baseline_bytes_identical": false,
+      "max_sample_difference": 0.01821712590754032
+    }
+  ],
+  "transfer": [
+    {
+      "factor": 0.5,
+      "histories": [
+        {
+          "history": 20,
+          "six_cell_improves": false,
+          "every_release_cell_not_worse": false,
+          "every_tail_not_worse": false,
+          "weak_count_not_worse": true
+        },
+        {
+          "history": 10,
+          "six_cell_improves": true,
+          "every_release_cell_not_worse": false,
+          "every_tail_not_worse": false,
+          "weak_count_not_worse": true
+        }
+      ],
+      "passes": false
+    },
+    {
+      "factor": 0.25,
+      "histories": [
+        {
+          "history": 20,
+          "six_cell_improves": false,
+          "every_release_cell_not_worse": false,
+          "every_tail_not_worse": false,
+          "weak_count_not_worse": false
+        },
+        {
+          "history": 10,
+          "six_cell_improves": true,
+          "every_release_cell_not_worse": false,
+          "every_tail_not_worse": false,
+          "weak_count_not_worse": true
+        }
+      ],
+      "passes": false
+    },
+    {
+      "factor": 0.1,
+      "histories": [
+        {
+          "history": 20,
+          "six_cell_improves": false,
+          "every_release_cell_not_worse": false,
+          "every_tail_not_worse": false,
+          "weak_count_not_worse": false
+        },
+        {
+          "history": 10,
+          "six_cell_improves": true,
+          "every_release_cell_not_worse": false,
+          "every_tail_not_worse": false,
+          "weak_count_not_worse": true
+        }
+      ],
+      "passes": false
+    }
+  ],
+  "render_count": 8,
+  "parameter_fits": 0,
+  "gain_fits": 0,
+  "gate_changes": 0,
+  "DSP_changes": false,
+  "strict_eligible": false
+}

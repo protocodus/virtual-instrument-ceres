@@ -1,0 +1,67 @@
+{
+  "wav_sha256": "8cab183b7a7182b8541c4ab55a3a4ad377f426972b8561995ae3b86207610a27",
+  "gain": 1,
+  "fades": false,
+  "segments": [
+    {
+      "scene": "lp_q_step",
+      "variant": "parent",
+      "source_seconds": [
+        0.75,
+        3.75
+      ],
+      "start_seconds": 0.0,
+      "end_seconds": 3.0
+    },
+    {
+      "scene": "lp_q_step",
+      "variant": "capacitors",
+      "source_seconds": [
+        0.75,
+        3.75
+      ],
+      "start_seconds": 3.25,
+      "end_seconds": 6.25
+    },
+    {
+      "scene": "hp_q_step",
+      "variant": "parent",
+      "source_seconds": [
+        0.75,
+        3.75
+      ],
+      "start_seconds": 6.5,
+      "end_seconds": 9.5
+    },
+    {
+      "scene": "hp_q_step",
+      "variant": "capacitors",
+      "source_seconds": [
+        0.75,
+        3.75
+      ],
+      "start_seconds": 9.75,
+      "end_seconds": 12.75
+    },
+    {
+      "scene": "idle_il",
+      "variant": "parent",
+      "source_seconds": [
+        0.5,
+        1.2
+      ],
+      "start_seconds": 13.0,
+      "end_seconds": 13.7
+    },
+    {
+      "scene": "idle_il",
+      "variant": "capacitors",
+      "source_seconds": [
+        0.5,
+        1.2
+      ],
+      "start_seconds": 13.95,
+      "end_seconds": 14.65
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+Test project /private/tmp/ceres-sub-polarity-20261018/build
+    Start 1: native_dsp_contracts
+1/7 Test #1: native_dsp_contracts .............   Passed    8.72 sec
+    Start 2: sound_path_circuit_contracts
+2/7 Test #2: sound_path_circuit_contracts .....   Passed    3.05 sec
+    Start 3: voice_expression_contracts
+3/7 Test #3: voice_expression_contracts .......   Passed    1.33 sec
+    Start 4: embedded_allocation_contract
+4/7 Test #4: embedded_allocation_contract .....   Passed    1.29 sec
+    Start 5: native_embedded_audio_parity
+5/7 Test #5: native_embedded_audio_parity .....   Passed    4.21 sec
+    Start 6: active_sound_path_audio_parity
+6/7 Test #6: active_sound_path_audio_parity ...   Passed    2.69 sec
+    Start 7: expression_audio_parity
+7/7 Test #7: expression_audio_parity ..........   Passed    2.68 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =  23.96 sec

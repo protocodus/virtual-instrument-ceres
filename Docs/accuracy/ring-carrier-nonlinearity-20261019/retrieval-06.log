@@ -1,0 +1,2 @@
+GET https://www.datasheetarchive.com/pdf/download/distributors/Datasheets-110/DSAP007706.pdf?h=8ac8d2193e7849db24e3f0a3064cdead%3Ac197c656d556d1c32c56965455b06fb9995b494ef6f3eeb3166ef003ff08967c688fda70e9efe20e02f4e2%3Aef0ead4d721e2a0f9a490c02a4c23ce9
+URLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:992)'))

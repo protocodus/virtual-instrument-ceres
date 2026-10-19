@@ -1,0 +1,16 @@
+{
+  "schema": "ceres-source-ratio-implementation-v1",
+  "plan_sha256": "2fcfa6f47c40cfe035ee40b078791faef3bbaf65ddffb88fd1c4a8f2e90b9d6a",
+  "script_sha256": "ad142afd0aea3883657b4746b642ae04b9dc3655f9487d489478f0e56f17b202",
+  "python": "3.11.0 (v3.11.0:deaf509e8f, Oct 24 2022, 14:43:23) [Clang 13.0.0 (clang-1300.0.29.30)]",
+  "numpy": "1.26.4",
+  "scipy": "1.14.1",
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "command": [
+    "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/brass_ratio_modulation.py",
+    "run"
+  ],
+  "native_render_calls": 0,
+  "frozen_before_estimates": true
+}

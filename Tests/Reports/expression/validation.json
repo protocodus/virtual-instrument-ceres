@@ -1,0 +1,149 @@
+{
+  "status": "pass",
+  "recorded_utc": "2026-10-18T14:36:03.199508+00:00",
+  "scope": "Optional modern per-voice velocity expression; no hardware model/calibration change at default source0.",
+  "parameter_keys": 57,
+  "new_native_groups": 5,
+  "native_groups": 36,
+  "allocation_witness": {
+    "blocks": 576,
+    "frames_per_block": 64,
+    "post_construction_new_calls": 0
+  },
+  "parity_stream": {
+    "samples": 384000,
+    "rates": [
+      44100,
+      48000,
+      96000,
+      192000
+    ],
+    "scenes_per_rate": 8
+  },
+  "legacy_baseline_commit": "b22dda696090a754f0018f2646bf92b259de406f",
+  "builds": {
+    "release": {
+      "compiled_source_sha256": {
+        "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+        "Source/DSP/ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+        "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+        "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+        "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d"
+      },
+      "binary_sha256": {
+        "ceres_render": "ffbd063332bc132c515152fe8e514746456660e43879b0f183fe50786d0cca1d",
+        "ceres_tests": "ac324da791a4069a413ceefe9ebf8fd8c261420040dad575be90f69c9014626d",
+        "ceres_sound_path_tests": "641a493feb030cb549122bcbfb0e4c30f265e13138ab21c5ce8aee53e19e1553",
+        "ceres_expression_tests": "17ede619f178d8f12208044eada9ca38072d95fc29f0b73e63b5eefb585f8c14",
+        "ceres_embedded_contract": "f7e415500dfdf00ccc647e5675fa2946998525cf27d32c954032792dc8e9f54b",
+        "ceres_native_parity": "43057a594496298edb43ff85d209a6f934ba81a8524bd266a008621508a91010",
+        "ceres_embedded_parity": "a823023ed621f1b3f51aa53930e3bcc946144d86cde48758f60ca5db49aee4fd",
+        "libceres.a": "267fca2e4f76b20c55d0b1569ffdc1bfe0f2820cdf1ea4a3746db66f75f891ac",
+        "libceres_embedded.a": "f7065cddd69ecc42cac00ffa9cb091763e0723e29c3c2645438febfbb5f152e7"
+      },
+      "ctest_count": 7,
+      "native_groups": 36,
+      "sanitizers": [],
+      "asan_detect_leaks": null
+    },
+    "sanitizer": {
+      "compiled_source_sha256": {
+        "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+        "Source/DSP/ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+        "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+        "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+        "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d"
+      },
+      "binary_sha256": {
+        "ceres_render": "b1befc1232f6829eda1cee3a2492911e609174eff8836fbcbd7323cf11d1ab53",
+        "ceres_tests": "833283f37e8c2b30445026d6c07fc655c359385db40281647661a58f4f6be7f5",
+        "ceres_sound_path_tests": "9b7c2df5525e4374eee81d677bde997f4fab94c7f23b9f0070d004c887dbe611",
+        "ceres_expression_tests": "d6e03f6efdd0269110f7806062bb1252e765b4936426a4a0e364c240632c6a9a",
+        "ceres_embedded_contract": "92f4756ddf82ab5e8bd06b9ae352f34acf1502470f4c4d9f7c515db90a219abb",
+        "ceres_native_parity": "847b0128a47daf9ee02428f8f46b2b67d8196362390d520a6fd7772ffd1d0f33",
+        "ceres_embedded_parity": "46c513cbb03a7dfc155a9ae1ed0bc5c3c1d7dc21de2b588267ad952050e7c50f",
+        "libceres.a": "4da48bfc1abdabafed4e964b07485e5423c20e46d2107ac25eb8583e757b847b",
+        "libceres_embedded.a": "231ead3aab4ceb168701b82cbd8f2db643da67fdbb652a9c501df26abfc17cf9"
+      },
+      "ctest_count": 7,
+      "native_groups": 36,
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "asan_detect_leaks": false
+    }
+  },
+  "default_performance": {
+    "workload": "engineering Init",
+    "rate": 48000,
+    "block_size": 64,
+    "voices": 4,
+    "oversampling": 4,
+    "measured_blocks": 10000,
+    "warmup_blocks": 500,
+    "deadline_ms": 1.33333333,
+    "wall_median_ms": 0.264999981,
+    "wall_p99_ms": 0.342999992,
+    "wall_max_ms": 2.44499999,
+    "wall_deadline_misses": 4,
+    "cpu_median_ms": 0.264458,
+    "cpu_p99_ms": 0.287417,
+    "cpu_max_ms": 0.505541,
+    "cpu_deadline_misses": 0,
+    "checksum": -2.14726522885438,
+    "scope": "native DSP only; no Rack host or target CPU evidence",
+    "compile_command": [
+      "c++",
+      "-std=c++17",
+      "-O3",
+      "-DNDEBUG",
+      "-DCERES_EMBEDDED_TARGET=1",
+      "-I",
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Source/DSP",
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/native_performance.cpp",
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build/libceres_embedded.a",
+      "-o",
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build/ceres_expression_performance"
+    ],
+    "binary_sha256": "82319a8c3b5a25e70a3c9716d8c919ef79471a69052fc51014f1c2296ddc59b7",
+    "embedded_library_sha256": "f7065cddd69ecc42cac00ffa9cb091763e0723e29c3c2645438febfbb5f152e7",
+    "compiled_source_sha256": {
+      "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+      "Source/DSP/ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+      "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+      "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+      "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d"
+    },
+    "performance_source_sha256": "d4becb82fdaeb40a66eb33b701bb50d107995170e77e17a06de54b84c9d50075",
+    "measurement_script_sha256": "6815085ea61318f877b3060b2505c9b15eb8740cc0ae70123bde6d4400f551e6"
+  },
+  "verified_file_sha256": {
+    "Source/DSP/ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+    "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+    "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d",
+    "Tests/dsp_tests.cpp": "8d52b31c96f330641ec453db34d0ed492ca67515e26745341270982c21ecc439",
+    "Tests/SoundPathTests.cpp": "c874f29f59fb39c3e5235083c40796e267c6efbfed0993e1c65196374d07454a",
+    "Tests/ExpressionTests.cpp": "e243d0295ad8326d9ceb167f805e403a579cdfd606ce4d5e62e5a130ee918484",
+    "Tests/EmbeddedContract.cpp": "3b47b2bc38a68320de4c5eea57540836bed57b275a610ac44123efd67827ac77",
+    "Tests/ParityDriver.cpp": "ab9016cc0eadb561ff7b8e97fa7fc10bc83e261704f44fccabeae5d79d6775ea",
+    "Tests/check_expression_parity.py": "b8dbe80e262ec2000fe73c7a1f7abd362813c4dab66ce633c53d2bb375400212",
+    "Tests/check_expression_legacy.py": "d6048b12bc3c937c5dc76383a28f49243d22804e1c463d23c05baf7979320f84",
+    "Tests/record_expression_validation.py": "d3f1a4fb6aeac098abd6ac82f4a7ac116b57a97cbff0a83f7fe9e4fe5c04ea36",
+    "Tests/check_expression_performance.py": "6815085ea61318f877b3060b2505c9b15eb8740cc0ae70123bde6d4400f551e6",
+    "Tests/check_sound_path_parity.py": "cc848fd7a10173ba1a0d4b7b2a87417d002b15170d77e684ad0abc2c57f5ddf8",
+    "Tools/check_embedded.py": "4fccbbcd4b79e10ee02f72b866b0789abd8fd9f3199e15c3f92c18c24d3a8da5",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "README.md": "4143ad5e908444eb254dd97460d9ca9b7000f164dcf85588d60f7afb3d0786f3",
+    "Docs/DSP_SOURCE.md": "4729705d718bfa3032c9d878f0f8962bac6902321ef139ad0e6757f22cec4b74",
+    "Tests/Reports/expression/release.log": "b2a7aa74067c46c6537ed0472bc996becb0d42d6bc8e118bfe52556b2d1ba0f6",
+    "Tests/Reports/expression/release-details.log": "1fc700dea3ad82b8bb74dd5d61e3052e25f239015ed2b98be3886513ef1dc033",
+    "Tests/Reports/expression/sanitizer.log": "65e8235bc98de96fcf5785960c61bfe4552f5725add11353a20ac3c6faa2938d",
+    "Tests/Reports/expression/sanitizer-details.log": "9f07f4abee9fc52ae8e21c63fcb839e65e811fff08d1ea29a212ceacb2297560",
+    "Tests/Reports/expression/legacy-parity.json": "277e06d4b4df71851f9ea6191bf023fc5f3b744a7219c0283c7ed72d88364844",
+    "Tests/Reports/expression/performance-default.json": "180632a0d77349687897fee3f22f56b49be7fcd2eb636f2389699468ae13f518",
+    "Tools/native_performance.cpp": "d4becb82fdaeb40a66eb33b701bb50d107995170e77e17a06de54b84c9d50075"
+  },
+  "limits": "Native timing is not SDK/Reason host timing. Allocation interposition covers new/new[], not every platform allocator. No hardware fidelity claim is made for velocity routing."
+}

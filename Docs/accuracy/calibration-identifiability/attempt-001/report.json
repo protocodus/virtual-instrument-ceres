@@ -1,0 +1,712 @@
+{
+  "DSP_changes": false,
+  "analytic_J_octaves_per_parameter": [
+    [
+      0.07878680374813093,
+      0.0,
+      0.04113134607439189,
+      0.0,
+      0.1864621022039099,
+      0.0,
+      0.41632868425576086,
+      0.0
+    ],
+    [
+      0.07878680374813093,
+      0.0,
+      0.04113134607439189,
+      0.0,
+      0.1864621022039099,
+      0.0,
+      0.0832395653187763,
+      -0.33308911893698456
+    ],
+    [
+      0.07878680374813093,
+      0.0,
+      0.04113134607439189,
+      0.0,
+      0.1864621022039099,
+      0.0,
+      0.45637565847910044,
+      0.04004697422333958
+    ],
+    [
+      0.0,
+      0.07255030683485571,
+      0.11706981330169897,
+      0.0,
+      0.5479863601356122,
+      0.0,
+      2.183248028748431,
+      0.0
+    ],
+    [
+      0.0,
+      0.07255030683485571,
+      0.11706981330169897,
+      0.0,
+      0.5479863601356122,
+      0.0,
+      0.7475237651931272,
+      -1.4357242635553038
+    ],
+    [
+      0.0,
+      0.07255030683485571,
+      0.11706981330169897,
+      0.0,
+      0.5479863601356122,
+      0.0,
+      2.355863732191149,
+      0.17261570344271782
+    ],
+    [
+      0.07891415384570583,
+      0.0,
+      0.0,
+      0.0411978303165082,
+      0.0,
+      0.1867634974348372,
+      0.0,
+      0.0
+    ],
+    [
+      0.07891415384570583,
+      0.0,
+      0.0,
+      0.0411978303165082,
+      0.0,
+      0.1867634974348372,
+      -0.12033511709721897,
+      -0.12033511709721897
+    ],
+    [
+      0.07891415384570583,
+      0.0,
+      0.0,
+      0.0411978303165082,
+      0.0,
+      0.1867634974348372,
+      0.22729966562808027,
+      0.22729966562808027
+    ],
+    [
+      0.0,
+      0.07246942942065186,
+      0.0,
+      0.11693930656514277,
+      0.0,
+      0.5473754775389663,
+      2.4613789921294167,
+      0.0
+    ],
+    [
+      0.0,
+      0.07246942942065186,
+      0.0,
+      0.11693930656514277,
+      0.0,
+      0.5473754775389663,
+      1.9441091658550946,
+      -0.517269826274322
+    ],
+    [
+      0.0,
+      0.07246942942065186,
+      0.0,
+      0.11693930656514277,
+      0.0,
+      0.5473754775389663,
+      3.4384442195364713,
+      0.9770652274070546
+    ]
+  ],
+  "attempt": "attempt-001",
+  "audio_renders": 0,
+  "checks": {
+    "all_three_symbolic_null_directions_independent": true,
+    "analytic_vs_central_difference_max_abs_error": 8.150824459818296e-11,
+    "analytic_vs_original_network_max_node_error_V": 0.0,
+    "exponential_column_relative_residual_after_nuisance_projection": 3.823456688550888e-15,
+    "finite_difference_step": 1e-05,
+    "minimum_reference_manual_diode_off_margin_V": 0.595615417133843
+  },
+  "columns": [
+    "shared_HP_bias_V",
+    "shared_LP_bias_V",
+    "Flute_BR_V",
+    "Brass_BR_V",
+    "Flute_touch_source_V",
+    "Brass_touch_source_V",
+    "common_fractional_exponential_scale",
+    "common_fractional_EG_amplitude"
+  ],
+  "decision": "The declared shared cutoff calibration is structurally non-identifiable when these nuisance controls and EG amplitude are unknown.",
+  "declaration_sha256": "7e632997dde7f3714fe7c4700ad2471093233b60d3cf7ac0caef20d8544ed02b",
+  "finite_difference_J": [
+    [
+      0.07878680374218128,
+      0.0,
+      0.04113134607630631,
+      0.0,
+      0.18646210219741552,
+      0.0,
+      0.4163286842578939,
+      0.0
+    ],
+    [
+      0.07878680374842628,
+      0.0,
+      0.0411313460770002,
+      0.0,
+      0.1864621022050483,
+      0.0,
+      0.08323956531899879,
+      -0.3330891189368135
+    ],
+    [
+      0.07878680374773239,
+      0.0,
+      0.04113134607353075,
+      0.0,
+      0.18646210220851775,
+      0.0,
+      0.45637565847800315,
+      0.04004697422010928
+    ],
+    [
+      0.0,
+      0.07255030685104913,
+      0.11706981328796216,
+      0.0,
+      0.5479863601332013,
+      0.0,
+      2.1832480287420353,
+      0.0
+    ],
+    [
+      0.0,
+      0.0725503068399469,
+      0.11706981330461551,
+      0.0,
+      0.5479863601443036,
+      0.0,
+      0.7475237651932697,
+      -1.4357242635598675
+    ],
+    [
+      0.0,
+      0.07255030685104913,
+      0.11706981331016662,
+      0.0,
+      0.5479863601776103,
+      0.0,
+      2.355863732206309,
+      0.17261570346427388
+    ],
+    [
+      0.07891415384570584,
+      0.0,
+      0.0,
+      0.0411978303165082,
+      0.0,
+      0.1867634974348372,
+      0.0,
+      0.0
+    ],
+    [
+      0.07891415384417289,
+      0.0,
+      0.0,
+      0.04119783031802937,
+      0.0,
+      0.18676349743257378,
+      -0.12033511709794163,
+      -0.12033511709655385
+    ],
+    [
+      0.07891415384764233,
+      0.0,
+      0.0,
+      0.041197830315253814,
+      0.0,
+      0.1867634974381249,
+      0.22729966562828882,
+      0.22729966562690104
+    ],
+    [
+      0.0,
+      0.07246942943517354,
+      0.0,
+      0.11693930652700855,
+      0.0,
+      0.547375477544243,
+      2.461378992135721,
+      0.0
+    ],
+    [
+      0.0,
+      0.07246942941296908,
+      0.0,
+      0.11693930653811078,
+      0.0,
+      0.5473754775775497,
+      1.9441091658634055,
+      -0.5172698263056219
+    ],
+    [
+      0.0,
+      0.07246942939076462,
+      0.0,
+      0.1169393066158264,
+      0.0,
+      0.5473754775220385,
+      3.438444219550085,
+      0.9770652273255463
+    ]
+  ],
+  "independent_null_directions": [
+    {
+      "coefficients_in_column_order": [
+        -0.5220588235294118,
+        -1.6136363636363635,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_abs_residual_octaves": 1.3877787807814457e-17,
+      "name": "BR_and_bias",
+      "relative_residual": 1.957478263964998e-18
+    },
+    {
+      "coefficients_in_column_order": [
+        -2.3666666666666667,
+        -7.553191489361702,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "max_abs_residual_octaves": 1.1102230246251565e-16,
+      "name": "touch_and_bias",
+      "relative_residual": 6.2323875825185616e-18
+    },
+    {
+      "coefficients_in_column_order": [
+        0.0,
+        0.0,
+        251.92486345836747,
+        646.8318653356789,
+        -57.80444015437999,
+        -142.68349970639974,
+        1.0,
+        -1.0
+      ],
+      "max_abs_residual_octaves": 1.7763568394002505e-15,
+      "name": "exponential_and_EG_scale",
+      "relative_residual": 1.2304605377191682e-18
+    }
+  ],
+  "input_bindings": {
+    "inherited_source_files_sha256": {
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/network.py": "b03cdb48f68c73cc70312cb2c8061d69a1d81fea1f6e0330464f8e052f631297",
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Source/DSP/ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+      "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case10-LPx1-Qfactory.patch": "fbc0735460f73b6ca83fb4e22b4365a89e5e3ebf9b84e1f43d01e45f68470ac8",
+      "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case20-LPx1-Qfactory.patch": "19a8f7ea6bb45f3d007c8be05529a72fa646b37bf2941abe69e1a42c33edfab1",
+      "/tmp/ceres-cs50-1x8LGd/research/brilliance-shared-bus-check.md": "90baf174c023382eeffb2a1bfd621964b303746a3d089925983abbdae0cb20e4",
+      "/tmp/ceres-cs50-1x8LGd/research/cs-servicing-guide.pdf": "2738f7ddc46f0bedbab38dcad8e2c112c41b3e6ca34670d471d0cb8c0dbde633",
+      "/tmp/ceres-cs50-1x8LGd/research/cutoff-m-eg-continuity.png": "13e8257f359e31faa35182a1c8b26aec0ac6ca9c4e0520b933548a581ae4a5cb",
+      "/tmp/ceres-cs50-1x8LGd/research/cutoff-scale-t71-detail.png": "6cd8a59494e1dcafafe051899ed9089b7b3293252f31836c9d37fff06f9d5fd1",
+      "/tmp/ceres-cs50-1x8LGd/research/cutoff-voltage-scale.md": "aff170f4e18a7c00793f00c2321f216dd93a3c50a0ab8ba354104a1324e3cf1f",
+      "/tmp/ceres-cs50-1x8LGd/research/lp-bus-coupling-source.md": "b5f12526171f981b75d2f90911a3f4317b39555e3d3b9d79ccb8b0adb221e21c",
+      "/tmp/ceres-cs50-1x8LGd/research/pitch-modulation-global-controls.png": "c9cbb89014b0b6b27ae653c45d3b8feb40b08bc957d277ec348578cae5bcfcfb",
+      "/tmp/ceres-cs50-1x8LGd/research/presets-72.png": "5f7402c4c580f658468034e0fcd6f28392bcbacc24f9fe8203025f8c45c38363",
+      "/tmp/ceres-cs50-1x8LGd/research/q-m-rank-table.png": "7299af97b5a07bec425a1a6ddb3d33b95b8ad775181452e7fe6e8c464a76118c",
+      "/tmp/ceres-cs50-1x8LGd/research/service1-08.png": "07c59b3a2dd9d1d7f5bff25a0635491da2dace85f2791cfaaa8465858b586668",
+      "/tmp/ceres-cs50-1x8LGd/research/service1.pdf": "c3a4b0d4e27e9af90c88258d03a1c09c5d080ea162e562d9bf267fc8ffbbadc1",
+      "/tmp/ceres-cs50-1x8LGd/research/service2.pdf": "1102e55b949378e7776555bca1a4d73105ca2d76d6fcf3aa4c2b103566201cfc",
+      "/tmp/ceres-cs50-1x8LGd/tools/benchmark_whitmore_brilliance_endpoint.py": "258addcc274eb370a1fae2e112aefbc5dce22e33cba04eda25885f8dddd66923"
+    },
+    "repository_files_sha256": {
+      "Docs/accuracy/preset-dc-loading/network.py": "b03cdb48f68c73cc70312cb2c8061d69a1d81fea1f6e0330464f8e052f631297",
+      "Docs/accuracy/preset-dc-loading/source-evidence.json": "3e4965c2a3cf6b0e0252d48439578b38f58e11274138f143d5fb9b40f70a98c3",
+      "Docs/accuracy/preset-dc-loading/source-review.md": "e5bc4a83b6527760312b731ed606855cb51348c756635f8d6fa80e1526194de8",
+      "Source/DSP/ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+      "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+      "Tools/accuracy/calibration_identifiability.py": "1ecf547f6351da86b5f401ecc27cc243dbf208ef787ebf5a88da5e6d209414b8"
+    },
+    "source_evidence_sha256": "3e4965c2a3cf6b0e0252d48439578b38f58e11274138f143d5fb9b40f70a98c3"
+  },
+  "limits": [
+    "A local algebraic audit of a declared linear fixed-impedance control model, not a hardware parameter measurement or an audio fidelity result.",
+    "BR, touch and bias are independent voltage coordinates here; large gauge vectors are not feasible operating-point recommendations.",
+    "The actual BR/touch controls, voice trims, chip input current, diode law and real trim impedances are not identified by these assumptions.",
+    "No claim of global non-identifiability for every nonlinear hardware model; nonlinear loading, known voltages or other measurements can break these model identities.",
+    "The common exponential scale and EG-amplitude columns are hypotheses; their variation is not established component tolerance.",
+    "Zero/IL/AL are optimistic known control states, not estimates from the public recordings; no temporal sampling or independent holdout is asserted.",
+    "Fixing nuisance values can produce a conditional fit, but does not identify their actual hardware values or justify a production mapping change.",
+    "No gains, Q, MIDI, gates, phase, source masks or recording scores are optimized."
+  ],
+  "model": {
+    "EG_amplitude": "One fractional multiplier on all four known E values, including both initial and peak; held zero stays zero.",
+    "baseline_bias_BR_touch_V": 0.0,
+    "bias_branch_ohms": 355000.0,
+    "bias_reference": "355k fixed Thevenin branch; real trim resistance is not varied.",
+    "chip_incremental_input_current": 0.0,
+    "diode_drop_V": 0.6,
+    "exponential_reference": "Existing .7/.65 actual-bus slopes converted by the retained network, both multiplied by one common factor.",
+    "output_coordinate": "log2 variable-gm shift for voice 1; not audio amplitude, total cutoff Hz, or a measured chip voltage law.",
+    "parameter_units": [
+      "V",
+      "V",
+      "V",
+      "V",
+      "V",
+      "V",
+      "fraction",
+      "fraction"
+    ],
+    "rank": "B",
+    "row_construction": "Two presets x two stages x zero/initial/peak; all four voices use the same known E in each row.",
+    "touch_reference": "One of the existing Rmod source branches per stage; other modulation branches stay at zero."
+  },
+  "numpy_version": "1.26.4",
+  "original_plans_modified": false,
+  "recording_parameter_fits": 0,
+  "recordings_read": 0,
+  "rows": [
+    {
+      "EG_V": 0.0,
+      "EG_state": "zero",
+      "all_four_voices_equal_EG": true,
+      "preset": "flute",
+      "reference_bus_V": 0.5947552632225153,
+      "reference_log2_variable_gm_shift": 0.41632868425576086,
+      "reference_pin4_V": [
+        0.02995982908339502,
+        0.029959829083395017,
+        0.029959829083395013,
+        0.029959829083395017
+      ],
+      "stage": "HP"
+    },
+    {
+      "EG_V": -2.62,
+      "EG_state": "initial",
+      "all_four_voices_equal_EG": true,
+      "preset": "flute",
+      "reference_bus_V": 0.5833682101956547,
+      "reference_log2_variable_gm_shift": 0.0832395653187763,
+      "reference_pin4_V": [
+        0.005990082461852677,
+        0.005990082461852677,
+        0.005990082461852676,
+        0.005990082461852677
+      ],
+      "stage": "HP"
+    },
+    {
+      "EG_V": 0.315,
+      "EG_state": "peak",
+      "all_four_voices_equal_EG": true,
+      "preset": "flute",
+      "reference_bus_V": 0.5961243173078059,
+      "reference_log2_variable_gm_shift": 0.45637565847910044,
+      "reference_pin4_V": [
+        0.03284168793293159,
+        0.032841687932931594,
+        0.032841687932931594,
+        0.032841687932931594
+      ],
+      "stage": "HP"
+    },
+    {
+      "EG_V": 0.0,
+      "EG_state": "zero",
+      "all_four_voices_equal_EG": true,
+      "preset": "flute",
+      "reference_bus_V": 3.3588431211514336,
+      "reference_log2_variable_gm_shift": 2.183248028748431,
+      "reference_pin4_V": [
+        0.1610470797934688,
+        0.1610470797934688,
+        0.16104707979346883,
+        0.16104707979346883
+      ],
+      "stage": "LP"
+    },
+    {
+      "EG_V": -2.62,
+      "EG_state": "initial",
+      "all_four_voices_equal_EG": true,
+      "preset": "flute",
+      "reference_bus_V": 3.3240791150270694,
+      "reference_log2_variable_gm_shift": 0.7475237651931272,
+      "reference_pin4_V": [
+        0.055141018278891826,
+        0.05514101827889181,
+        0.05514101827889181,
+        0.05514101827889182
+      ],
+      "stage": "LP"
+    },
+    {
+      "EG_V": 0.315,
+      "EG_state": "peak",
+      "all_four_voices_equal_EG": true,
+      "preset": "flute",
+      "reference_bus_V": 3.3630227631091336,
+      "reference_log2_variable_gm_shift": 2.355863732191149,
+      "reference_pin4_V": [
+        0.17378006047174807,
+        0.17378006047174807,
+        0.1737800604717481,
+        0.17378006047174813
+      ],
+      "stage": "LP"
+    },
+    {
+      "EG_V": 0.0,
+      "EG_state": "zero",
+      "all_four_voices_equal_EG": true,
+      "preset": "brass1",
+      "reference_bus_V": 0.0,
+      "reference_log2_variable_gm_shift": 0.0,
+      "reference_pin4_V": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "stage": "HP"
+    },
+    {
+      "EG_V": -0.945,
+      "EG_state": "initial",
+      "all_four_voices_equal_EG": true,
+      "preset": "brass1",
+      "reference_bus_V": -0.004384582866156938,
+      "reference_log2_variable_gm_shift": -0.12033511709721897,
+      "reference_pin4_V": [
+        -0.008659551160659956,
+        -0.008659551160659952,
+        -0.008659551160659956,
+        -0.008659551160659956
+      ],
+      "stage": "HP"
+    },
+    {
+      "EG_V": 1.785,
+      "EG_state": "peak",
+      "all_four_voices_equal_EG": true,
+      "preset": "brass1",
+      "reference_bus_V": 0.00828198985829644,
+      "reference_log2_variable_gm_shift": 0.22729966562808027,
+      "reference_pin4_V": [
+        0.01635692997013547,
+        0.016356929970135468,
+        0.01635692997013547,
+        0.016356929970135468
+      ],
+      "stage": "HP"
+    },
+    {
+      "EG_V": 0.0,
+      "EG_state": "zero",
+      "all_four_voices_equal_EG": true,
+      "preset": "brass1",
+      "reference_bus_V": 3.786736910968333,
+      "reference_log2_variable_gm_shift": 2.4613789921294167,
+      "reference_pin4_V": [
+        0.18156338342129322,
+        0.18156338342129327,
+        0.18156338342129327,
+        0.18156338342129327
+      ],
+      "stage": "LP"
+    },
+    {
+      "EG_V": -0.945,
+      "EG_state": "initial",
+      "all_four_voices_equal_EG": true,
+      "preset": "brass1",
+      "reference_bus_V": 3.7750861144088192,
+      "reference_log2_variable_gm_shift": 1.9441091658550946,
+      "reference_pin4_V": [
+        0.1434070246888821,
+        0.1434070246888821,
+        0.1434070246888821,
+        0.14340702468888208
+      ],
+      "stage": "LP"
+    },
+    {
+      "EG_V": 1.785,
+      "EG_state": "peak",
+      "all_four_voices_equal_EG": true,
+      "preset": "brass1",
+      "reference_bus_V": 3.8087439711363067,
+      "reference_log2_variable_gm_shift": 3.4384442195364713,
+      "reference_pin4_V": [
+        0.25363650547140315,
+        0.25363650547140315,
+        0.2536365054714032,
+        0.2536365054714032
+      ],
+      "stage": "LP"
+    }
+  ],
+  "schema": "ceres-local-calibration-identifiability-v1",
+  "status": "checks_pass",
+  "subset_SVD": [
+    {
+      "columns": [
+        "shared_HP_bias_V",
+        "shared_LP_bias_V",
+        "Flute_BR_V",
+        "Brass_BR_V"
+      ],
+      "identifiable_subspace_condition_number": 1.4148184065246818,
+      "nullity": 1,
+      "rank": 3,
+      "raw_column_L2_norm": [
+        0.1931435020032791,
+        0.17761220585072315,
+        0.21492181473540123,
+        0.21474679957608853
+      ],
+      "relative_rank_threshold": 1e-10,
+      "shape": [
+        12,
+        4
+      ],
+      "singular_values_column_normalized": [
+        1.4142135623730951,
+        1.000427323877345,
+        0.9995724934388771,
+        4.035876378828552e-16
+      ],
+      "svd_reconstruction_max_abs_error": 4.163336342344337e-16
+    },
+    {
+      "columns": [
+        "shared_HP_bias_V",
+        "shared_LP_bias_V",
+        "Flute_BR_V",
+        "Brass_BR_V",
+        "Flute_touch_source_V",
+        "Brass_touch_source_V"
+      ],
+      "identifiable_subspace_condition_number": 247.41053916677637,
+      "nullity": 2,
+      "rank": 4,
+      "raw_column_L2_norm": [
+        0.1931435020032791,
+        0.17761220585072315,
+        0.21492181473540123,
+        0.21474679957608853,
+        1.002582415245218,
+        1.001749246146615
+      ],
+      "relative_rank_threshold": 1e-10,
+      "shape": [
+        12,
+        6
+      ],
+      "singular_values_column_normalized": [
+        1.7320366597534707,
+        1.4141967388131438,
+        1.000023791708386,
+        0.007000658361549935,
+        4.4396485631671854e-16,
+        1.4155918984967493e-17
+      ],
+      "svd_reconstruction_max_abs_error": 4.163336342344337e-16
+    },
+    {
+      "columns": [
+        "shared_HP_bias_V",
+        "shared_LP_bias_V",
+        "Flute_BR_V",
+        "Brass_BR_V",
+        "Flute_touch_source_V",
+        "Brass_touch_source_V",
+        "common_fractional_exponential_scale"
+      ],
+      "identifiable_subspace_condition_number": 302.3824745817635,
+      "nullity": 2,
+      "rank": 5,
+      "raw_column_L2_norm": [
+        0.1931435020032791,
+        0.17761220585072315,
+        0.21492181473540123,
+        0.21474679957608853,
+        1.002582415245218,
+        1.001749246146615,
+        5.7437780354362475
+      ],
+      "relative_rank_threshold": 1e-10,
+      "shape": [
+        12,
+        7
+      ],
+      "singular_values_column_normalized": [
+        1.9676666789401822,
+        1.418919048098516,
+        1.020185641947861,
+        0.27227832762678095,
+        0.006507211377450811,
+        4.403053382376062e-16,
+        1.2862679507586516e-17
+      ],
+      "svd_reconstruction_max_abs_error": 5.551115123125783e-16
+    },
+    {
+      "columns": [
+        "shared_HP_bias_V",
+        "shared_LP_bias_V",
+        "Flute_BR_V",
+        "Brass_BR_V",
+        "Flute_touch_source_V",
+        "Brass_touch_source_V",
+        "common_fractional_exponential_scale",
+        "common_fractional_EG_amplitude"
+      ],
+      "identifiable_subspace_condition_number": 23.099606835836187,
+      "nullity": 3,
+      "rank": 5,
+      "raw_column_L2_norm": [
+        0.1931435020032791,
+        0.17761220585072315,
+        0.21492181473540123,
+        0.21474679957608853,
+        1.002582415245218,
+        1.001749246146615,
+        5.7437780354362475,
+        1.86869544696786
+      ],
+      "relative_rank_threshold": 1e-10,
+      "shape": [
+        12,
+        8
+      ],
+      "singular_values_column_normalized": [
+        1.970168579719494,
+        1.509403965631552,
+        1.0215619247301126,
+        0.888409963292683,
+        0.08529013475082273,
+        2.274413338084394e-16,
+        9.379590405440967e-17,
+        4.303776846921613e-17
+      ],
+      "svd_reconstruction_max_abs_error": 4.440892098500626e-16
+    }
+  ]
+}

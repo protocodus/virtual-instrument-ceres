@@ -1,0 +1,76 @@
+{
+  "schema": "ceres-cs50-public-creator-metadata-v1",
+  "media_downloaded": false,
+  "videos": [
+    {
+      "id": "synth4ever_overview",
+      "url": "https://www.youtube.com/watch?v=j1kM0EpneNc",
+      "retrieved_UTC": "2026-10-18T18:06:54.652645+00:00",
+      "access": "Public watch-page HTML text only; curl, no media acquisition",
+      "response_bytes": 1607578,
+      "response_sha256": "107003ad531f04fafc9a92d5267c1faacc3ae9a1e555716a4c93344cc42071b6",
+      "title": "YAMAHA CS-50 - Analog Synthesizer Review, Sounds & Demo",
+      "author": "synth4ever",
+      "publishDate": "2021-08-11T06:00:17-07:00",
+      "description_excerpt": "MXR analog stereo chorus used for stereo width.",
+      "complete_description_sha256": "c6231d0e694255d418fc1c2a9213bee45ab29576850361291f0a2439c4998583",
+      "complete_description_characters": 4011
+    },
+    {
+      "id": "syntheticmachines_multitrack",
+      "url": "https://www.youtube.com/watch?v=22A7arAclog",
+      "retrieved_UTC": "2026-10-18T18:06:54.550280+00:00",
+      "access": "Public watch-page HTML text only; curl, no media acquisition",
+      "response_bytes": 1198578,
+      "response_sha256": "f1de9cfdc715f68110ad3151bdb7e62f256935af4b5681c9b5e6a1accea650d7",
+      "title": "Yamaha CS 50",
+      "author": "SyntheticMachines",
+      "publishDate": "2010-05-20T08:21:08-07:00",
+      "description_excerpt": "Ambient demo track made with the Yamaha CS 50. Multitrack Recording + external FX.",
+      "complete_description_sha256": "201e7c7f2f50c94068609ea3df63f9ba7ca2e99f3722e0e358e8cff87f698e3c",
+      "complete_description_characters": 82
+    },
+    {
+      "id": "thomas_faurby",
+      "url": "https://www.youtube.com/watch?v=-wExnI0y008",
+      "retrieved_UTC": "2026-10-18T18:06:54.537560+00:00",
+      "access": "Public watch-page HTML text only; curl, no media acquisition",
+      "response_bytes": 1233993,
+      "response_sha256": "a9ba1d9e2f07e945315d6cc1fd2e1b4247198729ffbd8f4d771865ea336fe169",
+      "title": "Yamaha CS50 demo (HQ)",
+      "author": "Thomas Faurby",
+      "publishDate": "2011-12-06T02:15:26-08:00",
+      "description_excerpt": "As usual a quick demo of my new (extremely cool) synth, the Yamaha CS50.",
+      "complete_description_sha256": "60d59e517010fdd6484b8467b39b3aa1aabec7160555a59297c74ad3b62474bc",
+      "complete_description_characters": 72
+    },
+    {
+      "id": "automaticgainsay_presets",
+      "url": "https://www.youtube.com/watch?v=HupZtUPiJLU",
+      "retrieved_UTC": "2026-10-18T18:06:53.662466+00:00",
+      "access": "Public watch-page HTML text only; curl, no media acquisition",
+      "response_bytes": 1267150,
+      "response_sha256": "8c0204d16cf19fb6f23ab5822bb4dfcbcb55e2d53359613cdfebd244b3fbd875",
+      "title": "The Yamaha CS-50- Presets",
+      "author": "AutomaticGainsay",
+      "publishDate": "2013-02-19T02:12:57-08:00",
+      "description_excerpt": "Here is a demonstration of the preset sounds that exist on the CS-50.",
+      "complete_description_sha256": "7e5194a9d27d698e8014d43acf07d7b951ce9cfd8df46259081c8e22ffdb53ce",
+      "complete_description_characters": 69
+    },
+    {
+      "id": "doctor_mix_presets",
+      "url": "https://www.youtube.com/watch?v=nl19OnD8SrY",
+      "retrieved_UTC": "2026-10-18T18:06:52.113143+00:00",
+      "access": "Public watch-page HTML text only; curl, no media acquisition",
+      "response_bytes": 1139402,
+      "response_sha256": "47549e4797ca61eb235247b010d854bc40e2724a6efef0b1c0f1f5e99fd63ef7",
+      "title": "Yamaha CS50: Famous Presets",
+      "author": "Doctor Mix",
+      "publishDate": "2018-08-17T08:00:05-07:00",
+      "description_excerpt": "Today we show some of the famous presets of the Yamaha CS50.",
+      "complete_description_sha256": "0418ea26a81455f818ad8c584fa0e79202f34e28e6abf4e6e0a1676e898eb911",
+      "complete_description_characters": 1166
+    }
+  ]
+}

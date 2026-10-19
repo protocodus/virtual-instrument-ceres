@@ -1,0 +1,88 @@
+{
+  "status": "pass",
+  "created_utc": "2026-10-19T07:39:02.619447+00:00",
+  "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "parent_source_sha256": {
+    "ceres.cpp": "cc2ee3cdcf7dfab7ebc60071627a2557520f6cdbadd2a590796629a9aad8fd10",
+    "ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8"
+  },
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "bd785967fea79ed0df68bc0fb70f6c063c44439eac975c96357eb71bcdcaa10f",
+    "Source/DSP/ceres.cpp": "3472f2667c232409a9fe824580c273f9a1e3ddc46d49f26b05ef1d351996605a",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "3f169300a4e9fa8e103f2cdafba2f6dd5bb2c1f3b37aa3c040918e84c0bbdfd5"
+  },
+  "compile_command": [
+    "c++",
+    "-std=c++17",
+    "-O3",
+    "-DNDEBUG",
+    "-I",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-wj1g24q1",
+    "/private/tmp/ceres-ring-carrier-20261019/Tests/ParityDriver.cpp",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-wj1g24q1/ceres.cpp",
+    "-o",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-wj1g24q1/parent"
+  ],
+  "comparisons": [
+    {
+      "scene": "default-controls",
+      "exact": true,
+      "variants": {
+        "parent": {
+          "command": [
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-wj1g24q1/parent",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-wj1g24q1/parent.f32"
+          ],
+          "binary_sha256": "f71450045616b623df7e0a687a2bc41e2c61cc4e109fb123ee8e921b47bdd037",
+          "audio_sha256": "678a97a19ce585aebc0a983a254635d2058133081db1091e96ec5bd846a1b490",
+          "samples": 384000
+        },
+        "candidate": {
+          "command": [
+            "/private/tmp/ceres-ring-carrier-20261019/build/ceres_native_parity",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-wj1g24q1/candidate.f32"
+          ],
+          "binary_sha256": "e27e1104ffe48733d013b59980bf15a84280b705a4200b19d99706bc988b7b0d",
+          "audio_sha256": "678a97a19ce585aebc0a983a254635d2058133081db1091e96ec5bd846a1b490",
+          "samples": 384000
+        }
+      }
+    },
+    {
+      "scene": "active-carrier-bypassed",
+      "exact": true,
+      "variants": {
+        "parent": {
+          "command": [
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-wj1g24q1/parent",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-wj1g24q1/parent.f32",
+            "ring-bypass"
+          ],
+          "binary_sha256": "f71450045616b623df7e0a687a2bc41e2c61cc4e109fb123ee8e921b47bdd037",
+          "audio_sha256": "bab8e1f819e19a3931e33783126d21d8f7a68d39fc237418bf28c4adf8ab856c",
+          "samples": 384000
+        },
+        "candidate": {
+          "command": [
+            "/private/tmp/ceres-ring-carrier-20261019/build/ceres_native_parity",
+            "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-parent-wj1g24q1/candidate.f32",
+            "ring-bypass"
+          ],
+          "binary_sha256": "e27e1104ffe48733d013b59980bf15a84280b705a4200b19d99706bc988b7b0d",
+          "audio_sha256": "bab8e1f819e19a3931e33783126d21d8f7a68d39fc237418bf28c4adf8ab856c",
+          "samples": 384000
+        }
+      }
+    }
+  ],
+  "samples_per_variant": 768000,
+  "scope": "mix0 exact dry path; active carrier rates/depths/EG, allSUB functions, note/pedal/pressure/panic/reset. Same compiler/math library. Temporary binaries/streams deleted; retained source/commands reproduce. No recording fit.",
+  "verified_file_sha256": {
+    "Tests/check_ring_bypass_parent.py": "b51552d498916fc8747c24174eca22cfb573ab3559bf32d6dd0db36ab46b53b9",
+    "Tests/ParityDriver.cpp": "940cbe8f10c1cd1baaebb23059d27ccf39f616a27f843cbe556485f1c5a83427",
+    "Source/DSP/ceres.cpp": "3472f2667c232409a9fe824580c273f9a1e3ddc46d49f26b05ef1d351996605a",
+    "Source/DSP/ceres.hpp": "bd785967fea79ed0df68bc0fb70f6c063c44439eac975c96357eb71bcdcaa10f"
+  }
+}

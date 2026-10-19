@@ -1,0 +1,16 @@
+{
+  "reason": "Initial candidate completed before neutral output-trim API addition. Preserve compiled identity without binding mutable worktree.",
+  "reports": {
+    "Docs/accuracy/runs/soundpath/report.json": {
+      "report_sha256": "b2cbc8a9184f738e5ff153009090d4af603b8ee537f36e323a5b7fa2b5f2e809",
+      "binary": "Docs/accuracy/pre-trim-source/ceres_render",
+      "source_root": "Docs/accuracy/pre-trim-source"
+    },
+    "Docs/accuracy/runs/soundpath-final/report.json": {
+      "report_sha256": "8eeb41595e7d9eec0900cbe999350327ec8bd475b94a21636a41f355428f9596",
+      "binary": "Docs/accuracy/soundpath-final-source/ceres_render",
+      "source_root": "Docs/accuracy/soundpath-final-source",
+      "reason": "Original worktree renderer was superseded by velocity implementation. Rebuilt from exact git b22dda69 inputs with original Release toolchain; executable SHA256 is byte-identical to the original frozen report. Historical report/audio/metrics remain unchanged."
+    }
+  }
+}

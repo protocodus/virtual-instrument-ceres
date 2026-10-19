@@ -1,0 +1,33 @@
+{
+  "canonical_experiment": "/tmp/ceres-cs50-1x8LGd",
+  "model_version": "0.10.0",
+  "source_scope": "canonical source only; isolated amp-bias/LP-bus and decay diagnostics excluded",
+  "files": {
+    "Source/DSP/ceres.hpp": {
+      "original_path": "src/ceres.hpp",
+      "original_sha256": "36d5c6b2122316266ff91628577645055ef48583a377051aff2be172effdbe91"
+    },
+    "Source/DSP/ceres.cpp": {
+      "original_path": "src/ceres.cpp",
+      "original_sha256": "d9c174ccd023d380c7420d523d52422cccef6118b995a7a448f4a415fc46eae2"
+    },
+    "Tools/render_main.cpp": {
+      "original_path": "src/render_main.cpp",
+      "original_sha256": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb"
+    },
+    "Tools/build_identity.hpp.in": {
+      "original_path": "src/build_identity.hpp.in",
+      "original_sha256": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b"
+    },
+    "Tests/dsp_tests.cpp": {
+      "original_path": "tests/dsp_tests.cpp",
+      "original_sha256": "fd6e9ae7cd3a501ba97da5f94e2c17c3369143d9fb0dac7e16e0d0270151f1d6"
+    }
+  },
+  "validation_reference": {
+    "path": "reports/v10-lp-bus-candidate-validation.json",
+    "sha256": "145cac8e71b6ad0b517b3c9c9a76f852880f10a7a5157bfaf409fb27e7113048",
+    "scope": "Historical experiment handoff; isolated candidate was not promoted."
+  },
+  "no_hardware_audio_or_manuals_imported": true
+}

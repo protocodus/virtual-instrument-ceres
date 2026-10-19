@@ -1,0 +1,15 @@
+{
+  "status": "pass",
+  "scope": "Steady220Hz source-scaled matched carrier pairs times440Hz sine, ideal analog passive transfer;192kHz versus1.536MHz sampling, in-band Fourier coefficients20..23980Hz.",
+  "max_coefficient_difference": 4.709966188050835e-16,
+  "relative_to_peak_db": -298.809933843142,
+  "physical_constants": {
+    "dc_volts": -0.023489437180096218,
+    "two_vt_volts": 0.0513851582421717,
+    "carrier_source_peak_volts": 1.5
+  },
+  "normalization": "none",
+  "limitations": "Not a native DSP test, dynamic-FM bound or full-instrument alias-free claim.",
+  "script_sha256": "2b3ba05d28e37404798bb13fa85fd74f47a0fa930d872da80caa8706cec53b94",
+  "passive_oracle_sha256": "e94cc5d976540dbee545dc4bc3ab86ba0a926e157fd010d85c540cb762bb1a74"
+}

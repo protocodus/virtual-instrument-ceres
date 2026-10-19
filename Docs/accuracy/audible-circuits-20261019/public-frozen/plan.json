@@ -1,0 +1,490 @@
+{
+  "status": "declared_before_audio",
+  "baseline_commit": "10e17fd9ecdc0a5a0354bad4c5a53780885a5503",
+  "input_sha256": {
+    "Docs/accuracy/inputs/research/brass1-release-spectra-160.json": "c352cba0c40f1b227c6d8999a1d8084062d36acfa3f236659e212d69105d296f",
+    "Docs/accuracy/inputs/research/brass1-release-spectra-160-plan.json": "dd1e47127460525382954bd2736a879b97d17ee1d3f9f219de43245b59f5659b",
+    "Docs/accuracy/inputs/references/whitmore-acquisition.json": "49398f8a8c5b3ea5ff063fc9d44b27c00c540424bee5331e8013acc394cff5a7",
+    "Docs/accuracy/inputs/research/whitmore-transpose-keyboard.json": "b1351f629eb4bbaa491335591a57d072d8e57b18f6bd133617378bc0c3e32263",
+    "Docs/accuracy/inputs/references/whitmore-original.info.json": "6eacf2197b45b0aece675ce2cadf79fedb996c138b2dd6f309ecbe862629001d",
+    "Docs/accuracy/inputs/calibration/whitmore-flute-high-source.wav": "63bd4bc8910103af81bc5c47fbc558833283d0055af1cd02a165f2540b495d90",
+    "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-high-factory-physical.wav": "0672f265c4fdbf9f8050fcff18a6447bc5c362d9e521c97d6440084504b55f9b",
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/whitmore-transpose-high-factory-physical.patch": "9135e3e3bf96f18b56ae7a90d53ddfaa65ee8d155d3771799270510a682dd47f",
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.events.tsv": "d4f8d7749e38e5cc07d49300e14c206e679523a7b1c589ccb13f248c802da55d",
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.mid": "edbf3a324337e89d08bfeb5b26f98101b7707ec6657c569c168355fc5d1670ee",
+    "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-high-effective-compensated.wav": "cf5a3acb608b6f9e53ff0d5ec26f3f2fc14f7e3e242d1574ba2ff466caf202d9",
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/ceres-flute-physical-effective.patch": "a2ff51a4202c94b0417d0b49096f11460e927b17f00ea1ba4fb7f943778c1c37",
+    "Docs/accuracy/inputs/calibration/whitmore-flute-lower-source.wav": "6c988f3e1178da0b400a990ee30ddc15351818fa2e43cb0898c90aa81aef9e1c",
+    "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-lower-factory-physical.wav": "7497eeb7b4a268532d2279e3ac085abbd7a18886f4d48032ecedaba0c1bc29ec",
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/whitmore-transpose-lower-factory-physical.patch": "9135e3e3bf96f18b56ae7a90d53ddfaa65ee8d155d3771799270510a682dd47f",
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/lower-physical.events.tsv": "fe9e6a9e45782cc099590ba2d0fa97a34f0a8cfb649d7ec77a25f84c894a2b2f",
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/lower-physical.mid": "1856f7d6ad99963129615c35df4218c335004d73d04d02f958bc7c92976e173f",
+    "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-lower-effective-compensated.wav": "117bb8264841fbe70aac3ac1059765594cdbf2877d7b450b01ac4608c67ea002",
+    "Docs/accuracy/inputs/references/whitmore-brass1-context.wav": "af1498002748e094af1cd95b6bc52c1e8919e9dce953a02ba03b8309fd5012dc",
+    "Docs/accuracy/inputs/calibration/release-factorial/case20-baseline.wav": "cd4218382d4f09f37b7961e1294a9830aac5831e14c6ac7c8f2585af98e6e73b",
+    "Docs/accuracy/inputs/calibration/brass-filter-grid/case20-LPx1-Qfactory.patch": "19a8f7ea6bb45f3d007c8be05529a72fa646b37bf2941abe69e1a42c33edfab1",
+    "Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--96.events.tsv": "e84e416eac8438635ed91a6e40b3c6f4386c4c774014f6082a35b0a79bb8def0",
+    "Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--96.mid": "f3d6e26efdfd27b3365b23705560a92c6dde090467863c8d3bb6201c00388314",
+    "Docs/accuracy/inputs/calibration/release-factorial/case10-baseline.wav": "5bb646f7ccfad9feda3bd6d27a4ba26a2222f3fe5c1a05f1570af75f776669f0",
+    "Docs/accuracy/inputs/calibration/brass-filter-grid/case10-LPx1-Qfactory.patch": "fbc0735460f73b6ca83fb4e22b4365a89e5e3ebf9b84e1f43d01e45f68470ac8",
+    "Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--48.events.tsv": "4d51bad6580cb046e4bb9fdc1da566cb2b99ad3bc23583c0582d3147243240f1",
+    "Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--48.mid": "031691666bb160c1f25384fede2d5f6c5a92f31175a0421393bc0b719f21e4e1",
+    "Docs/accuracy/inputs/references/ptk_cs50_sawtooth.wav": "27319ed76c3b98e6ed394b8395d66b96846e2305a9ffe42c14fda63adf9588c9",
+    "Docs/accuracy/inputs/renders/v10/dry-sawtooth.wav": "8d0ec15f02c949e531601f7d931b7bd5ddc05af57e0ceb95ecc11413d1a2a6f9",
+    "Docs/accuracy/inputs/renders/v09/dry-sawtooth.patch": "64e123642fed06490d5f3923bcf8a72d42594e6bade63121ac554026920d1f1a",
+    "Docs/accuracy/inputs/renders/v09/dry-sawtooth.events.tsv": "d55f59d823cbab6849f3bf0c9f89c1c754d935c9a85b5cd5409bddd12e546656",
+    "Docs/accuracy/inputs/renders/v09/dry-sawtooth.mid": "701da8cdc6890df8a5cd27c11fc9cf318846c0fda59ef72a539d709b79849530",
+    "Docs/accuracy/inputs/references/ptk_cs50_square.wav": "2059f16fa8e924c2257a721622790d33b14a8e7c6a3d434bfbf29cb7b1269ee1",
+    "Docs/accuracy/inputs/renders/v10/dry-square.wav": "9654d20841422ba9f016ea9e63794538a8d5b68b7af8ae31158ab77c0ed9fbe2",
+    "Docs/accuracy/inputs/renders/v09/dry-square.patch": "b16ba5b56354b8f1eab1d3c7713bc4326d2bd37f9c62e2dc9edaa9e68e46e2b5",
+    "Docs/accuracy/inputs/renders/v09/dry-square.events.tsv": "b89a24fb2750fd869839d6f9de93554396c2468f5a8becfcb86aa616e0e46c87",
+    "Docs/accuracy/inputs/renders/v09/dry-square.mid": "0e6479af232dc5d6fe3d8f2920f1533f17d7d41f736d19a0ada750c35323594a",
+    "Docs/accuracy/baseline-source/Source/DSP/ceres.hpp": "01ce1d02f39ad3f4db28ea5fa281ea82eb2163c15d4fb838d7944f6220701b9c",
+    "Docs/accuracy/baseline-source/Source/DSP/ceres.cpp": "ac10943cc36eca7605101a22cc5d0947f59f08bbff806c324ec2cb652bd13908",
+    "Docs/accuracy/baseline-source/Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Docs/accuracy/baseline-source/Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "Docs/accuracy/baseline-source/CMakeLists.txt": "266a99817309eda6093f9edb21089b5d459b36ccf65f96e6a2762fd35746436b",
+    "Tools/accuracy/run_battery.py": "19153bec22f120d0cd4d643dd87c37dee096d5c6d24adc9aa6368a18538b71ea",
+    "Tools/accuracy/metrics.py": "34cba33ccf34b62be818518cc34a5d4d48ece032366b1b238a5075f94b9935cd",
+    "Tools/accuracy/origins.json": "bf5525099d6c85ced0c71a9e9555811dab55e1b53cda3be6ce7d2662d68c4fa6"
+  },
+  "origins": {
+    "Docs/accuracy/inputs/research/brass1-release-spectra-160.json": {
+      "path": "/tmp/ceres-cs50-1x8LGd/research/brass1-release-spectra-160.json",
+      "sha256": "c352cba0c40f1b227c6d8999a1d8084062d36acfa3f236659e212d69105d296f"
+    },
+    "Docs/accuracy/inputs/research/brass1-release-spectra-160-plan.json": {
+      "path": "/tmp/ceres-cs50-1x8LGd/research/brass1-release-spectra-160-plan.json",
+      "sha256": "dd1e47127460525382954bd2736a879b97d17ee1d3f9f219de43245b59f5659b"
+    },
+    "Docs/accuracy/inputs/references/whitmore-acquisition.json": {
+      "path": "/tmp/ceres-cs50-1x8LGd/references/whitmore-acquisition.json",
+      "sha256": "49398f8a8c5b3ea5ff063fc9d44b27c00c540424bee5331e8013acc394cff5a7"
+    },
+    "Docs/accuracy/inputs/research/whitmore-transpose-keyboard.json": {
+      "path": "/tmp/ceres-cs50-1x8LGd/research/whitmore-transpose-keyboard.json",
+      "sha256": "b1351f629eb4bbaa491335591a57d072d8e57b18f6bd133617378bc0c3e32263"
+    },
+    "Docs/accuracy/inputs/references/whitmore-original.info.json": {
+      "path": "/tmp/ceres-cs50-1x8LGd/references/whitmore-original.info.json",
+      "sha256": "6eacf2197b45b0aece675ce2cadf79fedb996c138b2dd6f309ecbe862629001d"
+    },
+    "Docs/accuracy/inputs/calibration/whitmore-flute-high-source.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-flute-high-source.wav",
+      "sha256": "63bd4bc8910103af81bc5c47fbc558833283d0055af1cd02a165f2540b495d90"
+    },
+    "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-high-factory-physical.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/renders/ceres-whitmore-transpose-high-factory-physical.wav",
+      "sha256": "0672f265c4fdbf9f8050fcff18a6447bc5c362d9e521c97d6440084504b55f9b"
+    },
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/whitmore-transpose-high-factory-physical.patch": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-transpose/whitmore-transpose-high-factory-physical.patch",
+      "sha256": "9135e3e3bf96f18b56ae7a90d53ddfaa65ee8d155d3771799270510a682dd47f"
+    },
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.events.tsv": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-transpose/high-physical.events.tsv",
+      "sha256": "d4f8d7749e38e5cc07d49300e14c206e679523a7b1c589ccb13f248c802da55d"
+    },
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.mid": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-transpose/high-physical.mid",
+      "sha256": "edbf3a324337e89d08bfeb5b26f98101b7707ec6657c569c168355fc5d1670ee"
+    },
+    "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-high-effective-compensated.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/renders/ceres-whitmore-transpose-high-effective-compensated.wav",
+      "sha256": "cf5a3acb608b6f9e53ff0d5ec26f3f2fc14f7e3e242d1574ba2ff466caf202d9"
+    },
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/ceres-flute-physical-effective.patch": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-transpose/ceres-flute-physical-effective.patch",
+      "sha256": "a2ff51a4202c94b0417d0b49096f11460e927b17f00ea1ba4fb7f943778c1c37"
+    },
+    "Docs/accuracy/inputs/calibration/whitmore-flute-lower-source.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-flute-lower-source.wav",
+      "sha256": "6c988f3e1178da0b400a990ee30ddc15351818fa2e43cb0898c90aa81aef9e1c"
+    },
+    "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-lower-factory-physical.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/renders/ceres-whitmore-transpose-lower-factory-physical.wav",
+      "sha256": "7497eeb7b4a268532d2279e3ac085abbd7a18886f4d48032ecedaba0c1bc29ec"
+    },
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/whitmore-transpose-lower-factory-physical.patch": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-transpose/whitmore-transpose-lower-factory-physical.patch",
+      "sha256": "9135e3e3bf96f18b56ae7a90d53ddfaa65ee8d155d3771799270510a682dd47f"
+    },
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/lower-physical.events.tsv": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-transpose/lower-physical.events.tsv",
+      "sha256": "fe9e6a9e45782cc099590ba2d0fa97a34f0a8cfb649d7ec77a25f84c894a2b2f"
+    },
+    "Docs/accuracy/inputs/calibration/whitmore-transpose/lower-physical.mid": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-transpose/lower-physical.mid",
+      "sha256": "1856f7d6ad99963129615c35df4218c335004d73d04d02f958bc7c92976e173f"
+    },
+    "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-lower-effective-compensated.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/renders/ceres-whitmore-transpose-lower-effective-compensated.wav",
+      "sha256": "117bb8264841fbe70aac3ac1059765594cdbf2877d7b450b01ac4608c67ea002"
+    },
+    "Docs/accuracy/inputs/references/whitmore-brass1-context.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/references/whitmore-brass1-context.wav",
+      "sha256": "af1498002748e094af1cd95b6bc52c1e8919e9dce953a02ba03b8309fd5012dc"
+    },
+    "Docs/accuracy/inputs/calibration/release-factorial/case20-baseline.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case20-baseline.wav",
+      "sha256": "cd4218382d4f09f37b7961e1294a9830aac5831e14c6ac7c8f2585af98e6e73b"
+    },
+    "Docs/accuracy/inputs/calibration/brass-filter-grid/case20-LPx1-Qfactory.patch": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case20-LPx1-Qfactory.patch",
+      "sha256": "19a8f7ea6bb45f3d007c8be05529a72fa646b37bf2941abe69e1a42c33edfab1"
+    },
+    "Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--96.events.tsv": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/central-off-shift--96.events.tsv",
+      "sha256": "e84e416eac8438635ed91a6e40b3c6f4386c4c774014f6082a35b0a79bb8def0"
+    },
+    "Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--96.mid": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/central-off-shift--96.mid",
+      "sha256": "f3d6e26efdfd27b3365b23705560a92c6dde090467863c8d3bb6201c00388314"
+    },
+    "Docs/accuracy/inputs/calibration/release-factorial/case10-baseline.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case10-baseline.wav",
+      "sha256": "5bb646f7ccfad9feda3bd6d27a4ba26a2222f3fe5c1a05f1570af75f776669f0"
+    },
+    "Docs/accuracy/inputs/calibration/brass-filter-grid/case10-LPx1-Qfactory.patch": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case10-LPx1-Qfactory.patch",
+      "sha256": "fbc0735460f73b6ca83fb4e22b4365a89e5e3ebf9b84e1f43d01e45f68470ac8"
+    },
+    "Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--48.events.tsv": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/central-off-shift--48.events.tsv",
+      "sha256": "4d51bad6580cb046e4bb9fdc1da566cb2b99ad3bc23583c0582d3147243240f1"
+    },
+    "Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--48.mid": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/central-off-shift--48.mid",
+      "sha256": "031691666bb160c1f25384fede2d5f6c5a92f31175a0421393bc0b719f21e4e1"
+    },
+    "Docs/accuracy/inputs/references/ptk_cs50_sawtooth.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/references/ptk_cs50_sawtooth.wav",
+      "sha256": "27319ed76c3b98e6ed394b8395d66b96846e2305a9ffe42c14fda63adf9588c9"
+    },
+    "Docs/accuracy/inputs/renders/v10/dry-sawtooth.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/renders/v10/dry-sawtooth.wav",
+      "sha256": "8d0ec15f02c949e531601f7d931b7bd5ddc05af57e0ceb95ecc11413d1a2a6f9"
+    },
+    "Docs/accuracy/inputs/renders/v09/dry-sawtooth.patch": {
+      "path": "/tmp/ceres-cs50-1x8LGd/renders/v09/dry-sawtooth.patch",
+      "sha256": "64e123642fed06490d5f3923bcf8a72d42594e6bade63121ac554026920d1f1a"
+    },
+    "Docs/accuracy/inputs/renders/v09/dry-sawtooth.events.tsv": {
+      "path": "/tmp/ceres-cs50-1x8LGd/renders/v09/dry-sawtooth.events.tsv",
+      "sha256": "d55f59d823cbab6849f3bf0c9f89c1c754d935c9a85b5cd5409bddd12e546656"
+    },
+    "Docs/accuracy/inputs/renders/v09/dry-sawtooth.mid": {
+      "path": "/tmp/ceres-cs50-1x8LGd/renders/v09/dry-sawtooth.mid",
+      "sha256": "701da8cdc6890df8a5cd27c11fc9cf318846c0fda59ef72a539d709b79849530"
+    },
+    "Docs/accuracy/inputs/references/ptk_cs50_square.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/references/ptk_cs50_square.wav",
+      "sha256": "2059f16fa8e924c2257a721622790d33b14a8e7c6a3d434bfbf29cb7b1269ee1"
+    },
+    "Docs/accuracy/inputs/renders/v10/dry-square.wav": {
+      "path": "/tmp/ceres-cs50-1x8LGd/renders/v10/dry-square.wav",
+      "sha256": "9654d20841422ba9f016ea9e63794538a8d5b68b7af8ae31158ab77c0ed9fbe2"
+    },
+    "Docs/accuracy/inputs/renders/v09/dry-square.patch": {
+      "path": "/tmp/ceres-cs50-1x8LGd/renders/v09/dry-square.patch",
+      "sha256": "b16ba5b56354b8f1eab1d3c7713bc4326d2bd37f9c62e2dc9edaa9e68e46e2b5"
+    },
+    "Docs/accuracy/inputs/renders/v09/dry-square.events.tsv": {
+      "path": "/tmp/ceres-cs50-1x8LGd/renders/v09/dry-square.events.tsv",
+      "sha256": "b89a24fb2750fd869839d6f9de93554396c2468f5a8becfcb86aa616e0e46c87"
+    },
+    "Docs/accuracy/inputs/renders/v09/dry-square.mid": {
+      "path": "/tmp/ceres-cs50-1x8LGd/renders/v09/dry-square.mid",
+      "sha256": "0e6479af232dc5d6fe3d8f2920f1533f17d7d41f736d19a0ada750c35323594a"
+    },
+    "calibration/whitmore-transpose.json": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-transpose.json",
+      "sha256": "8d35f16f37973a5e9101c952e7836c9f4cac0a4159cf889fc899bfd6a6068b28"
+    },
+    "calibration/brass-filter-grid.json": {
+      "path": "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid.json",
+      "sha256": "4a798735da1cfb207111d3ff526d436201782902e2642153095f27ca343a325c"
+    },
+    "reports/v09-regression.json": {
+      "path": "/tmp/ceres-cs50-1x8LGd/reports/v09-regression.json",
+      "sha256": "0fcd55d03c5c68303f80c2d350dd52b203f3f07a3e42d5b94634b29df9dac54d"
+    },
+    "reports/v10-global-release-regression.json": {
+      "path": "/tmp/ceres-cs50-1x8LGd/reports/v10-global-release-regression.json",
+      "sha256": "b0c59bdaf76322a54cc499fe6edc3cbe59a700df265e2da44309e9394a62a309"
+    }
+  },
+  "cases": [
+    {
+      "id": "flute-high-factory-physical",
+      "family": "flute",
+      "preset": "flute",
+      "frames": 154800,
+      "rate": 48000,
+      "seed": 50,
+      "offset_seconds": 0.225,
+      "duration": 1.9,
+      "expected_f0": 670.0,
+      "recording_gain": 2.2187598696129043,
+      "reference": "Docs/accuracy/inputs/calibration/whitmore-flute-high-source.wav",
+      "historical_audio": "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-high-factory-physical.wav",
+      "patch": "Docs/accuracy/inputs/calibration/whitmore-transpose/whitmore-transpose-high-factory-physical.patch",
+      "events": "Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.events.tsv",
+      "midi": "Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.mid",
+      "source_seconds": [
+        205.75,
+        207.65
+      ],
+      "source_url": "https://www.youtube.com/watch?v=Fj21t8MIS_o",
+      "creator": "Andy Whitmore",
+      "settings_status": "Named factory Flute and physical note/transpose visually supported; unknown globals, pressure, exact gates and voice count. Effective family is a prior high-window fit, not hardware settings.",
+      "midi_status": "Source-pitch following synthetic fresh held gate; physical notes 88/84, octave -1. Bends also affect filter key tracking.",
+      "strict_eligible": false,
+      "midi_validation": {
+        "event_count": 194,
+        "sample_exact_schedule": true,
+        "warnings": [],
+        "original_hardware_MIDI": false
+      }
+    },
+    {
+      "id": "flute-high-effective-compensated",
+      "family": "flute",
+      "preset": "flute",
+      "frames": 154800,
+      "rate": 48000,
+      "seed": 50,
+      "offset_seconds": 0.225,
+      "duration": 1.9,
+      "expected_f0": 670.0,
+      "recording_gain": 1.4257361547253915,
+      "reference": "Docs/accuracy/inputs/calibration/whitmore-flute-high-source.wav",
+      "historical_audio": "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-high-effective-compensated.wav",
+      "patch": "Docs/accuracy/inputs/calibration/whitmore-transpose/ceres-flute-physical-effective.patch",
+      "events": "Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.events.tsv",
+      "midi": "Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.mid",
+      "source_seconds": [
+        205.75,
+        207.65
+      ],
+      "source_url": "https://www.youtube.com/watch?v=Fj21t8MIS_o",
+      "creator": "Andy Whitmore",
+      "settings_status": "Named factory Flute and physical note/transpose visually supported; unknown globals, pressure, exact gates and voice count. Effective family is a prior high-window fit, not hardware settings.",
+      "midi_status": "Source-pitch following synthetic fresh held gate; physical notes 88/84, octave -1. Bends also affect filter key tracking.",
+      "strict_eligible": false,
+      "midi_validation": {
+        "event_count": 194,
+        "sample_exact_schedule": true,
+        "warnings": [],
+        "original_hardware_MIDI": false
+      }
+    },
+    {
+      "id": "flute-lower-factory-physical",
+      "family": "flute",
+      "preset": "flute",
+      "frames": 119000,
+      "rate": 48000,
+      "seed": 50,
+      "offset_seconds": 0.17916666666666667,
+      "duration": 1.2,
+      "expected_f0": 530.0,
+      "recording_gain": 2.2187598696129043,
+      "reference": "Docs/accuracy/inputs/calibration/whitmore-flute-lower-source.wav",
+      "historical_audio": "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-lower-factory-physical.wav",
+      "patch": "Docs/accuracy/inputs/calibration/whitmore-transpose/whitmore-transpose-lower-factory-physical.patch",
+      "events": "Docs/accuracy/inputs/calibration/whitmore-transpose/lower-physical.events.tsv",
+      "midi": "Docs/accuracy/inputs/calibration/whitmore-transpose/lower-physical.mid",
+      "source_seconds": [
+        210.8,
+        212.0
+      ],
+      "source_url": "https://www.youtube.com/watch?v=Fj21t8MIS_o",
+      "creator": "Andy Whitmore",
+      "settings_status": "Named factory Flute and physical note/transpose visually supported; unknown globals, pressure, exact gates and voice count. Effective family is a prior high-window fit, not hardware settings.",
+      "midi_status": "Source-pitch following synthetic fresh held gate; physical notes 88/84, octave -1. Bends also affect filter key tracking.",
+      "strict_eligible": false,
+      "midi_validation": {
+        "event_count": 124,
+        "sample_exact_schedule": true,
+        "warnings": [],
+        "original_hardware_MIDI": false
+      }
+    },
+    {
+      "id": "flute-lower-effective-compensated",
+      "family": "flute",
+      "preset": "flute",
+      "frames": 119000,
+      "rate": 48000,
+      "seed": 50,
+      "offset_seconds": 0.17916666666666667,
+      "duration": 1.2,
+      "expected_f0": 530.0,
+      "recording_gain": 1.4257361547253915,
+      "reference": "Docs/accuracy/inputs/calibration/whitmore-flute-lower-source.wav",
+      "historical_audio": "Docs/accuracy/inputs/renders/ceres-whitmore-transpose-lower-effective-compensated.wav",
+      "patch": "Docs/accuracy/inputs/calibration/whitmore-transpose/ceres-flute-physical-effective.patch",
+      "events": "Docs/accuracy/inputs/calibration/whitmore-transpose/lower-physical.events.tsv",
+      "midi": "Docs/accuracy/inputs/calibration/whitmore-transpose/lower-physical.mid",
+      "source_seconds": [
+        210.8,
+        212.0
+      ],
+      "source_url": "https://www.youtube.com/watch?v=Fj21t8MIS_o",
+      "creator": "Andy Whitmore",
+      "settings_status": "Named factory Flute and physical note/transpose visually supported; unknown globals, pressure, exact gates and voice count. Effective family is a prior high-window fit, not hardware settings.",
+      "midi_status": "Source-pitch following synthetic fresh held gate; physical notes 88/84, octave -1. Bends also affect filter key tracking.",
+      "strict_eligible": false,
+      "midi_validation": {
+        "event_count": 124,
+        "sample_exact_schedule": true,
+        "warnings": [],
+        "original_hardware_MIDI": false
+      }
+    },
+    {
+      "id": "brass-history20",
+      "family": "brass",
+      "preset": "brass1",
+      "frames": 96800,
+      "rate": 48000,
+      "seed": 50,
+      "offset_seconds": 0.21666666666666667,
+      "duration": 1.6,
+      "recording_gain": 1.2183595407585435,
+      "reference": "Docs/accuracy/inputs/references/whitmore-brass1-context.wav",
+      "historical_audio": "Docs/accuracy/inputs/calibration/release-factorial/case20-baseline.wav",
+      "patch": "Docs/accuracy/inputs/calibration/brass-filter-grid/case20-LPx1-Qfactory.patch",
+      "events": "Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--96.events.tsv",
+      "midi": "Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--96.mid",
+      "source_seconds": [
+        136.4,
+        138.0
+      ],
+      "source_url": "https://www.youtube.com/watch?v=Fj21t8MIS_o",
+      "creator": "Andy Whitmore",
+      "settings_status": "Named Brass I; BR -15 boundary, common AM and global release are conditional effective controls; actual control voltages and modulation route unknown.",
+      "midi_status": "Reused fixed chord gate hypothesis 20, not original MIDI; physical chord+octave correction retained.",
+      "strict_eligible": false,
+      "midi_validation": {
+        "event_count": 167,
+        "sample_exact_schedule": true,
+        "warnings": [],
+        "original_hardware_MIDI": false
+      }
+    },
+    {
+      "id": "brass-history10",
+      "family": "brass",
+      "preset": "brass1",
+      "frames": 96800,
+      "rate": 48000,
+      "seed": 50,
+      "offset_seconds": 0.21666666666666667,
+      "duration": 1.6,
+      "recording_gain": 1.2183595407585435,
+      "reference": "Docs/accuracy/inputs/references/whitmore-brass1-context.wav",
+      "historical_audio": "Docs/accuracy/inputs/calibration/release-factorial/case10-baseline.wav",
+      "patch": "Docs/accuracy/inputs/calibration/brass-filter-grid/case10-LPx1-Qfactory.patch",
+      "events": "Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--48.events.tsv",
+      "midi": "Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--48.mid",
+      "source_seconds": [
+        136.4,
+        138.0
+      ],
+      "source_url": "https://www.youtube.com/watch?v=Fj21t8MIS_o",
+      "creator": "Andy Whitmore",
+      "settings_status": "Named Brass I; BR -15 boundary, common AM and global release are conditional effective controls; actual control voltages and modulation route unknown.",
+      "midi_status": "Reused fixed chord gate hypothesis 10, not original MIDI; physical chord+octave correction retained.",
+      "strict_eligible": false,
+      "midi_validation": {
+        "event_count": 167,
+        "sample_exact_schedule": true,
+        "warnings": [],
+        "original_hardware_MIDI": false
+      }
+    },
+    {
+      "id": "dry-sawtooth",
+      "family": "dry",
+      "preset": "init",
+      "frames": 146704,
+      "rate": 48000,
+      "seed": 50,
+      "offset_seconds": 0.0,
+      "duration": 3.0563333333333333,
+      "expected_f0": 177.1225400637074,
+      "recording_gain": 2.60310051474971,
+      "reference": "Docs/accuracy/inputs/references/ptk_cs50_sawtooth.wav",
+      "historical_audio": "Docs/accuracy/inputs/renders/v10/dry-sawtooth.wav",
+      "patch": "Docs/accuracy/inputs/renders/v09/dry-sawtooth.patch",
+      "events": "Docs/accuracy/inputs/renders/v09/dry-sawtooth.events.tsv",
+      "midi": "Docs/accuracy/inputs/renders/v09/dry-sawtooth.mid",
+      "source_seconds": [
+        0.0,
+        3.0563333333333333
+      ],
+      "source_url": "https://www.polynominal.com/yamaha-cs50/",
+      "creator": "Polynominal/PTK archive recording",
+      "settings_status": "Named waveform, dry creator context; all effective oscillator/filter/envelope values previously fitted. No known factory preset or complete hardware settings.",
+      "midi_status": "Inferred monophonic pitch/onset and estimated gate, not original MIDI.",
+      "strict_eligible": false,
+      "midi_validation": {
+        "event_count": 2,
+        "sample_exact_schedule": true,
+        "warnings": [],
+        "original_hardware_MIDI": false
+      }
+    },
+    {
+      "id": "dry-square",
+      "family": "dry",
+      "preset": "init",
+      "frames": 194351,
+      "rate": 48000,
+      "seed": 50,
+      "offset_seconds": 0.0,
+      "duration": 4.048979166666666,
+      "expected_f0": 177.76731331784256,
+      "recording_gain": 1.7162306558852893,
+      "reference": "Docs/accuracy/inputs/references/ptk_cs50_square.wav",
+      "historical_audio": "Docs/accuracy/inputs/renders/v10/dry-square.wav",
+      "patch": "Docs/accuracy/inputs/renders/v09/dry-square.patch",
+      "events": "Docs/accuracy/inputs/renders/v09/dry-square.events.tsv",
+      "midi": "Docs/accuracy/inputs/renders/v09/dry-square.mid",
+      "source_seconds": [
+        0.0,
+        4.048979166666666
+      ],
+      "source_url": "https://www.polynominal.com/yamaha-cs50/",
+      "creator": "Polynominal/PTK archive recording",
+      "settings_status": "Named waveform, dry creator context; all effective oscillator/filter/envelope values previously fitted. No known factory preset or complete hardware settings.",
+      "midi_status": "Inferred monophonic pitch/onset and estimated gate, not original MIDI.",
+      "strict_eligible": false,
+      "midi_validation": {
+        "event_count": 2,
+        "sample_exact_schedule": true,
+        "warnings": [],
+        "original_hardware_MIDI": false
+      }
+    }
+  ],
+  "native_case_count": 8,
+  "parameter_fits": 0,
+  "gain_fits": 0,
+  "original_MIDI_available": false,
+  "strict_eligible": false,
+  "metrics": {
+    "flute": "128ms Hann/40ms hop, pitch-following H2..7 relative H1, full trajectory and median; fixed-gain RMS level and slope separate.",
+    "brass": "Frozen source-defined 160ms masks, 243 valid partial records; six equally weighted note/phase cells, weak counts separately. Fixed common-frame C4 higher ratios and 40dB floored H1 tail error.",
+    "dry": "128ms Hann,32 harmonics on fixed early .4-.6/train .8-1.0/late1.2-1.4s windows; all H2..32 and odd subset separately; fixed-gain RMS shape."
+  },
+  "limits": [
+    "All recordings and windows are reused development evidence, no untouched known-settings holdout.",
+    "Audio references are offline analysis/listening only; synthesis uses no sample assets.",
+    "No controls, gain, gate, source eligibility, or masking may be fitted by this battery.",
+    "Neutral global controls and filter_lfo=0 do not verify newly added control paths.",
+    "Public creator audio copyright remains with the creator; local analysis excerpts are not a redistribution license."
+  ]
+}

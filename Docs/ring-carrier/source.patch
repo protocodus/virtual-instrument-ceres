@@ -1,0 +1,371 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ec6f93d..0a4ce38 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -49,0 +50,3 @@ if(BUILD_TESTING)
++  add_executable(ceres_ring_carrier_tests Tests/RingCarrierTests.cpp)
++  target_link_libraries(ceres_ring_carrier_tests PRIVATE ceres)
++  add_test(NAME ring_carrier_circuit_contracts COMMAND ceres_ring_carrier_tests)
+diff --git a/Source/DSP/ceres.cpp b/Source/DSP/ceres.cpp
+index 149c63b..9efd356 100644
+--- a/Source/DSP/ceres.cpp
++++ b/Source/DSP/ceres.cpp
+@@ -301,0 +302,48 @@ struct OutputCoupling {
++// Direct CS-50 PRA: four 100uF capacitors around the uA796 carrier input.
++// Nodes x=pin7, b=pin8, a=audio-bias, s=bypassed local supply. This passive
++// limit assumes an ideal sine source and zero incremental IC input currents.
++// It does not identify the multiplier's transistor law or wet-gain trim.
++struct RingCarrierCoupling {
++    std::array<std::array<double,4>,4> inverse{};
++    std::array<double,4> memory{};
++    void configure(double fs) {
++        std::array<std::array<double,4>,4> g{};
++        auto ground=[&](unsigned i,double r){g[i][i]+=1/r;};
++        auto edge=[&](unsigned i,unsigned j,double r){
++            const double y=1/r;g[i][i]+=y;g[j][j]+=y;g[i][j]-=y;g[j][i]-=y;
++        };
++        ground(0,33000);edge(0,1,100);edge(1,2,820);edge(1,3,1200);
++        ground(2,1000);ground(3,390);
++        // TPT capacitor coordinates w=(x-source,b,a,s):
++        // (I+G/(2fsC))*v=memory+(source,0,0,0), memory'=2w-memory.
++        // Factor once at construction, not in the sample callback.
++        std::array<std::array<double,8>,4> augmented{};
++        for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j) {
++            augmented[i][j]=(i==j?1.:0.)+g[i][j]/(2*fs*100e-6);
++            augmented[i][j+4]=(i==j?1.:0.);
++        }
++        for(unsigned col=0;col<4;++col) {
++            unsigned pivot=col;
++            for(unsigned row=col+1;row<4;++row)
++                if(std::abs(augmented[row][col])>std::abs(augmented[pivot][col]))pivot=row;
++            std::swap(augmented[col],augmented[pivot]);
++            const double diagonal=augmented[col][col];
++            for(double& value:augmented[col])value/=diagonal;
++            for(unsigned row=0;row<4;++row)if(row!=col) {
++                const double multiplier=augmented[row][col];
++                for(unsigned j=0;j<8;++j)augmented[row][j]-=multiplier*augmented[col][j];
++            }
++        }
++        for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j)inverse[i][j]=augmented[i][j+4];
++        clear();
++    }
++    void clear() {memory.fill(0);}
++    double process(double source) {
++        auto rhs=memory;rhs[0]+=source;
++        std::array<double,4> nodes{};
++        for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j)nodes[i]+=inverse[i][j]*rhs[j];
++        for(unsigned i=0;i<4;++i)memory[i]=2*(nodes[i]-(i==0?source:0.))-memory[i];
++        return nodes[0]-nodes[1]; // actual differential carrier; no gain normalization
++    }
++};
++
+@@ -526,0 +575,2 @@ struct Synth::Impl {
++    double ringCoupledCarrier=0;
++    RingCarrierCoupling ringCarrierCoupling;
+@@ -549,0 +600 @@ struct Synth::Impl {
++        ringCarrierCoupling.configure(internalFs);
+@@ -603,0 +655 @@ struct Synth::Impl {
++        ringCarrierCoupling.clear();ringCoupledCarrier=0;
+@@ -711,2 +763,2 @@ struct Synth::Impl {
+-        // topology; carrier leak, transistor transfer, input coupling and
+-        // wet-gain trim are unidentified. Direct PRA/Overall wet output uses
++        // topology; carrier leak, transistor transfer, audio-input loading
++        // and wet-gain trim remain unidentified. Direct PRA/Overall wet output uses
+@@ -719 +771,3 @@ struct Synth::Impl {
+-        const double wet=ringWetCoupling.process(bus*ringCarrier,.1,internalFs);
++        // Keep this free-running passive network connected even at mix0.
++        ringCoupledCarrier=ringCarrierCoupling.process(ringCarrier);
++        const double wet=ringWetCoupling.process(bus*ringCoupledCarrier,.1,internalFs);
+@@ -808,0 +863 @@ void Synth::allSoundOff() {
++    impl_->ringCarrierCoupling.clear();impl_->ringCoupledCarrier=0;
+@@ -845 +900 @@ Synth::ModulationState Synth::modulationState() const {
+-        impl_->ringCarrier,impl_->physicalKeyPresses};
++        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier};
+@@ -850,0 +906,11 @@ Synth::SoundPathState Synth::soundPathState() const {
++std::vector<double> ringCarrierResponse(double fs,const std::vector<double>& input) {
++    if(!std::isfinite(fs)||fs<100||fs>1536000)
++        throw std::invalid_argument("Invalid ring carrier probe sample rate");
++    RingCarrierCoupling coupling;coupling.configure(fs);
++    std::vector<double> result;result.reserve(input.size());
++    for(double value:input) {
++        if(!std::isfinite(value))throw std::invalid_argument("Nonfinite ring carrier probe input");
++        result.push_back(coupling.process(value));
++    }
++    return result;
++}
+diff --git a/Source/DSP/ceres.hpp b/Source/DSP/ceres.hpp
+index e60b37a..1322fb7 100644
+--- a/Source/DSP/ceres.hpp
++++ b/Source/DSP/ceres.hpp
+@@ -183,0 +184,2 @@ public:
++        // ringCarrier is the unchanged raw free-running oscillator sine.
++        // ringCoupledCarrier is pin7-pin8 after the passive carrier network.
+@@ -185,0 +188 @@ public:
++        double ringCoupledCarrier;
+@@ -201,0 +205,3 @@ private:
++// Exact production passive carrier network, zero initial incremental charge.
++// Ideal source, four100uF caps, zero incremental IC current; returns pin7-pin8.
++std::vector<double> ringCarrierResponse(double sampleRate,const std::vector<double>& input);
+diff --git a/Tests/ParityDriver.cpp b/Tests/ParityDriver.cpp
+index 62e4e7a..6cb954c 100644
+--- a/Tests/ParityDriver.cpp
++++ b/Tests/ParityDriver.cpp
+@@ -53,0 +54 @@ int main(int argc,char** argv) {
++        if(argc==3 && std::strcmp(argv[2],"ring-bypass")==0)patch.ringMix=0;
+diff --git a/Tests/RingCarrierTests.cpp b/Tests/RingCarrierTests.cpp
+new file mode 100644
+index 0000000..56c0cc2
+--- /dev/null
++++ b/Tests/RingCarrierTests.cpp
+@@ -0,0 +1,145 @@
++#include "ceres.hpp"
++#include <algorithm>
++#include <array>
++#include <cmath>
++#include <complex>
++#include <iostream>
++#include <limits>
++#include <stdexcept>
++#include <vector>
++namespace {
++constexpr double pi=3.141592653589793238462643383279502884;
++using Complex=std::complex<double>;
++template<class T>using Matrix=std::array<std::array<T,4>,4>;
++template<class T>using Vector=std::array<T,4>;
++void require(bool ok,const char* why){if(!ok)throw std::runtime_error(why);}
++void near(double a,double b,double tolerance,const char* why){
++    if(!std::isfinite(a)||!std::isfinite(b)||std::abs(a-b)>tolerance){
++        std::cerr<<why<<": "<<a<<" versus "<<b<<'\n';throw std::runtime_error(why);
++    }
++}
++template<class T>Vector<T> solve(Matrix<T> a,Vector<T> b){
++    // Independent elimination of the physical nodal equations; no reuse of
++    // production's precomputed inverse or companion-state implementation.
++    for(unsigned col=0;col<4;++col){
++        unsigned pivot=col;for(unsigned i=col+1;i<4;++i)if(std::abs(a[i][col])>std::abs(a[pivot][col]))pivot=i;
++        std::swap(a[col],a[pivot]);std::swap(b[col],b[pivot]);
++        require(std::abs(a[col][col])>1e-20,"Nonsingular nodal system");
++        for(unsigned row=col+1;row<4;++row){
++            const T ratio=a[row][col]/a[col][col];
++            for(unsigned j=col;j<4;++j)a[row][j]-=ratio*a[col][j];b[row]-=ratio*b[col];
++        }
++    }
++    Vector<T> x{};for(int row=3;row>=0;--row){T sum=b[row];for(unsigned j=row+1;j<4;++j)sum-=a[row][j]*x[j];x[row]=sum/a[row][row];}
++    return x;
++}
++Matrix<double> conductance(){
++    // Explicit independent KCL rows x,b,a,s; six physical resistors.
++    return {{{1/33000.+1/100.,-1/100.,0,0},
++        {-1/100.,1/100.+1/820.+1/1200.,-1/820.,-1/1200.},
++        {0,-1/820.,1/820.+1/1000.,0},
++        {0,-1/1200.,0,1/1200.+1/390.}}};
++}
++Complex response(double frequency,double fs){
++    const auto g=conductance();Matrix<Complex> a{};Vector<Complex> b{};
++    const Complex sc(0,2*fs*std::tan(pi*frequency/fs)*100e-6);
++    for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j)a[i][j]=g[i][j]+(i==j?sc:Complex(0));
++    b[0]=sc;const auto v=solve(a,b);return v[0]-v[1];
++}
++void frequencyResponse(){
++    for(double fs:{8000.,192000.}){
++        const std::size_t count=static_cast<std::size_t>(fs*8);
++        std::vector<double> input(count,0);input[0]=1;
++        const auto output=ceres::ringCarrierResponse(fs,input);
++        require(std::all_of(output.begin(),output.end(),[](double v){return std::isfinite(v);}),"Finite impulse");
++        near(output.back(),0,1e-14,"Impulse tail settled before Fourier comparison");
++        for(double f:{.2,1.,6.6692178847,30.,220.}){
++            Complex measured=0,z=1;const auto step=std::polar(1.,-2*pi*f/fs);
++            for(double value:output){measured+=value*z;z*=step;}
++            const auto expected=response(f,fs);
++            near(std::abs(measured-expected),0,2e-10,"Actual native complex response versus physical four-node KCL");
++            near(std::arg(measured/expected),0,2e-8,"Actual native carrier phase");
++            require(std::abs(measured)<1,"No frequency-dependent gain normalization");
++            std::cout<<"response fs="<<fs<<" f="<<f<<" dB="<<20*std::log10(std::abs(measured))
++                <<" phase="<<std::arg(measured)*180/pi<<'\n';
++        }
++    }
++}
++void independentTransient(){
++    const auto g=conductance();
++    for(double fs:{32000.,192000.}){
++        std::vector<double> input(1200);
++        for(unsigned i=0;i<input.size();++i)input[i]=i<211?1:(i<509?-.7:std::sin(i*.031));
++        const auto actual=ceres::ringCarrierResponse(fs,input);
++        Vector<double> previous{};double previousInput=0;
++        for(unsigned n=0;n<input.size();++n){
++            Matrix<double> a{};Vector<double> rhs{};
++            // C/h*(q_n-q_prev)+G/2*(q_n+q_prev)=B/2*(u_n+u_prev)
++            // q=(x-u,b,a,s), B=-G*e0; independently retain physical q and u.
++            for(unsigned i=0;i<4;++i){
++                rhs[i]=100e-6*fs*previous[i]-.5*g[i][0]*(input[n]+previousInput);
++                for(unsigned j=0;j<4;++j){a[i][j]=.5*g[i][j]+(i==j?100e-6*fs:0);rhs[i]-=.5*g[i][j]*previous[j];}
++            }
++            const auto q=solve(a,rhs);
++            near(actual[n],input[n]+q[0]-q[1],5e-13,"Production companion versus simultaneous physical-state trapezoids");
++            for(unsigned i=0;i<4;++i){
++                double residual=100e-6*fs*(q[i]-previous[i])+.5*g[i][0]*(input[n]+previousInput);
++                for(unsigned j=0;j<4;++j)residual+=.5*g[i][j]*(q[j]+previous[j]);
++                near(residual,0,8e-15,"Independent transient KCL residual");
++            }
++            previous=q;previousInput=input[n];
++        }
++    }
++}
++void productionLifecycle(){
++    constexpr double fs=8000,internal=4*fs;
++    ceres::Patch p;p.ringMix=0;p.ringRate=6.669;p.ringDepth=0;
++    ceres::Synth dry(fs,21),wet(fs,21);dry.setPatch(p);p.ringMix=1;wet.setPatch(p);
++    double phase=0;
++    for(unsigned segment=0;segment<2;++segment){
++        std::vector<double> input(4*900);
++        for(unsigned frame=0;frame<900;++frame)for(unsigned sub=0;sub<4;++sub){
++            const double rate=frame<333?6.669:30;
++            input[4*frame+sub]=std::sin(2*pi*phase);phase+=rate*(1/internal);phase-=std::floor(phase);
++        }
++        const auto expected=ceres::ringCarrierResponse(internal,input);
++        for(unsigned frame=0;frame<900;++frame){
++            if(frame==0){p.ringRate=6.669;p.ringMix=0;dry.setPatch(p);p.ringMix=1;wet.setPatch(p);}
++            if(frame==7)wet.noteOn(60);
++            if(frame==53)wet.noteOn(64);
++            if(frame==131)wet.noteOff(60);
++            if(frame==219)wet.noteOff(64);
++            if(frame==333){p.ringRate=30;p.ringMix=0;dry.setPatch(p);p.ringMix=1;wet.setPatch(p);}
++            dry.process();wet.process();const auto d=dry.modulationState(),w=wet.modulationState();
++            near(d.ringCarrier,input[frame*4+3],0,"Raw oscillator arithmetic unchanged");
++            near(w.ringCarrier,d.ringCarrier,0,"Notes and mix cannot reset carrier phase");
++            near(d.ringCoupledCarrier,expected[frame*4+3],0,"Real engine uses exact probe network even at mix0");
++            near(w.ringCoupledCarrier,d.ringCoupledCarrier,0,"Wet/dry carrier history identical across note/patch events");
++        }
++        const double raw=dry.modulationState().ringCarrier;
++        dry.allSoundOff();wet.allSoundOff();
++        near(dry.modulationState().ringCarrier,raw,0,"Panic keeps carrier phase convention");
++        near(dry.modulationState().ringCoupledCarrier,0,0,"Explicit software panic clears coupling with wet path");
++    }
++    dry.reset();wet.reset();p.ringRate=6.669;p.ringMix=0;dry.setPatch(p);wet.setPatch(p);
++    ceres::Synth fresh(fs,21);fresh.setPatch(p);
++    for(unsigned n=0;n<100;++n){
++        require(dry.process()==fresh.process(),"Reset restores deterministic dry audio");wet.process();
++        near(dry.modulationState().ringCoupledCarrier,wet.modulationState().ringCoupledCarrier,0,"Reset reinitializes carrier network and phase");
++    }
++}
++void invalidProbe(){
++    for(double rate:{0.,std::numeric_limits<double>::quiet_NaN(),1600000.}){
++        bool threw=false;try{ceres::ringCarrierResponse(rate,{0});}catch(const std::invalid_argument&){threw=true;}
++        require(threw,"Invalid probe rate rejected");
++    }
++    bool threw=false;try{ceres::ringCarrierResponse(48000,{std::numeric_limits<double>::infinity()});}catch(const std::invalid_argument&){threw=true;}
++    require(threw,"Nonfinite probe signal rejected");
++}
++}
++int main(){try{
++    frequencyResponse();std::cout<<"PASS complex carrier frequency response\n";
++    independentTransient();std::cout<<"PASS independent physical-state trapezoids/KCL\n";
++    productionLifecycle();std::cout<<"PASS native connection, mix bypass history, notes/live edits/panic/reset\n";
++    invalidProbe();std::cout<<"PASS native diagnostic validation\n";
++}catch(const std::exception& e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}}
+diff --git a/Tests/check_ring_bypass_parent.py b/Tests/check_ring_bypass_parent.py
+new file mode 100644
+index 0000000..71deb00
+--- /dev/null
++++ b/Tests/check_ring_bypass_parent.py
+@@ -0,0 +1,39 @@
++#!/usr/bin/env python3
++"""Recompile corrected-SUB parent and compare exact mix-zero audio."""
++import argparse
++from datetime import datetime,timezone
++import hashlib
++import json
++import os
++from pathlib import Path
++import subprocess
++import tempfile
++ROOT=Path(__file__).resolve().parents[1]
++PARENT='d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43'
++def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
++def main():
++    ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--build-dir',type=Path,default=ROOT/'build');ap.add_argument('--report',type=Path,required=True);args=ap.parse_args()
++    build=args.build_dir.resolve();identity=json.loads(subprocess.check_output([str(build/'ceres_render'),'--build-info'],text=True))
++    for name,digest in identity.items():assert sha(ROOT/name)==digest,name
++    records=[];parent_hashes={}
++    with tempfile.TemporaryDirectory(prefix='ceres-ring-parent-') as tmp:
++        tmp=Path(tmp)
++        for name in ('ceres.cpp','ceres.hpp'):
++            (tmp/name).write_bytes(subprocess.check_output(['git','show',PARENT+':Source/DSP/'+name],cwd=ROOT));parent_hashes[name]=sha(tmp/name)
++        compile_command=[os.environ.get('CXX','c++'),'-std=c++17','-O3','-DNDEBUG','-I',str(tmp),str(ROOT/'Tests/ParityDriver.cpp'),str(tmp/'ceres.cpp'),'-o',str(tmp/'parent')]
++        subprocess.run(compile_command,check=True)
++        for scene,extra in [('default-controls',[]),('active-carrier-bypassed',['ring-bypass'])]:
++            streams=[];variants={}
++            for label,binary in [('parent',tmp/'parent'),('candidate',build/'ceres_native_parity')]:
++                output=tmp/(label+'.f32');command=[str(binary),str(output),*extra]
++                subprocess.run(command,check=True);streams.append(output.read_bytes())
++                variants[label]={'command':command,'binary_sha256':sha(binary),'audio_sha256':sha(output),'samples':len(streams[-1])//4}
++            assert len(streams[0])==384000*4 and streams[0]==streams[1],scene
++            records.append({'scene':scene,'exact':True,'variants':variants})
++    report={'status':'pass','created_utc':datetime.now(timezone.utc).isoformat(),'parent_commit':PARENT,
++        'parent_source_sha256':parent_hashes,'compiled_source_sha256':identity,'compile_command':compile_command,
++        'comparisons':records,'samples_per_variant':768000,
++        'scope':'mix0 exact dry path; active carrier rates/depths/EG, allSUB functions, note/pedal/pressure/panic/reset. Same compiler/math library. Temporary binaries/streams deleted; retained source/commands reproduce. No recording fit.',
++        'verified_file_sha256':{str(p.relative_to(ROOT)):sha(p) for p in [Path(__file__),ROOT/'Tests/ParityDriver.cpp',ROOT/'Source/DSP/ceres.cpp',ROOT/'Source/DSP/ceres.hpp']}}
++    args.report.parent.mkdir(parents=True,exist_ok=True);args.report.write_text(json.dumps(report,indent=2)+'\n');print('PASS mix0 parent parity:768000 float32 samples')
++if __name__=='__main__':main()
+diff --git a/Tests/record_ring_carrier_validation.py b/Tests/record_ring_carrier_validation.py
+new file mode 100644
+index 0000000..928187c
+--- /dev/null
++++ b/Tests/record_ring_carrier_validation.py
+@@ -0,0 +1,55 @@
++#!/usr/bin/env python3
++"""Bind completed ring-carrier validation; no test/audio reruns."""
++from datetime import datetime,timezone
++import hashlib
++import json
++from pathlib import Path
++import re
++import subprocess
++ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'Docs/ring-carrier'
++PARENT='d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43'
++def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
++def main():
++    identity=json.loads(subprocess.check_output([str(ROOT/'build/ceres_render'),'--build-info'],text=True))
++    for name,digest in identity.items():assert sha(ROOT/name)==digest,name
++    parity=json.loads((OUT/'parent-parity.json').read_text())
++    assert parity['status']=='pass' and parity['parent_commit']==PARENT and parity['samples_per_variant']==768000
++    assert parity['compiled_source_sha256']==identity
++    for name,digest in parity['verified_file_sha256'].items():assert sha(ROOT/name)==digest,name
++    for log,count in [('release.log',8),('sanitize.log',3)]:assert f'100% tests passed, 0 tests failed out of {count}' in (OUT/log).read_text(),log
++    def table(source):return source.split('const Parameter parameters[] = {',1)[1].split('\n};',1)[0]
++    parent=subprocess.check_output(['git','show',PARENT+':Source/DSP/ceres.cpp'],cwd=ROOT,text=True)
++    assert table(parent)==table((ROOT/'Source/DSP/ceres.cpp').read_text())
++    keys=re.findall(r'\{"([a-z_]+)",',table(parent));assert len(keys)==57
++    code=['CMakeLists.txt','Source/DSP/ceres.cpp','Source/DSP/ceres.hpp','Tests/RingCarrierTests.cpp',
++          'Tests/ParityDriver.cpp','Tests/check_ring_bypass_parent.py','Tests/record_ring_carrier_validation.py']
++    diff=subprocess.check_output(['git','diff',PARENT,'--binary','--unified=0','--',*code],cwd=ROOT);assert diff
++    (OUT/'source.patch').write_bytes(diff)
++    audit=Path('/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring')
++    assert sha(audit/'evidence.json')=='afa33dd2d74d3352167a00d28d00d1134ab173cfcba52f738cf647a146f3286f'
++    # Bind the exact source-only circuit oracle; do not rerun hardware fits.
++    expected=json.loads((audit/'passive-carrier-result.json').read_text())
++    actual=json.loads(subprocess.check_output(['python3',str(audit/'passive_carrier.py')],text=True))
++    assert expected==actual,'Frozen passive oracle differs'
++    files=[ROOT/p for p in code]+[ROOT/'Docs/DSP_SOURCE.md']+[OUT/p for p in [
++        'README.md','source.patch','configure.log','build.log','release.log','sanitize-configure.log',
++        'sanitize-build.log','sanitize.log','parent-parity.json','parent-parity.log']]
++    files += [audit/p for p in ['evidence.json','source-review.md','passive_carrier.py','passive-carrier-result.json',
++        'evidence/pra-ring-carrier-bias.png','evidence/guide-ring-carrier-62.png']]
++    files += [Path('/tmp/ceres-cs50-1x8LGd/research')/p for p in ['service2.pdf','cs-servicing-guide.pdf']]
++    binaries=[ROOT/'build'/p for p in ['ceres_render','libceres.a','libceres_embedded.a','ceres_ring_carrier_tests','ceres_native_parity','ceres_embedded_parity']]
++    report={'status':'pass','created_utc':datetime.now(timezone.utc).isoformat(),'parent_commit':PARENT,
++        'compiled_source_sha256':identity,'release_ctest_passed':8,'asan_ubsan_ctest_passed':3,'asan_options':'detect_leaks=0',
++        'embedded_keys':57,'parameter_table_byte_identical':True,'parent_bypass_audio_exact_samples':768000,
++        'native_embedded_active_parity':'Existing native/embedded, active-soundpath and expression 384000-sample comparisons passed; ring uses multiple rates/mixes/depths.',
++        'circuit_tests':{'processing_rates_hz':[8000,192000],'frequencies_hz':[.2,1,6.6692178847,30,220],
++            'max_allowed_complex_response_error':2e-10,'max_allowed_phase_error_rad':2e-8,'impulse_tail_limit':1e-14,
++            'independent_transient_rates_hz':[32000,192000],'physical_state_max_error':5e-13,'kcl_residual_limit':8e-15},
++        'scope':'Four passive 100uF carrier capacitors only, ideal source / zero incremental IC current; no frequency normalization, oscillator/envelope/parameter/UI change or recording fit. Explicit panic clears coupling but preserves phase.',
++        'allocation_check':'Existing embedded all 57-key contract passed with zero post-construction new/new[] allocations.',
++        'binary_sha256':{str(p.relative_to(ROOT)):sha(p) for p in binaries},
++        'verified_file_sha256':{str(p.relative_to(ROOT)) if p.is_relative_to(ROOT) else str(p):sha(p) for p in files}}
++    (OUT/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
++    for name,digest in report['verified_file_sha256'].items():assert sha(ROOT/name)==digest,name
++    print('PASS',len(report['verified_file_sha256']),'bindings; renderer',sha(ROOT/'build/ceres_render'))
++if __name__=='__main__':main()

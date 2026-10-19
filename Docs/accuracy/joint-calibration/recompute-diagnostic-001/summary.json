@@ -1,0 +1,33 @@
+{
+  "actual_qualification_status": "qualification_pass",
+  "actual_sha256": "ab33fdcfff5f20054dd4a282cbb744f017c32b879f781fa592942c626a69dee1",
+  "changed_leaf_count": 989,
+  "check_exception": "Traceback (most recent call last):\n  File \"/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/recompute-diagnostic-001/diagnose.py\", line 98, in main\n    module.check('attempt-001')\n  File \"/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/joint_calibration.py\", line 503, in check\n    assert actual==saved,'Preserve differing result; do not overwrite evidence'\nAssertionError: Preserve differing result; do not overwrite evidence\n",
+  "declaration_sha256": "ac17d4b0f084fb63b05fce651213a57192307ad506fd3ebab201a28cc635f780",
+  "exact_diff_sha256": "a70cbdf352d3b3d42de3b15e34b317053214424e4d1a45f2e75dc4c3c148bf89",
+  "first_difference": {
+    "absolute_difference": 3.552713678800501e-15,
+    "actual": -14.275534710677366,
+    "expected": -14.27553471067737,
+    "kind": "value",
+    "path": "$.baselines.flute-high-factory-physical.analytical_ratios_db[7][4]",
+    "relative_difference": 2.488672929458294e-16
+  },
+  "fits": 0,
+  "maximum_numeric_difference": {
+    "absolute_difference": 1.4210854715202004e-14,
+    "actual": -26.75255473898451,
+    "expected": -26.752554738984497,
+    "kind": "value",
+    "path": "$.cases[11].analytical_delta_ratios_db[23][5]",
+    "relative_difference": 5.311961737431224e-16
+  },
+  "new_audio_renders": 0,
+  "nonnumeric_changed_leaf_count": 0,
+  "nonnumeric_differences": [],
+  "numeric_changed_leaf_count": 989,
+  "original_report_sha256": "5ae567e7dbdbce2ac63569f367c74e2867b0f432186313391cb3e740b80ae176",
+  "saved_qualification_status": "qualification_pass",
+  "source_helper_sha256": "5c4b5aabafc28cc5d8dcaf502a2956e03899f0dd8977d8f7d94410a4a06d7114",
+  "status": "exact_difference"
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "ceres.audible-ring-switch-scenes.v1",
+  "declared_before_new_render": true,
+  "base_scene_plan_sha256": "ecb1e576a53e05f19de90a9f5dec0cef6731819ab1513967cb75a3495251d8ff",
+  "base_manifest_sha256": "86e9ef0174cac404d35fa2313d8d38628e483fcc00bf64a9017320157ea848f9",
+  "driver_sha256": "7a7eb95569f973fa925270ef625a33171d33f6bd7869fb522f9f9b5c63c0ad2c",
+  "parent_and_passive_audio": "Reuse exact hash-bound existing ring-run-001 WAVs; no rerender or changes to their declaration.",
+  "physical_variant": "Source-scaled matchedBJT switching core in separate ring-only branch; commit/source/binary frozen before render.",
+  "physical_law": {
+    "equation": "tanh((delta_v + 1.5*passive_differential)/(2VT))",
+    "dc_delta_v": -0.0234894371800962,
+    "two_vt_volts": 0.0513851582421717,
+    "source_peak_volts": 1.5,
+    "temperature_K": 298.15,
+    "normalization": "none; no DC mean removal, wetgain compensation or peak normalization"
+  },
+  "source_limits": "Ideal3VppIG00150 source, zero chip/network loading and centered balance trim DC; matched upperBJT exponentials and infinite beta. Audio pair transfer, current loading, source impedance and actual gain trim remain uncalibrated.",
+  "rates": [
+    1,
+    30,
+    220
+  ],
+  "measurement_window_seconds": [
+    2.5,
+    4.5
+  ],
+  "listening_window_seconds": [
+    2,
+    4
+  ],
+  "sidebands_to_measure": "440+n*rate for n=-5..5 within20..20000Hz; includes440Hz dry feedthrough. Report actual harmonic and total RMS changes, not calibrated hardware accuracy.",
+  "reused_wav_sha256": {
+    "parent-1": "414a4e4a5792f552b148bfa01dcdb019f5eaddd5b46bf8a54575c87006356282",
+    "parent-30": "35198aefb053a22296f02087c8f69a9adaec420e8f166210f3c64896e264364e",
+    "parent-220": "8968b61eb2e43166a23e01b050fdc5a48a9be35b93d5e03a8befcad8b383b11a",
+    "ring-1": "589783c4dfc7dd8c854045bc0200b6168a341f80839c4f4ca34335d4adc88193",
+    "ring-30": "22f456a3613f56d028562b184ee84af5fe75720416d74bad2c83920cf4db334c",
+    "ring-220": "a5b91c301174dc154948f7262ce2ef33872c114175660a740787c50b47f05da8"
+  },
+  "parameter_fits": 0,
+  "gain_fits": 0,
+  "gate_or_phase_changes": 0
+}

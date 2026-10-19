@@ -1,0 +1,59 @@
+{
+  "source_url": "https://www.youtube.com/watch?v=Fj21t8MIS_o",
+  "creator": "Andy Whitmore",
+  "source_metadata": "Docs/accuracy/inputs/references/whitmore-original.info.json",
+  "source_metadata_sha256": "6eacf2197b45b0aece675ce2cadf79fedb996c138b2dd6f309ecbe862629001d",
+  "screen_report_sha256": "b69cbd58bab45b2e004c161a4fc1f9d6279821acc1d9e7a106976b0fe524a4f3",
+  "acquisition": {
+    "no_account_or_cookies": true,
+    "public_video_format": "248, VP9 1920x1012,25fps",
+    "commands": [
+      "yt-dlp --ignore-config --no-playlist --no-progress -f 'bestvideo[height<=1080]' --download-sections '*900-970' -o 'Docs/accuracy/active-source/whitmore-resonance-900-970.%(ext)s' 'https://www.youtube.com/watch?v=Fj21t8MIS_o'",
+      "yt-dlp --ignore-config --no-playlist --no-progress -f 'bestvideo[height<=1080]' --download-sections '*740-780' -o 'Docs/accuracy/active-source/whitmore-sub-740-780.%(ext)s' 'https://www.youtube.com/watch?v=Fj21t8MIS_o'"
+    ],
+    "audio": "Previously acquired original English-US source, unchanged stereo48k float32 decode; new excerpts are exact sample slices."
+  },
+  "observations": [
+    {
+      "seconds": [
+        901,
+        908,
+        915,
+        922
+      ],
+      "finding": "Left hand contacts upper manual VCF bank; red manual LP resonance cap toward labeled HIGH. Lower-front global RES/BR caps not touched in these sampled frames. Exact manual cutoff and CV obscured.",
+      "supports": "Manual VCF sweep, not isolated global RES sweep."
+    },
+    {
+      "seconds": [
+        957,
+        964
+      ],
+      "finding": "Manual LP resonance cap now visibly toward LOW; hand again contacts manual filter bank. Exact values and simultaneous HP settings remain unmeasured.",
+      "supports": "Creator full/no-resonance contrast belongs at least partly to manual filter controls."
+    },
+    {
+      "seconds": [
+        755
+      ],
+      "finding": "Left finger contacts SUB SPEED white cap. Other hand holds low keyboard region.",
+      "supports": "SUB rate manipulation, not calibrated rate or route."
+    },
+    {
+      "seconds": [
+        762
+      ],
+      "finding": "SUB VCO white cap is visibly higher than755 and finger is at its vicinity; VCF green cap remains near lower travel in sampled views. Spectrogram shows harmonic pitch motion.",
+      "supports": "VCO modulation is active. A zero VCF depth or exact VCF response cannot be inferred from cap proximity to end."
+    }
+  ],
+  "limits": [
+    "Sampled stills do not prove controls stayed fixed between frames.",
+    "Do not infer electrical voltage or endpoint from physical cap position alone.",
+    "Exact sounding gates, pressure, active voice count, HP/LP/resonance settings and recording response remain unresolved.",
+    "These are new development source screens, not independent known-settings holdouts.",
+    "No synth fitting or quantitative accuracy target was selected."
+  ],
+  "strict_eligible": false,
+  "native_renders": 0
+}

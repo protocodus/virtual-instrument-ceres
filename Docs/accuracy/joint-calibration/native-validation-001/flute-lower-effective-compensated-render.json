@@ -1,0 +1,20 @@
+{
+  "statistics": {
+    "sample_rate": 48000,
+    "frames": 119000,
+    "channels": 1,
+    "sample_format": "float32",
+    "seed": 50,
+    "preset": "flute",
+    "peak": 0.129513517022,
+    "rms": 0.0484536954119,
+    "samples_above_unity": 0,
+    "render_seconds": 0.452758583,
+    "audio_seconds": 2.47916666667,
+    "realtime_factor": 5.47569225577,
+    "normalization": "none",
+    "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+  },
+  "audio_sha256": "117bb8264841fbe70aac3ac1059765594cdbf2877d7b450b01ac4608c67ea002",
+  "log_sha256": "c901723661a29d1124dd4e26225b3bc4044c35d9b3f984d89f060949911969ec"
+}

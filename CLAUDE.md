@@ -4,12 +4,13 @@
 
 This is Ceres's canonical repository: it owns the DSP engine in
 `Source/DSP/` and the JUCE plug-in (VST3, AU, CLAP, Standalone) that wraps it.
-The repository is a scaffold: the engine renders silence and there are no
-controls or presets until the owner defines the instrument. No Reason Rack
-Extension exists for Ceres yet. If one is added, it lives in the private
+The repository currently contains two distinct engines: the tested C++17
+circuit synthesizer `ceres.cpp`/`ceres.hpp`, and the unchanged silent
+`CeresEngine.*` scaffold used by the JUCE plug-in. The plug-in is not yet
+connected to the circuit model. The existing Reason Rack Extension lives in the private
 `protocodus/reason-rack-extensions` repository as a thin adapter that mounts
 this repository as the pinned submodule `Examples/Ceres/Instrument` and
-compiles `Source/DSP/*.cpp` directly. DSP and playing-model changes land here
+compiles `Source/DSP/ceres.cpp` with `CERES_EMBEDDED_TARGET` directly. DSP and playing-model changes land here
 first; the Rack pin then advances. Reason property mapping, MIDI/CV, routing,
 host latency, patches and panels stay in the adapter.
 
@@ -19,8 +20,9 @@ Protocodus portfolio standard kept in the project, not in this repository.
 - The DSP version is the product version: `project(Ceres VERSION X.Y.Z)` in
   `CMakeLists.txt`. Any DSP or behaviour change bumps it, and versions only go
   up. A Rack device would take the same `X.Y.Z` plus its own stage suffix.
-- `Source/DSP/` is JUCE-free and C++17 (the Rack toolchain); the
-  `CeresDSPCxx17` target proves it. No allocation, file I/O, locks or
+- `Source/DSP/` is JUCE-free and C++17 (the Rack toolchain);
+  `CeresDSPCxx17` proves scaffold portability; `ceres` and `ceres_embedded`
+  explicitly compile the circuit engine as C++17. No allocation, file I/O, locks or
   exceptions on the audio thread.
 - `PLUGIN_MANUFACTURER_CODE Cers` / `PLUGIN_CODE Cer1`, `BUNDLE_ID` and the
   CLAP id `cz.protocodus.ceres` never change once a build reaches users:
@@ -150,7 +152,7 @@ ctest --test-dir build-dsp -L unit --output-on-failure
 Use a separate `build-plugin` directory (`-DCERES_BUILD_PLUGIN=ON`, the
 default) for the processor, editor and packaging. Every test is
 `Ceres.<Suite>` with one tier label: `unit`, `audio` (`Ceres.AudioDemos`,
-every preset's demo rendered twice; it fails until the first preset exists),
+every existing standalone circuit research preset rendered twice),
 `render` (`Ceres.EditorRender`, the editor screenshot) or `fuzz` (`Ceres.DspFuzz`; `Ceres.ParameterMatrix` in
 the plug-in build). Select the suites that cover a change with `-R`, then run
 the full suite before a substantive DSP change is called done.

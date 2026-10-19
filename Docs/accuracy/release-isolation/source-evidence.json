@@ -1,0 +1,359 @@
+{
+  "date": "2026-10-18",
+  "before_native_audio": true,
+  "current_commit": "55869df8ba728e25a6b5792aa07dfd55f134439c",
+  "external_source_sha256": {
+    "/tmp/ceres-cs50-1x8LGd/research/service1.pdf": "c3a4b0d4e27e9af90c88258d03a1c09c5d080ea162e562d9bf267fc8ffbbadc1",
+    "/tmp/ceres-cs50-1x8LGd/research/service2.pdf": "1102e55b949378e7776555bca1a4d73105ca2d76d6fcf3aa4c2b103566201cfc",
+    "/tmp/ceres-cs50-1x8LGd/research/service1-10.png": "2367567b6ed2a91248ab77ea3f056856012cf11e0a6fe0ac32ecf76771607640",
+    "/tmp/ceres-cs50-1x8LGd/research/filter-eg-detail.png": "7307bd7e97b1eb6b4ffa3251dac492d8686ef4744716aaaf17cbfbb4c8c61cda",
+    "/tmp/ceres-cs50-1x8LGd/research/envelope-audit-crop.png": "83e9b64111247f63488042505e2a3dd914f565ce00fd56561e09c5d1419e1b95",
+    "/tmp/ceres-cs50-1x8LGd/research/tracking-amp-sustain-path.png": "ac2bc5c2a9992c1f5d1d58a53da0e2901d25200a988ebb4220cf89bdf80cca09",
+    "/tmp/ceres-cs50-1x8LGd/research/tracking-cs50-sub.png": "dcaf356b4703f715853e57285e15b1ab2fe84dafd840b82d29daa7dcd0bd4874",
+    "/tmp/ceres-cs50-1x8LGd/research/sustain-release-routing.md": "4df91ecef7eb484805bd84bef20f0b01460d8cb34e8d7702bf82ed1c4a3ed87d",
+    "/tmp/ceres-cs50-1x8LGd/research/vcf-release-path-audit.md": "bd37c76b3462bc28d8ae54026752cf3b754937503a26e74a39058ff01b0f24da",
+    "/tmp/ceres-cs50-1x8LGd/research/envelope-timing-audit.md": "83cd46a34692545ee6f55ad488e7b9b1a64caa737cc0f311f8dc2b5ba1130a82",
+    "/tmp/ceres-cs50-1x8LGd/research/envelope-control-scale.md": "bd30074891377f6e1ec0758a0ae04aec2b1f6af2bbf92cd75437502979ea5589",
+    "/tmp/ceres-cs50-1x8LGd/research/vcf-decay-loading-followup.md": "f34d5f7a0a4c04176e56a87f483ed8f439b7f8f99fc005ddb2090aba76bf5c56",
+    "/tmp/ceres-cs50-1x8LGd/research/brass-locus-envelope-reachability.json": "c7c2c1a876be9b1d52454648c62978edbf18b98380c2b428aa11ee72f27fa4d4",
+    "/tmp/ceres-cs50-1x8LGd/reports/vcf-decay-qmax-study.md": "00de8b4c75938b6d5a7656a4d4570bb571aff5426108e6b5dd2e7981dc488fde",
+    "/tmp/ceres-cs50-1x8LGd/reports/vcf-decay-decade-study.md": "d77bc31a67ba707bdb3f13b3223e6afeacf84a9d07ad1b9159ef006ff5d88cc0",
+    "/tmp/ceres-cs50-1x8LGd/reports/lp-envelope-anchor-study.md": "a7c41b0501aaafcce68b2a5ef245604eadf6cd01ad556a44085fa92b2b487de1",
+    "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-brass1-global-release/nominal-SUS-10V.patch": "291cd187b8c8045ca0458738342c75ffc43064abd78c176ce18ccfaabf64fd46",
+    "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-brass1-global-release/nominal-SUS-5V.patch": "c223dfdf3d90faf5947efc6a0ce71b4af3dd950daa19ade6e89d260ffaf80a60",
+    "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-brass1-global-release/nominal-SUS-6V.patch": "c8d0d919cae73e4ebe95cd123c9b7dfbf9047e148327c2485c809106f9ff1c54",
+    "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-brass1-global-release/nominal-SUS-7V.patch": "b0d976a8c1161f9bf014c04807f811bca205455e2992d080fbc0d346ef7b6168",
+    "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-brass1-global-release/nominal-SUS-8V.patch": "81c10344201b3a3cb4ece38b459c0ad3372360c3086e6d9d95a57dfb12857ce7",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/canonical-best-zero.patch": "19a8f7ea6bb45f3d007c8be05529a72fa646b37bf2941abe69e1a42c33edfab1",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/dry-sawtooth_bias-0.02.patch": "257517d8b93bc3ec64a6dc1a6405400f8a94706996c742fb2e304d44ae6ef517",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/dry-sawtooth_bias0.patch": "cac4672732dbd4669070fe3f45cfd52f46efd09a21c962aee67cb9ac1b0eb1cf",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/dry-square_bias-0.02.patch": "2a60b3ccafd1b23daa41449504d148617f1b7b6a69ebafcac2b053a1ea99972a",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/dry-square_bias0.patch": "9ede683c579ca6f590f6dcd17699cd5e1dc46842caee7dd513a54a3e2a2b44d6",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-48_SUS4_bias-0.02.patch": "f3b3e00f1902343ce7f0f7170fb24ba2283cf8be8f78e5a55c36ef5a3b2397f6",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-48_SUS4_bias0.patch": "868677b72ea3bc60afd74e4281932a220bc47d17cf2c43f2bdd167228d4a4723",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-48_SUS5_bias-0.02.patch": "b69141600e86f2c8373890d8298570be0c547bb76f77abc2f8d69540bb7d0219",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-48_SUS5_bias0.patch": "5d19b90ffaf76abed2e92692cb3a733811d9dfce5ebb51c9a419678bb6678267",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-48_SUS6_bias-0.02.patch": "a3d6f0ddf001b5bb9d25f2a006fc90df3437b898a94f1d81c9b545bde250d5a8",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-48_SUS6_bias0.patch": "39dae32a53c26f374bab8c179b032e9467f627fdb55153708a553f45934edd0b",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-48_SUS7_bias-0.02.patch": "497ff957e40473cf91363771f552eb6a54d864f6b2029e2384746471a691b1ec",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-48_SUS7_bias0.patch": "33f60c5886ee7d420416e7086d911e277e5514e19d3a23cf2c6173bb276efa4f",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-96_SUS4_bias-0.02.patch": "f3b3e00f1902343ce7f0f7170fb24ba2283cf8be8f78e5a55c36ef5a3b2397f6",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-96_SUS4_bias0.patch": "868677b72ea3bc60afd74e4281932a220bc47d17cf2c43f2bdd167228d4a4723",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-96_SUS5_bias-0.02.patch": "b69141600e86f2c8373890d8298570be0c547bb76f77abc2f8d69540bb7d0219",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-96_SUS5_bias0.patch": "5d19b90ffaf76abed2e92692cb3a733811d9dfce5ebb51c9a419678bb6678267",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-96_SUS6_bias-0.02.patch": "a3d6f0ddf001b5bb9d25f2a006fc90df3437b898a94f1d81c9b545bde250d5a8",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-96_SUS6_bias0.patch": "39dae32a53c26f374bab8c179b032e9467f627fdb55153708a553f45934edd0b",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-96_SUS7_bias-0.02.patch": "497ff957e40473cf91363771f552eb6a54d864f6b2029e2384746471a691b1ec",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off-96_SUS7_bias0.patch": "33f60c5886ee7d420416e7086d911e277e5514e19d3a23cf2c6173bb276efa4f",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off0_SUS4_bias-0.02.patch": "f3b3e00f1902343ce7f0f7170fb24ba2283cf8be8f78e5a55c36ef5a3b2397f6",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off0_SUS4_bias0.patch": "868677b72ea3bc60afd74e4281932a220bc47d17cf2c43f2bdd167228d4a4723",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off0_SUS5_bias-0.02.patch": "b69141600e86f2c8373890d8298570be0c547bb76f77abc2f8d69540bb7d0219",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off0_SUS5_bias0.patch": "5d19b90ffaf76abed2e92692cb3a733811d9dfce5ebb51c9a419678bb6678267",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off0_SUS6_bias-0.02.patch": "a3d6f0ddf001b5bb9d25f2a006fc90df3437b898a94f1d81c9b545bde250d5a8",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off0_SUS6_bias0.patch": "39dae32a53c26f374bab8c179b032e9467f627fdb55153708a553f45934edd0b",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off0_SUS7_bias-0.02.patch": "497ff957e40473cf91363771f552eb6a54d864f6b2029e2384746471a691b1ec",
+    "/tmp/ceres-cs50-1x8LGd/calibration/amp-bias/off0_SUS7_bias0.patch": "33f60c5886ee7d420416e7086d911e277e5514e19d3a23cf2c6173bb276efa4f",
+    "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case10-baseline.patch": "fbc0735460f73b6ca83fb4e22b4365a89e5e3ebf9b84e1f43d01e45f68470ac8",
+    "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case10-both-slow.patch": "fd433f34994e952dc934e88a3d4fd7ab8607d35791129d3ebb04c56576f81a71",
+    "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case10-slow-amp.patch": "13f09fdd8eea920f5d128e195cc5bc603bcd1feadc5ccf827f3e0753474a87b4",
+    "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case10-slow-vcf.patch": "e3ba4e3dc3c20d8169c5289552a07f8fed3b489ebd56f8fbdef524fce94f2fa2",
+    "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case20-baseline.patch": "19a8f7ea6bb45f3d007c8be05529a72fa646b37bf2941abe69e1a42c33edfab1",
+    "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case20-both-slow.patch": "c325bbeeaa855554dc73b04c90c54cd8e59ffb388dc0926d4dbece7e6c669ac4",
+    "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case20-slow-amp.patch": "7c0737a663acb0a07cd75b08192f76ad57b84834215cf096c12a651b4ca3001b",
+    "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case20-slow-vcf.patch": "7751beeb9f33c0f976299cfe69eb9331c023787bd1b788d91ed90dd629240acf",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case10-LPx0.5-Q075.patch": "f48f61461f5f6a5bcee9284beba47933547de36987b463cbf91e431b76945a20",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case10-LPx0.5-Qfactory.patch": "2164ddb73c024338d60bb33671ca180612bfbb5028f68b1c04ca22baf265aed1",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case10-LPx0.5-Qmax.patch": "07492ba5a1fb2b53697573d1ae1512593c6b86dbecf989accccac8cb203c47f9",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case10-LPx1-Q075.patch": "ba7535f137187a4e0fb033311e605187f3204129080df46b341c715c3420cdd6",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case10-LPx1-Qfactory.patch": "fbc0735460f73b6ca83fb4e22b4365a89e5e3ebf9b84e1f43d01e45f68470ac8",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case10-LPx1-Qmax.patch": "dab8709f79edcfbfe9449ab8099a5f5e193dc99f525db82a9c3496551cfd93be",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case20-LPx0.5-Q075.patch": "cdb1b2f8e156d379f86959ee8323101083a05fe9640e77828099d19a784f06d4",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case20-LPx0.5-Qfactory.patch": "ab4b718413a31c0c6ad1e83c823d5474a2568aca7787beaf7fbb6e9a605025a2",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case20-LPx0.5-Qmax.patch": "fe93bd6f8344c5cc5cb6c1635f751e2bbc2013aeb1a5f1c6125ba55f39e520a6",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case20-LPx1-Q075.patch": "d86fb2b8fc57813693601fa0e6f77189d2c759e8b7dcf33e0c2c76089ee43e6b",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case20-LPx1-Qfactory.patch": "19a8f7ea6bb45f3d007c8be05529a72fa646b37bf2941abe69e1a42c33edfab1",
+    "/tmp/ceres-cs50-1x8LGd/calibration/brass-filter-grid/case20-LPx1-Qmax.patch": "a74e1c0fb82139ed5d7936c437ef4515e9e88aa39945c5a3e37b30b992f2aaff",
+    "/tmp/ceres-cs50-1x8LGd/calibration/lp-envelope-anchor/case10-Q075-span1.5.patch": "2160bf8f621f9e5820dcdc6ad5342d5174eaa0d8e72d7cc4824f7d9cb9c42da7",
+    "/tmp/ceres-cs50-1x8LGd/calibration/lp-envelope-anchor/case10-Q075-span1.patch": "ba7535f137187a4e0fb033311e605187f3204129080df46b341c715c3420cdd6",
+    "/tmp/ceres-cs50-1x8LGd/calibration/lp-envelope-anchor/case10-Q075-span2.patch": "01f50a30f3ea66ff469938fbf44053c785bc90141ee4d2451a429ac18737e6fe",
+    "/tmp/ceres-cs50-1x8LGd/calibration/lp-envelope-anchor/case10-Qfactory-span1.5.patch": "4df8eba87e7412b84601cc35212614d5c5f5928f4386cab8f7fe02438403c6dd",
+    "/tmp/ceres-cs50-1x8LGd/calibration/lp-envelope-anchor/case10-Qfactory-span1.patch": "fbc0735460f73b6ca83fb4e22b4365a89e5e3ebf9b84e1f43d01e45f68470ac8",
+    "/tmp/ceres-cs50-1x8LGd/calibration/lp-envelope-anchor/case10-Qfactory-span2.patch": "6006e38b17011c2281b427ff9db0ea1bb8e54a14649194fcd6da27f71e5072b4",
+    "/tmp/ceres-cs50-1x8LGd/calibration/lp-envelope-anchor/case20-Q075-span1.5.patch": "29b486f3e914975191b83e30dadc3625da9477280a1050d38fbcfa86a8e87476",
+    "/tmp/ceres-cs50-1x8LGd/calibration/lp-envelope-anchor/case20-Q075-span1.patch": "d86fb2b8fc57813693601fa0e6f77189d2c759e8b7dcf33e0c2c76089ee43e6b",
+    "/tmp/ceres-cs50-1x8LGd/calibration/lp-envelope-anchor/case20-Q075-span2.patch": "60797296f89ed1b289206a1be87e4650e885fd9b3c8edf6d5747c99a25af8585",
+    "/tmp/ceres-cs50-1x8LGd/calibration/lp-envelope-anchor/case20-Qfactory-span1.5.patch": "f8f7fc7dc34248efbef0cfa9002be07d1308f9d9dc36bebd40ee91807e040f14",
+    "/tmp/ceres-cs50-1x8LGd/calibration/lp-envelope-anchor/case20-Qfactory-span1.patch": "19a8f7ea6bb45f3d007c8be05529a72fa646b37bf2941abe69e1a42c33edfab1",
+    "/tmp/ceres-cs50-1x8LGd/calibration/lp-envelope-anchor/case20-Qfactory-span2.patch": "0b6fa4b6575913bf39497914ccc2d32d1019eb3c6baf03521a26da8fa8a97774",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case10-Q075-R0-D0.1.patch": "a6d7bc77f8e3ce54231c96dc7222f77d9968db38a14a96e85150407c68dd4f54",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case10-Q075-R0-D1.patch": "164e7bd1d39e336960fb20aa1b9096adc30f591727497590fbf3e4a390f243c6",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case10-Q075-R1-D0.1.patch": "18ec66a65334d258e6c27788a3a3f751549e90e27b77084f512e86874a72582f",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case10-Q075-R1-D1.patch": "c5040b30f5a4061d04eb0a63384772389228022c0f1f14ae8c48d3241ca00ca7",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case10-Qfactory-R0-D0.1.patch": "0f6c4d8c0f27843e69c09e96ca3eb88a29fb54697e0e02c59d068bd2cdc7ded3",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case10-Qfactory-R0-D1.patch": "fc904b600b88b9a469eef291fb91cbb8f1d2f12faee53b7411d97cc06ec8ede5",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case10-Qfactory-R1-D0.1.patch": "52879ecb63aff6d6ab71b19e531aa40f57391f78a1b84bd0c518c0cc84feab38",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case10-Qfactory-R1-D1.patch": "fe7bad29014b0c8c92d003bf11386068e8d656a6638e4b5ea1052edd404f162d",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case20-Q075-R0-D0.1.patch": "ad925db0b0c9cb0d6858d5de951a01b9dc0ddff737880b6763e1de2675e9296e",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case20-Q075-R0-D1.patch": "ae8f75ec25521bdc516842f1d1642d1b0468f6563d88778c11ed1e89d6a1ed34",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case20-Q075-R1-D0.1.patch": "2cd8c0b8ec7d4d4004c6ca81a41ff66b7a8e69fde821a531804411575d8123c8",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case20-Q075-R1-D1.patch": "2b4fbee9afa2f2fe261a0cd68384b9c0a3a183efc4c7e101901f1d74b78cb522",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case20-Qfactory-R0-D0.1.patch": "110818ed820d75e0c9e16fcf17c33635a0051f23e7ccfaa662899ac2bcb20033",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case20-Qfactory-R0-D1.patch": "233fb9c1092788610d29bd02f689d6bbd80647ca781517804b5cbbbd1a87bba5",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case20-Qfactory-R1-D0.1.patch": "6ab1601e959121ec3b901ab6673587e4e25dd0d3c9cc079fb845b396443d2036",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-decade/case20-Qfactory-R1-D1.patch": "e1f0128f874bc703f4b78d98c82d088d326bc541ecf4ae0dc2dddb57acc88626",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-qmax/case10-Qmax-R0-D0.1.patch": "3210b78bde5cde8a14bf162796417d077bcb751fe13e0df4dff3a3fd65984273",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-qmax/case10-Qmax-R0-D1.patch": "b6992296274dfa53d6f4958916aa6de310a4dd45bab4b139efa1c09e4ddba9cb",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-qmax/case10-Qmax-R1-D0.1.patch": "4c1d558a29f8d6b7d582fcb8037039f4b7032ea534407a87b9c302155f4afe0d",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-qmax/case10-Qmax-R1-D1.patch": "5f56271bd7ef26cea4ab174a805c33f4d00f40d5969ac87accbe53f4634d7274",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-qmax/case20-Qmax-R0-D0.1.patch": "f59866d1a040907a50c497bf5f404486ac892bb540f08a0b270ddd762dd2c00a",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-qmax/case20-Qmax-R0-D1.patch": "14c04db77d15e9cb20d35217859e547e63394563ae418cba5a78c51bb8b9f291",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-qmax/case20-Qmax-R1-D0.1.patch": "8d757ea090ed81018490e002f134f6ec4ff1567d8b084a64f4698aa965b5abe6",
+    "/tmp/ceres-cs50-1x8LGd/calibration/vcf-decay-qmax/case20-Qmax-R1-D1.patch": "1c259473e18b4ec340baad5a231006ffd5aad1afc405891f3ea5507a08df79ca"
+  },
+  "current_code_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Source/DSP/ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8"
+  },
+  "Envelope_body_matches_frozen_reachability_code": true,
+  "Envelope_body_sha256": "8edb64b0681c61abede29f6e68826d50a52bc0f783ce0b184318acd4e379f543",
+  "primary_pages": [
+    {
+      "document": "/tmp/ceres-cs50-1x8LGd/research/service1.pdf",
+      "pdf_page": 10,
+      "printed_page": 20,
+      "claim": "Negative IL -> AL -> grounded SL0 -> IL, higher timing CV faster; published A/D/R decade."
+    },
+    {
+      "document": "/tmp/ceres-cs50-1x8LGd/research/service2.pdf",
+      "pdf_page": 12,
+      "printed_page": 16,
+      "claim": "Separate IG00151 timing VCAs,0.22uF capacitors,82k+VR19/VR20,VR15/VR16 bias and100k feedback."
+    },
+    {
+      "document": "/tmp/ceres-cs50-1x8LGd/research/service2.pdf",
+      "pdf_page": 6,
+      "printed_page": 8,
+      "claim": "Separate RF/RA diode/follower selectors share SUS; no selector timing capacitor."
+    }
+  ],
+  "historical_inventory": [
+    {
+      "directory": "whitmore-brass1-global-release",
+      "count": 5,
+      "filter_release_overrides": [
+        {
+          "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-brass1-global-release/nominal-SUS-5V.patch",
+          "filter_release": 0.436884804012708,
+          "amp_release": 0.436884804012708,
+          "global_release": 0
+        },
+        {
+          "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-brass1-global-release/nominal-SUS-6V.patch",
+          "filter_release": 0.21896108633692227,
+          "amp_release": 0.21896108633692227,
+          "global_release": 0
+        },
+        {
+          "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-brass1-global-release/nominal-SUS-7V.patch",
+          "filter_release": 0.10974050113322432,
+          "amp_release": 0.10974050113322432,
+          "global_release": 0
+        },
+        {
+          "path": "/tmp/ceres-cs50-1x8LGd/calibration/whitmore-brass1-global-release/nominal-SUS-8V.patch",
+          "filter_release": 0.05500053817983126,
+          "amp_release": 0.05500053817983126,
+          "global_release": 0
+        }
+      ]
+    },
+    {
+      "directory": "amp-bias",
+      "count": 29,
+      "filter_release_overrides": []
+    },
+    {
+      "directory": "release-factorial",
+      "count": 8,
+      "filter_release_overrides": [
+        {
+          "path": "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case10-both-slow.patch",
+          "filter_release": 30.0,
+          "amp_release": 30.0,
+          "global_release": 0.21896108633692227
+        },
+        {
+          "path": "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case10-slow-vcf.patch",
+          "filter_release": 30.0,
+          "amp_release": null,
+          "global_release": 0.21896108633692227
+        },
+        {
+          "path": "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case20-both-slow.patch",
+          "filter_release": 30.0,
+          "amp_release": 30.0,
+          "global_release": 0.436884804012708
+        },
+        {
+          "path": "/tmp/ceres-cs50-1x8LGd/calibration/release-factorial/case20-slow-vcf.patch",
+          "filter_release": 30.0,
+          "amp_release": null,
+          "global_release": 0.436884804012708
+        }
+      ]
+    },
+    {
+      "directory": "brass-filter-grid",
+      "count": 12,
+      "filter_release_overrides": []
+    },
+    {
+      "directory": "lp-envelope-anchor",
+      "count": 12,
+      "filter_release_overrides": []
+    },
+    {
+      "directory": "vcf-decay-decade",
+      "count": 16,
+      "filter_release_overrides": []
+    },
+    {
+      "directory": "vcf-decay-qmax",
+      "count": 8,
+      "filter_release_overrides": []
+    }
+  ],
+  "total_historical_patches": 90,
+  "crossing_formula": "t_cross=t_off+(factor*T60/log(1000))*log((Eoff-IL)/(Etarget-IL)); post-update center includes one192k step.",
+  "state_calculations": [
+    {
+      "history": 20,
+      "R_factor": 1,
+      "T60_s": 0.436884804012708,
+      "tau_s": 0.06324555320336758,
+      "C4_off_seconds": 137.32083333333333,
+      "E_before_off": 1.377018826179094,
+      "Q1_negative_witness": -0.81703125,
+      "continuous_crossing_seconds": 137.50414463537288,
+      "second_lobe_center_E": [
+        1.37879009691099,
+        0.7698112751277887,
+        0.30491464488205644,
+        -0.03394544714594627
+      ]
+    },
+    {
+      "history": 20,
+      "R_factor": 0.5,
+      "T60_s": 0.218442402006354,
+      "tau_s": 0.03162277660168379,
+      "C4_off_seconds": 137.32083333333333,
+      "E_before_off": 1.377018826179094,
+      "Q1_negative_witness": -0.81703125,
+      "continuous_crossing_seconds": 137.4124889843531,
+      "second_lobe_center_E": [
+        1.37879009691099,
+        0.32138840139989033,
+        -0.2721860667635515,
+        -0.5875436396474412
+      ]
+    },
+    {
+      "history": 20,
+      "R_factor": 0.25,
+      "T60_s": 0.109221201003177,
+      "tau_s": 0.015811388300841896,
+      "C4_off_seconds": 137.32083333333333,
+      "E_before_off": 1.377018826179094,
+      "Q1_negative_witness": -0.81703125,
+      "continuous_crossing_seconds": 137.36666115884321,
+      "second_lobe_center_E": [
+        1.37879009691099,
+        -0.2543339446178652,
+        -0.7500495613328048,
+        -0.8899724316978284
+      ]
+    },
+    {
+      "history": 20,
+      "R_factor": 0.1,
+      "T60_s": 0.0436884804012708,
+      "tau_s": 0.006324555320336759,
+      "C4_off_seconds": 137.32083333333333,
+      "E_before_off": 1.377018826179094,
+      "Q1_negative_witness": -0.81703125,
+      "continuous_crossing_seconds": 137.3391644635373,
+      "second_lobe_center_E": [
+        1.37879009691099,
+        -0.8329603676281566,
+        -0.9402574497948367,
+        -0.9447992515507918
+      ]
+    },
+    {
+      "history": 10,
+      "R_factor": 1,
+      "T60_s": 0.21896108633692227,
+      "tau_s": 0.03169786384922228,
+      "C4_off_seconds": 137.42083333333335,
+      "E_before_off": 1.1790309969914479,
+      "Q1_negative_witness": -0.81703125,
+      "continuous_crossing_seconds": 137.5098816630511,
+      "second_lobe_center_E": [
+        1.37879009691099,
+        1.3366423725779488,
+        1.2957830464357776,
+        1.256172733916877
+      ]
+    },
+    {
+      "history": 10,
+      "R_factor": 0.5,
+      "T60_s": 0.10948054316846113,
+      "tau_s": 0.01584893192461114,
+      "C4_off_seconds": 137.42083333333335,
+      "E_before_off": 1.1790309969914479,
+      "Q1_negative_witness": -0.81703125,
+      "continuous_crossing_seconds": 137.46535749819222,
+      "second_lobe_center_E": [
+        1.37879009691099,
+        1.3366423725779488,
+        1.2957830464357776,
+        1.256172733916877
+      ]
+    },
+    {
+      "history": 10,
+      "R_factor": 0.25,
+      "T60_s": 0.05474027158423057,
+      "tau_s": 0.00792446596230557,
+      "C4_off_seconds": 137.42083333333335,
+      "E_before_off": 1.1790309969914479,
+      "Q1_negative_witness": -0.81703125,
+      "continuous_crossing_seconds": 137.44309541576277,
+      "second_lobe_center_E": [
+        1.37879009691099,
+        1.3366423725779488,
+        1.2957830464357776,
+        1.256172733916877
+      ]
+    },
+    {
+      "history": 10,
+      "R_factor": 0.1,
+      "T60_s": 0.021896108633692228,
+      "tau_s": 0.0031697863849222286,
+      "C4_off_seconds": 137.42083333333335,
+      "E_before_off": 1.1790309969914479,
+      "Q1_negative_witness": -0.81703125,
+      "continuous_crossing_seconds": 137.42973816630513,
+      "second_lobe_center_E": [
+        1.37879009691099,
+        1.3366423725779488,
+        1.2957830464357776,
+        1.256172733916877
+      ]
+    }
+  ],
+  "state_calculation_scope": "Closed-form no-audio diagnostic from frozen D1 production traces; Q1 state is a prior stationary witness, not a fitted target or physical control. Current study keeps factory Q and never selects from these calculations."
+}

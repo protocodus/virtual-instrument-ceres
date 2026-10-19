@@ -1,0 +1,504 @@
+{
+  "audio_read": false,
+  "expanded_audio_cap_f": 1e-05,
+  "fit_count": 0,
+  "main_capacitances_f": [
+    0.0001,
+    0.0001,
+    0.0001,
+    0.0001
+  ],
+  "native_render_count": 0,
+  "nodes": [
+    "pin7",
+    "pin8",
+    "audio_bias",
+    "local_supply",
+    "pin1",
+    "pin4",
+    "audio_cap_right"
+  ],
+  "rows": [
+    {
+      "four_node": {
+        "db": -38.43448360844056,
+        "kcl_max_abs_amp_per_source_volt": 1.3552527156068805e-19,
+        "magnitude": 0.011975008202868193,
+        "phase_degrees": 83.80941690625801
+      },
+      "frequency_hz": 0.2,
+      "full_external_zero_IC_current": [
+        {
+          "db": -38.43396137886263,
+          "kcl_max_abs_amp_per_source_volt": 1.7569554237634638e-19,
+          "magnitude": 0.011975728208733154,
+          "phase_degrees": 83.83993812828109,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0
+        },
+        {
+          "db": -38.434065143167054,
+          "kcl_max_abs_amp_per_source_volt": 1.8816336951745032e-19,
+          "magnitude": 0.011975585143861633,
+          "phase_degrees": 83.83926599767503,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -38.43396752791554,
+          "kcl_max_abs_amp_per_source_volt": 2.6519031098861194e-19,
+          "magnitude": 0.011975719730688483,
+          "phase_degrees": 83.83997761865722,
+          "signal_series_ohms": 330,
+          "trim_fraction": 1
+        },
+        {
+          "db": -38.4316581494098,
+          "kcl_max_abs_amp_per_source_volt": 8.131516293641283e-20,
+          "magnitude": 0.011978904222758407,
+          "phase_degrees": 83.83114760299304,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0
+        },
+        {
+          "db": -38.43175576550454,
+          "kcl_max_abs_amp_per_source_volt": 2.34051006103887e-19,
+          "magnitude": 0.011978769598980359,
+          "phase_degrees": 83.83044889105209,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -38.43165717668607,
+          "kcl_max_abs_amp_per_source_volt": 1.3552527156068805e-19,
+          "magnitude": 0.011978905564263478,
+          "phase_degrees": 83.83115917034496,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 1
+        }
+      ],
+      "scalar_oracle_magnitude_error": 5.204170427930421e-18
+    },
+    {
+      "four_node": {
+        "db": -26.4370339234613,
+        "kcl_max_abs_amp_per_source_volt": 8.243750062963789e-19,
+        "magnitude": 0.04765937072794399,
+        "phase_degrees": 72.37643441387884
+      },
+      "frequency_hz": 1,
+      "full_external_zero_IC_current": [
+        {
+          "db": -26.412014402781736,
+          "kcl_max_abs_amp_per_source_volt": 7.743345235849456e-19,
+          "magnitude": 0.047796850442040885,
+          "phase_degrees": 72.51783142438947,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0
+        },
+        {
+          "db": -26.41225196687751,
+          "kcl_max_abs_amp_per_source_volt": 7.439785042467509e-19,
+          "magnitude": 0.04779554318846637,
+          "phase_degrees": 72.51930525629747,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -26.411957038235276,
+          "kcl_max_abs_amp_per_source_volt": 8.073783692708403e-19,
+          "magnitude": 0.04779716610961394,
+          "phase_degrees": 72.51833657776068,
+          "signal_series_ohms": 330,
+          "trim_fraction": 1
+        },
+        {
+          "db": -26.428285289592157,
+          "kcl_max_abs_amp_per_source_volt": 4.84869951806108e-19,
+          "magnitude": 0.047707398558828544,
+          "phase_degrees": 72.34344211699985,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0
+        },
+        {
+          "db": -26.428574057283868,
+          "kcl_max_abs_amp_per_source_volt": 9.640649038664098e-19,
+          "magnitude": 0.04770581252366874,
+          "phase_degrees": 72.3445379233537,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -26.428281046315423,
+          "kcl_max_abs_amp_per_source_volt": 1.0029099020701703e-18,
+          "magnitude": 0.04770742186510484,
+          "phase_degrees": 72.34342778020466,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 1
+        }
+      ],
+      "scalar_oracle_magnitude_error": 9.020562075079397e-17
+    },
+    {
+      "four_node": {
+        "db": -13.305939548134385,
+        "kcl_max_abs_amp_per_source_volt": 8.673617379884035e-19,
+        "magnitude": 0.21612401282710547,
+        "phase_degrees": 67.901219648121
+      },
+      "frequency_hz": 6.6692178847,
+      "full_external_zero_IC_current": [
+        {
+          "db": -13.316606152607466,
+          "kcl_max_abs_amp_per_source_volt": 1.939479807224432e-18,
+          "magnitude": 0.21585876717775798,
+          "phase_degrees": 67.7978881207949,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0
+        },
+        {
+          "db": -13.316597311322527,
+          "kcl_max_abs_amp_per_source_volt": 1.939479807224432e-18,
+          "magnitude": 0.21585898689846802,
+          "phase_degrees": 67.79767734889522,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -13.316638239939333,
+          "kcl_max_abs_amp_per_source_volt": 1.2583432062661141e-18,
+          "magnitude": 0.21585796975580188,
+          "phase_degrees": 67.7976129240748,
+          "signal_series_ohms": 330,
+          "trim_fraction": 1
+        },
+        {
+          "db": -13.306918333389222,
+          "kcl_max_abs_amp_per_source_volt": 1.4074089017168082e-18,
+          "magnitude": 0.21609965987220908,
+          "phase_degrees": 67.9026945262693,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0
+        },
+        {
+          "db": -13.306885736926283,
+          "kcl_max_abs_amp_per_source_volt": 1.205222818706544e-18,
+          "magnitude": 0.2161004708539352,
+          "phase_degrees": 67.90264593165136,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -13.30691880129166,
+          "kcl_max_abs_amp_per_source_volt": 1.2266347333466993e-18,
+          "magnitude": 0.2160996482310808,
+          "phase_degrees": 67.90269519984972,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 1
+        }
+      ],
+      "scalar_oracle_magnitude_error": 5.551115123125783e-17
+    },
+    {
+      "four_node": {
+        "db": -12.959060761229669,
+        "kcl_max_abs_amp_per_source_volt": 8.290613795096749e-19,
+        "magnitude": 0.22492978179401804,
+        "phase_degrees": 67.62527532067004
+      },
+      "frequency_hz": 7,
+      "full_external_zero_IC_current": [
+        {
+          "db": -12.970115068016852,
+          "kcl_max_abs_amp_per_source_volt": 2.4532694666933987e-18,
+          "magnitude": 0.2246437015682285,
+          "phase_degrees": 67.53434146500794,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0
+        },
+        {
+          "db": -12.97011016940333,
+          "kcl_max_abs_amp_per_source_volt": 1.2266347333466993e-18,
+          "magnitude": 0.22464382826140908,
+          "phase_degrees": 67.53414703785839,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -12.970147957526239,
+          "kcl_max_abs_amp_per_source_volt": 8.673617379884035e-19,
+          "magnitude": 0.22464285094642106,
+          "phase_degrees": 67.53410251644787,
+          "signal_series_ohms": 330,
+          "trim_fraction": 1
+        },
+        {
+          "db": -12.9599199409672,
+          "kcl_max_abs_amp_per_source_volt": 8.673617379884035e-19,
+          "magnitude": 0.22490753357752313,
+          "phase_degrees": 67.62697887804997,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0
+        },
+        {
+          "db": -12.959891320064123,
+          "kcl_max_abs_amp_per_source_volt": 1.2266347333466993e-18,
+          "magnitude": 0.22490827467228638,
+          "phase_degrees": 67.62692259606874,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -12.959920351982957,
+          "kcl_max_abs_amp_per_source_volt": 1.155566541522067e-18,
+          "magnitude": 0.22490752293491287,
+          "phase_degrees": 67.62697966552149,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 1
+        }
+      ],
+      "scalar_oracle_magnitude_error": 2.7755575615628914e-17
+    },
+    {
+      "four_node": {
+        "db": -3.4700289250037146,
+        "kcl_max_abs_amp_per_source_volt": 1.9368821089499895e-18,
+        "magnitude": 0.6706540533440276,
+        "phase_degrees": 44.95568741308318
+      },
+      "frequency_hz": 30,
+      "full_external_zero_IC_current": [
+        {
+          "db": -3.4702134479913878,
+          "kcl_max_abs_amp_per_source_volt": 3.878959614448864e-18,
+          "magnitude": 0.6706398061246522,
+          "phase_degrees": 44.95992709125077,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0
+        },
+        {
+          "db": -3.470213705932874,
+          "kcl_max_abs_amp_per_source_volt": 6.860679293818674e-19,
+          "magnitude": 0.6706397862089231,
+          "phase_degrees": 44.95993077947345,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -3.4702137056892095,
+          "kcl_max_abs_amp_per_source_volt": 8.673617379884035e-19,
+          "magnitude": 0.6706397862277365,
+          "phase_degrees": 44.959937560882494,
+          "signal_series_ohms": 330,
+          "trim_fraction": 1
+        },
+        {
+          "db": -3.4700246285213483,
+          "kcl_max_abs_amp_per_source_volt": 3.576224061345498e-18,
+          "magnitude": 0.670654385083682,
+          "phase_degrees": 44.95576803298893,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0
+        },
+        {
+          "db": -3.4700247714583177,
+          "kcl_max_abs_amp_per_source_volt": 5.124262311686789e-19,
+          "magnitude": 0.6706543740472415,
+          "phase_degrees": 44.9557653446376,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -3.4700246264824353,
+          "kcl_max_abs_amp_per_source_volt": 1.734723475976807e-18,
+          "magnitude": 0.6706543852411104,
+          "phase_degrees": 44.95576807154057,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 1
+        }
+      ],
+      "scalar_oracle_magnitude_error": 1.1102230246251565e-16
+    },
+    {
+      "four_node": {
+        "db": -1.5983121690271709,
+        "kcl_max_abs_amp_per_source_volt": 7.05981306231723e-18,
+        "magnitude": 0.8319254140801946,
+        "phase_degrees": 31.920820929207398
+      },
+      "frequency_hz": 50,
+      "full_external_zero_IC_current": [
+        {
+          "db": -1.5982708580080607,
+          "kcl_max_abs_amp_per_source_volt": 7.023086426956682e-18,
+          "magnitude": 0.8319293708157554,
+          "phase_degrees": 31.92160013387638,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0
+        },
+        {
+          "db": -1.5982708296204646,
+          "kcl_max_abs_amp_per_source_volt": 2.1246318396855225e-18,
+          "magnitude": 0.8319293735347025,
+          "phase_degrees": 31.921600804619754,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -1.5982707380554033,
+          "kcl_max_abs_amp_per_source_volt": 2.168404344971009e-18,
+          "magnitude": 0.83192938230475,
+          "phase_degrees": 31.921601847402066,
+          "signal_series_ohms": 330,
+          "trim_fraction": 1
+        },
+        {
+          "db": -1.5983107263032494,
+          "kcl_max_abs_amp_per_source_volt": 1.3132289110330889e-19,
+          "magnitude": 0.8319255522627925,
+          "phase_degrees": 31.920831290341415,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0
+        },
+        {
+          "db": -1.598310774380304,
+          "kcl_max_abs_amp_per_source_volt": 6.992893892674703e-18,
+          "magnitude": 0.8319255476580218,
+          "phase_degrees": 31.920830944761434,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -1.5983107256149536,
+          "kcl_max_abs_amp_per_source_volt": 6.942281208919283e-18,
+          "magnitude": 0.8319255523287168,
+          "phase_degrees": 31.92083129529878,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 1
+        }
+      ],
+      "scalar_oracle_magnitude_error": 2.220446049250313e-16
+    },
+    {
+      "four_node": {
+        "db": -0.45991200847083136,
+        "kcl_max_abs_amp_per_source_volt": 1.440382577715263e-18,
+        "magnitude": 0.9484280712071752,
+        "phase_degrees": 17.584386433259663
+      },
+      "frequency_hz": 100,
+      "full_external_zero_IC_current": [
+        {
+          "db": -0.45990438049596116,
+          "kcl_max_abs_amp_per_source_volt": 2.5766023332497465e-18,
+          "magnitude": 0.9484289041199765,
+          "phase_degrees": 17.58442512939481,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0
+        },
+        {
+          "db": -0.4599043745003982,
+          "kcl_max_abs_amp_per_source_volt": 1.4476433706704057e-17,
+          "magnitude": 0.9484289047746435,
+          "phase_degrees": 17.58442516123148,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -0.4599043629306433,
+          "kcl_max_abs_amp_per_source_volt": 2.6020852139652106e-18,
+          "magnitude": 0.9484289060379671,
+          "phase_degrees": 17.584425208494938,
+          "signal_series_ohms": 330,
+          "trim_fraction": 1
+        },
+        {
+          "db": -0.45991186974672715,
+          "kcl_max_abs_amp_per_source_volt": 3.939199787763863e-18,
+          "magnitude": 0.9484280863547123,
+          "phase_degrees": 17.584386867048448,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0
+        },
+        {
+          "db": -0.4599118743714331,
+          "kcl_max_abs_amp_per_source_volt": 3.0966064860187975e-18,
+          "magnitude": 0.9484280858497323,
+          "phase_degrees": 17.584386852578703,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -0.45991186968046055,
+          "kcl_max_abs_amp_per_source_volt": 1.3879481770324007e-17,
+          "magnitude": 0.9484280863619481,
+          "phase_degrees": 17.584386867256047,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 1
+        }
+      ],
+      "scalar_oracle_magnitude_error": 1.1102230246251565e-16
+    },
+    {
+      "four_node": {
+        "db": -0.09921282754710005,
+        "kcl_max_abs_amp_per_source_volt": 3.6591823321385775e-18,
+        "magnitude": 0.9886426879005678,
+        "phase_degrees": 8.235149310706122
+      },
+      "frequency_hz": 220,
+      "full_external_zero_IC_current": [
+        {
+          "db": -0.09921240993282035,
+          "kcl_max_abs_amp_per_source_volt": 2.1955093992831465e-18,
+          "magnitude": 0.9886427354341344,
+          "phase_degrees": 8.235150173591183,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0
+        },
+        {
+          "db": -0.0992124096052753,
+          "kcl_max_abs_amp_per_source_volt": 1.9109063290057016e-18,
+          "magnitude": 0.9886427354714161,
+          "phase_degrees": 8.235150174288364,
+          "signal_series_ohms": 330,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -0.09921240901262482,
+          "kcl_max_abs_amp_per_source_volt": 2.791670920238629e-17,
+          "magnitude": 0.9886427355388726,
+          "phase_degrees": 8.235150175314118,
+          "signal_series_ohms": 330,
+          "trim_fraction": 1
+        },
+        {
+          "db": -0.09921282084116612,
+          "kcl_max_abs_amp_per_source_volt": 3.5236570605778894e-18,
+          "magnitude": 0.9886426886638485,
+          "phase_degrees": 8.235149319926103,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0
+        },
+        {
+          "db": -0.09921282106474562,
+          "kcl_max_abs_amp_per_source_volt": 1.870248747537495e-18,
+          "magnitude": 0.9886426886384003,
+          "phase_degrees": 8.23514931961855,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 0.5
+        },
+        {
+          "db": -0.0992128208379619,
+          "kcl_max_abs_amp_per_source_volt": 3.672734859294646e-18,
+          "magnitude": 0.9886426886642132,
+          "phase_degrees": 8.23514931993052,
+          "signal_series_ohms": 330000,
+          "trim_fraction": 1
+        }
+      ],
+      "scalar_oracle_magnitude_error": 2.220446049250313e-16
+    }
+  ],
+  "scope": "Small-signal differential carrier pin7-pin8. Ideal IG00150 voltage source; zero incremental IC currents. No multiplier law or normalizing gain."
+}

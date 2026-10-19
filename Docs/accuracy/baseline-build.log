@@ -1,0 +1,18 @@
+$ cmake -S /Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/baseline-source -B /Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/baseline-build -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
+-- The CXX compiler identification is AppleClang 21.0.0.21000101
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/baseline-build
+
+$ cmake --build /Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/baseline-build --target ceres_render -j 2
+[ 25%] Building CXX object CMakeFiles/ceres.dir/Source/DSP/ceres.cpp.o
+[ 50%] Linking CXX static library libceres.a
+[ 50%] Built target ceres
+[ 75%] Building CXX object CMakeFiles/ceres_render.dir/Tools/render_main.cpp.o
+[100%] Linking CXX executable ceres_render
+[100%] Built target ceres_render

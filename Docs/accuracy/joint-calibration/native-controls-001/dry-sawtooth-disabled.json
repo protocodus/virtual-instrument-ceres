@@ -1,0 +1,26 @@
+{
+  "id": "dry-sawtooth-disabled",
+  "kind": "disabled",
+  "original_id": "dry-sawtooth",
+  "audio": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/dry-sawtooth-disabled.wav",
+  "audio_sha256": "8d0ec15f02c949e531601f7d931b7bd5ddc05af57e0ceb95ecc11413d1a2a6f9",
+  "statistics": {
+    "sample_rate": 48000,
+    "frames": 146704,
+    "channels": 1,
+    "sample_format": "float32",
+    "seed": 50,
+    "preset": "init",
+    "peak": 0.0914834365249,
+    "rms": 0.0247637033328,
+    "samples_above_unity": 0,
+    "render_seconds": 0.612410417,
+    "audio_seconds": 3.05633333333,
+    "realtime_factor": 4.99066189681,
+    "normalization": "none",
+    "timing_scope": "native offline DSP plus WAV I/O; not host deadline performance"
+  },
+  "peak": 0.09148343652486801,
+  "log_sha256": "deb66569c6ab807ce640625747d1a2c3097393db6673c5f38f01c643ecb62449",
+  "byte_exact_to_frozen": true
+}

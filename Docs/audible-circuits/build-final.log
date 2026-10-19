@@ -1,0 +1,42 @@
+-- Configuring done (0.5s)
+-- Generating done (0.1s)
+-- Build files have been written to: /private/tmp/ceres-audible-integrated-20261019/build
+[  3%] Building CXX object CMakeFiles/ceres_embedded.dir/Source/DSP/ceres.cpp.o
+[  7%] Building CXX object CMakeFiles/ceres.dir/Source/DSP/ceres.cpp.o
+[ 11%] Linking CXX static library libceres_embedded.a
+[ 11%] Built target ceres_embedded
+[ 15%] Building CXX object CMakeFiles/ceres_embedded_contract.dir/Tests/EmbeddedContract.cpp.o
+[ 19%] Building CXX object CMakeFiles/ceres_embedded_parity.dir/Tests/ParityDriver.cpp.o
+[ 23%] Linking CXX static library libceres.a
+[ 23%] Built target ceres
+[ 30%] Building CXX object CMakeFiles/ceres_render.dir/Tools/render_main.cpp.o
+[ 30%] Building CXX object CMakeFiles/ceres_oscillator_circuit_tests.dir/Tests/OscillatorCircuitTests.cpp.o
+[ 38%] Building CXX object CMakeFiles/ceres_sound_path_tests.dir/Tests/SoundPathTests.cpp.o
+[ 38%] Building CXX object CMakeFiles/ceres_tests.dir/Tests/dsp_tests.cpp.o
+[ 42%] Linking CXX executable ceres_embedded_contract
+[ 42%] Built target ceres_embedded_contract
+[ 46%] Building CXX object CMakeFiles/ceres_capacitor_tests.dir/Tests/CapacitorContinuityTests.cpp.o
+[ 50%] Linking CXX executable ceres_embedded_parity
+[ 50%] Built target ceres_embedded_parity
+[ 53%] Building CXX object CMakeFiles/ceres_ring_carrier_tests.dir/Tests/RingCarrierTests.cpp.o
+[ 57%] Linking CXX executable ceres_oscillator_circuit_tests
+[ 61%] Linking CXX executable ceres_sound_path_tests
+[ 61%] Built target ceres_oscillator_circuit_tests
+[ 61%] Built target ceres_sound_path_tests
+[ 65%] Building CXX object CMakeFiles/ceres_ring_switching_tests.dir/Tests/RingSwitchingTests.cpp.o
+[ 69%] Building CXX object CMakeFiles/ceres_expression_tests.dir/Tests/ExpressionTests.cpp.o
+[ 73%] Linking CXX executable ceres_render
+[ 76%] Linking CXX executable ceres_capacitor_tests
+[ 76%] Built target ceres_render
+[ 76%] Built target ceres_capacitor_tests
+[ 80%] Building CXX object CMakeFiles/ceres_native_parity.dir/Tests/ParityDriver.cpp.o
+[ 84%] Linking CXX executable ceres_ring_carrier_tests
+[ 84%] Built target ceres_ring_carrier_tests
+[ 88%] Linking CXX executable ceres_ring_switching_tests
+[ 88%] Built target ceres_ring_switching_tests
+[ 92%] Linking CXX executable ceres_expression_tests
+[ 92%] Built target ceres_expression_tests
+[ 96%] Linking CXX executable ceres_native_parity
+[ 96%] Built target ceres_native_parity
+[100%] Linking CXX executable ceres_tests
+[100%] Built target ceres_tests

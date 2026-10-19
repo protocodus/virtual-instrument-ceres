@@ -1,0 +1,66 @@
+{
+  "status": "pass",
+  "reason": "Historical soundpath-final report referred to mutable build/ceres_render later superseded by expression implementation",
+  "historical_report_sha256": "8eeb41595e7d9eec0900cbe999350327ec8bd475b94a21636a41f355428f9596",
+  "original_expected_binary_sha256": "f114c02a42c6e40178205b8cc973bc552ab32f810c002b713ccbdc19bb638e2b",
+  "recovered_binary": "Docs/accuracy/soundpath-final-source/ceres_render",
+  "recovered_binary_sha256": "f114c02a42c6e40178205b8cc973bc552ab32f810c002b713ccbdc19bb638e2b",
+  "byte_identical_executable": true,
+  "source_commit": "b22dda696090a754f0018f2646bf92b259de406f",
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "42ca7aa529968edde3726a61713e9d4da59cd884db1a9e620db6c80b9fc86e36",
+    "Source/DSP/ceres.cpp": "05e3ecfd53e9ccaa5901952cbdadf04d8b167ffe66df8064e13088da86913e4e",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "541ae94745a83bdac8b0a452cf9367a763c632205099aa08717490c64e5cc1eb"
+  },
+  "recovery_build_directory": "/tmp/ceres-b4-identity-recovery-20261018",
+  "commands": [
+    [
+      "git",
+      "show",
+      "b22dda696090a754f0018f2646bf92b259de406f:Source/DSP/ceres.hpp"
+    ],
+    [
+      "git",
+      "show",
+      "b22dda696090a754f0018f2646bf92b259de406f:Source/DSP/ceres.cpp"
+    ],
+    [
+      "git",
+      "show",
+      "b22dda696090a754f0018f2646bf92b259de406f:Tools/render_main.cpp"
+    ],
+    [
+      "git",
+      "show",
+      "b22dda696090a754f0018f2646bf92b259de406f:Tools/build_identity.hpp.in"
+    ],
+    [
+      "git",
+      "show",
+      "b22dda696090a754f0018f2646bf92b259de406f:CMakeLists.txt"
+    ],
+    [
+      "cmake",
+      "-S",
+      "/tmp/ceres-b4-identity-recovery-20261018",
+      "-B",
+      "/tmp/ceres-b4-identity-recovery-20261018/build",
+      "-DBUILD_TESTING=OFF",
+      "-DCMAKE_BUILD_TYPE=Release"
+    ],
+    [
+      "cmake",
+      "--build",
+      "/tmp/ceres-b4-identity-recovery-20261018/build",
+      "--target",
+      "ceres_render",
+      "-j",
+      "2"
+    ]
+  ],
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+  "historical_report_audio_metrics_changed": false,
+  "frozen_plan_and_measurement_code_changed": false
+}

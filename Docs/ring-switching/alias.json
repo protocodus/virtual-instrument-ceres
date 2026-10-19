@@ -1,0 +1,87 @@
+{
+  "status": "pass",
+  "created_utc": "2026-10-19T07:58:35.516496+00:00",
+  "carrier_hz": 220,
+  "period_seconds": 0.05,
+  "nominal_source_vpp": 3,
+  "temperature_kelvin": 298.15,
+  "dc_differential_volts": -0.023489437180096218,
+  "reference_oversampling_over192k": 16,
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "7f37338cc128af74d9ebc2b221a2a7bd849b9f9608104afc55cb31a780dd0646",
+    "Source/DSP/ceres.cpp": "f08afce7f5ad3c085e1f85a7610a83eee13423f6e40cf32d36f30072e2b69a93",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "cc5f850d8c36dfec256e731db0cba1a13a535abb5e3c1113298271936f156ca5"
+  },
+  "compile_command": [
+    "c++",
+    "-O3",
+    "-std=c++17",
+    "-I",
+    "/private/tmp/ceres-ring-switching-20261019/Source/DSP",
+    "/private/tmp/ceres-ring-switching-20261019/Tests/RingSwitchingAlias.cpp",
+    "/private/tmp/ceres-ring-switching-20261019/build/libceres.a",
+    "-o",
+    "/var/folders/jl/cjv384t54g3bpst5xzs9zqnc0000gn/T/ceres-ring-switch-alias-r4uy222m/probe"
+  ],
+  "temporary_probe_binary_sha256": "5c16003d5041db801ae153986d9d951e08f42e45d5cb0ba8f2567a2f65048600",
+  "probe_runs": [
+    {
+      "processing_rate_hz": 192000,
+      "samples": 9600,
+      "raw_probe_sha256": "b5c7068ae9859b97c1ac614740f36eaa58ba69908bcee61e57c908171bf2729e",
+      "max_native_vs_independent_exp_current_error": 2.220446049250313e-16
+    },
+    {
+      "processing_rate_hz": 3072000,
+      "samples": 153600,
+      "raw_probe_sha256": "9ad8c29b1d17beb4243445a87c8d02f264fb41b09d45b2e00804f1e4924793fa",
+      "max_native_vs_independent_exp_current_error": 2.220446049250313e-16
+    }
+  ],
+  "comparisons": [
+    {
+      "audio_input_sine_hz": 0,
+      "band_hz": [
+        0,
+        24000
+      ],
+      "sampled_vs_reference_band_error_rms": 5.7547054716734785e-15,
+      "reference_band_rms": 0.9889018730987026,
+      "error_relative_db": -284.70260196687485,
+      "reference_above24k_rms_before_decimator": 0.000556149941269634
+    },
+    {
+      "audio_input_sine_hz": 440,
+      "band_hz": [
+        0,
+        24000
+      ],
+      "sampled_vs_reference_band_error_rms": 2.0177542828365795e-15,
+      "reference_band_rms": 0.7057862354641987,
+      "error_relative_db": -290.8760981302104,
+      "reference_above24k_rms_before_decimator": 0.00016972454290249778
+    },
+    {
+      "audio_input_sine_hz": 15000,
+      "band_hz": [
+        0,
+        24000
+      ],
+      "sampled_vs_reference_band_error_rms": 4.751823758821833e-14,
+      "reference_band_rms": 0.6991607381590458,
+      "error_relative_db": -263.354334151216,
+      "reference_above24k_rms_before_decimator": 0.011741983535088084
+    }
+  ],
+  "absolute_band_error_limit": 2e-11,
+  "scope": "Actual production steering kernel at192k versus independent exponential-current evaluation at3.072MHz for a common periodic steady analog carrier input; carrier-only and linear440/15000Hz signal products. This bounds periodic sampling error of this new stage for these inputs. Not a universal dynamic synth alias bound; no FIR/output/VCA nonlinearities or hardware recording involved. Above24k reference energy is reported, not claimed absent; existing decimator handles it. No mean/peak normalization. Temporary probe binaries/streams removed.",
+  "verified_file_sha256": {
+    "Tests/check_ring_switching_alias.py": "67e6f1fd30c74a335964ea67577c4ae7d7854f0a496b90b7c6edd304be04d9fd",
+    "Tests/RingSwitchingAlias.cpp": "35bd15c0db9ae04c448be4e12e43fd798cdaf830e9611677aee289d1b8dbb8bc",
+    "Source/DSP/ceres.cpp": "f08afce7f5ad3c085e1f85a7610a83eee13423f6e40cf32d36f30072e2b69a93",
+    "Source/DSP/ceres.hpp": "7f37338cc128af74d9ebc2b221a2a7bd849b9f9608104afc55cb31a780dd0646",
+    "build/libceres.a": "77167e59f8a1ac2bce45830d6aca378489954cc25c5211c1fbc18292f7a686f8"
+  }
+}

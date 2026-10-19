@@ -1,0 +1,32 @@
+{
+  "schema": "ceres.audible-oscillator-scenes.v1",
+  "declared_before_render": true,
+  "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "candidate_commit": "d30b76d",
+  "driver_sha256": "27f3f42b60d6a9d49686330eeeb1206477c623b4d8dbd75d205d0bcfb6225854",
+  "sample_rate": 48000,
+  "seed": 1,
+  "format": "float32 mono",
+  "seconds": 4,
+  "waves": [
+    "saw",
+    "sine",
+    "pulse"
+  ],
+  "notes": [
+    69,
+    81,
+    93,
+    105
+  ],
+  "note_on_seconds": [
+    0,
+    0.9,
+    1.8,
+    2.7
+  ],
+  "note_duration_seconds": 0.65,
+  "gain": "unchanged volume.25, drive.05, no normalization",
+  "control": "Pulse must be byte-identical; saw and sine intentionally differ. Upper notes expose reset conditioning. No recorded waveform fit or calibration claim.",
+  "all_other_parameters": "Patch defaults plus exact values in bound driver; reset deliberately each model default6us versus59.7286us. Q/EG continuity not in this isolated candidate."
+}

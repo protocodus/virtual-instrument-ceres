@@ -1,0 +1,50 @@
+{
+  "BR_voltage_is_boundary_hypothesis_not_measurement": true,
+  "bound_files_reverified": 112,
+  "completion_proven": false,
+  "consecutive_blocked_goal_turns": 0,
+  "diagnostic_point_not_candidate": [
+    0.0,
+    -2.408947723514567,
+    1.3298454744496089
+  ],
+  "distinct_forwards": 80,
+  "fit_status": "forward_budget_stopped_diagnostic_only",
+  "frozen_plan_sha256": "3482bca5ed0305c2a384125d05da73d19c17ed3c7f699e8cde262c045151071a",
+  "goal_status": "active",
+  "native_candidate_validation_permitted": false,
+  "new_native_WAV_ceiling": 10,
+  "new_native_WAV_count": 1,
+  "new_transfer_scoring": false,
+  "next_safe_action": "Do not resume or expand this stopped fit. Review the already-source-established oscillator-only VIB versus shared-KV distinction and the frozen reconstructed Flute bend trajectory. Declare a bounded route diagnostic preserving F0, Q, EGs and gains; separate unknown constant master tuning from oscillator modulation, and retain both source hypotheses rather than claim exclusive hardware routing.",
+  "no_GUI_changes": true,
+  "no_samples_in_synthesis": true,
+  "open_requirements": [
+    "Raw factory cutoff/envelope accuracy remains inadequate.",
+    "No independent known-settings/original-MIDI holdout.",
+    "Actual BR/RES, pressure, gates, ring mix and chip trim remain incompletely known."
+  ],
+  "previous_goal_turn_classification": "progress",
+  "production_mapping_changed": false,
+  "progress_evidence": [
+    "Cross-passage primary-video control assumption independently corrected.",
+    "One new native dark-endpoint anchor; qualified change prediction.",
+    "One constrained80-forward calibration attempt stopped as declared; every evaluated point infeasible.",
+    "Canonical training anchor scored; frozen95inputs/audio and8MIDI verifier passed."
+  ],
+  "recorded_utc": "2026-10-18T23:30:05.251388+00:00",
+  "report_sha256": {
+    "RESULT.md": "613cd5d4fc777daeffa930de680fa70b551f38d5ea2591ddddfb5b8d01d77b3c",
+    "fit-001/candidate.json": "9f621d772bcfaafb1080de5b86fa0c8af0caf2ae92735e64f7837994ae4f530d",
+    "jacobian-001/report.json": "ec88bc75ef69312c0517308f454618a77a254e7694bf24db50f95a30f2c942b2",
+    "method.md": "6ab46f2c004a8a97e30c6d1411f9ab928be40103851bc16a4338164a66d82d3c",
+    "plan.json": "9c7c3a4b6ed44375ae1fa7c0952f4df78fd5e6e0bbb99a109ad96ab449cfd0c6",
+    "qualify-001/report.json": "821aed18d35d46353f557d6898a07a706cf2576bf2538a23cc468367a5d9730b",
+    "review-001/review.json": "67d47df7d8daa2f15853f3f12f1eda297b0f9c58150e274a9994cf1cc95ef14a",
+    "training-anchor-metrics-001/report.json": "631b4e9e96ebb041f161893886ea7834d4609d4475d2abe081db6adeb4b83c62"
+  },
+  "research_engine_commit": "ff2dd42e71f545bd52e621bac896d1e46c132d53",
+  "retained_corrected_SUB_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "source_conditioned_BR_V": -15,
+  "this_goal_turn_classification": "progress"
+}

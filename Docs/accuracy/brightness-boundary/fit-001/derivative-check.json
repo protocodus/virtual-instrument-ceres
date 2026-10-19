@@ -1,0 +1,29 @@
+{
+  "MAE_sign_crossings": [
+    {
+      "parameter": 1,
+      "record_indices": []
+    },
+    {
+      "parameter": 2,
+      "record_indices": []
+    }
+  ],
+  "checks": [
+    {
+      "constraint_derivative_max_abs_error": 1.1740435706952823e-10,
+      "objective_derivative_abs_error": 6.337970148706518e-10,
+      "parameter": 1,
+      "step": 0.0001
+    },
+    {
+      "constraint_derivative_max_abs_error": 9.219033536567167e-09,
+      "objective_derivative_abs_error": 4.1394798699911917e-10,
+      "parameter": 2,
+      "step": 1e-05
+    }
+  ],
+  "no_records_excluded": true,
+  "passed": true,
+  "threshold": 1e-06
+}

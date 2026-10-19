@@ -1,0 +1,345 @@
+{
+  "schema": "ceres-filter-video-inspection-v1",
+  "recorded_utc": "2026-10-18T19:54:38.696595+00:00",
+  "source_url": "https://www.youtube.com/watch?v=ivVAJ13Tzvc",
+  "creator": "AutomaticGainsay",
+  "decoded_source_duration_s": 632.3258049886622,
+  "method": "34paused on-service source screenshots; sparse inspection, not continuous viewing or audio/gate analysis. Every retained seek reports adShowing=false and expected sourceID.",
+  "source_frames": [
+    {
+      "timestamp_target_s": 45,
+      "path": "frames/ceres-filter-045.png",
+      "sha256": "c1514767bdee20a60b005757f96dd7e35164d6fbd8779f35102229ac41fe057d",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 60,
+      "path": "frames/ceres-filter-060.png",
+      "sha256": "c9db0d3d4389bf8cb6309634b51e4bf9a531139447abf87083d439768c299e93",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 90,
+      "path": "frames/ceres-filter-090.png",
+      "sha256": "4c65feeafd29bea6fb6205f67343669c4f53016f12c6e957faca3ecdd694d3aa",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 94,
+      "path": "frames/ceres-filter-094.png",
+      "sha256": "c97db3723c6ac99e9cf6ceff7a63bd7a98f6fb23a09bb251355773167a61ec6d",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 98,
+      "path": "frames/ceres-filter-098.png",
+      "sha256": "fe7498a341018a9b7df6475654981f7d51a284f55740ddd8a5dda0a562e2eef3",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 102,
+      "path": "frames/ceres-filter-102.png",
+      "sha256": "46789812b40c98ff0d5ff3a664f14536aad11e8a1359af312f4c4b1335eec1d3",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 106,
+      "path": "frames/ceres-filter-106.png",
+      "sha256": "3ddfb05dafa7964cd8264b4f1dc5ff61dd474606de6ef9acdf8c542a245ea054",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 110,
+      "path": "frames/ceres-filter-110.png",
+      "sha256": "4630f826d2e92d8c6b24953c1ae0350b7cccf073bf655d297579990e348149eb",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 114,
+      "path": "frames/ceres-filter-114.png",
+      "sha256": "450fc010580a09b0f6df68ea488703871e0923154b2ced58a2240434213e0a51",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 118,
+      "path": "frames/ceres-filter-118.png",
+      "sha256": "daf90e59892134fbc9aee681bb5ac760d375ae58566e7a88c67af80fe5b461c1",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 120,
+      "path": "frames/ceres-filter-120.png",
+      "sha256": "831becf39b59f4a4e5dd7de1dd8994a42daef4c7dc2fb96dcee1d1545fd35563",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 122,
+      "path": "frames/ceres-filter-122.png",
+      "sha256": "a657c10c6bacf35f6e05e69b6b7cd4221d9a652bc1a9f3733878c124b4f9a19d",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 126,
+      "path": "frames/ceres-filter-126.png",
+      "sha256": "70568913563de0cdb445eb24908b3655352c5a65d9d5cb18cb8eba0628cb9436",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 130,
+      "path": "frames/ceres-filter-130.png",
+      "sha256": "f578e636d7c5e7516cbc00c880baef295f2f2c7214f4bd3209c005b92ec7321c",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 134,
+      "path": "frames/ceres-filter-134.png",
+      "sha256": "24ace09a1055a93576240f932d6d03f06f3bc813730505e7978b4aeb35f58183",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 138,
+      "path": "frames/ceres-filter-138.png",
+      "sha256": "0ac799bd2b378362deb119ad470fc03d3244b9b25abb5143d094c9eb3e0cfe8e",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 142,
+      "path": "frames/ceres-filter-142.png",
+      "sha256": "e9a8aa6b78659199de984fb9f571999505e702d7851f9253301ba84ca191c476",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 146,
+      "path": "frames/ceres-filter-146.png",
+      "sha256": "e99a16a1ff88b0b7b35cc339667a1e69ac4599eb9769a5f16e9160099b81d39e",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 150,
+      "path": "frames/ceres-filter-150.png",
+      "sha256": "efc43aa1832916b5d03823b9564036a78ef9dcad2e359975283ab731de95148c",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 180,
+      "path": "frames/ceres-filter-180.png",
+      "sha256": "ef9267a76d522c8fa8f9b2829e81ec9cd2723fa2965eb59a6f8942042da7d98a",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 210,
+      "path": "frames/ceres-filter-210.png",
+      "sha256": "ad1ff1d67cf8fce7a970aadcc923a7b186bae9e0a48637ffd1573a8078d80e5e",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 240,
+      "path": "frames/ceres-filter-240.png",
+      "sha256": "1516e97b8028a82d70f06e1cc3ed10596abea17a93813e13d99bf932c7195896",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 270,
+      "path": "frames/ceres-filter-270.png",
+      "sha256": "8c552533969d57ef0bbd29ac54ccf8fa998939c85af668b55d105b09a79fe150",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 300,
+      "path": "frames/ceres-filter-300.png",
+      "sha256": "75baf21ccc8f4667463ce1adb25df103ca858830671f5bb07f1d09f9cee646f7",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 330,
+      "path": "frames/ceres-filter-330.png",
+      "sha256": "79f105bf554af0202c13b0df0ae3c69f892b4b81fa58d9b7a327f154e03f0b96",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 360,
+      "path": "frames/ceres-filter-360.png",
+      "sha256": "2a5d601a1e9e90bfd1c5d85cf84009f20c3a20912fe6d6d3001e1b5234288cad",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 390,
+      "path": "frames/ceres-filter-390.png",
+      "sha256": "8631068e9ce8ddd8ac9af8fe2135b8ebf91e701efefac1669b1c11eda6847437",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 420,
+      "path": "frames/ceres-filter-420.png",
+      "sha256": "f7fe1b19c682d7ee5cb946d058b0e0cbeb4fd0145e970fdfa304d653332b8496",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 450,
+      "path": "frames/ceres-filter-450.png",
+      "sha256": "f643fd473ed884171737512eef45d0497ed9cdc1881eeccf71421bc32b271bbc",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 480,
+      "path": "frames/ceres-filter-480.png",
+      "sha256": "a796dc9b65a9e4ae77bcfa26936a316dc06f2ecf5c1754d801698f933887dfb8",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 510,
+      "path": "frames/ceres-filter-510.png",
+      "sha256": "9015525c280328006207b87cf97ecc40f0b4e5ac6c301f08e2e75b3f50765c51",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 540,
+      "path": "frames/ceres-filter-540.png",
+      "sha256": "0975bb7bca4d77716fcd910e6f70e3500b95481803328af19585defa9e4e79c0",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 570,
+      "path": "frames/ceres-filter-570.png",
+      "sha256": "85029c00224fdb34371f2964d7c8e16057f5c0265ca242303053d1cffbc75158",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    },
+    {
+      "timestamp_target_s": 600,
+      "path": "frames/ceres-filter-600.png",
+      "sha256": "9ab2816ee92f7d8ccca91c5a618c59190c15a1c3b729b5c139ed39476ccdc2b8",
+      "size_pixels": [
+        1105,
+        622
+      ]
+    }
+  ],
+  "retained_bindings": {
+    "browser-observations.json": "f83e5a97154476d69918743770f5611856ee6016a167f719d2bd2f9473d8a694",
+    "detail-browser-observations.json": "965ef31fdec68e2d9b57a7359800e1b242fddc166667cb3f15a4913e7269978b",
+    "contact.png": "829ee79a865215a7245afc15916e8a2cb06bf42cc231df1a5c6718fa8de67bed",
+    "panel1-filter-bottom.png": "dc9f0a9c671dcb0c6f43d7eb70e66beafef85138a18f4a85d29a04effcc83340",
+    "pra-filter-buffers.png": "ad4ab648bb9b5ecf5030a643074c0753108337174136c9613f2d4d5fb036cfc0"
+  },
+  "positive_finding": "Initial IL/ALzero and HP/LPreslow; PN1manualLPB10k is buffered in PRA beforeT71, unlike passive preset source. A relative manualLPtest can avoid absolute bias identification.",
+  "candidate_region_s": [
+    90,
+    146
+  ],
+  "simple_two_plateau_test_qualified": false,
+  "reason": "LPcap is hand-occluded during initial sweep, returns to high at106, resonance is raised in110\u2013118; next unobscured lowerLPstate is after changedQ. SameQ and sameheldvoice across2visibleintermediateplateaus not established.",
+  "not_claimed": [
+    "No exact manualvoltage, cutoff, Q, gate, RCtimeconstant, or MIDI recovered.",
+    "No claim that entirevideo lacks usable data; uninspected frames may support another test.",
+    "No recordingloss improvement, audiofit, render, DSP/defaultchange."
+  ],
+  "audio_acquisition_attempt": {
+    "path": "/tmp/ceres-manual-lp-reference-20261018/attempt-001/acquisition.json",
+    "sha256": "1b922c76b2ced8fe4d9bb2cf77e9814f6f53990b09a30908edd94e4f31299cba",
+    "audio_downloaded": false,
+    "caveat": "Public metadata exposes EnglishAAC139/140 without originalmarker. Root player settings has no audio-trackselector. Absence of marker alone is not proof of dubbing or a user-required stop. Visual qualification remains incomplete."
+  },
+  "source_review_sha256": "b0e5202a6067b0ce135c41fed451583e9e4b682b38d9531ad933f748dc4bc5b6",
+  "DSP_changed": false,
+  "GUI_changed": false,
+  "samples_added": false
+}

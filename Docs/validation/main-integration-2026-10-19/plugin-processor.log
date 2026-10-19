@@ -1,0 +1,10 @@
+Test project /private/tmp/ceres-publish-main-20261019/build-plugin
+    Start 16: Ceres.PluginProcessor
+1/1 Test #16: Ceres.PluginProcessor ............   Passed    1.09 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+unit    =   1.09 sec*proc (1 test)
+
+Total Test time (real) =   1.10 sec

@@ -1,0 +1,34 @@
+{
+  "commit": "10e17fd9ecdc0a5a0354bad4c5a53780885a5503",
+  "plan_sha256": "3482bca5ed0305c2a384125d05da73d19c17ed3c7f699e8cde262c045151071a",
+  "commands": [
+    [
+      "cmake",
+      "-S",
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/baseline-source",
+      "-B",
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/baseline-build",
+      "-DBUILD_TESTING=OFF",
+      "-DCMAKE_BUILD_TYPE=Release"
+    ],
+    [
+      "cmake",
+      "--build",
+      "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/baseline-build",
+      "--target",
+      "ceres_render",
+      "-j",
+      "2"
+    ]
+  ],
+  "binary": "Docs/accuracy/baseline-build/ceres_render",
+  "binary_sha256": "62843dfa159a0e275fb068ce226e12c8db7186af9299045ebcb8cfd7a39aa0b5",
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "01ce1d02f39ad3f4db28ea5fa281ea82eb2163c15d4fb838d7944f6220701b9c",
+    "Source/DSP/ceres.cpp": "ac10943cc36eca7605101a22cc5d0947f59f08bbff806c324ec2cb652bd13908",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "266a99817309eda6093f9edb21089b5d459b36ccf65f96e6a2762fd35746436b"
+  },
+  "log_sha256": "4759b7d2bdb8806d1c1597c9a75aa1e1f99becc95abf8223f3776d4301c887ef"
+}

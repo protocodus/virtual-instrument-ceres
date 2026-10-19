@@ -1,0 +1,23 @@
+Test project /private/tmp/ceres-audible-circuits-20261019/build
+    Start 1: native_dsp_contracts
+1/9 Test #1: native_dsp_contracts ...............   Passed    6.28 sec
+    Start 2: sound_path_circuit_contracts
+2/9 Test #2: sound_path_circuit_contracts .......   Passed    1.05 sec
+    Start 3: capacitor_continuity_contracts
+3/9 Test #3: capacitor_continuity_contracts .....   Passed    0.68 sec
+    Start 4: voice_expression_contracts
+4/9 Test #4: voice_expression_contracts .........   Passed    0.39 sec
+    Start 5: embedded_allocation_contract
+5/9 Test #5: embedded_allocation_contract .......   Passed    0.44 sec
+    Start 6: native_embedded_audio_parity
+6/9 Test #6: native_embedded_audio_parity .......   Passed    3.57 sec
+    Start 7: active_sound_path_audio_parity
+7/9 Test #7: active_sound_path_audio_parity .....   Passed    2.72 sec
+    Start 8: expression_audio_parity
+8/9 Test #8: expression_audio_parity ............   Passed    2.73 sec
+    Start 9: capacitor_native_embedded_parity
+9/9 Test #9: capacitor_native_embedded_parity ...   Passed    2.75 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Total Test time (real) =  20.61 sec

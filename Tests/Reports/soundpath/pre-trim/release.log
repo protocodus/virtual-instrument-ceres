@@ -1,0 +1,15 @@
+Test project /Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build
+    Start 1: native_dsp_contracts
+1/5 Test #1: native_dsp_contracts .............   Passed    7.02 sec
+    Start 2: sound_path_circuit_contracts
+2/5 Test #2: sound_path_circuit_contracts .....   Passed    0.84 sec
+    Start 3: embedded_allocation_contract
+3/5 Test #3: embedded_allocation_contract .....   Passed    0.53 sec
+    Start 4: native_embedded_audio_parity
+4/5 Test #4: native_embedded_audio_parity .....   Passed    3.63 sec
+    Start 5: active_sound_path_audio_parity
+5/5 Test #5: active_sound_path_audio_parity ...   Passed    2.54 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =  14.56 sec

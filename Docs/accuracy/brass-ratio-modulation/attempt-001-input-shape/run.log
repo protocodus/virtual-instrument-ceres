@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/brass_ratio_modulation.py", line 370, in <module>
+    elif args.action=='run':run()
+                            ^^^^^
+  File "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/brass_ratio_modulation.py", line 337, in run
+    started=time.monotonic();report,arrays=compute(plan)
+                                           ^^^^^^^^^^^^^
+  File "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/brass_ratio_modulation.py", line 308, in compute
+    fs,source=wavfile.read(wav);assert fs==48000 and source.ndim==1 and len(source)==76800
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

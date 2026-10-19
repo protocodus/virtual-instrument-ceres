@@ -1,0 +1,96 @@
+{
+  "status": "pass",
+  "recorded_utc": "2026-10-18T14:06:11.275905+00:00",
+  "scope": "Bounded native circuit/lifecycle, embedded allocation, and native/embedded audio checks; not hardware calibration.",
+  "parameter_keys": 56,
+  "new_groups": 5,
+  "existing_groups": 26,
+  "allocation_witness": {
+    "blocks": 512,
+    "frames_per_block": 64,
+    "post_construction_new_calls": 0
+  },
+  "each_parity_stream": {
+    "float32_samples": 384000,
+    "rates": [
+      44100,
+      48000,
+      96000,
+      192000
+    ],
+    "scenes_per_rate": 8,
+    "comparison": "byte-exact"
+  },
+  "builds": {
+    "release": {
+      "build_directory": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build",
+      "compiled_source_sha256": {
+        "Source/DSP/ceres.hpp": "42ca7aa529968edde3726a61713e9d4da59cd884db1a9e620db6c80b9fc86e36",
+        "Source/DSP/ceres.cpp": "05e3ecfd53e9ccaa5901952cbdadf04d8b167ffe66df8064e13088da86913e4e",
+        "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+        "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+        "CMakeLists.txt": "541ae94745a83bdac8b0a452cf9367a763c632205099aa08717490c64e5cc1eb"
+      },
+      "binary_sha256": {
+        "libceres.a": "1db01d3fb0d4fd5c18fc927bddaa4389140d24703b12a415035ef62e8ae61ec4",
+        "libceres_embedded.a": "b9b676d5ac9e0e92ab550126613b9acddd24de6cf523edfcfd855a8f144fa383",
+        "ceres_render": "f114c02a42c6e40178205b8cc973bc552ab32f810c002b713ccbdc19bb638e2b",
+        "ceres_tests": "6208cc3f1215af58b04274013a3c34f66ff338e1c08d0ed751f86a54e0ffb760",
+        "ceres_sound_path_tests": "38dae556d39b39cfae825f4937179aaa6d9de0b438154dbeae2b43f0954e2be6",
+        "ceres_embedded_contract": "270d46924be81611fdadd15b8c7b187c7f6a739a5ababbe4b6c0143e243c974d",
+        "ceres_native_parity": "ea7c32cfef92223c1075a6338206b449848fdee3b41f967fe6d4fdbc82a2a212",
+        "ceres_embedded_parity": "151204ff6cdd4f255ed1543a307590de7980bbe11ab0391bfcbbdb09359d0227"
+      },
+      "ctest_count": 5,
+      "native_group_count": 31,
+      "sanitizers": [],
+      "asan_detect_leaks": null
+    },
+    "sanitizer": {
+      "build_directory": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/build-sanitize",
+      "compiled_source_sha256": {
+        "Source/DSP/ceres.hpp": "42ca7aa529968edde3726a61713e9d4da59cd884db1a9e620db6c80b9fc86e36",
+        "Source/DSP/ceres.cpp": "05e3ecfd53e9ccaa5901952cbdadf04d8b167ffe66df8064e13088da86913e4e",
+        "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+        "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+        "CMakeLists.txt": "541ae94745a83bdac8b0a452cf9367a763c632205099aa08717490c64e5cc1eb"
+      },
+      "binary_sha256": {
+        "libceres.a": "41d87789ebf07ba969c0a1f7ef3d4ef8cbf0c422ef76bedd2c48d13ef36cf4e1",
+        "libceres_embedded.a": "3bfc072ef7e76a61e27fd2f7e6f34dd1fa31c0fdc842b4c1ea508d2a7bcede34",
+        "ceres_render": "20f84e17f7a1bc2856abbd431684a9a6be07451582528ad9e0f1f401eeda0cb7",
+        "ceres_tests": "178ff397929399c7c442784cfece94cdd29bad15d3f53d7082156c3aaafd36ce",
+        "ceres_sound_path_tests": "42f49a3e77173298bba856ea0b9259b9507df26fb5c0ad48e908350136011498",
+        "ceres_embedded_contract": "a0a3024707513fc77dcbdfde123a855a3ed718942d16bc852b9711e460275279",
+        "ceres_native_parity": "d6c25c8323f186fd6f2d629cf88d13dddaee2b80fff792fe0d6e6c97ad90e2c6",
+        "ceres_embedded_parity": "63ddb646925d461fb0cc73cc29ff4235fc043d5bb82afd268c2bccadaae3aa4d"
+      },
+      "ctest_count": 5,
+      "native_group_count": 31,
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "asan_detect_leaks": false
+    }
+  },
+  "verified_file_sha256": {
+    "Source/DSP/ceres.cpp": "05e3ecfd53e9ccaa5901952cbdadf04d8b167ffe66df8064e13088da86913e4e",
+    "Source/DSP/ceres.hpp": "42ca7aa529968edde3726a61713e9d4da59cd884db1a9e620db6c80b9fc86e36",
+    "CMakeLists.txt": "541ae94745a83bdac8b0a452cf9367a763c632205099aa08717490c64e5cc1eb",
+    "Tests/dsp_tests.cpp": "8d52b31c96f330641ec453db34d0ed492ca67515e26745341270982c21ecc439",
+    "Tests/SoundPathTests.cpp": "c874f29f59fb39c3e5235083c40796e267c6efbfed0993e1c65196374d07454a",
+    "Tests/EmbeddedContract.cpp": "0aa75639397054ab53952d81630ce3ac5bec0738cedd22ec262f892d1bbca3b7",
+    "Tests/ParityDriver.cpp": "085267a0089522251a4fddbcf964c6692a9328d9022ee4bc46a63423bde86224",
+    "Tests/check_sound_path_parity.py": "cc848fd7a10173ba1a0d4b7b2a87417d002b15170d77e684ad0abc2c57f5ddf8",
+    "Tests/record_sound_path_validation.py": "ce39374fdb8332615bca5a4719e76a60c0eb7c18b78e1f1345d399847f51f665",
+    "Tools/check_embedded.py": "4fccbbcd4b79e10ee02f72b866b0789abd8fd9f3199e15c3f92c18c24d3a8da5",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "Tests/Reports/soundpath/release.log": "1128966339a72c498ae71ad91a0740722a6b6cedc39edf199f88bc069409b8e3",
+    "Tests/Reports/soundpath/release-details.log": "3a3c1695367f32e24f3ff9879d3df1e4175734f78d05d5d47bea1daa699d695a",
+    "Tests/Reports/soundpath/sanitizer.log": "b3a5a3ac4dbd43ce18d9a35e89cf3f6df7fa73e3af9a4eb1202192571b4bd4db",
+    "Tests/Reports/soundpath/sanitizer-details.log": "8172603e1fb3358e3985159367614254f0e6b685a9b813b9dc8f6e0fa6bd9fc3"
+  },
+  "pre_trim_logs": "pre-trim/*.log preserve successful predecessor checks; they are not claimed as final-source validation."
+}

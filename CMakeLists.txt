@@ -22,7 +22,7 @@ endif()
 
 # C is required in addition to C++: JUCE's macOS plug-in wrappers (AU and
 # Standalone) compile C/Objective-C sources with non-Xcode generators too.
-project(Ceres VERSION 0.0.1 LANGUAGES C CXX)
+project(Ceres VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -42,8 +42,12 @@ set(CERES_CLAP_JUCE_EXTENSIONS_PATH "" CACHE PATH
 
 include(CTest)
 
+option(CERES_SANITIZE "Compatibility alias for CERES_ENABLE_SANITIZERS" OFF)
 option(CERES_ENABLE_SANITIZERS "Instrument development builds with ASan and UBSan" OFF)
 option(CERES_BUILD_LIBFUZZER "Build CeresDspFuzz as a Clang libFuzzer target" OFF)
+if(CERES_SANITIZE)
+    set(CERES_ENABLE_SANITIZERS ON)
+endif()
 if(CERES_ENABLE_SANITIZERS)
     if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         message(FATAL_ERROR "CERES_ENABLE_SANITIZERS requires Clang or GCC")
@@ -75,6 +79,43 @@ if(NOT MSVC)
         CXX_EXTENSIONS OFF)
     target_compile_options(CeresDSPCxx17 PRIVATE -Wall -Wextra -Wpedantic)
 endif()
+
+# Standalone circuit engine and embedded ABI remain independent of the
+# existing CeresDSP JUCE scaffold. Do not link either into the plugin implicitly.
+set(CERES_IDENTITY_FILES Source/DSP/ceres.hpp Source/DSP/ceres.cpp Tools/render_main.cpp Tools/build_identity.hpp.in CMakeLists.txt)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CERES_IDENTITY_FILES})
+set(CERES_SOURCE_JSON "{")
+set(CERES_IDENTITY_SEPARATOR "")
+foreach(CERES_IDENTITY_FILE IN LISTS CERES_IDENTITY_FILES)
+  file(SHA256 "${CMAKE_CURRENT_SOURCE_DIR}/${CERES_IDENTITY_FILE}" CERES_IDENTITY_HASH)
+  string(APPEND CERES_SOURCE_JSON "${CERES_IDENTITY_SEPARATOR}\"${CERES_IDENTITY_FILE}\":\"${CERES_IDENTITY_HASH}\"")
+  set(CERES_IDENTITY_SEPARATOR ",")
+endforeach()
+string(APPEND CERES_SOURCE_JSON "}")
+configure_file(Tools/build_identity.hpp.in generated/build_identity.hpp @ONLY)
+
+add_library(ceres STATIC Source/DSP/ceres.cpp)
+add_library(ceres_embedded STATIC Source/DSP/ceres.cpp)
+target_compile_definitions(ceres_embedded PUBLIC CERES_EMBEDDED_TARGET=1)
+foreach(target ceres ceres_embedded)
+  target_include_directories(${target} PUBLIC Source/DSP)
+  set_target_properties(${target} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF POSITION_INDEPENDENT_CODE ON)
+  if(MSVC)
+    target_compile_options(${target} PRIVATE /W4)
+  else()
+    target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic)
+  endif()
+endforeach()
+if(NOT MSVC)
+  target_compile_options(ceres_embedded PRIVATE -fno-exceptions)
+endif()
+if(CERES_BUILD_TOOLS)
+add_executable(ceres_render Tools/render_main.cpp)
+set_target_properties(ceres_render PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+target_include_directories(ceres_render PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+target_link_libraries(ceres_render PRIVATE ceres)
+endif()
+
 
 if(CERES_BUILD_PLUGIN)
     if(CERES_JUCE_PATH)
@@ -195,11 +236,12 @@ if(CERES_BUILD_PLUGIN)
 endif()
 
 if(CERES_BUILD_TOOLS)
-    # One README demo per factory preset from Docs/audio/midi (Tools/
-    # PresetDemoRenderer.h is the shared portfolio copy; do not edit it here).
+    # Existing standalone circuit research presets, not the separate silent
+    # plugin scaffold. PresetDemoRenderer.h is the unchanged portfolio copy.
     add_executable(RenderCeresPresetDemos Tools/RenderPresetDemos.cpp)
     find_package(Threads REQUIRED)
-    target_link_libraries(RenderCeresPresetDemos PRIVATE CeresDSP Threads::Threads)
+    target_link_libraries(RenderCeresPresetDemos PRIVATE ceres Threads::Threads)
+    set_target_properties(RenderCeresPresetDemos PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
     if(MSVC)
         target_compile_options(RenderCeresPresetDemos PRIVATE /W4 /permissive-)
     else()
@@ -208,6 +250,58 @@ if(CERES_BUILD_TOOLS)
 endif()
 
 if(BUILD_TESTING)
+  add_executable(ceres_oscillator_circuit_tests Tests/OscillatorCircuitTests.cpp)
+  target_link_libraries(ceres_oscillator_circuit_tests PRIVATE ceres)
+  add_test(NAME Ceres.oscillator_circuit_contracts COMMAND ceres_oscillator_circuit_tests)
+  add_executable(ceres_tests Tests/dsp_tests.cpp)
+  target_link_libraries(ceres_tests PRIVATE ceres)
+  add_test(NAME Ceres.native_dsp_contracts COMMAND ceres_tests)
+  add_executable(ceres_sound_path_tests Tests/SoundPathTests.cpp)
+  target_link_libraries(ceres_sound_path_tests PRIVATE ceres)
+  add_test(NAME Ceres.sound_path_circuit_contracts COMMAND ceres_sound_path_tests)
+  add_executable(ceres_capacitor_tests Tests/CapacitorContinuityTests.cpp)
+  target_link_libraries(ceres_capacitor_tests PRIVATE ceres)
+  add_test(NAME Ceres.capacitor_continuity_contracts COMMAND ceres_capacitor_tests)
+  add_executable(ceres_ring_carrier_tests Tests/RingCarrierTests.cpp)
+  target_link_libraries(ceres_ring_carrier_tests PRIVATE ceres)
+  add_test(NAME Ceres.ring_carrier_circuit_contracts COMMAND ceres_ring_carrier_tests)
+  add_executable(ceres_ring_switching_tests Tests/RingSwitchingTests.cpp)
+  target_link_libraries(ceres_ring_switching_tests PRIVATE ceres)
+  add_test(NAME Ceres.ring_switching_circuit_contracts COMMAND ceres_ring_switching_tests)
+  add_executable(ceres_expression_tests Tests/ExpressionTests.cpp)
+  target_link_libraries(ceres_expression_tests PRIVATE ceres)
+  add_test(NAME Ceres.voice_expression_contracts COMMAND ceres_expression_tests)
+  add_executable(ceres_embedded_contract Tests/EmbeddedContract.cpp)
+  target_link_libraries(ceres_embedded_contract PRIVATE ceres_embedded)
+  if(NOT MSVC)
+    target_compile_options(ceres_embedded_contract PRIVATE -fno-exceptions)
+  endif()
+  add_test(NAME Ceres.embedded_allocation_contract COMMAND ceres_embedded_contract)
+  add_executable(ceres_native_parity Tests/ParityDriver.cpp)
+  target_link_libraries(ceres_native_parity PRIVATE ceres)
+  add_executable(ceres_embedded_parity Tests/ParityDriver.cpp)
+  target_link_libraries(ceres_embedded_parity PRIVATE ceres_embedded)
+  find_package(Python3 COMPONENTS Interpreter)
+  if(Python3_Interpreter_FOUND)
+    add_test(NAME Ceres.native_embedded_audio_parity COMMAND "${Python3_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tools/check_embedded.py" --build-dir "$<TARGET_FILE_DIR:ceres_native_parity>"
+      --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
+    add_test(NAME Ceres.active_sound_path_audio_parity COMMAND "${Python3_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_sound_path_parity.py" "$<TARGET_FILE_DIR:ceres_native_parity>"
+      --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
+    add_test(NAME Ceres.expression_audio_parity COMMAND "${Python3_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_expression_parity.py" "$<TARGET_FILE_DIR:ceres_native_parity>"
+      --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
+    add_test(NAME Ceres.capacitor_native_embedded_parity COMMAND "${Python3_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_capacitor_parity.py" "$<TARGET_FILE_DIR:ceres_native_parity>"
+      --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
+  endif()
+
+  foreach(target IN ITEMS ceres_oscillator_circuit_tests ceres_tests ceres_sound_path_tests
+      ceres_capacitor_tests ceres_ring_carrier_tests ceres_ring_switching_tests ceres_expression_tests
+      ceres_embedded_contract ceres_native_parity ceres_embedded_parity)
+    set_target_properties(${target} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+  endforeach()
     add_executable(CeresDSPTests Tests/test_dsp.cpp)
     target_link_libraries(CeresDSPTests PRIVATE CeresDSP)
     add_test(NAME Ceres.DSP COMMAND CeresDSPTests)

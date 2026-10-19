@@ -1,0 +1,157 @@
+{
+  "all_float32_segment_bytes_exact": true,
+  "all_input_hashes_unchanged": true,
+  "exact_zero_gap_count": 23,
+  "manifest_sha256": "5a676f9bf5bac2d4c82919f6b037c41924e75f9857b7b4026ef347c13dd41501",
+  "native_rerenders": 0,
+  "output_sha256": "210f2ca29541d47c8c3ec12e8f67c82ae6ca0ced985dcd8f1b6fecf61035cf3e",
+  "per_segment_normalization": false,
+  "report_sha256": "9aaad3d8ab62145d54d42352ad62a3e335ca6fe00d3991381c3ea33724314f7d",
+  "segments": [
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 1,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 2,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 3,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 4,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 5,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 6,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 7,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 8,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 9,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 10,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 11,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 12,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 13,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 14,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 15,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 16,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 17,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 18,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 19,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 20,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 21,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 22,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 23,
+      "input_dtype": "float32"
+    },
+    {
+      "float32_sample_bytes_exact": true,
+      "frozen_gain_exact": true,
+      "index": 24,
+      "input_dtype": "float32"
+    }
+  ],
+  "status": "pass"
+}

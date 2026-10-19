@@ -1,0 +1,21 @@
+{
+  "all_gate_flags_exact": true,
+  "exact_equality_check_still_failed": true,
+  "field_group_counts": {
+    "baseline.analytical_ratios_db": 5,
+    "case.analytical_delta_levels_db": 11,
+    "case.analytical_delta_ratios_db": 311,
+    "case.anchored_prediction_levels_db": 5,
+    "case.anchored_prediction_ratios_db": 291,
+    "case.level_delta_error": 14,
+    "case.level_error_db": 11,
+    "case.ratio_delta_error": 30,
+    "case.ratio_error_db": 311
+  },
+  "interpretation": "The exact dictionary-equality failure is caused by floating-point differences in analytical predictions and their derived errors/statistics. Native measurements and all pass/fail flags are identical. The underlying kernel responsible for low-order variation has not yet been isolated.",
+  "largest_absolute_difference_db": 1.4210854715202004e-14,
+  "native_measurements_exact": true,
+  "original_report_preserved": true,
+  "qualification_tolerances_unchanged": true,
+  "status": "floating_last_bit_differences_only"
+}

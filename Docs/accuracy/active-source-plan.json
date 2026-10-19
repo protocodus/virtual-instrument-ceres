@@ -1,0 +1,38 @@
+{
+  "source_url": "https://www.youtube.com/watch?v=Fj21t8MIS_o",
+  "creator": "Andy Whitmore",
+  "source_audio": "/tmp/ceres-cs50-1x8LGd/references/whitmore-original.wav",
+  "source_audio_sha256": "cb765eee0f7eb6d0b0c9b4052b4d25f3dec21d94ac16e44302147d37c8fa4104",
+  "creator_metadata_sha256": "6eacf2197b45b0aece675ce2cadf79fedb996c138b2dd6f309ecbe862629001d",
+  "script_sha256": "af06780de9a7c7e3c3a3d09ac3b793b39a69962ceeab9cca44b1c73aaaf31db9",
+  "windows": [
+    {
+      "id": "sub",
+      "seconds": [
+        740,
+        780
+      ],
+      "chapter": "Sculpting Sub-Oscillator Modulation"
+    },
+    {
+      "id": "resonant-noise",
+      "seconds": [
+        900,
+        928
+      ],
+      "chapter": "Wind - Open Close Filter with 4 Oscillators - full Resonance"
+    },
+    {
+      "id": "no-resonance",
+      "seconds": [
+        950,
+        970
+      ],
+      "chapter": "Filter open - no Resonance"
+    }
+  ],
+  "measurement": "Source-only mono mean,4096-sample Hann spectral windows,1024-sample hop; RMS, centroid80..8000Hz and spectral-flatness descriptors only. No model scores or extracted MIDI.",
+  "eligibility": "Not eligible for a known-settings hardware accuracy test: absolute manual/global controls, active physical notes and gate/pressure remain unresolved. Video is screened for actual route evidence.",
+  "prior_exposure": "Chapter names and ten frames900..970 visually screened before declaration; no spectral fitting or acoustic parameter selection.",
+  "source_use": "Analysis-only. Creator claims dry; unknown recording chain. Copyright remains with creator; no redistribution license inferred."
+}

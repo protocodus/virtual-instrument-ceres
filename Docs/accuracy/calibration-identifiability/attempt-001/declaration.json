@@ -1,0 +1,19 @@
+{
+  "attempt": "attempt-001",
+  "expected_subset_ranks": [
+    3,
+    4,
+    5,
+    5
+  ],
+  "finite_difference_step": 1e-05,
+  "input_pins": {
+    "Docs/accuracy/preset-dc-loading/network.py": "b03cdb48f68c73cc70312cb2c8061d69a1d81fea1f6e0330464f8e052f631297",
+    "Docs/accuracy/preset-dc-loading/source-evidence.json": "3e4965c2a3cf6b0e0252d48439578b38f58e11274138f143d5fb9b40f70a98c3",
+    "Source/DSP/ceres.cpp": "3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa",
+    "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8"
+  },
+  "kind": "source-only local algebra check, no audio or fitting",
+  "rank_threshold": 1e-10,
+  "tool_sha256": "1ecf547f6351da86b5f401ecc27cc243dbf208ef787ebf5a88da5e6d209414b8"
+}

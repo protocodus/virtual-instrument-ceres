@@ -1,0 +1,20 @@
+[  2%] Built target CeresDSPCxx17
+[  8%] Built target ceres_embedded
+[ 14%] Built target ceres
+[ 20%] Built target CeresDSP
+[ 25%] Built target ceres_embedded_contract
+[ 31%] Built target ceres_oscillator_circuit_tests
+[ 37%] Built target ceres_embedded_parity
+[ 40%] Building CXX object CMakeFiles/ceres_render.dir/Tools/render_main.cpp.o
+[ 45%] Built target ceres_tests
+[ 51%] Built target ceres_capacitor_tests
+[ 57%] Built target ceres_sound_path_tests
+[ 62%] Built target ceres_ring_carrier_tests
+[ 68%] Built target ceres_ring_switching_tests
+[ 74%] Built target ceres_expression_tests
+[ 80%] Built target ceres_native_parity
+[ 85%] Built target CeresDspFuzz
+[ 91%] Built target CeresDSPTests
+[ 97%] Built target RenderCeresPresetDemos
+[100%] Linking CXX executable ceres_render
+[100%] Built target ceres_render

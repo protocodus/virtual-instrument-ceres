@@ -1,0 +1,79 @@
+{
+  "status": "pass",
+  "created_utc": "2026-10-19T07:43:58.452588+00:00",
+  "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "bd785967fea79ed0df68bc0fb70f6c063c44439eac975c96357eb71bcdcaa10f",
+    "Source/DSP/ceres.cpp": "3472f2667c232409a9fe824580c273f9a1e3ddc46d49f26b05ef1d351996605a",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "3f169300a4e9fa8e103f2cdafba2f6dd5bb2c1f3b37aa3c040918e84c0bbdfd5"
+  },
+  "release_ctest_passed": 8,
+  "asan_ubsan_ctest_passed": 3,
+  "asan_options": "detect_leaks=0",
+  "embedded_keys": 57,
+  "parameter_table_byte_identical": true,
+  "parent_bypass_audio_exact_samples": 768000,
+  "native_embedded_active_parity": "Existing native/embedded, active-soundpath and expression 384000-sample comparisons passed; ring uses multiple rates/mixes/depths.",
+  "circuit_tests": {
+    "processing_rates_hz": [
+      8000,
+      192000
+    ],
+    "frequencies_hz": [
+      0.2,
+      1,
+      6.6692178847,
+      30,
+      220
+    ],
+    "max_allowed_complex_response_error": 2e-10,
+    "max_allowed_phase_error_rad": 2e-08,
+    "impulse_tail_limit": 1e-14,
+    "independent_transient_rates_hz": [
+      32000,
+      192000
+    ],
+    "physical_state_max_error": 5e-13,
+    "kcl_residual_limit": 8e-15
+  },
+  "scope": "Four passive 100uF carrier capacitors only, ideal source / zero incremental IC current; no frequency normalization, oscillator/envelope/parameter/UI change or recording fit. Explicit panic clears coupling but preserves phase.",
+  "allocation_check": "Existing embedded all 57-key contract passed with zero post-construction new/new[] allocations.",
+  "binary_sha256": {
+    "build/ceres_render": "4b4236ddc900c18c42d55797ac97678aff19e8ebc27968f51bb63841caac71a0",
+    "build/libceres.a": "502c06a119ff761b5bf3a2deff182854ceedd417ec6b7d9c910a7a605eb9a966",
+    "build/libceres_embedded.a": "d6cf6122c1e2eb74626b0afe8fbc83b9d04f984eb8160b28d6005f1c60bc6bf6",
+    "build/ceres_ring_carrier_tests": "53543324885f69d585ffa9dccfee69c145c4cfa8b7c143038fdbbae2fe78df4f",
+    "build/ceres_native_parity": "e27e1104ffe48733d013b59980bf15a84280b705a4200b19d99706bc988b7b0d",
+    "build/ceres_embedded_parity": "24e2e72f22f1583f2b56a06fe8812cb7027ef83e716f3708df812b6641528638"
+  },
+  "verified_file_sha256": {
+    "CMakeLists.txt": "3f169300a4e9fa8e103f2cdafba2f6dd5bb2c1f3b37aa3c040918e84c0bbdfd5",
+    "Source/DSP/ceres.cpp": "3472f2667c232409a9fe824580c273f9a1e3ddc46d49f26b05ef1d351996605a",
+    "Source/DSP/ceres.hpp": "bd785967fea79ed0df68bc0fb70f6c063c44439eac975c96357eb71bcdcaa10f",
+    "Tests/RingCarrierTests.cpp": "913e2b8e37e0cf2e08afe22069db462529d4b88aa2a095d4bf60dc60f8aa4bf9",
+    "Tests/ParityDriver.cpp": "940cbe8f10c1cd1baaebb23059d27ccf39f616a27f843cbe556485f1c5a83427",
+    "Tests/check_ring_bypass_parent.py": "b51552d498916fc8747c24174eca22cfb573ab3559bf32d6dd0db36ab46b53b9",
+    "Tests/record_ring_carrier_validation.py": "6036a6455b7466bd6688a1330edca34bdb850e013916c3e1e5b79bf8e0bb2797",
+    "Docs/DSP_SOURCE.md": "9a2a488a3cd4a5d4455ca856a562292ea3b65f732f03a124809601688f1e275d",
+    "Docs/ring-carrier/README.md": "2a4df42f9f4fc83fdf6b7a9e65cf79289268787d2cf7fef1af26d94215c74fce",
+    "Docs/ring-carrier/source.patch": "6d24a9c925c27567ac8b60a99b9cf41125e5f947ed5e79c094a9a26ccf033c64",
+    "Docs/ring-carrier/configure.log": "28bedef07f305ae5cc2a06099ab3d48c2474672f31354fd35e4bdefb30a7e308",
+    "Docs/ring-carrier/build.log": "e217e1cba473cb3a75180a9285ec2c2f930ab4027c4a857c13e7c9f1572476d2",
+    "Docs/ring-carrier/release.log": "847ea7f64c53688dd94755447ace1b5c5012ee6ff27a101b006cccfa3ddf4962",
+    "Docs/ring-carrier/sanitize-configure.log": "afe441b697c02620739ffa5acd84e4f7187f92e30f378c04d4d059351061534b",
+    "Docs/ring-carrier/sanitize-build.log": "3714817f0b6015b789d05b39fe8949ff5001971449e54ac10ba4143f9d10b9bd",
+    "Docs/ring-carrier/sanitize.log": "d69fc94b51cb8b5fbe2582ab6173892ffa99d39ed0a260864db37c4ef26440bf",
+    "Docs/ring-carrier/parent-parity.json": "6bc8b1d77b82fa96337cd4ca557c9c7f9b69c0e4548455e8880d1f8b03bd798b",
+    "Docs/ring-carrier/parent-parity.log": "8154dd5f23c72b67a91ded697bf221a60c75bef6c9276dae9b6d8d1a0a42607f",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/evidence.json": "afa33dd2d74d3352167a00d28d00d1134ab173cfcba52f738cf647a146f3286f",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/source-review.md": "ebc209139290d3e25690248e842907cc3442f781c432d541c95c66dafff80002",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/passive_carrier.py": "e94cc5d976540dbee545dc4bc3ab86ba0a926e157fd010d85c540cb762bb1a74",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/passive-carrier-result.json": "18208b88e75a2f3dd5fbbcdfd02b95557ba3a3eb8e05bb2b3d1c5ad2cdb392a2",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/evidence/pra-ring-carrier-bias.png": "be383c7758f7aa1038ed40f134f5e9b72fc9736e31600831309e3892048175a7",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/evidence/guide-ring-carrier-62.png": "03608a61e96300d15a3880c450cc4c5c19cfe914fd6b801ca2ea1b4e4fa0d46c",
+    "/tmp/ceres-cs50-1x8LGd/research/service2.pdf": "1102e55b949378e7776555bca1a4d73105ca2d76d6fcf3aa4c2b103566201cfc",
+    "/tmp/ceres-cs50-1x8LGd/research/cs-servicing-guide.pdf": "2738f7ddc46f0bedbab38dcad8e2c112c41b3e6ca34670d471d0cb8c0dbde633"
+  }
+}

@@ -1,0 +1,102 @@
+Start testing: Oct 18 13:06 CEST
+----------------------------------------------------------
+1/3 Testing: native_dsp_contracts
+1/3 Test: native_dsp_contracts
+Command: "/Users/vojta/Dev/virtual-instrument-ceres/build/ceres_tests"
+Directory: /Users/vojta/Dev/virtual-instrument-ceres/build
+"native_dsp_contracts" start time: Oct 18 13:06 CEST
+Output:
+----------------------------------------------------------
+PASS parameter ranges and constructor validation
+PASS physical source/Q capacitor transfer, four source loads, DC rejection, Q and slope
+PASS production cascade physical voltages, passive mixer, fixed Q current and VCA calibration
+PASS keyboard/envelope gm scaling with fixed feed conductance
+PASS shared master PITCH, independent oscillator routes, fixed feed floor and nominal range
+PASS deterministic seed and reset
+PASS four output coupling RC transfers, decay and diagnostic validation
+PASS output capacitor allocation/idle/panic lifecycle and dry-line polarity
+PASS four voices, stealing, repeated notes and release tails
+PASS sustain, CC123 behavior and controller-preserving panic
+PASS shared global release bounds, independent RC trajectories and held-note invariance
+PASS global release production equivalence and live capacitor-state continuity
+PASS global release versus MIDI pedal, panic and reset lifecycle
+PASS hardware velocity behavior and sample-rate pitch invariance
+PASS WSC saw/pulse polarity and folded-sine phase
+PASS RC attack curvature, fixed duration, linear limit and retrigger charge
+PASS optional saturating-current attack ODE, exact solution, limits and retrigger
+PASS factory five-RC envelope trajectories and engineering T60 compatibility
+PASS factory HP/LP envelope resistor ratios and engineering-patch compatibility
+PASS fixed PWM reset edge, duty, phase offset and sourced speed calibration
+PASS extreme finite output and all factory presets
+<end of output>
+Test time =   5.85 sec
+----------------------------------------------------------
+Test Passed.
+"native_dsp_contracts" end time: Oct 18 13:06 CEST
+"native_dsp_contracts" time elapsed: 00:00:05
+----------------------------------------------------------
+
+2/3 Testing: embedded_allocation_contract
+2/3 Test: embedded_allocation_contract
+Command: "/Users/vojta/Dev/virtual-instrument-ceres/build/ceres_embedded_contract"
+Directory: /Users/vojta/Dev/virtual-instrument-ceres/build
+"embedded_allocation_contract" start time: Oct 18 13:06 CEST
+Output:
+----------------------------------------------------------
+PASS embedded: no exceptions, numeric Patch, 512x64 frames, 45 control keys, zero post-construction new/new[] allocations
+<end of output>
+Test time =   0.55 sec
+----------------------------------------------------------
+Test Passed.
+"embedded_allocation_contract" end time: Oct 18 13:06 CEST
+"embedded_allocation_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/3 Testing: native_embedded_audio_parity
+3/3 Test: native_embedded_audio_parity
+Command: "/opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14" "/Users/vojta/Dev/virtual-instrument-ceres/Tools/check_embedded.py" "--build-dir" "/Users/vojta/Dev/virtual-instrument-ceres/build"
+Directory: /Users/vojta/Dev/virtual-instrument-ceres/build
+"native_embedded_audio_parity" start time: Oct 18 13:06 CEST
+Output:
+----------------------------------------------------------
+{
+  "status": "pass",
+  "comparison": "byte-exact float32 stream on this compiler/math-library build",
+  "rates": [
+    44100,
+    48000,
+    96000,
+    192000
+  ],
+  "scenes_per_rate": 8,
+  "frames_per_scene": 12000,
+  "samples_per_variant": 384000,
+  "variants": {
+    "native": {
+      "audio_sha256": "a83030a3efb47c5054d4bf2f2003e38b92502d62053f9812ba7ab09e3214fd9f",
+      "bytes": 1536000,
+      "binary_sha256": "0d3a6acd36bc3629b655cc03588608ae15cf3812cd6791fd496c1fe9809857ba"
+    },
+    "embedded": {
+      "audio_sha256": "a83030a3efb47c5054d4bf2f2003e38b92502d62053f9812ba7ab09e3214fd9f",
+      "bytes": 1536000,
+      "binary_sha256": "a1ae75308ae1903bdde34782a1088a2c9e069a1f78f5f0b08a8d0329dfec9dae"
+    }
+  },
+  "input_sha256": {
+    "Source/DSP/ceres.hpp": "c8307eb9132811bc4fbf22cf848fa89a8295f4d0198a073b70d10b32b8807585",
+    "Source/DSP/ceres.cpp": "226bbbe68986b3b7433bd884a17eaab10c9bc4dcc65d13a9ec112303a777add7",
+    "Tests/ParityDriver.cpp": "c395f445418530f9e75ff278a05ecc2b4aed1282c81295fc0cc237a6d436e31e",
+    "Tools/check_embedded.py": "4fccbbcd4b79e10ee02f72b866b0789abd8fd9f3199e15c3f92c18c24d3a8da5",
+    "Docs/EXPERIMENT_IMPORT.json": "23fab3632d93660191ae2eb5ab1edabad20f67d7d1c7a659a742983f58c56bab"
+  }
+}
+<end of output>
+Test time =   3.40 sec
+----------------------------------------------------------
+Test Passed.
+"native_embedded_audio_parity" end time: Oct 18 13:06 CEST
+"native_embedded_audio_parity" time elapsed: 00:00:03
+----------------------------------------------------------
+
+End testing: Oct 18 13:06 CEST

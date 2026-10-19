@@ -1,0 +1,50 @@
+{
+  "audio_read": false,
+  "brass_equal_cells": 6,
+  "candidate_adoption": "rejected_unchanged",
+  "input_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/candidate-prediction-check-001/check_predictions.py": "5fb4deb65848eb09f15916f1233cdcad887f57fbc523c2b6952ca772f466b190",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/candidate-prediction-check-001/report.json": "705ed7314556e9faf39a90106c956d45fa8ef940c01921afe457780002ce2999",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/candidate-prediction-check-001/reproduction.json": "852a43480d01a91fc44b97d844a5cc19dba9cd396eed6fcd341e0a14e91d921e",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/fit-replay-001/report.json": "61583571f31be2b95bd1b860558e2e54d6b80397842c88be6a72bd85d74c5587"
+  },
+  "level_RMS_db": [
+    0.005674378498973558,
+    0.005412549773005199
+  ],
+  "maximum_arithmetic_difference": 0.0,
+  "method": "Independent reconstruction from saved arrays without importing the diagnostic helper or reading audio, model, source targets or transfer metrics.",
+  "model_or_optimizer_executed": false,
+  "native_MSE_db2": 89.57411243806743,
+  "no_concrete_error_found": true,
+  "objective_components": 14,
+  "prediction_error_energy_db2": 0.0038071922352013498,
+  "ratio_RMS_db": [
+    0.07592083567325425,
+    0.062310126606343635
+  ],
+  "record_counts": {
+    "brass_ratio": 243,
+    "brass_unique_note_levels": 70,
+    "flute_level": 45,
+    "flute_ratio": 270
+  },
+  "residual_error_cross_term_db2": 0.17408111208793947,
+  "reviewer": "/root/hardware_research",
+  "scalar_comparisons": 4128,
+  "scope": "Training-only diagnostic for this one conditional candidate; no hardware calibration identification claim.",
+  "source_targets_read": false,
+  "status": "independent_stored_evidence_review_pass",
+  "surrogate_MSE_db2": 89.3962241337443,
+  "transfer_metrics_read": false,
+  "verified": [
+    "Original replay arrays and masks",
+    "Independent masks, cell selection and weights",
+    "All 14 components and 628 weighted residuals",
+    "Prediction-error arrays and statistics",
+    "Objective norm decomposition",
+    "Frozen tool identities",
+    "Saved zero-difference numerical reproduction"
+  ],
+  "weighted_residual_count": 628
+}

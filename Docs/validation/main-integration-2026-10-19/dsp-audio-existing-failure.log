@@ -1,0 +1,16 @@
+Test project /private/tmp/ceres-publish-main-20261019/build-dsp
+    Start 15: Ceres.AudioDemos
+1/1 Test #15: Ceres.AudioDemos .................***Failed    1.17 sec
+error: the instrument declares no presets
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+audio    =   1.17 sec*proc (1 test)
+
+Total Test time (real) =   1.18 sec
+
+The following tests FAILED:
+	 15 - Ceres.AudioDemos (Failed)                         audio
+Errors while running CTest

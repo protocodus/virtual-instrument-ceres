@@ -1,0 +1,180 @@
+{
+  "scope": "Bounded native4voice/48k/4x probe,640000 measured samples per workload; no Rack/target-CPU or realtime-host claim. Sequential parent/candidate runs; no performance tuning.",
+  "driver_sha256": "d4becb82fdaeb40a66eb33b701bb50d107995170e77e17a06de54b84c9d50075",
+  "runs": {
+    "parent-default": {
+      "command": [
+        "/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/performance/parent-performance"
+      ],
+      "compile": [
+        "c++",
+        "-O3",
+        "-std=c++17",
+        "-I/tmp/ceres-sub-polarity-20261018/Source/DSP",
+        "/tmp/ceres-audible-integrated-20261019/Tools/native_performance.cpp",
+        "/tmp/ceres-sub-polarity-20261018/build/libceres.a",
+        "-o",
+        "/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/performance/parent-performance"
+      ],
+      "binary_sha256": "509228835fe0b2f1952fe6579034c3ead6fb6b7e871245d048e274e476f96bb7",
+      "compiled_source_sha256": {
+        "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+        "Source/DSP/ceres.cpp": "cc2ee3cdcf7dfab7ebc60071627a2557520f6cdbadd2a590796629a9aad8fd10",
+        "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+        "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+        "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d"
+      },
+      "stats": {
+        "workload": "engineering Init",
+        "rate": 48000,
+        "block_size": 64,
+        "voices": 4,
+        "oversampling": 4,
+        "measured_blocks": 10000,
+        "warmup_blocks": 500,
+        "deadline_ms": 1.33333333,
+        "wall_median_ms": 0.217999972,
+        "wall_p99_ms": 0.278999971,
+        "wall_max_ms": 0.686000043,
+        "wall_deadline_misses": 0,
+        "cpu_median_ms": 0.217541,
+        "cpu_p99_ms": 0.2435,
+        "cpu_max_ms": 0.452208,
+        "cpu_deadline_misses": 0,
+        "checksum": -2.14726522885438,
+        "scope": "native DSP only; no Rack host or target CPU evidence"
+      }
+    },
+    "parent-active": {
+      "command": [
+        "/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/performance/parent-performance",
+        "active"
+      ],
+      "compile": [
+        "c++",
+        "-O3",
+        "-std=c++17",
+        "-I/tmp/ceres-sub-polarity-20261018/Source/DSP",
+        "/tmp/ceres-audible-integrated-20261019/Tools/native_performance.cpp",
+        "/tmp/ceres-sub-polarity-20261018/build/libceres.a",
+        "-o",
+        "/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/performance/parent-performance"
+      ],
+      "binary_sha256": "509228835fe0b2f1952fe6579034c3ead6fb6b7e871245d048e274e476f96bb7",
+      "compiled_source_sha256": {
+        "Source/DSP/ceres.hpp": "577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8",
+        "Source/DSP/ceres.cpp": "cc2ee3cdcf7dfab7ebc60071627a2557520f6cdbadd2a590796629a9aad8fd10",
+        "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+        "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+        "CMakeLists.txt": "a49901a806c114c07eedf455d04a5ee5348c4c8a75cb4afdb7220ab70005387d"
+      },
+      "stats": {
+        "workload": "active sound paths",
+        "rate": 48000,
+        "block_size": 64,
+        "voices": 4,
+        "oversampling": 4,
+        "measured_blocks": 10000,
+        "warmup_blocks": 500,
+        "deadline_ms": 1.33333333,
+        "wall_median_ms": 0.220000045,
+        "wall_p99_ms": 0.319999992,
+        "wall_max_ms": 5.41300001,
+        "wall_deadline_misses": 11,
+        "cpu_median_ms": 0.220291,
+        "cpu_p99_ms": 0.274875,
+        "cpu_max_ms": 0.591666,
+        "cpu_deadline_misses": 0,
+        "checksum": -0.19883370196490846,
+        "scope": "native DSP only; no Rack host or target CPU evidence"
+      }
+    },
+    "candidate-default": {
+      "command": [
+        "/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/performance/candidate-performance"
+      ],
+      "compile": [
+        "c++",
+        "-O3",
+        "-std=c++17",
+        "-I/tmp/ceres-audible-integrated-20261019/Source/DSP",
+        "/tmp/ceres-audible-integrated-20261019/Tools/native_performance.cpp",
+        "/tmp/ceres-audible-integrated-20261019/build/libceres.a",
+        "-o",
+        "/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/performance/candidate-performance"
+      ],
+      "binary_sha256": "4dcd1f1839c377c8f7deffe41c8df655e6f3ef0ccd3e1d0aedf75e65f03176ac",
+      "compiled_source_sha256": {
+        "Source/DSP/ceres.hpp": "e90e883a9a41a61ce596d5fc316e3cca3f0f2fa03422ea4744e61d70faa17952",
+        "Source/DSP/ceres.cpp": "3fe87405e051b6bfade6b37324789eb1567f83e61cd8a493d4c5a1e0a6c6fa31",
+        "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+        "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+        "CMakeLists.txt": "3d922bcfbe24bf253e6338ab32a9348830cb0ef21cd8f74607c8ed06c5151b6d"
+      },
+      "stats": {
+        "workload": "engineering Init",
+        "rate": 48000,
+        "block_size": 64,
+        "voices": 4,
+        "oversampling": 4,
+        "measured_blocks": 10000,
+        "warmup_blocks": 500,
+        "deadline_ms": 1.33333333,
+        "wall_median_ms": 0.22300001,
+        "wall_p99_ms": 0.287000032,
+        "wall_max_ms": 0.598000013,
+        "wall_deadline_misses": 0,
+        "cpu_median_ms": 0.222625,
+        "cpu_p99_ms": 0.251833,
+        "cpu_max_ms": 0.33,
+        "cpu_deadline_misses": 0,
+        "checksum": -2.1481505840074133,
+        "scope": "native DSP only; no Rack host or target CPU evidence"
+      }
+    },
+    "candidate-active": {
+      "command": [
+        "/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/performance/candidate-performance",
+        "active"
+      ],
+      "compile": [
+        "c++",
+        "-O3",
+        "-std=c++17",
+        "-I/tmp/ceres-audible-integrated-20261019/Source/DSP",
+        "/tmp/ceres-audible-integrated-20261019/Tools/native_performance.cpp",
+        "/tmp/ceres-audible-integrated-20261019/build/libceres.a",
+        "-o",
+        "/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/performance/candidate-performance"
+      ],
+      "binary_sha256": "4dcd1f1839c377c8f7deffe41c8df655e6f3ef0ccd3e1d0aedf75e65f03176ac",
+      "compiled_source_sha256": {
+        "Source/DSP/ceres.hpp": "e90e883a9a41a61ce596d5fc316e3cca3f0f2fa03422ea4744e61d70faa17952",
+        "Source/DSP/ceres.cpp": "3fe87405e051b6bfade6b37324789eb1567f83e61cd8a493d4c5a1e0a6c6fa31",
+        "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+        "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+        "CMakeLists.txt": "3d922bcfbe24bf253e6338ab32a9348830cb0ef21cd8f74607c8ed06c5151b6d"
+      },
+      "stats": {
+        "workload": "active sound paths",
+        "rate": 48000,
+        "block_size": 64,
+        "voices": 4,
+        "oversampling": 4,
+        "measured_blocks": 10000,
+        "warmup_blocks": 500,
+        "deadline_ms": 1.33333333,
+        "wall_median_ms": 0.230000005,
+        "wall_p99_ms": 0.286999973,
+        "wall_max_ms": 0.627000001,
+        "wall_deadline_misses": 0,
+        "cpu_median_ms": 0.229291,
+        "cpu_p99_ms": 0.257,
+        "cpu_max_ms": 0.333042,
+        "cpu_deadline_misses": 0,
+        "checksum": -0.9692838437785793,
+        "scope": "native DSP only; no Rack host or target CPU evidence"
+      }
+    }
+  }
+}

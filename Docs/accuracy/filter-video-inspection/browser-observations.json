@@ -1,0 +1,386 @@
+{
+  "source": "https://www.youtube.com/watch?v=ivVAJ13Tzvc",
+  "method": "Bounded on-service paused seeked still-frame inspection; no source audio/video acquired.",
+  "observations": [
+    {
+      "t": 45,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 45,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"okay let's take a look at the filter\\nsection of the Yamaha cs50\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=45;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=ivVAJ13Tzvc\n- Page Title: The Yamaha CS-50 Part 2- The Filter - YouTube\n- Console: 14 errors, 100 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T19-06-30-460Z.log#L76-L117"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-045.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-045.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-045.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 60,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 60,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"off though first this filter is 12 DB\\nper octave\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=60;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-060.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-060.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-060.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 90,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 90,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"look okay we have the low pass filter\\nall the way open\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=90;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-090.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-090.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-090.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 120,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 120,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"filters\\n[Music]\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=120;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-120.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-120.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-120.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 150,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 150,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"[Music]\\nfilter and here's the cool thing\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=150;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-150.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-150.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-150.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 180,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 180,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"adding resonance here's a trick that\\npeople often Overlook people look\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=180;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-180.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-180.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-180.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 210,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 210,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"bring the filter cut off point up you're\\nactually emphasizing base frequencies\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=210;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=ivVAJ13Tzvc\n- Page Title: The Yamaha CS-50 Part 2- The Filter - YouTube\n- Console: 14 errors, 103 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T19-06-30-460Z.log#L118-L120"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-210.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-210.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-210.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 240,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 240,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=240;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-240.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-240.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-240.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 270,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 270,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"synthesizer um people at Yamaha weren't\\nhappy\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=270;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-270.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-270.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-270.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 300,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 300,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"another an overall filter cut off\\n[Music]\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=300;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-300.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-300.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-300.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 330,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 330,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"attack level which is basically your\\nenvelope\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=330;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-330.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-330.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-330.png',\n  scale: 'css',\n  type: 'png'\n});\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=ivVAJ13Tzvc\n- Page Title: The Yamaha CS-50 Part 2- The Filter - YouTube\n- Console: 14 errors, 106 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T19-06-30-460Z.log#L121-L123"
+          }
+        ]
+      }
+    },
+    {
+      "t": 360,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 360,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"have a variety of ways that the envelope\\naffects the filter\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=360;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-360.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-360.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-360.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 390,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 390,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"[Music]\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=390;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-390.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-390.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-390.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 420,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 420,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"[Music]\\nBrilliance we're clipping\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=420;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=ivVAJ13Tzvc\n- Page Title: The Yamaha CS-50 Part 2- The Filter - YouTube\n- Console: 14 errors, 109 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T19-06-30-460Z.log#L124-L126"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-420.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-420.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-420.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 450,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 450,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"filter like that with the standard low\\npass\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=450;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=ivVAJ13Tzvc\n- Page Title: The Yamaha CS-50 Part 2- The Filter - YouTube\n- Console: 14 errors, 112 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T19-06-30-460Z.log#L127-L129"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-450.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-450.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-450.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 480,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 480,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"modulation\\n[Music]\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=480;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=ivVAJ13Tzvc\n- Page Title: The Yamaha CS-50 Part 2- The Filter - YouTube\n- Console: 14 errors, 118 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T19-06-30-460Z.log#L130-L135"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-480.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-480.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-480.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 510,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 510,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"point\\ny\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=510;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=ivVAJ13Tzvc\n- Page Title: The Yamaha CS-50 Part 2- The Filter - YouTube\n- Console: 14 errors, 121 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T19-06-30-460Z.log#L136-L138"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-510.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-510.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-510.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 540,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 540,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"[Music]\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=540;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=ivVAJ13Tzvc\n- Page Title: The Yamaha CS-50 Part 2- The Filter - YouTube\n- Console: 14 errors, 124 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T19-06-30-460Z.log#L139-L141"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-540.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-540.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-540.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 570,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 570,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"four layers of pulse width modulation\\nEtc it's just capable\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=570;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=ivVAJ13Tzvc\n- Page Title: The Yamaha CS-50 Part 2- The Filter - YouTube\n- Console: 14 errors, 127 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T19-06-30-460Z.log#L142-L144"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-570.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-570.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-570.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    },
+    {
+      "t": 600,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n{\n  \"currentTime\": 600,\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 632.3258049886622,\n  \"paused\": true,\n  \"adShowing\": false,\n  \"videoId\": \"ivVAJ13Tzvc\",\n  \"caption\": \"resonance\\n[Music]\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('async () => {const v=document.querySelector(\\'video\\');const p=document.querySelector(\\'#movie_player\\');if(p.classList.contains(\\'ad-showing\\'))throw Error(\\'Advertisement, not source\\');v.pause();v.muted=true;v.currentTime=600;await new Promise(r=>v.addEventListener(\\'seeked\\',r,{once:true}));return{currentTime:v.currentTime,width:v.videoWidth,height:v.videoHeight,duration:v.duration,paused:v.paused,adShowing:p.classList.contains(\\'ad-showing\\'),videoId:window.ytInitialPlayerResponse?.videoDetails?.videoId,caption:document.querySelector(\\'.captions-text\\')?.innerText}}');\n```\n### Page\n- Page URL: https://www.youtube.com/watch?v=ivVAJ13Tzvc\n- Page Title: The Yamaha CS-50 Part 2- The Filter - YouTube\n- Console: 14 errors, 130 warnings\n### Events\n- New console entries: .playwright-mcp/console-2026-10-18T19-06-30-460Z.log#L145-L147"
+          }
+        ]
+      },
+      "screenshot": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n- [Screenshot of element](.playwright-mcp/ceres-filter-600.png)\n### Ran Playwright code\n```js\n// Screenshot element and save it as .playwright-mcp/ceres-filter-600.png\nawait page.locator('video').screenshot({\n  path: '.playwright-mcp/ceres-filter-600.png',\n  scale: 'css',\n  type: 'png'\n});\n```"
+          }
+        ]
+      }
+    }
+  ]
+}

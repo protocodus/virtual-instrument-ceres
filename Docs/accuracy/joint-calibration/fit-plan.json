@@ -1,0 +1,115 @@
+{
+  "schema": "ceres-fixed-gauge-joint-fit-v1",
+  "declared_utc": "2026-10-18T21:56:36.734027+00:00",
+  "training_ids": [
+    "flute-high-factory-physical",
+    "brass-history20"
+  ],
+  "dynamic_qualification": {
+    "authorized": true,
+    "thresholds": {
+      "brass_cell_signed_mean_abs_db": 0.5,
+      "level_p95_abs_db": 2.0,
+      "level_rms_db": 1.0,
+      "quadrature_delta_max_db": 0.1,
+      "ratio_p95_abs_db": 2.0,
+      "ratio_rms_db": 1.0
+    },
+    "cache_legacy_max_difference_db": 1e-09
+  },
+  "jacobian": {
+    "central_steps": [
+      0.25,
+      0.25,
+      0.01
+    ],
+    "hp_rms_db_per_V_min": 0.02,
+    "normalized_singular_ratio_min": 0.001,
+    "analytic_derivative_max_abs_error": 1e-06
+  },
+  "fit": {
+    "authorized": true,
+    "requires_dynamic_and_jacobian_pass": true,
+    "x0": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "lower_bounds": [
+      -15.0,
+      -15.0,
+      0.5
+    ],
+    "upper_bounds": [
+      15.0,
+      15.0,
+      2.0
+    ],
+    "max_nfev": 80,
+    "anchor": "native_unfitted_plus_analytical_delta_from_theta0",
+    "objective": "equal_clip_ratio_level_and_six_brass_cells",
+    "method": "trf",
+    "loss": "linear",
+    "tolerances": {
+      "ftol": 1e-08,
+      "xtol": 1e-08,
+      "gtol": 1e-08
+    },
+    "candidate_count": 1,
+    "bounds_are_engineering_search_limits_not_measured_tolerances": true
+  },
+  "numeric_reproduction": {
+    "strict_prior_check": "failed_and_preserved",
+    "difference_scope": "989Fluteanalytical/derivedfloating leaves; max1.4210854715202004e-14dB; native,Brass,masks,decisions unchanged",
+    "new_phase_numeric_comparison_tolerance_db": 1e-10,
+    "not_a_bitwise_reproducibility_claim": true
+  },
+  "native_validation": {
+    "remaining_render_count": 8,
+    "total_new_WAV_ceiling": 20,
+    "transfer_ids": [
+      "flute-lower-factory-physical",
+      "brass-history10"
+    ],
+    "candidate_must_be_frozen_before_transfer_scoring": true,
+    "spectral_transfer": "Both rawFlute medianH2\u20137MAE and trajectoryMSE improve; bothBrass six-cellMAE improve, against frozen and unfitted controls.",
+    "promotion_gate": "Additionally no increased Flute fixedgainRMS, any Brass cell error, weak-count or per-note tailRMS; retain every adverseresult. Nativevalidation and actualsourceconstraints required; surrogate alone neverpromotes.",
+    "clamp_and_diode_diagnostics": "Preserve full16kHz startup/held/tail frequency range/clampcounts and conservativeEGbox diodechecks;16kcounts are not192kinternalcounts. Invaliddiodes stop; any finalclamps/bound-hits remain materialcalibrationlimits."
+  },
+  "fixed_nuisance": "RankB,Vd.6,fixed355k,zerochipcurrent,FluteBR0,BrassBR\u221215,touch0; existing source,EGtimes,keys,gates,Q,AMphase,recordgain,masks unchanged.",
+  "interpretation": "One conditional predictive candidate, not uniquely recovered physical calibration. No per-record/preset calibration choice and no transfer tuning. Researchbaseline55869df isolates newmapping; separateSUBpolarityfix remainsretained.",
+  "input_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/amp-bias/central-off-shift--96.events.tsv": "e84e416eac8438635ed91a6e40b3c6f4386c4c774014f6082a35b0a79bb8def0",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/brass-filter-grid/case20-LPx1-Qfactory.patch": "19a8f7ea6bb45f3d007c8be05529a72fa646b37bf2941abe69e1a42c33edfab1",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/whitmore-flute-high-source.wav": "63bd4bc8910103af81bc5c47fbc558833283d0055af1cd02a165f2540b495d90",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/whitmore-transpose/high-physical.events.tsv": "d4f8d7749e38e5cc07d49300e14c206e679523a7b1c589ccb13f248c802da55d",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/calibration/whitmore-transpose/whitmore-transpose-high-factory-physical.patch": "9135e3e3bf96f18b56ae7a90d53ddfaa65ee8d155d3771799270510a682dd47f",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/references/whitmore-brass1-context.wav": "af1498002748e094af1cd95b6bc52c1e8919e9dce953a02ba03b8309fd5012dc",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/research/brass1-release-spectra-160.json": "c352cba0c40f1b227c6d8999a1d8084062d36acfa3f236659e212d69105d296f",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/attempt-001/brass-history20-trace.json": "91e52daecf2e69f0c6b2a82ea6ee231c65af96d390c72e8c3c5a4177ab073ccd",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/attempt-001/brass-history20.f64": "f1f86a2d9cc827e977ea7146ad983abb7b1a6705568eddca5444a0be5a3c8f72",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/attempt-001/flute-high-factory-physical-trace.json": "c5b571ec31b347d26fd6ed9b0b74b17572702ba2e9b32d514f2dab128e93e0f7",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/attempt-001/flute-high-factory-physical.f64": "e32e874336e02a304b0b122e5413478e814cd7a176d49f925bf36e3d5fa7971d",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/attempt-001/report.json": "5ae567e7dbdbce2ac63569f367c74e2867b0f432186313391cb3e740b80ae176",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/fit-method.md": "8be7d28dd4d1255548a01b37ee013aaaf12f024a2c78469fa292578df9269610",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-control-patches/brass-history20.patch": "02be5105fb1237b805c41e0e9f4bbe9122ddfd018fe6c71dc51d2082eadd7372",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-control-patches/flute-high-factory-physical.patch": "5959497f466eb83373e9fd7071c932d0184e4de4d863abccf44fb2ffe7e04a3b",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/brass-history20-disabled.json": "0a7422c126e56d59cb40d33909860746980b978e1d0ed93a64fb63ea378133f1",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/brass-history20-disabled.wav": "cd4218382d4f09f37b7961e1294a9830aac5831e14c6ac7c8f2585af98e6e73b",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/brass-history20-unfitted.json": "1d72af5d493bfa5e2d7e5cd3d3b7208fa7710c81f3cb31b3afe0985ef6271536",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/brass-history20-unfitted.wav": "382a568ae0c1862b9389f77af2af7757dc0b1d3981ecdfcbca4c6262becee3a1",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/flute-high-factory-physical-disabled.json": "f2beceefe70dfbec2bc7e5adf1988bfb00db24b724dbb0f28a332bb3c6763914",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/flute-high-factory-physical-disabled.wav": "0672f265c4fdbf9f8050fcff18a6447bc5c362d9e521c97d6440084504b55f9b",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/flute-high-factory-physical-unfitted.json": "c624344190c15f07f17af9f9cf38a6d8908cd58d59ea18d7ff80242462dfa0ad",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/flute-high-factory-physical-unfitted.wav": "01b41a0f5067565eaff0f496e08f264c8b35eb315d4eb16a01750927be3de070",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/native-controls-001/report.json": "5be734d37c275908764805dd837f7ff9accddc209e705f47664748aa57db2371",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/plan.json": "9a13c10f5c6a65d65cf20cd061e133c1d4a88a6eb5532895bf2279c5a06a54ca",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/recompute-diagnostic-001/exact-diff.json": "a70cbdf352d3b3d42de3b15e34b317053214424e4d1a45f2e75dc4c3c148bf89",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/joint-calibration/recompute-diagnostic-001/summary.json": "6b88accbcd7e06a02af5ad99e19ac54d2b780447ab6aee0542763085a1244019",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/plan.json": "3482bca5ed0305c2a384125d05da73d19c17ed3c7f699e8cde262c045151071a",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/preset-dc-loading/network.py": "b03cdb48f68c73cc70312cb2c8061d69a1d81fea1f6e0330464f8e052f631297",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/joint_calibration.py": "5c4b5aabafc28cc5d8dcaf502a2956e03899f0dd8977d8f7d94410a4a06d7114",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/joint_fit.py": "f563762e55ab2b0c41ff4c4ba34cac103c936dc55115b5683a8a2364f330dab6",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/accuracy/metrics.py": "34cba33ccf34b62be818518cc34a5d4d48ece032366b1b238a5075f94b9935cd"
+  }
+}

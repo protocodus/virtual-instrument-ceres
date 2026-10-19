@@ -1,0 +1,13 @@
+{
+  "schema": "ceres-source-ratio-artifacts-v1",
+  "sha256": {
+    "Docs/accuracy/brass-ratio-modulation/plan.json": "2fcfa6f47c40cfe035ee40b078791faef3bbaf65ddffb88fd1c4a8f2e90b9d6a",
+    "Docs/accuracy/brass-ratio-modulation/proposal-initial.json": "3e1e393feb4d8f6e929ff910426d05e5c141c1ab2843329599fbe813661bcb8a",
+    "Docs/accuracy/brass-ratio-modulation/implementation.json": "16fc562a983f3d9ff78692e0b4af2e5a626c2cabb043010de4a06fe8dc7c2e3a",
+    "Docs/accuracy/brass-ratio-modulation/report.json": "acfe7c2a203afcb2b1d9a46d03379644ade3771b25d41302f716c5ec8f634d99",
+    "Docs/accuracy/brass-ratio-modulation/arrays.npz": "fe7f937d245357f9a9148af6a4d8cad6467818fcf6f6eea8322e5aa4ccdb3cef",
+    "Docs/accuracy/brass-ratio-modulation/README.md": "07811d0043df06effb00fb0534ae521a7ca7fb5b9733012dc4292b0b79b337d3",
+    "Docs/accuracy/brass-ratio-modulation/ratios.png": "6e2afc8899081dea6492e5926ecd264db0d779b72fe0b13e68435e3906d1e680",
+    "Tools/accuracy/brass_ratio_modulation.py": "ad142afd0aea3883657b4746b642ae04b9dc3655f9487d489478f0e56f17b202"
+  }
+}

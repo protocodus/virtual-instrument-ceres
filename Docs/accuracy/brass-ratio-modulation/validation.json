@@ -1,0 +1,40 @@
+{
+  "schema": "ceres-brass-ratio-modulation-validation-v1",
+  "status": "pass",
+  "check": {
+    "status": "pass",
+    "bindings": 16,
+    "cases": 61,
+    "frames_per_window": 81,
+    "carrier_offsets": 3,
+    "full_recompute": true,
+    "maximum_array_difference": 0.0
+  },
+  "bound_files": {
+    "Docs/accuracy/brass-ratio-modulation/plan.json": "2fcfa6f47c40cfe035ee40b078791faef3bbaf65ddffb88fd1c4a8f2e90b9d6a",
+    "Docs/accuracy/brass-ratio-modulation/report.json": "acfe7c2a203afcb2b1d9a46d03379644ade3771b25d41302f716c5ec8f634d99",
+    "Docs/accuracy/brass-ratio-modulation/implementation.json": "16fc562a983f3d9ff78692e0b4af2e5a626c2cabb043010de4a06fe8dc7c2e3a",
+    "Docs/accuracy/brass-ratio-modulation/arrays.npz": "fe7f937d245357f9a9148af6a4d8cad6467818fcf6f6eea8322e5aa4ccdb3cef",
+    "Docs/accuracy/brass-ratio-modulation/run.log": "e6a8e6ae1342eb0f6cef4bf35845bcfcdae64e6fe580af337c3d2e812182297d",
+    "Docs/accuracy/brass-ratio-modulation/README.md": "07811d0043df06effb00fb0534ae521a7ca7fb5b9733012dc4292b0b79b337d3",
+    "Docs/accuracy/brass-ratio-modulation/proposal-initial.json": "3e1e393feb4d8f6e929ff910426d05e5c141c1ab2843329599fbe813661bcb8a",
+    "Docs/accuracy/brass-ratio-modulation/ratios.png": "6e2afc8899081dea6492e5926ecd264db0d779b72fe0b13e68435e3906d1e680",
+    "Docs/accuracy/brass-ratio-modulation/check.log": "e9069be029f1bab3f74cb18b3580b1bba44ad3c6d0a68b08ad508877563fc6e5",
+    "Docs/accuracy/brass-ratio-modulation/artifacts.json": "690ab3b666a18c0835b65e22cf46ac1823f52c46bc1ae45df8116ab2145a786d",
+    "Docs/accuracy/brass-ratio-modulation/attempt-001-input-shape/plan.json": "9feaf015792eede359858891e47216730f415bfeead01fa33defbc4cef1853d0",
+    "Docs/accuracy/brass-ratio-modulation/attempt-001-input-shape/implementation.json": "84de8d07339a313fa07d46e9ebae0683a7dc2615ae637184af251a2b068b56f8",
+    "Docs/accuracy/brass-ratio-modulation/attempt-001-input-shape/run.log": "6116875543cea4ef1c90631e3e0b5dae4be802f9815fb2f0b165d186f10f7578",
+    "Docs/accuracy/brass-ratio-modulation/attempt-001-input-shape/brass_ratio_modulation.py": "b83e2013f7df68eff729db4211bd47b72e6eb652a1e52eff8e3bc2888c876cac",
+    "Docs/accuracy/brass-ratio-modulation/attempt-001-input-shape/failure.json": "9e80ba42cbdf353641dbf8a6161ee7de3d27e1b455b0f59ac5eadf2fd7287b7c"
+  },
+  "helper_sha256": "ad142afd0aea3883657b4746b642ae04b9dc3655f9487d489478f0e56f17b202",
+  "failed_attempt_preserved": {
+    "path": "Docs/accuracy/brass-ratio-modulation/attempt-001-input-shape",
+    "reason": "Input shape assertion stopped before estimates; corrected to the benchmark-established stereo mean. No thresholds/source settings changed."
+  },
+  "visual_review": "ratios.png inspected; six panels show source and carrier sensitivity against limited static-control spread; readable axes/legend.",
+  "outcome": "Strict predeclared two-target coloration criterion fails; estimator recovery and geometry pass. No DSP or default change and no route identification.",
+  "native_render_calls": 0,
+  "original_hardware_MIDI": false,
+  "strict_eligible": false
+}

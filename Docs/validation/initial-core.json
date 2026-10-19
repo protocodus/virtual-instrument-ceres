@@ -1,0 +1,68 @@
+{
+  "status": "pass",
+  "created_utc": "2026-10-18T11:08:48.187938+00:00",
+  "product_version": "0.1.0",
+  "imported_model_version": "0.10.0",
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+  "release": {
+    "ctest_cases": 3,
+    "native_dsp_groups": 21,
+    "embedded_frames": 32768,
+    "embedded_control_keys": 45,
+    "post_construction_new_calls": 0
+  },
+  "asan_ubsan": {
+    "ctest_cases": 3,
+    "native_dsp_groups": 21,
+    "ASAN_OPTIONS": "detect_leaks=0",
+    "scope": "native code and embedded configuration; no SDK target/Reason host execution"
+  },
+  "parity": {
+    "original_native_embedded": "byte-identical",
+    "samples_per_variant": 384000,
+    "rates": [
+      44100,
+      48000,
+      96000,
+      192000
+    ],
+    "scenes_per_rate": 8
+  },
+  "commands": [
+    "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release",
+    "cmake --build build -j 4",
+    "ctest --test-dir build --output-on-failure",
+    "python3 Tools/check_embedded.py --build-dir build --baseline-source /tmp/ceres-cs50-1x8LGd/src --report Docs/validation/initial-parity.json",
+    "cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCERES_SANITIZE=ON",
+    "cmake --build build-asan -j 4",
+    "ASAN_OPTIONS=detect_leaks=0 ctest --test-dir build-asan --output-on-failure"
+  ],
+  "file_sha256": {
+    "CMakeLists.txt": "266a99817309eda6093f9edb21089b5d459b36ccf65f96e6a2762fd35746436b",
+    "Source/DSP/ceres.cpp": "226bbbe68986b3b7433bd884a17eaab10c9bc4dcc65d13a9ec112303a777add7",
+    "Source/DSP/ceres.hpp": "c8307eb9132811bc4fbf22cf848fa89a8295f4d0198a073b70d10b32b8807585",
+    "Tests/dsp_tests.cpp": "fd6e9ae7cd3a501ba97da5f94e2c17c3369143d9fb0dac7e16e0d0270151f1d6",
+    "Tests/EmbeddedContract.cpp": "285a8d06966924c5590dba4ae38eec55ce0a7d1db7a8c0e894a7948dcb32dfb5",
+    "Tests/ParityDriver.cpp": "c395f445418530f9e75ff278a05ecc2b4aed1282c81295fc0cc237a6d436e31e",
+    "Tools/check_embedded.py": "4fccbbcd4b79e10ee02f72b866b0789abd8fd9f3199e15c3f92c18c24d3a8da5",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "Docs/EXPERIMENT_IMPORT.json": "23fab3632d93660191ae2eb5ab1edabad20f67d7d1c7a659a742983f58c56bab",
+    "Docs/validation/initial-parity.json": "8ab74cb4f580505a9bfa0edf8af8b4306ea6394b4a31223f6f504efef07068ef",
+    "Docs/validation/release-ctest.log": "3dcb9e7d165f2bf531b4cc81911802c95e06848e4936f2190bc9ad3bbd559398",
+    "Docs/validation/asan-ubsan-ctest.log": "f36c3250c66ce14c2e3095a063866eeda5bc6d6c7fec3fe058f5ae51f56e2974"
+  },
+  "local_binary_sha256": {
+    "build/ceres_render": "cd165ff3487a9a02a4ef40a146c6d36906b7366830676ae999e10237d7aa0ebb",
+    "build/ceres_tests": "d5ded220b41d147de032b30018d861afbad923700f7e9652125eb1b62419d2b4",
+    "build/ceres_embedded_contract": "1f2f2d312ab89acb4504bfd5b9dc49c84107cfd47d98b816a35ecab79b4293b9",
+    "build/libceres.a": "62da4b694db8461061b6bdaee7cada70c56c93a28fa50efffc270878a7d25d90",
+    "build/libceres_embedded.a": "43683a7863a2e436d207b16bff1a94a0039fe2eefafaff195c1911a18f0ea393"
+  },
+  "limitations": [
+    "Local macOS/AppleClang checks only; SDK translation, wrapper integration and Reason host performance remain separate.",
+    "Allocation witness counts new/new[] during its bounded realtime path, not every platform allocation primitive.",
+    "Exact audio comparison applies to the measured same-compiler build, not arbitrary cross-platform outputs."
+  ]
+}

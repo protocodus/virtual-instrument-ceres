@@ -1,0 +1,7 @@
+# Unfitted full-network control; original timing/source/Q/gain unchanged.
+octave=-1
+calibration_network=1
+calibration_hp_bias=0
+calibration_lp_bias=0
+calibration_alpha=1
+brilliance=0

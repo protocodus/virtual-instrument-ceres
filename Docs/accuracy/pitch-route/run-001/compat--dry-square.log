@@ -1,0 +1,5 @@
+["/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/identity/ceres_render", "--preset", "init", "--patch", "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/renders/v09/dry-square.patch", "--events", "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/inputs/renders/v09/dry-square.events.tsv", "--output", "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/pitch-route/run-001/compat--dry-square.wav", "--rate", "48000", "--frames", "194351", "--seed", "50", "--research-pitch-route", "shared"]
+STDOUT
+{"sample_rate":48000,"frames":194351,"channels":1,"sample_format":"float32","seed":50,"preset":"init","peak":0.107013516128,"rms":0.0361045104383,"samples_above_unity":0,"render_seconds":0.739820208,"audio_seconds":4.04897916667,"realtime_factor":5.47292318172,"research_pitch_route":"shared","research_master_semitones":0,"normalization":"none","timing_scope":"native offline DSP plus WAV I/O; not host deadline performance"}
+
+STDERR

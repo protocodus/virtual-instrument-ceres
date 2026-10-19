@@ -1,0 +1,417 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0a4ce38..c353624 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -52,0 +53,3 @@ if(BUILD_TESTING)
++  add_executable(ceres_ring_switching_tests Tests/RingSwitchingTests.cpp)
++  target_link_libraries(ceres_ring_switching_tests PRIVATE ceres)
++  add_test(NAME ring_switching_circuit_contracts COMMAND ceres_ring_switching_tests)
+diff --git a/Source/DSP/ceres.cpp b/Source/DSP/ceres.cpp
+index 9efd356..55533e7 100644
+--- a/Source/DSP/ceres.cpp
++++ b/Source/DSP/ceres.cpp
+@@ -24,0 +25,12 @@ constexpr double qControlTau=10e-6*(220e3/2);
++// Fairchild uA796 upper carrier pairs have no emitter degeneration. In the
++// matched, forward-active/infinite-beta limit their current steering is
++// tanh(V7minus8/(2VT)). Guide p49 gives the carrier sine as nominal3Vpp.
++constexpr double ringThermalVoltage=1.380649e-23*298.15/1.602176634e-19;
++constexpr double ringSourcePeakVolts=1.5;
++// Nominal zero-IC-current DC circuit, balance VR5 at center. Unlike the
++// reduced AC network, include both470+(100k+25k) signal-input returns.
++constexpr double ringBiasGround=1/(1/1000.+2/(470.+125000.));
++constexpr double ringBiasLoad=1/(1/33100.+1/(820.+ringBiasGround));
++constexpr double ringPin8Dc=15*ringBiasLoad/(390+1200+ringBiasLoad);
++constexpr double ringDifferentialDc=-ringPin8Dc*100/33100.;
++double ringSteering(double volts) { return std::tanh(volts/(2*ringThermalVoltage)); }
+@@ -575,0 +588 @@ struct Synth::Impl {
++    double ringSwitchGain=ringSteering(ringDifferentialDc);
+@@ -655,0 +669 @@ struct Synth::Impl {
++        ringSwitchGain=ringSteering(ringDifferentialDc);
+@@ -762,3 +776,3 @@ struct Synth::Impl {
+-        // output. Ideal balanced multiplier models the uA796 functional
+-        // topology; carrier leak, transistor transfer, audio-input loading
+-        // and wet-gain trim remain unidentified. Direct PRA/Overall wet output uses
++        // output. The carrier uses the physical matched upper-BJT steering
++        // law; signal-pair nonlinearity/loading, mismatch and wet gain remain
++        // unidentified. Direct PRA/Overall wet output uses
+@@ -773 +787,6 @@ struct Synth::Impl {
+-        const double wet=ringWetCoupling.process(bus*ringCoupledCarrier,.1,internalFs);
++        // No mean removal or gain normalization: the nominal DC mismatch
++        // permits signal feedthrough and even carrier harmonics. This is a
++        // 25C ideal-source/zero-IC-DC-load and zero-incremental-input-current
++        // limit, not fitted hardware gain (collector/bias loads also omitted).
++        ringSwitchGain=ringSteering(ringDifferentialDc+ringSourcePeakVolts*ringCoupledCarrier);
++        const double wet=ringWetCoupling.process(bus*ringSwitchGain,.1,internalFs);
+@@ -863,0 +883 @@ void Synth::allSoundOff() {
++    impl_->ringSwitchGain=ringSteering(ringDifferentialDc);
+@@ -900 +920 @@ Synth::ModulationState Synth::modulationState() const {
+-        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier};
++        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier,impl_->ringSwitchGain};
+@@ -916,0 +937,4 @@ std::vector<double> ringCarrierResponse(double fs,const std::vector<double>& inp
++double ringSwitchingResponse(double differentialVolts) {
++    if(!std::isfinite(differentialVolts))throw std::invalid_argument("Nonfinite carrier differential voltage");
++    return ringSteering(differentialVolts);
++}
+diff --git a/Source/DSP/ceres.hpp b/Source/DSP/ceres.hpp
+index 1322fb7..029479d 100644
+--- a/Source/DSP/ceres.hpp
++++ b/Source/DSP/ceres.hpp
+@@ -188,0 +189 @@ public:
++        double ringSwitchGain; // matched upper-pair steering, includes nominal DC bias
+@@ -207,0 +209,3 @@ std::vector<double> ringCarrierResponse(double sampleRate,const std::vector<doub
++// Matched carrier-pair steering at25C, input in physical differential volts.
++// No source amplitude/DC offset is added by this pointwise diagnostic.
++double ringSwitchingResponse(double differentialVolts);
+diff --git a/Tests/RingSwitchingAlias.cpp b/Tests/RingSwitchingAlias.cpp
+new file mode 100644
+index 0000000..8c64d85
+--- /dev/null
++++ b/Tests/RingSwitchingAlias.cpp
+@@ -0,0 +1,27 @@
++// Small offline witness. Samples the actual production steering kernel;
++// no audio file or synth/recording optimization is involved.
++#include "ceres.hpp"
++#include <cmath>
++#include <complex>
++#include <cstdio>
++#include <cstdlib>
++int main(int argc,char** argv){
++    if(argc!=2)return 2;
++    const long rate=std::strtol(argv[1],nullptr,10);if(rate!=192000&&rate!=3072000)return 3;
++    constexpr double pi=3.141592653589793238462643383279502884,frequency=220.;
++    // Same analog steady physical input at both sample rates: this isolates
++    // sampling of the new nonlinear stage, not RC discretization differences.
++    const std::complex<double> sc(0,2*pi*frequency*100e-6);
++    const auto ya=1/1000.+sc,ys=1/390.+sc;
++    const auto zb=1./(sc+ya/(1.+820.*ya)+ys/(1.+1200.*ys));
++    const auto ac=sc/(sc+1/33000.+1./(100.+zb))*100./(100.+zb);
++    constexpr double dc=-.023489437180096218;
++    constexpr double vt=1.380649e-23*298.15/1.602176634e-19;
++    for(long n=0;n<rate/20;++n){
++        const double volts=dc+1.5*std::abs(ac)*std::sin(2*pi*frequency*(double(n)/rate)+std::arg(ac));
++        const double forward=std::exp(volts/(2*vt)),reverse=std::exp(-volts/(2*vt));
++        const double values[]={ceres::ringSwitchingResponse(volts),(forward-reverse)/(forward+reverse)};
++        if(std::fwrite(values,sizeof(double),2,stdout)!=2)return 4;
++    }
++    return 0;
++}
+diff --git a/Tests/RingSwitchingTests.cpp b/Tests/RingSwitchingTests.cpp
+new file mode 100644
+index 0000000..53da0ca
+--- /dev/null
++++ b/Tests/RingSwitchingTests.cpp
+@@ -0,0 +1,102 @@
++#include "ceres.hpp"
++#include <algorithm>
++#include <array>
++#include <cmath>
++#include <iostream>
++#include <limits>
++#include <stdexcept>
++
++namespace {
++constexpr double vt=1.380649e-23*298.15/1.602176634e-19;
++void require(bool ok,const char* why){if(!ok)throw std::runtime_error(why);}
++void near(double a,double b,double tolerance,const char* why){
++    if(!std::isfinite(a)||!std::isfinite(b)||std::abs(a-b)>tolerance){
++        std::cerr<<why<<": "<<a<<" versus "<<b<<'\n';throw std::runtime_error(why);
++    }
++}
++// Ratio of two BJT collector currents with matched Is and a common emitter.
++// This uses exponential currents, not the production tanh identity.
++double currentRatio(double volts){
++    const double first=std::exp(volts/(2*vt)),second=std::exp(-volts/(2*vt));
++    return (first-second)/(first+second);
++}
++double independentBias(){
++    // Full six-node DC KCL including the two 470+125k returns. Node order is
++    // carrier7, carrier8, audio-bias, local-supply, audio1, audio4. All IC
++    // currents are omitted, exactly the declared uncalibrated loading limit.
++    std::array<std::array<double,6>,6> a{};std::array<double,6> b{};
++    auto ground=[&](unsigned i,double r){a[i][i]+=1/r;};
++    auto resistor=[&](unsigned i,unsigned j,double r){
++        a[i][i]+=1/r;a[j][j]+=1/r;a[i][j]-=1/r;a[j][i]-=1/r;
++    };
++    ground(0,33000);resistor(0,1,100);resistor(1,2,820);resistor(1,3,1200);
++    ground(2,1000);ground(3,390);b[3]=15/390.;
++    resistor(2,4,470);resistor(2,5,470);ground(4,125000);ground(5,125000);
++    const auto original=a;const auto originalB=b;
++    for(unsigned col=0;col<6;++col){
++        unsigned pivot=col;for(unsigned i=col+1;i<6;++i)if(std::abs(a[i][col])>std::abs(a[pivot][col]))pivot=i;
++        std::swap(a[col],a[pivot]);std::swap(b[col],b[pivot]);
++        for(unsigned row=col+1;row<6;++row){
++            const double ratio=a[row][col]/a[col][col];
++            for(unsigned j=col;j<6;++j)a[row][j]-=ratio*a[col][j];b[row]-=ratio*b[col];
++        }
++    }
++    std::array<double,6> x{};
++    for(int row=5;row>=0;--row){double sum=b[row];for(unsigned j=row+1;j<6;++j)sum-=a[row][j]*x[j];x[row]=sum/a[row][row];}
++    for(unsigned row=0;row<6;++row){double error=-originalB[row];for(unsigned j=0;j<6;++j)error+=original[row][j]*x[j];near(error,0,3e-17,"Full DC nodal KCL");}
++    const double dc=x[0]-x[1];near(dc,-.023489437180096218,2e-14,"Source-only nominal DC solution");return dc;
++}
++void physicalCurrentLaw(){
++    for(double volts:{-1.5,-.5,-.1,-2*vt,-vt,-.01,-.001,0.,.001,.01,vt,2*vt,.1,.5,1.5})
++        near(ceres::ringSwitchingResponse(volts),currentRatio(volts),3e-16,"Independent matched BJT current ratio in physical volts");
++    near(ceres::ringSwitchingResponse(0),0,0,"Balanced pair zero differential");
++    const double epsilon=1e-7;
++    near((ceres::ringSwitchingResponse(epsilon)-ceres::ringSwitchingResponse(-epsilon))/(2*epsilon),1/(2*vt),3e-11,"Small-signal slope has physical factor2VT");
++    near(ceres::ringSwitchingResponse(1e300),1,0,"Finite large positive limit");
++    near(ceres::ringSwitchingResponse(-1e300),-1,0,"Finite large negative limit");
++    for(double value:{std::numeric_limits<double>::infinity(),-std::numeric_limits<double>::infinity(),std::numeric_limits<double>::quiet_NaN()}){
++        bool threw=false;try{ceres::ringSwitchingResponse(value);}catch(const std::invalid_argument&){threw=true;}
++        require(threw,"Nonfinite physical differential rejected by offline probe");
++    }
++}
++void productionConnectionAndLifecycle(){
++    const double dc=independentBias();ceres::Patch p;p.ringDepth=0;p.ringRate=.2;
++    ceres::Synth dry(8000,19),wet(8000,19);dry.setPatch(p);p.ringMix=1;wet.setPatch(p);
++    near(dry.modulationState().ringSwitchGain,currentRatio(dc),3e-14,"Constructor includes physical nominal DC feedthrough");
++    near(dry.modulationState().ringSwitchGain,-.4277380604918782,3e-14,"No hidden zero-subtraction");
++    for(unsigned i=0;i<13000;++i){
++        if(i==11)wet.noteOn(64);
++        if(i==191)wet.noteOff(64);
++        if(i==911){p.ringRate=220;dry.setPatch(p);wet.setPatch(p);}
++        if(i==1317){p.ringRate=6.669;p.ringMix=0;dry.setPatch(p);p.ringMix=1;wet.setPatch(p);}
++        require(std::isfinite(dry.process())&&std::isfinite(wet.process()),"Finite production audio");
++        const auto a=dry.modulationState(),b=wet.modulationState();
++        near(a.ringSwitchGain,currentRatio(dc+1.5*a.ringCoupledCarrier),4e-14,"Actual production wiring uses3Vpp after passive coupling");
++        near(a.ringSwitchGain,b.ringSwitchGain,0,"Notes and mix do not reset or suspend steering history");
++    }
++    const auto before=dry.modulationState();dry.allSoundOff();
++    near(dry.modulationState().ringCarrier,before.ringCarrier,0,"Software panic preserves free carrier phase");
++    near(dry.modulationState().ringCoupledCarrier,0,0,"Panic clears existing passive state convention");
++    near(dry.modulationState().ringSwitchGain,currentRatio(dc),3e-14,"Panic returns steering to nominal DC not artificialzero");
++    dry.process();const auto after=dry.modulationState();
++    near(after.ringSwitchGain,currentRatio(dc+1.5*after.ringCoupledCarrier),4e-14,"Post-panic state uses same physical law");
++    dry.reset();near(dry.modulationState().ringCarrier,0,0,"Explicit reset resets freeclock");
++    near(dry.modulationState().ringSwitchGain,currentRatio(dc),3e-14,"Reset initializes steering to nominal DC");
++}
++void slowCarrierBoundary(){
++    // An intentionally diagnostic consequence of THIS fixed zero-load DC
++    // model: at0.2Hz its passive AC swing is less than the nominal bias, so
++    // the upper pair never reverses. This is not measured hardware leakage.
++    ceres::Patch p;p.ringRate=.2;p.ringDepth=0;ceres::Synth s(8000,7);s.setPatch(p);
++    double lo=1,hi=-1,mean=0;
++    for(unsigned i=0;i<80000;++i){s.process();if(i>=40000){const double f=s.modulationState().ringSwitchGain;lo=std::min(lo,f);hi=std::max(hi,f);mean+=f/40000.;}}
++    require(lo<hi&&hi<0,"Slow nominal carrier keeps signed DC steering without gain normalization");
++    require(mean<-.3,"Slow nominal carrier preserves nonzero mean feedthrough");
++    std::cout<<"slow0.2Hz steering min="<<lo<<" max="<<hi<<" mean="<<mean<<'\n';
++}
++}
++int main(){try{
++    physicalCurrentLaw();std::cout<<"PASS physical BJT current law,units,factor2VT,limits\n";
++    productionConnectionAndLifecycle();std::cout<<"PASS independent6node DC,production wiring/lifecycle/no DC removal\n";
++    slowCarrierBoundary();std::cout<<"PASS nominal slow-rate no-crossing boundary\n";
++}catch(const std::exception& e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}}
+diff --git a/Tests/check_ring_switching_alias.py b/Tests/check_ring_switching_alias.py
+new file mode 100644
+index 0000000..c86afdb
+--- /dev/null
++++ b/Tests/check_ring_switching_alias.py
+@@ -0,0 +1,59 @@
++#!/usr/bin/env python3
++"""Bounded periodic nonlinear-stage alias comparison; no hardware audio or fit."""
++import argparse
++from datetime import datetime, timezone
++import hashlib
++import json
++import os
++from pathlib import Path
++import subprocess
++import tempfile
++import numpy as np
++ROOT=Path(__file__).resolve().parents[1]
++def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
++def main():
++    ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--build-dir',type=Path,default=ROOT/'build');ap.add_argument('--report',type=Path,required=True);args=ap.parse_args()
++    build=args.build_dir.resolve();identity=json.loads(subprocess.check_output([str(build/'ceres_render'),'--build-info'],text=True))
++    for name,digest in identity.items():assert sha(ROOT/name)==digest,name
++    signals={};records=[]
++    with tempfile.TemporaryDirectory(prefix='ceres-ring-switch-alias-') as temp:
++        binary=Path(temp)/'probe'
++        command=[os.environ.get('CXX','c++'),'-O3','-std=c++17','-I',str(ROOT/'Source/DSP'),str(ROOT/'Tests/RingSwitchingAlias.cpp'),str(build/'libceres.a'),'-o',str(binary)]
++        subprocess.run(command,check=True);binary_hash=sha(binary)
++        for fs in [192000,3072000]:
++            raw=subprocess.check_output([str(binary),str(fs)])
++            data=np.frombuffer(raw,dtype=np.float64).reshape(-1,2)
++            assert len(data)==fs//20 and np.all(np.isfinite(data))
++            error=float(np.max(np.abs(data[:,0]-data[:,1])))
++            assert error<5e-16,(fs,error)
++            signals[fs]=data
++            records.append({'processing_rate_hz':fs,'samples':len(data),'raw_probe_sha256':hashlib.sha256(raw).hexdigest(),'max_native_vs_independent_exp_current_error':error})
++    comparisons=[]
++    for signal_hz in [0,440,15000]:
++        vectors={}
++        for fs,data in signals.items():
++            # Reference uses independent exponential BJT currents, while the
++            #192k result is the production kernel. Both share source volts.
++            waveform=data[:,0 if fs==192000 else 1].copy()
++            if signal_hz:waveform*=np.sin(2*np.pi*signal_hz*np.arange(len(waveform))/fs)
++            vectors[fs]=np.fft.rfft(waveform)/len(waveform)
++        count=1201 #20Hz bins; include24k boundary explicitly.
++        actual=vectors[192000][:count];reference=vectors[3072000][:count]
++        weight=np.full(count,2.);weight[0]=1
++        rms=lambda v:float(np.sqrt(np.sum(weight*np.abs(v)**2)))
++        difference=rms(actual-reference);reference_rms=rms(reference)
++        high_reference=float(np.sqrt(2*np.sum(np.abs(vectors[3072000][count:])**2)))
++        assert difference<2e-11,(signal_hz,difference)
++        comparisons.append({'audio_input_sine_hz':signal_hz,'band_hz':[0,24000],'sampled_vs_reference_band_error_rms':difference,
++            'reference_band_rms':reference_rms,'error_relative_db':float(20*np.log10(max(difference,1e-300)/reference_rms)),
++            'reference_above24k_rms_before_decimator':high_reference})
++    files=[Path(__file__),ROOT/'Tests/RingSwitchingAlias.cpp',ROOT/'Source/DSP/ceres.cpp',ROOT/'Source/DSP/ceres.hpp',build/'libceres.a']
++    report={'status':'pass','created_utc':datetime.now(timezone.utc).isoformat(),'carrier_hz':220,'period_seconds':.05,
++        'nominal_source_vpp':3,'temperature_kelvin':298.15,'dc_differential_volts':-.023489437180096218,
++        'reference_oversampling_over192k':16,'compiled_source_sha256':identity,'compile_command':command,'temporary_probe_binary_sha256':binary_hash,
++        'probe_runs':records,'comparisons':comparisons,'absolute_band_error_limit':2e-11,
++        'scope':'Actual production steering kernel at192k versus independent exponential-current evaluation at3.072MHz for a common periodic steady analog carrier input; carrier-only and linear440/15000Hz signal products. This bounds periodic sampling error of this new stage for these inputs. Not a universal dynamic synth alias bound; no FIR/output/VCA nonlinearities or hardware recording involved. Above24k reference energy is reported, not claimed absent; existing decimator handles it. No mean/peak normalization. Temporary probe binaries/streams removed.',
++        'verified_file_sha256':{str(p.relative_to(ROOT)):sha(p) for p in files}}
++    args.report.parent.mkdir(parents=True,exist_ok=True);args.report.write_text(json.dumps(report,indent=2)+'\n')
++    print('PASS',len(comparisons),'bounded periodic alias comparisons; worst RMS',max(x['sampled_vs_reference_band_error_rms'] for x in comparisons))
++if __name__=='__main__':main()
+diff --git a/Tests/check_ring_switching_parent.py b/Tests/check_ring_switching_parent.py
+new file mode 100644
+index 0000000..827276e
+--- /dev/null
++++ b/Tests/check_ring_switching_parent.py
+@@ -0,0 +1,39 @@
++#!/usr/bin/env python3
++"""Recompile passive-ring parent and compare exact mix-zero audio."""
++import argparse
++from datetime import datetime,timezone
++import hashlib
++import json
++import os
++from pathlib import Path
++import subprocess
++import tempfile
++ROOT=Path(__file__).resolve().parents[1]
++PARENT='8c5a96e75f426dd7854cfee8e76cccd9478bbbfe'
++def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
++def main():
++    ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--build-dir',type=Path,default=ROOT/'build');ap.add_argument('--report',type=Path,required=True);args=ap.parse_args()
++    build=args.build_dir.resolve();identity=json.loads(subprocess.check_output([str(build/'ceres_render'),'--build-info'],text=True))
++    for name,digest in identity.items():assert sha(ROOT/name)==digest,name
++    records=[];parent_hashes={}
++    with tempfile.TemporaryDirectory(prefix='ceres-ring-parent-') as tmp:
++        tmp=Path(tmp)
++        for name in ('ceres.cpp','ceres.hpp'):
++            (tmp/name).write_bytes(subprocess.check_output(['git','show',PARENT+':Source/DSP/'+name],cwd=ROOT));parent_hashes[name]=sha(tmp/name)
++        compile_command=[os.environ.get('CXX','c++'),'-std=c++17','-O3','-DNDEBUG','-I',str(tmp),str(ROOT/'Tests/ParityDriver.cpp'),str(tmp/'ceres.cpp'),'-o',str(tmp/'parent')]
++        subprocess.run(compile_command,check=True)
++        for scene,extra in [('default-controls',[]),('active-carrier-bypassed',['ring-bypass'])]:
++            streams=[];variants={}
++            for label,binary in [('parent',tmp/'parent'),('candidate',build/'ceres_native_parity')]:
++                output=tmp/(label+'.f32');command=[str(binary),str(output),*extra]
++                subprocess.run(command,check=True);streams.append(output.read_bytes())
++                variants[label]={'command':command,'binary_sha256':sha(binary),'audio_sha256':sha(output),'samples':len(streams[-1])//4}
++            assert len(streams[0])==384000*4 and streams[0]==streams[1],scene
++            records.append({'scene':scene,'exact':True,'variants':variants})
++    report={'status':'pass','created_utc':datetime.now(timezone.utc).isoformat(),'parent_commit':PARENT,
++        'parent_source_sha256':parent_hashes,'compiled_source_sha256':identity,'compile_command':compile_command,
++        'comparisons':records,'samples_per_variant':768000,
++        'scope':'mix0 exact dry path; active carrier rates/depths/EG, allSUB functions, note/pedal/pressure/panic/reset. Same compiler/math library. Temporary binaries/streams deleted; retained source/commands reproduce. No recording fit.',
++        'verified_file_sha256':{str(p.relative_to(ROOT)):sha(p) for p in [Path(__file__),ROOT/'Tests/ParityDriver.cpp',ROOT/'Source/DSP/ceres.cpp',ROOT/'Source/DSP/ceres.hpp']}}
++    args.report.parent.mkdir(parents=True,exist_ok=True);args.report.write_text(json.dumps(report,indent=2)+'\n');print('PASS mix0 parent parity:768000 float32 samples')
++if __name__=='__main__':main()
+diff --git a/Tests/dsp_tests.cpp b/Tests/dsp_tests.cpp
+index 6e13c3d..8a42783 100644
+--- a/Tests/dsp_tests.cpp
++++ b/Tests/dsp_tests.cpp
+@@ -976 +976,22 @@ void ringAudioAndFreeCarrier() {
+-    require(toneMagnitude(w,440,fs)<.002*low,"Fully wet ideal ring suppresses dry carrier");
++    // Physical upper-pair steering has a nominal DC offset and therefore
++    // permits signal feedthrough/even sidebands. Independently derive the
++    // carrier amplitude from the passive Schur network, then integrate the
++    // matched-BJT current ratio rather than relaxing a suppression limit.
++    const std::complex<double> sc(0,2*(4*fs)*std::tan(pi*47/(4*fs)));
++    const auto ya=1/1000.+sc*100e-6,ys=1/390.+sc*100e-6;
++    const auto zb=1./(sc*100e-6+ya/(1.+820.*ya)+ys/(1.+1200.*ys));
++    const auto hc=(sc*100e-6)/(sc*100e-6+1/33000.+1./(100.+zb))*100./(100.+zb);
++    const double ra=1/(1/1000.+2/(470.+125000.)),rb=1/(1/33100.+1/(820.+ra));
++    const double dc=-(15*rb/(390+1200+rb))*100/33100.;
++    const double vt=1.380649e-23*298.15/1.602176634e-19;
++    std::array<std::complex<double>,4> coefficients{};
++    for(unsigned i=0;i<65536;++i) {
++        const double phase=2*pi*i/65536.,volts=dc+1.5*std::abs(hc)*std::sin(phase);
++        const double ratio=std::exp(volts/vt),steering=(ratio-1)/(ratio+1);
++        for(unsigned h=0;h<4;++h)coefficients[h]+=steering*std::polar(1.,-static_cast<double>(h)*phase)/65536.;
++    }
++    require(std::abs(toneMagnitude(w,440,fs)/low-std::abs(coefficients[0]/coefficients[1]))<2e-4,
++        "Nominal DC feedthrough matches physical BJT current-ratio oracle");
++    for(unsigned h=2;h<=3;++h)
++        require(std::abs(toneMagnitude(w,440-47*h,fs)/low-std::abs(coefficients[h]/coefficients[1]))<2e-4,
++            "Even/odd carrier sidebands match physical BJT current-ratio oracle");
+diff --git a/Tests/record_ring_switching_validation.py b/Tests/record_ring_switching_validation.py
+new file mode 100644
+index 0000000..e5f4963
+--- /dev/null
++++ b/Tests/record_ring_switching_validation.py
+@@ -0,0 +1,68 @@
++#!/usr/bin/env python3
++"""Bind completed physical ring-steering checks; no test/audio reruns."""
++from datetime import datetime,timezone
++import hashlib
++import json
++from pathlib import Path
++import re
++import subprocess
++ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'Docs/ring-switching'
++PARENT='8c5a96e75f426dd7854cfee8e76cccd9478bbbfe'
++def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
++def main():
++    identity=json.loads(subprocess.check_output([str(ROOT/'build/ceres_render'),'--build-info'],text=True))
++    for name,digest in identity.items():assert sha(ROOT/name)==digest,name
++    parity=json.loads((OUT/'parent-parity.json').read_text());alias=json.loads((OUT/'alias.json').read_text())
++    assert parity['status']=='pass' and parity['parent_commit']==PARENT and parity['samples_per_variant']==768000
++    assert alias['status']=='pass' and len(alias['comparisons'])==3
++    for report in [parity,alias]:
++        assert report['compiled_source_sha256']==identity
++        for name,digest in report['verified_file_sha256'].items():assert sha(ROOT/name)==digest,name
++    for log,count in [('release.log',9),('sanitize.log',4)]:assert f'100% tests passed, 0 tests failed out of {count}' in (OUT/log).read_text(),log
++    def table(source):return source.split('const Parameter parameters[] = {',1)[1].split('\n};',1)[0]
++    parent=subprocess.check_output(['git','show',PARENT+':Source/DSP/ceres.cpp'],cwd=ROOT,text=True)
++    assert table(parent)==table((ROOT/'Source/DSP/ceres.cpp').read_text())
++    keys=re.findall(r'\{"([a-z_]+)",',table(parent));assert len(keys)==57
++    code=['CMakeLists.txt','Source/DSP/ceres.cpp','Source/DSP/ceres.hpp','Tests/dsp_tests.cpp',
++        'Tests/RingSwitchingTests.cpp','Tests/RingSwitchingAlias.cpp','Tests/check_ring_switching_alias.py',
++        'Tests/check_ring_switching_parent.py','Tests/record_ring_switching_validation.py']
++    # New files must first be added with git add -N (or staged), so the exact
++    # immutable-parent diff is complete both before and after the final commit.
++    for name in code:subprocess.run(['git','ls-files','--error-unmatch',name],cwd=ROOT,check=True,stdout=subprocess.DEVNULL)
++    patch=subprocess.check_output(['git','diff',PARENT,'--binary','--unified=0','--',*code],cwd=ROOT);assert patch
++    (OUT/'source.patch').write_bytes(patch)
++    audit=Path('/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019')
++    assert sha(audit/'evidence.json')=='d023d975ce4edaa5ee6adc32f04914b66424e486f6e0431520d0dfdf2dbba030'
++    evidence=json.loads((audit/'evidence.json').read_text())
++    for name,digest in evidence['verified_sha256'].items():assert sha(name)==digest,name
++    constants=evidence['conditional_constants']
++    assert constants['carrier_dc_volts']==-.023489437180096218 and constants['source_peak_volts']==1.5
++    files=[ROOT/p for p in code]+[ROOT/'Docs/DSP_SOURCE.md',ROOT/'Tests/RingCarrierTests.cpp',ROOT/'Tests/ParityDriver.cpp',ROOT/'Tests/EmbeddedContract.cpp']
++    files+=[OUT/p for p in ['README.md','source.patch','configure.log','build.log','release.log','sanitize-configure.log',
++        'sanitize-build.log','sanitize.log','parent-parity.json','parent-parity.log','alias.json','alias.log']]
++    files+=[audit/p for p in ['evidence.json','source-audit.md','ElectronicSynth.pdf','fairchild-12.png',
++        'yamaha-pwm-49.png','dc_nominal.py','dc-nominal.json']]
++    binaries=[ROOT/'build'/p for p in ['ceres_render','libceres.a','libceres_embedded.a','ceres_tests',
++        'ceres_ring_carrier_tests','ceres_ring_switching_tests','ceres_native_parity','ceres_embedded_parity']]
++    report={'status':'pass','created_utc':datetime.now(timezone.utc).isoformat(),'parent_commit':PARENT,
++        'compiled_source_sha256':identity,'release_ctest_passed':9,'asan_ubsan_ctest_passed':4,'asan_options':'detect_leaks=0',
++        'parameter_keys':57,'parameter_table_byte_identical':True,'parent_bypass_audio_exact_samples':768000,
++        'native_embedded_active_parity':'Native/embedded, active-soundpath and expression384000-sample comparisons passed, including multiple active ring rates/mixes/depths.',
++        'physical_constants':constants,
++        'tests':['Independent exponential BJT current ratio and small-signal1/(2VT) derivative',
++            'Independent full6node DC KCL including signal-input returns',
++            'Production raw/passive/physical steering connection, mix0 history, notes/live controls, panic/reset',
++            'Explicit nominal DC feedthrough/no mean subtraction,0.2Hz no-crossing boundary',
++            'Actual fully wet0th/2nd/3rd carrier sidebands versus independent passive Schur plus exponential-current Fourier integral',
++            'Existing passive complex AC/physical-state trapezoids and DSP/allocation contracts'],
++        'periodic_alias':{'processing_hz':192000,'reference_hz':3072000,'carrier_hz':220,'audio_product_hz':[0,440,15000],
++            'band_hz':[0,24000],'max_rms_difference':max(c['sampled_vs_reference_band_error_rms'] for c in alias['comparisons']),
++            'scope':'Stationary physical-carrier kernel and linear signal products only; excludes dynamic/full-synth/FIR/output nonlinearities. Reference above24k energy reported separately.'},
++        'allocation_check':'Existing embedded57-key contract passes zero post-construction new/new[] allocations.',
++        'scope':'Physically scaled matched upper-pair steering after existing passive network. Fixed25C/nominal3Vpp ideal source, zero all-IC DC loads and incremental carrier input current. No current/gain/temperature fit, normalization, new parameter, GUI, clock/envelope change or hardware-recording render. Signal-port nonlinearization/loading and absolute wet gain remain uncalibrated.',
++        'binary_sha256':{str(p.relative_to(ROOT)):sha(p) for p in binaries},
++        'verified_file_sha256':{str(p.relative_to(ROOT)) if p.is_relative_to(ROOT) else str(p):sha(p) for p in files}}
++    (OUT/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
++    for name,digest in report['verified_file_sha256'].items():assert sha(ROOT/name)==digest,name
++    print('PASS',len(report['verified_file_sha256']),'bindings; renderer',sha(ROOT/'build/ceres_render'))
++if __name__=='__main__':main()

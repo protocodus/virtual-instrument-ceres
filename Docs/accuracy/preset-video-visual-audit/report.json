@@ -1,0 +1,852 @@
+{
+  "schema": "ceres-primary-preset-video-still-audit-v1",
+  "recorded_utc": "2026-10-18T19:02:29.658998+00:00",
+  "method": "Paused on-service HTML video, ordinary visible quality/skip controls and seeked events. Retained browser screenshots and exact tool observations. No remote audio/video acquisition. No continuous-watch, audio listening, gate measurement or MIDI transcription claimed.",
+  "sources": [
+    {
+      "url": "https://www.youtube.com/watch?v=HupZtUPiJLU",
+      "title": "The Yamaha CS-50- Presets",
+      "creator": "AutomaticGainsay",
+      "decoded_duration_s": 778.701,
+      "frames": [
+        {
+          "timestamp_target_s": 65,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-065.png",
+          "sha256": "4f340b5aeec94285f35cea32669dd9295542bcde27bbebcdccc11f99ea03ac95",
+          "size_pixels": [
+            815,
+            458
+          ]
+        },
+        {
+          "timestamp_target_s": 73,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-073.png",
+          "sha256": "cb704ca2cf93a68de799e80286a44366a703c64a388ca679a4082facfd81daec",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 76,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-076.png",
+          "sha256": "b008a17b768dc8be6a3c471889e1aa443cd89cc665d8313281c8b7196ccad83d",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 79,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-079.png",
+          "sha256": "18f03fddb56994ec0e5323ca5852158ae7705ee49e9ee447716c073adf44c677",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 107,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-107.png",
+          "sha256": "0212692e81102b30b03744af1f7cb3eca6e426470d8c617fcf0aeda3d82105eb",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 120,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-120.png",
+          "sha256": "70bbc7ddd8f919ce6effb99f88bc4ab432e1ae8cbf5f3a1ff396b08d3f32da08",
+          "size_pixels": [
+            815,
+            458
+          ]
+        },
+        {
+          "timestamp_target_s": 156,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-156.png",
+          "sha256": "9a2091ee6b26f8053dc1eb3eddc9f87c4b50c6643b47e9752a4d49c79d488558",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 165,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-165.png",
+          "sha256": "7edfbfcd03f39fbfe9e90bf7a23b40cb423a92bf9d9972a772c30aa7c22fbc8d",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 180,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-180.png",
+          "sha256": "6de1cfbc1a18c518a5a7aac1b7cc287204d88784fcd32cad579c591d5030e4c2",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 198,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-198.png",
+          "sha256": "21ea73555992a3432401bd277ea1d4e22734d9020af4889c44ed3fcdb00a8ec8",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 208,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-208.png",
+          "sha256": "14feaa43cd36e43eff010fbc1395c129bd1d85cf92b24703cdd9779a11f52c07",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 240,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-240.png",
+          "sha256": "064b1b724d06b78c4af209ba0b7ef975ec2804f8914831641ec39e780766b7d9",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 264,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-264.png",
+          "sha256": "55e838ea622eea3ea0fe94186ca279a8efb54fb4bf3f95408cf8ab42e78bc528",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 274,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-274.png",
+          "sha256": "8c362d7261c7efa5d84f88ae310e7fd9239c31a75ebf98a8984a1bc3652d4201",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 300,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-300.png",
+          "sha256": "05bc8237cafbc52e6bf6d32804994942f426732002b7e9ff533b6a41d88fc403",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 323,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-323.png",
+          "sha256": "2e58bce5bd9fa86f6e5a7259c0c8f41c744acc1a53bfc76ae0215f5c9eff6f1c",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 360,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-360.png",
+          "sha256": "fe028674d233b97faa135509ca3f93ecd39d2beeadc931fc23ffd9ae9a80d586",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 365,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-365.png",
+          "sha256": "994b7a4cc40839dbc4ffdd9124d53b5ae67eb977120b763fd38e86a5a82f082e",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 381,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-381.png",
+          "sha256": "67e5628c6fd8ec857b49c2561863659cf1ed9b090cb43df4246a628c9f50b041",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 391,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-391.png",
+          "sha256": "9fdf9237535780dd659c5479ab2c0937492c6254b6f14adbd6477613a462a65c",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 415,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-415.png",
+          "sha256": "02f1c59ea93db59a2b92714745b9e5ac6948f59275ca92991930bc07f1e7fb0d",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 420,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-420.png",
+          "sha256": "739f3a728171dd867a093a9ca1598dd52fbbbe43c6eee909c33d5c2e456bebf4",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 480,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-480.png",
+          "sha256": "82dd6c09ea4b732045080b3f3d92f19e406838b1f3f7df5ff9b375891726c986",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 540,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-540.png",
+          "sha256": "89c9ebe0ddb985d5521b540f08d4c7fed6de543464bbeaa08abda9941e0d13ee",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 600,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-600.png",
+          "sha256": "f5dd422639d40a38a12b1e0c0724c3a225d83c56a25d1ea1bec96da0dfbcf0e8",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 660,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-660.png",
+          "sha256": "f88f498e55c57aa1560e8f5da807c76d063749668dac75ff4e3ee3648db7ba20",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 720,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-720.png",
+          "sha256": "0072f76d60f0d50d36649c08a7fc3257e6b97c76029680837ca9e567ca2bff51",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 770,
+          "path": "automaticgainsay/frames/ceres-automaticgainsay-770.png",
+          "sha256": "d5ded2e993fd72a9ba22cb077489a8d4e7e42d0d31cbdc552edbadd0a8cdbed0",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        }
+      ],
+      "frame_count": 28,
+      "contact_sheet": {
+        "path": "automaticgainsay/contact.png",
+        "sha256": "781afdcfcaaee47da46a4f88be173367e92a2979798c95844e8e1dffb1d7d6f9"
+      },
+      "browser_observations": [
+        {
+          "path": "automaticgainsay/browser-observations.json",
+          "sha256": "3050b136bb601f978f98ac5b496f750bd15b4fd9d9a74bc97b786d5958be9c9e",
+          "observations": 26
+        }
+      ]
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=nl19OnD8SrY",
+      "title": "Yamaha CS50: Famous Presets",
+      "creator": "Doctor Mix",
+      "decoded_duration_s": 286.541,
+      "frames": [
+        {
+          "timestamp_target_s": 10,
+          "path": "doctormix/frames/ceres-doctormix-010.png",
+          "sha256": "596a2a9a2ae105d8df9d5a702b26b904237b13ae728047052e58a5e0fd07a76b",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 25,
+          "path": "doctormix/frames/ceres-doctormix-025.png",
+          "sha256": "e73b23b287009b09187927cbf7a179ac03e3a51e442f6abe2a47d42c1550dd86",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 50,
+          "path": "doctormix/frames/ceres-doctormix-050.png",
+          "sha256": "abe0e89ed65297ba1b1bc1b76abfd2cb9ef97aabdf052cee53c95bec2d675d65",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 54,
+          "path": "doctormix/frames/ceres-doctormix-054.png",
+          "sha256": "53ef90cd6348903aeedddb34be675bd22747d5cb00de7598e30ff5a225579570",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 58,
+          "path": "doctormix/frames/ceres-doctormix-058.png",
+          "sha256": "a1809367df3c486f155ae40017e7b51f21d620269527942809d73d3020e1d74a",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 60,
+          "path": "doctormix/frames/ceres-doctormix-060.png",
+          "sha256": "1cbd97c16d401ebc634feb89cf36c9fd81e7d7d8af8248c1ee4f9261237d1ebd",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 62,
+          "path": "doctormix/frames/ceres-doctormix-062.png",
+          "sha256": "ee128ade81d226662f5abe1ca9d633e49cb4730882836fdaab24bd062029a776",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 64,
+          "path": "doctormix/frames/ceres-doctormix-064.png",
+          "sha256": "c0d855597b64b99ea364aedd5014bfbef0268986fb495f9ce552554905ee507a",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 66,
+          "path": "doctormix/frames/ceres-doctormix-066.png",
+          "sha256": "1139ac66816e6cda1e9cc3cfdb8e4829f73a9356fb2e8204d966082a63e1d2db",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 68,
+          "path": "doctormix/frames/ceres-doctormix-068.png",
+          "sha256": "cbfd7e49da7a97702d7e49757aa26467ec29a6fcda42671b39b04b5801f835dd",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 70,
+          "path": "doctormix/frames/ceres-doctormix-070.png",
+          "sha256": "fc83cb6697052d9024b85b74fc9ac3ffd51d43a728eb805b63aea086f9086a2e",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 72,
+          "path": "doctormix/frames/ceres-doctormix-072.png",
+          "sha256": "23233049c6cdc6a1fdb0fade733cf2215b43e3b45bd8075da8ff95766438f4a7",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 74,
+          "path": "doctormix/frames/ceres-doctormix-074.png",
+          "sha256": "3ed87cbfc9c898aab45f0a444f16e6b9bd205b1f3cb857d031c2b38d51aff3b5",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 75,
+          "path": "doctormix/frames/ceres-doctormix-075.png",
+          "sha256": "5d916cae7b0a629c7653cd69c5c81b2e1defa8bfec12fafb6a04054ef208f2ce",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 100,
+          "path": "doctormix/frames/ceres-doctormix-100.png",
+          "sha256": "1e2c619430912c1f1d168f155750372cc89cc8424fedb3a6636fd19595288c71",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 125,
+          "path": "doctormix/frames/ceres-doctormix-125.png",
+          "sha256": "58aa9c7a0e393f5f1e0a44efe421c1a9e2abf3ea378c1fc76d14dfe78f3be50b",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 130,
+          "path": "doctormix/frames/ceres-doctormix-130.png",
+          "sha256": "9ccb1bad87c86b2816ae7a48e730ff84cc4bd0149d0619ffff46f4aa71b5c927",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 135,
+          "path": "doctormix/frames/ceres-doctormix-135.png",
+          "sha256": "6f11146f6c3aed8226d15e5f22580646e7404f4aa8336c63ab1d62bae889bc28",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 140,
+          "path": "doctormix/frames/ceres-doctormix-140.png",
+          "sha256": "b67b355d4e6b7d23819d3809ca1fc4912b69aea8dd777d326c355c0044ae0bf7",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 145,
+          "path": "doctormix/frames/ceres-doctormix-145.png",
+          "sha256": "fdc7e37e8936f8af23b3c946e2b6ee369b6423a2f5b78b13e6704be6887f1cab",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 150,
+          "path": "doctormix/frames/ceres-doctormix-150.png",
+          "sha256": "7a046144848792e865cf6621e4852f71535f2becc626e7d3d92c12a1c5b2b0bc",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 155,
+          "path": "doctormix/frames/ceres-doctormix-155.png",
+          "sha256": "6fefba0718020135d7403fe403c010b01ddaec036567f4d4a263932e9c95e35a",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 160,
+          "path": "doctormix/frames/ceres-doctormix-160.png",
+          "sha256": "756f5595fbc83e02edab5be9819921fac4e0e8f7f53824f764d61ace882bc8c6",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 165,
+          "path": "doctormix/frames/ceres-doctormix-165.png",
+          "sha256": "7aedd3b6c62f4a8fbf37fd897deff2a86a9feaf3a19365fb7233cf41858bbf1f",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 175,
+          "path": "doctormix/frames/ceres-doctormix-175.png",
+          "sha256": "1cf11bbe99fb997aec71cc12cd654ee0da1696b72493572440bc645c57ed61cf",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 200,
+          "path": "doctormix/frames/ceres-doctormix-200.png",
+          "sha256": "1783706f42f0172e584c02ff98cb267242d2c9b7e02511763bb2176b241a836a",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 225,
+          "path": "doctormix/frames/ceres-doctormix-225.png",
+          "sha256": "4849dcfaf02a548e34cecb8c07f3243844b594d0b7958c4bc7b6fbda7ea4b25e",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 250,
+          "path": "doctormix/frames/ceres-doctormix-250.png",
+          "sha256": "1ac11ae69c02e8eeeea6d674383ca6870dc6a1f1fdb64380ca899ce0f83fffc6",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 275,
+          "path": "doctormix/frames/ceres-doctormix-275.png",
+          "sha256": "eb648ea10231ba7caa0667973cb48760bb877d9128f737b5d8bdab14b7376aaf",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        }
+      ],
+      "frame_count": 29,
+      "contact_sheet": {
+        "path": "doctormix/contact.png",
+        "sha256": "6fe76c786cce9e05b49990339a1f7329aea7854c24ea84ac86f434f243fe373e"
+      },
+      "browser_observations": [
+        {
+          "path": "doctormix/browser-observations.json",
+          "sha256": "5b4560e260f2f93a7de62ab9f4eb1c14fcc4074f65199ad479ccdfbb4d8b2d87",
+          "observations": 12
+        },
+        {
+          "path": "doctormix/detail-browser-observations.json",
+          "sha256": "bb2603fb997fc53e78b93c19bb788b1df9a72d5585d3735b92f6a7a1c504e123",
+          "observations": 10
+        },
+        {
+          "path": "doctormix/middle-browser-observations.json",
+          "sha256": "7e1bd31a7ee949d2354942f525f0aa87742a1714dec88f252f566ad1134b5f9a",
+          "observations": 7
+        }
+      ]
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=AtoWZaNemxk",
+      "title": "The Yamaha CS-50 Part 4- The Amplifier",
+      "creator": "AutomaticGainsay",
+      "decoded_duration_s": 353.781,
+      "frames": [
+        {
+          "timestamp_target_s": 10,
+          "path": "amplifier/frames/ceres-amplifier-010.png",
+          "sha256": "1a3bf336435ab58cfab95177df80b59773e2766b3808c9e0678300bc5bf3a51e",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 30,
+          "path": "amplifier/frames/ceres-amplifier-030.png",
+          "sha256": "9968dbef91ba5512d215e7e86f7c72e461315cdaddc9f4cdde63cd8b5517bd41",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 45,
+          "path": "amplifier/frames/ceres-amplifier-045.png",
+          "sha256": "3d4be59bcbb33da1ab9aff30e0436d6d9a31a3923a70335308d9e66bdf738b54",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 60,
+          "path": "amplifier/frames/ceres-amplifier-060.png",
+          "sha256": "840babf2891d1153ac2642a4f4cd2b7da8d6b5ca7e31e5cf492bb4ecebd78e00",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 75,
+          "path": "amplifier/frames/ceres-amplifier-075.png",
+          "sha256": "d47fe024e7194546479f1eb54f3d563ffbfa81a7ca1d7615b806bf31f5f4da39",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 90,
+          "path": "amplifier/frames/ceres-amplifier-090.png",
+          "sha256": "4e0785a5b46cff797e3eecf1715ce12e4eb2f7a0f5abf704760419af8fef306c",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 120,
+          "path": "amplifier/frames/ceres-amplifier-120.png",
+          "sha256": "bf22301ead52f7268429ea1b87f774fced1ce64d50e2b36839b3d4efc083f8f0",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 150,
+          "path": "amplifier/frames/ceres-amplifier-150.png",
+          "sha256": "05f3cac457f444d8496468cb3ff4c6c4b5454f464083a4cf4fb1b5b1bc16c7a8",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 180,
+          "path": "amplifier/frames/ceres-amplifier-180.png",
+          "sha256": "e03a1bf5c8d4c9ec29c63901a56e07fa3ebab4ea61cab3e0e9d0110db692ed97",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 210,
+          "path": "amplifier/frames/ceres-amplifier-210.png",
+          "sha256": "bf99c1ba26827325184eb093a53d1286a5f53b86e833911a9421a231a0851c86",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 240,
+          "path": "amplifier/frames/ceres-amplifier-240.png",
+          "sha256": "ab3a6a27c2f120d559bd683c6c8a48265a50f929816753843e4521cd1a135de4",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 270,
+          "path": "amplifier/frames/ceres-amplifier-270.png",
+          "sha256": "774473499db69e038f89cfd0a88bb0c58b4ba63a144f239833f5012f2e3cc92b",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 280,
+          "path": "amplifier/frames/ceres-amplifier-280.png",
+          "sha256": "ff8f6b7854db663f97453f16a8713fe88777d5607289e4d5d5a0b6bcb11e0b1e",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 285,
+          "path": "amplifier/frames/ceres-amplifier-285.png",
+          "sha256": "3de9c43aac9b35746b310ff7334c47e535d38b7c796d28f33cf3f52fcbb55d00",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 290,
+          "path": "amplifier/frames/ceres-amplifier-290.png",
+          "sha256": "ad6ccd236ff1038bc015714f61fc0b7905a36e20c60e57d56bf7b65488dbb72f",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 295,
+          "path": "amplifier/frames/ceres-amplifier-295.png",
+          "sha256": "1580903f0af7362d69a8ec5adf73c8b8f22be905a61441c9b07a5dcbf445ddb2",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 300,
+          "path": "amplifier/frames/ceres-amplifier-300.png",
+          "sha256": "10ebcdd27060867565e9486c913ef4dd5bee9234b0911ee8f19fee16ae14d62e",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 305,
+          "path": "amplifier/frames/ceres-amplifier-305.png",
+          "sha256": "76fdb7188eadf793851cf056139408080d7c7047e0ca043cbb4655796ed77cfe",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 310,
+          "path": "amplifier/frames/ceres-amplifier-310.png",
+          "sha256": "ed0a402c33ae55736a00a02e705f6d382455f64178ce455349e67a27b1edea49",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 315,
+          "path": "amplifier/frames/ceres-amplifier-315.png",
+          "sha256": "ef6cd044a2b3a24ff5f49fdc37c1df6142b1af6d600823bb37eec23a087c96f9",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 320,
+          "path": "amplifier/frames/ceres-amplifier-320.png",
+          "sha256": "3d2844928f6c59eee34eb80cf32f7b305969915ade28c66d01db2a3cfcb3a24d",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 325,
+          "path": "amplifier/frames/ceres-amplifier-325.png",
+          "sha256": "dff80eb3f4963c8b9104cfeb49471a0cd9d0173b3b43b2d3febc90bd4472d215",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 330,
+          "path": "amplifier/frames/ceres-amplifier-330.png",
+          "sha256": "1f51a48a4f5f2ba9f4122261ae3ae346778be8ebfd41b6f669bd1e86a26ff06f",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 335,
+          "path": "amplifier/frames/ceres-amplifier-335.png",
+          "sha256": "91880812846e118edb8d1266aa4fd2dc088ea0176119dbae98c2fbe378f52f1c",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        },
+        {
+          "timestamp_target_s": 340,
+          "path": "amplifier/frames/ceres-amplifier-340.png",
+          "sha256": "aab1236f940ae1525b7b18c74d64117f810df70b241b80292633f11034973f4a",
+          "size_pixels": [
+            1105,
+            622
+          ]
+        }
+      ],
+      "frame_count": 25,
+      "contact_sheet": {
+        "path": "amplifier/contact.png",
+        "sha256": "b7341878a38aac5c01f8a050de42c50bacc76b61b03e72d0d81bf6666307b7b2"
+      },
+      "browser_observations": [
+        {
+          "path": "amplifier/browser-observations.json",
+          "sha256": "7f6fcfe067a87a50beb090214362e27cafc1725e94bc176b3bbf1c9e0c9bd67d",
+          "observations": 25
+        }
+      ]
+    }
+  ],
+  "sources_promoted_to_controlled_benchmark": 0,
+  "audio_renders": 0,
+  "DSP_changed": false,
+  "original_battery_changed": false,
+  "limits": [
+    "Sparse stills do not prove controls were constant between observations.",
+    "Machine captions are navigation aids, not verified timing or speech transcripts.",
+    "Mechanical positions are not measured control voltages; hidden globals and dry recording chain remain unestablished.",
+    "Reference audio is never a synthesis asset."
+  ],
+  "excluded_attempts": [
+    {
+      "path": "/Users/vojta/Dev/reason-rack-extension/.playwright-mcp/ceres-doctormix-000.png",
+      "sha256": "5e8aaf765ed00c6365646d3e663b653abf958335507f061f3c48a9e819f21e14",
+      "reason": "Advertisement at33.91s of159.601s; source metadata duration287s. Identified visually and by ad-showing; standard skip used. Screenshot excluded from source frames and contact."
+    },
+    {
+      "operation": "First screenshot target /tmp/ceres-automaticgainsay-065.png",
+      "reason": "Tool denied destination outside allowed screenshot roots; no screenshot there. Retried successfully in workspace .playwright-mcp."
+    },
+    {
+      "operation": "Snapshot selector [role=dialog]",
+      "reason": "Ambiguous selector matched5elements; narrowed to actual consent dialog."
+    },
+    {
+      "operation": "Public timedtext fetch",
+      "reason": "HTTP200 empty body; transcript not recovered this way. No access restriction bypass."
+    },
+    {
+      "operation": "Doctor Mix/amplifier transcript panels",
+      "reason": "Displayed loading panel; no transcript recovered. Only captions visible in source screenshots used as navigation aids."
+    },
+    {
+      "operation": "Amplifier pre-roll play click",
+      "reason": "Click timed out due overlay interception. Later live player showed second ad and ordinary Skip button; skipped via that visible control."
+    }
+  ]
+}

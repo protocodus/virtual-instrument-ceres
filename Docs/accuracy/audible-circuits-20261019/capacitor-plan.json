@@ -1,0 +1,73 @@
+{
+  "schema": "ceres.audible-capacitor-scenes.v1",
+  "declared_before_render": true,
+  "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
+  "driver_sha256": "750a72cba3e16869091678fca76543a29d47ff26913bce0e32924871e2ccf3bc",
+  "sample_rate": 48000,
+  "seed": 1,
+  "channels": 1,
+  "format": "float32",
+  "normalization": "none",
+  "scope": "Q/EG-only parent versus candidate, identical driver with reset6us, no fitting. Independent source-backed dynamics; not a hardware-accuracy score.",
+  "scene_order": [
+    "lp_q_step",
+    "lp_q_static",
+    "hp_q_step",
+    "idle_il",
+    "il_static"
+  ],
+  "scenes": {
+    "lp_q_step": {
+      "seconds": 7.5,
+      "note": 60,
+      "note_on": 0,
+      "note_off": 6.5,
+      "change_seconds": 1,
+      "change": "lp_resonance .2 -> .8",
+      "cutoffs": [
+        30,
+        1046.5022612023945
+      ],
+      "eg_coupling": [
+        0,
+        0
+      ]
+    },
+    "lp_q_static": {
+      "seconds": 7.5,
+      "same_as": "lp_q_step",
+      "difference": "lp_resonance .8 configured before first process; no edit",
+      "expectation": "parent/candidate byte-identical"
+    },
+    "hp_q_step": {
+      "seconds": 7.5,
+      "same_as": "lp_q_step",
+      "difference": "hp_cutoff261.6255653 lp8000, initial HP resonance.2 LP0; HP .2->.8 at1s"
+    },
+    "idle_il": {
+      "seconds": 2,
+      "note": 60,
+      "note_on": 0.55,
+      "note_off": 1.2,
+      "change_seconds": 0.5,
+      "change": "idle filter_initial0 -> -5",
+      "cutoffs": [
+        30,
+        3000
+      ],
+      "eg_coupling": [
+        0,
+        0.5393617021276597
+      ],
+      "filter_attack": 0.25,
+      "filter_release": 1
+    },
+    "il_static": {
+      "seconds": 2,
+      "same_as": "idle_il",
+      "difference": "filter_initial-5 configured before first process; no edit",
+      "expectation": "parent/candidate byte-identical"
+    }
+  },
+  "all_other_parameters": "Exact Patch defaults plus explicit values in bound driver. All waves except saw, SUB depths, ring, pressure, drift, velocity sensitivity and utility trim zero. No gain or phase adjustment."
+}

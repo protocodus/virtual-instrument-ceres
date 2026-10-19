@@ -1,0 +1,114 @@
+{
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin\n",
+  "machine": "Apple M1 Max",
+  "probe_sha256": "d4becb82fdaeb40a66eb33b701bb50d107995170e77e17a06de54b84c9d50075",
+  "builds": {
+    "baseline": {
+      "command": [
+        "clang++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-DCERES_EMBEDDED_TARGET=1",
+        "-I/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/baseline-source/Source/DSP",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/native_performance.cpp",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/baseline-source/Source/DSP/ceres.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/validation/performance/baseline"
+      ],
+      "binary_sha256": "37fd4fcb41a12049553f57348589c82434d6076f7c61a365f2a5d602a560f706",
+      "sources": {
+        "Source/DSP/ceres.cpp": "ac10943cc36eca7605101a22cc5d0947f59f08bbff806c324ec2cb652bd13908",
+        "Source/DSP/ceres.hpp": "01ce1d02f39ad3f4db28ea5fa281ea82eb2163c15d4fb838d7944f6220701b9c"
+      }
+    },
+    "candidate": {
+      "command": [
+        "clang++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-DCERES_EMBEDDED_TARGET=1",
+        "-I/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Source/DSP",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Tools/native_performance.cpp",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Source/DSP/ceres.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/validation/performance/candidate"
+      ],
+      "binary_sha256": "315bf72f43a96d55fc3536e0524bc84e2cc836c055319e7e942d169feb429f00",
+      "sources": {
+        "Source/DSP/ceres.cpp": "05e3ecfd53e9ccaa5901952cbdadf04d8b167ffe66df8064e13088da86913e4e",
+        "Source/DSP/ceres.hpp": "42ca7aa529968edde3726a61713e9d4da59cd884db1a9e620db6c80b9fc86e36"
+      }
+    }
+  },
+  "runs": [
+    {
+      "build": "baseline",
+      "workload": "engineering Init",
+      "rate": 48000,
+      "block_size": 64,
+      "voices": 4,
+      "oversampling": 4,
+      "measured_blocks": 10000,
+      "warmup_blocks": 500,
+      "deadline_ms": 1.33333333,
+      "wall_median_ms": 0.208999962,
+      "wall_p99_ms": 0.408999971,
+      "wall_max_ms": 0.880000007,
+      "wall_deadline_misses": 0,
+      "cpu_median_ms": 0.208084,
+      "cpu_p99_ms": 0.276542,
+      "cpu_max_ms": 0.527458,
+      "cpu_deadline_misses": 0,
+      "checksum": -2.14726522885438,
+      "scope": "native DSP only; no Rack host or target CPU evidence"
+    },
+    {
+      "build": "candidate",
+      "workload": "engineering Init",
+      "rate": 48000,
+      "block_size": 64,
+      "voices": 4,
+      "oversampling": 4,
+      "measured_blocks": 10000,
+      "warmup_blocks": 500,
+      "deadline_ms": 1.33333333,
+      "wall_median_ms": 0.212000043,
+      "wall_p99_ms": 0.521000009,
+      "wall_max_ms": 3.99,
+      "wall_deadline_misses": 2,
+      "cpu_median_ms": 0.211917,
+      "cpu_p99_ms": 0.34325,
+      "cpu_max_ms": 0.564625,
+      "cpu_deadline_misses": 0,
+      "checksum": -2.14726522885438,
+      "scope": "native DSP only; no Rack host or target CPU evidence"
+    },
+    {
+      "build": "candidate",
+      "workload": "active sound paths",
+      "rate": 48000,
+      "block_size": 64,
+      "voices": 4,
+      "oversampling": 4,
+      "measured_blocks": 10000,
+      "warmup_blocks": 500,
+      "deadline_ms": 1.33333333,
+      "wall_median_ms": 0.219999987,
+      "wall_p99_ms": 0.520000001,
+      "wall_max_ms": 1.31899997,
+      "wall_deadline_misses": 0,
+      "cpu_median_ms": 0.219167,
+      "cpu_p99_ms": 0.326375,
+      "cpu_max_ms": 0.536,
+      "cpu_deadline_misses": 0,
+      "checksum": -0.2008631103846974,
+      "scope": "native DSP only; no Rack host or target CPU evidence"
+    }
+  ],
+  "limits": [
+    "Native embedded ABI, not SDK target chip or Reason host. Concurrent task work may affect wall timing; per-block thread CPU retained.",
+    "All first runs retained; no performance optimization or exhaustive stress claim."
+  ]
+}

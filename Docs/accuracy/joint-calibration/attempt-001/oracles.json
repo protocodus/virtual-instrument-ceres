@@ -1,0 +1,10 @@
+{
+  "audio_renders": 0,
+  "broadpass_per_wave_gain_error": 2.7756422635651865e-17,
+  "direct_sine_coefficient_error": 5.551115123125783e-17,
+  "finite_reset_BLAMP_coefficient_error": 1.110578035817881e-14,
+  "normalized_KCL_max_error": 1.90582702009328e-16,
+  "scalar_AM_ratio_error_db": 0.0,
+  "transfer_max_relative_error": 8.849847239898367e-16,
+  "zero_change_error_db": 0.0
+}

@@ -1,0 +1,11 @@
+Test project /Users/vojta/Dev/virtual-instrument-ceres/build-asan
+    Start 1: native_dsp_contracts
+1/3 Test #1: native_dsp_contracts .............   Passed    9.28 sec
+    Start 2: embedded_allocation_contract
+2/3 Test #2: embedded_allocation_contract .....   Passed    0.78 sec
+    Start 3: native_embedded_audio_parity
+3/3 Test #3: native_embedded_audio_parity .....   Passed    4.12 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =  14.18 sec
