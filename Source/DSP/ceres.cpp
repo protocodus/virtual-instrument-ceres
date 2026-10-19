@@ -573,7 +573,8 @@ struct Synth::Impl {
     struct Voice {
         int note = 60, keyNote = 60;
         bool held = false, pedalHeld = false;
-        double velocity = 1, drift = 0, driftTarget = 0;
+        double velocity = 1, velocityValue = 1, drift = 0, driftTarget = 0;
+        std::uint32_t pressTicket = 0;
         unsigned driftCountdown = 0;
         std::uint64_t age = 0;
         Oscillator osc;
@@ -624,8 +625,12 @@ struct Synth::Impl {
     int lastAssignedKey = 60;
     bool pedal = false;
     // Physical-key ledger is independent of four-board allocation/stealing
-    // and MIDI damper. Repeated presses use FIFO-compatible counts.
+    // and MIDI damper. Per-pitch FIFO tickets retain stolen-press ownership
+    // without an unbounded event queue. Outstanding count is at most UINT32_MAX,
+    // so modulo-2^32 tickets are unique among outstanding presses. Matching uses
+    // equality only, never a signed comparison/subtraction across wraparound.
     std::array<std::uint32_t,128> physicalKeys{};
+    std::array<std::uint32_t,128> firstPress{}, nextPress{};
     std::size_t physicalKeyPresses = 0;
     explicit Impl(double sampleRate, std::uint64_t seedValue)
         : fs(sampleRate), internalFs(sampleRate*4), seed(seedValue), random(seedValue) {
@@ -681,22 +686,30 @@ struct Synth::Impl {
             for (unsigned i=0;i<voiceLimit;++i)
                 if (!voices[i].held && !voices[i].pedalHeld) voices[i].keyNote=lastAssignedKey;
     }
-    void keyOn(int note) {
+    bool keyOn(int note,std::uint32_t& ticket) {
         const bool wasEmpty=physicalKeyPresses==0;
-        auto& count=physicalKeys[static_cast<std::size_t>(note)];
-        if (count<std::numeric_limits<std::uint32_t>::max() &&
-            physicalKeyPresses<std::numeric_limits<std::size_t>::max()) { ++count; ++physicalKeyPresses; }
+        const auto pitch=static_cast<std::size_t>(note);
+        auto& count=physicalKeys[pitch];
+        // An unledgered key must never allocate a voice or trigger the ring EG.
+        if (count==std::numeric_limits<std::uint32_t>::max() ||
+            physicalKeyPresses==std::numeric_limits<std::size_t>::max()) return false;
+        ticket=nextPress[pitch]++;
+        ++count; ++physicalKeyPresses;
         if (wasEmpty) ringEnvelope.on();
+        return true;
     }
-    void keyOff(int note) {
-        auto& count=physicalKeys[static_cast<std::size_t>(note)];
-        if (count) {
-            --count; --physicalKeyPresses;
-            if (!physicalKeyPresses) ringEnvelope.off();
-        }
+    bool keyOff(int note,std::uint32_t& ticket) {
+        const auto pitch=static_cast<std::size_t>(note);
+        auto& count=physicalKeys[pitch];
+        if (!count) return false;
+        ticket=firstPress[pitch]++;
+        --count; --physicalKeyPresses;
+        if (!physicalKeyPresses) ringEnvelope.off();
+        return true;
     }
     void keysOff() {
-        physicalKeys.fill(0); physicalKeyPresses=0; ringEnvelope.off();
+        physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
+        physicalKeyPresses=0; ringEnvelope.off();
     }
     void reset() {
         random = Random(seed);
@@ -704,7 +717,8 @@ struct Synth::Impl {
         age = 0; lfoPhase = 0; pwmPhase = 0; lastSub=0;
         pressureTarget = pressureValue = bend = 0;
         pedal = false; busCoupling={}; lineCoupling={};
-        physicalKeys.fill(0); physicalKeyPresses=0; lastAssignedKey=60;
+        physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
+        physicalKeyPresses=0; lastAssignedKey=60;
         subNoiseMemory=0; ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={};
         ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
@@ -767,7 +781,13 @@ struct Synth::Impl {
             // not replace it when a released board follows another key CV.
             // Channel pressure keeps smoothing in either mode, so switching
             // back retains its ordinary controller history.
-            const double expression=patch.expressionSource==1 ? v.velocity : pressureValue;
+            // Modern MIDI velocity is not a physical CS-50 control. Reusing an
+            // audible board must not step its VCA gain or expression CV while
+            // its capacitor/oscillator histories remain connected. Use the
+            // existing 5ms controller RC clock; silent assignments precharge in
+            // noteOn. This digital adaptation does not slew the keyboard CV.
+            v.velocityValue+=(v.velocity-v.velocityValue)*pressureCoefficient;
+            const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
             if (v.driftCountdown-- == 0) {
                 v.driftTarget = random.bipolar();
                 v.driftCountdown = static_cast<unsigned>(internalFs * (.2 + random.unit()*.5));
@@ -818,7 +838,7 @@ struct Synth::Impl {
             const double beforeVca=v.commonCoupling.process(summed,outputCouplingTau[1],internalFs);
             // IG00151 gain is LINEAR in envelope CV (guide pp.40–41). The
             // optional velocity term is zero in factory-derived presets.
-            const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocity);
+            const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocityValue);
             const double pressureGain = 1-patch.pressureVolume*(1-expression);
             mixed += beforeVca * ampEnvelope * velocityGain * pressureGain * commonVcaGain;
         }
@@ -899,7 +919,8 @@ void Synth::noteOn(int note, double velocity) {
     if (note < 0 || note > 127 || !std::isfinite(velocity)) return;
     if (velocity <= 0) { noteOff(note); return; }
     auto& state = *impl_;
-    state.keyOn(note);
+    std::uint32_t ticket=0;
+    if (!state.keyOn(note,ticket)) return;
     state.lastAssignedKey=note;
     Impl::Voice* selected = nullptr;
     // Use an idle voice first, then the quietest released voice, then oldest
@@ -919,20 +940,25 @@ void Synth::noteOn(int note, double velocity) {
     // I/II changes the held keyboard voltage of released physical boards;
     // it does not re-gate their VCF/VCA or reset any oscillator/filter state.
     state.followFreeKeys();
+    const bool silent=selected->amp.stage==Envelope::Idle || selected->amp.voltage==0;
     selected->note = selected->keyNote = note;
     selected->velocity = clamp(velocity,0,1);
+    if (silent) selected->velocityValue=selected->velocity;
+    selected->pressTicket=ticket;
     selected->held = true; selected->pedalHeld = false;
     selected->age = ++state.age;
     selected->amp.on(); selected->filter.on();
 }
 void Synth::noteOff(int note) {
     if (note<0 || note>127) return;
-    impl_->keyOff(note);
-    // FIFO note-off for overlapping repeated MIDI notes.
+    std::uint32_t ticket=0;
+    if (!impl_->keyOff(note,ticket)) return;
+    // Consume the oldest physical press even when its voice was stolen. Its
+    // eventual note-off cannot release a newer same-pitch replacement.
     Impl::Voice* selected = nullptr;
     for (auto it=impl_->voices.begin();it!=impl_->voices.begin()+impl_->voiceLimit;++it) {
         auto& voice=*it;
-        if (voice.note == note && voice.held && (!selected || voice.age < selected->age)) selected = &voice;
+        if (voice.note == note && voice.held && voice.pressTicket==ticket) { selected=&voice; break; }
     }
     if (selected) {
         selected->held = false;

@@ -20,6 +20,13 @@ int main(int argc,char** argv){
             if(f==0)for(unsigned i=0;i<voices;++i)s.noteOn(40+int(i)*3,.1+.9*i/voices);
             if(f==111){s.pitchBend(.37);s.pressure(.65);}
             if(f==201)s.noteOn(78,.7);
+            // Overflow a repeated-pitch allocation, then consume the stolen
+            // presses before the surviving owners, with velocity retargets.
+            if(f==230)for(unsigned i=0;i<voices+2;++i)s.noteOn(60,.15+.7*i/(voices+2));
+            if(f==240 || f==245)s.noteOff(60);
+            if(f==250){s.sustain(true);s.noteOff(60);}
+            if(f==260){s.noteOn(60,.95);s.noteOn(60,.2);}
+            if(f==270)s.sustain(false);
             if(f==400){s.sustain(true);s.allNotesOff();}
             if(f==500){p.lpResonance=.2;p.hpResonance=.1;s.setPatch(p);}
             if(f==600)s.sustain(false);

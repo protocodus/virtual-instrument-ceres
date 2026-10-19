@@ -81,6 +81,9 @@ int main() {
         patch.ringMix=.7;patch.ringRate=220;patch.pwmDepth=.3;patch.filterLfo=.5;
         synth.setPatch(patch);
         for(unsigned i=0;i<voices;++i)synth.noteOn(40+int(i)*3,.3+.7*i/voices);
+        for(unsigned i=0;i<voices+2;++i)synth.noteOn(60,.1+.8*i/(voices+2));
+        for(unsigned frame=0;frame<64;++frame)require(std::isfinite(synth.process()),"audible velocity reuse finite");
+        synth.noteOff(60);synth.noteOff(60); // both presses have stolen owners
         for(unsigned block=0;block<24;++block) {
             if(block==2)require(!synth.configure(voices, factor==4?1:4),"live change rejected without allocation");
             if(block==3 || block==4 || block==6) {

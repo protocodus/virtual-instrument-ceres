@@ -13,6 +13,12 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 
 ## Version history
 
+### Unreleased — 0.2.1 — rapid-note continuity
+
+- Smooths velocity expression when an audible voice is reused, avoiding an instantaneous gain or filter-expression jump. Fresh silent notes retain their immediate velocity response.
+- Keeps overlapping repeated notes attached to their original key presses after voice stealing, so an older stolen note's key-up cannot release its newer replacement.
+- Retains free oscillator phase, envelope and filter capacitor state, keyboard pitch changes and the existing ring model.
+
 ### Unreleased — 0.2.0 — configurable polyphony and processing quality
 
 - Adds 1–16 preallocated voices and actual 1×, 2× or 4× internal processing. The standalone default remains four voices at 4×.
@@ -120,7 +126,9 @@ Neutral offsets, common level 1 and output trim 0 preserve the prior paths when 
 
 `expression_source` selects **0 = channel aftertouch** (the legacy default) or **1 = note-on velocity**. Values clamp to 0..1 and round to the nearest integer. The existing `pressure_volume`, `pressure_filter` and `pressure_vibrato` depths then use the selected source. This optional velocity mode is a modern DAW mapping, not a claim about the original hardware.
 
-Velocity is latched independently for each allocated voice and stays with its release tail, including during Sustain II pitch following. A new note assignment, repeated-note retrigger or steal stores the incoming velocity only on that board. Channel pressure has no audible effect in velocity mode; switching back uses its continuously smoothed history. Live source changes preserve oscillator/envelope/filter state and may change the expression gain immediately.
+Velocity is latched independently for each allocated voice and stays with its release tail, including during Sustain II pitch following. A new note assignment, repeated-note retrigger or steal stores the incoming velocity only on that board. When the board is still audible, its consumed velocity approaches the new target using the existing 5 ms digital expression RC; silent and zero-envelope assignments precharge immediately. This avoids a gain/filter-expression step without adding keyboard glide or resetting oscillator, envelope or filter state. Channel pressure has no audible effect in velocity mode; switching back uses its continuously smoothed history. Live source changes preserve oscillator/envelope/filter state and may change the expression gain immediately.
+
+Each physical note press also retains a FIFO identity after its board is stolen. Its eventual key-up consumes that press alone; a newer overlapping press of the same pitch keeps sounding until its own key-up. These velocity and MIDI ownership policies are software adaptations, not recovered CS-50 keyboard circuitry. See [the rapid-note validation](Docs/validation/note-reuse/README.md).
 
 Level gain is `1 − pressure_volume*(1 − expression)`; filter expression adds `expression*pressure_filter` octaves to each filter's variable conductance above its fixed resistor floor; vibrato adds `expression*pressure_vibrato` cents of the selected SUB waveform. The separate native `velocity_sensitivity` gain remains multiplicative and backward-compatible: leave it at zero when using only the selected expression level depth. All native research presets retain source 0. Hosts should default missing saved properties to 0 to preserve old patches, and explicitly save 1 for velocity-oriented patches.
 

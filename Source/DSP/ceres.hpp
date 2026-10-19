@@ -123,7 +123,12 @@ struct Patch {
     // (legacy/default), 1=each board's latched note-on velocity. The three
     // pressure* depths above consume this selected value. Velocity remains
     // unchanged through release, pedal and Sustain II pitch-following; only
-    // assigning/retriggering a board replaces it. Switching sources is live
+    // assigning/retriggering a board replaces its target. On an audible board,
+    // the consumed velocity follows that target with a 5ms digital controller
+    // RC to avoid a gain/CV step. Silent/zero-envelope assignments precharge
+    // immediately; keyboard pitch, physical EGs and phase are never slewed or
+    // reset by this adaptation. The same value feeds velocitySensitivity.
+    // Switching sources is live
     // without regating/resetting circuit state. This is not a CS-50 circuit.
     double expressionSource = 0.0;
     // Independent legacy velocity-to-gain depth, multiplicative with the
