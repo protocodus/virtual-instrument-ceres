@@ -1,0 +1,172 @@
+[  6%] Building CXX object CMakeFiles/CeresDSP.dir/Source/DSP/CeresEngine.cpp.o
+[  6%] Building CXX object clap-juce-extensions/CMakeFiles/clap_juce_extensions.dir/src/extensions/clap-juce-extensions.cpp.o
+[ 10%] Linking CXX static library libCeresDSP.a
+[ 10%] Built target CeresDSP
+[ 13%] Linking CXX static library libclap_juce_extensions.a
+[ 13%] Built target clap_juce_extensions
+[ 17%] Generating Ceres_artefacts/JuceLibraryCode/JuceHeader.h
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_processors/juce_audio_processors.mm.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Source/PluginEditor.cpp.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Source/PluginProcessor.cpp.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_gui_extra/juce_gui_extra.mm.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_gui_basics/juce_gui_basics_3.cpp.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_gui_basics/juce_gui_basics_2.cpp.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_gui_basics/juce_gui_basics_4.cpp.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_gui_basics/juce_gui_basics_5.cpp.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_gui_basics/juce_gui_basics.mm.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o
+[ 17%] Building C object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_graphics/juce_graphics_Sheenbidi.c.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_graphics/juce_graphics.mm.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_events/juce_events.mm.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_core/juce_core_CompilationTime.cpp.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_core/juce_core.mm.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_data_structures/juce_data_structures.mm.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_processors_headless/juce_audio_processors_headless_ara.cpp.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_processors_headless/juce_audio_processors_headless_lv2_libs.cpp.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_processors_headless/juce_audio_processors_headless.mm.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_basics/juce_audio_basics.mm.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_utils/juce_audio_utils.mm.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_formats/juce_audio_formats.mm.o
+[ 17%] Building CXX object CMakeFiles/Ceres.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_devices/juce_audio_devices.mm.o
+[ 17%] Linking CXX static library Ceres_artefacts/Release/libCeres_SharedCode.a
+[ 96%] Built target Ceres
+[100%] Building CXX object CMakeFiles/CeresPluginProcessorTests.dir/Tests/PluginProcessorTests.cpp.o
+[103%] Linking CXX executable CeresPluginProcessorTests
+[103%] Built target CeresPluginProcessorTests
+[  6%] Built target CeresDSP
+[ 13%] Built target clap_juce_extensions
+[ 93%] Built target Ceres
+[ 96%] Building CXX object CMakeFiles/CeresParameterMatrixTests.dir/Tests/ParameterMatrixTests.cpp.o
+In file included from /private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrixTests.cpp:13:
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:143:41: warning: implicit conversion changes signedness: 'int' to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  143 |         return i < j ? covered[i][j][a][b] : covered[j][i][b][a];
+      |                        ~~~~~~~          ^
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:143:38: warning: implicit conversion changes signedness: 'int' to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  143 |         return i < j ? covered[i][j][a][b] : covered[j][i][b][a];
+      |                        ~~~~~~~       ^
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:143:63: warning: implicit conversion changes signedness: 'int' to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  143 |         return i < j ? covered[i][j][a][b] : covered[j][i][b][a];
+      |                                              ~~~~~~~          ^
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:143:60: warning: implicit conversion changes signedness: 'int' to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  143 |         return i < j ? covered[i][j][a][b] : covered[j][i][b][a];
+      |                                              ~~~~~~~       ^
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:148:84: warning: implicit conversion changes signedness: 'const value_type' (aka 'const int') to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  148 |             for (std::size_t j = i + 1; j < n; ++j) gain += !covered[i][j][row[i]][row[j]];
+      |                                                              ~~~~~~~               ^~~~~~
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:148:76: warning: implicit conversion changes signedness: 'const value_type' (aka 'const int') to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  148 |             for (std::size_t j = i + 1; j < n; ++j) gain += !covered[i][j][row[i]][row[j]];
+      |                                                              ~~~~~~~       ^~~~~~
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:159:47: warning: implicit conversion changes signedness: 'int' to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  159 |                         if (!covered[i][j][a][b]) {
+      |                              ~~~~~~~          ^
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:159:44: warning: implicit conversion changes signedness: 'int' to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  159 |                         if (!covered[i][j][a][b]) {
+      |                              ~~~~~~~       ^
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:168:40: warning: implicit conversion changes signedness: 'int' to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  168 |                 if (covered[si][sj][a][b]) continue;
+      |                     ~~~~~~~            ^
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:168:37: warning: implicit conversion changes signedness: 'int' to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  168 |                 if (covered[si][sj][a][b]) continue;
+      |                     ~~~~~~~         ^
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:179:81: warning: implicit conversion changes signedness: 'int' to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  179 |                         if (gain > choiceGain || (gain == choiceGain && used[k][v] < used[k][choice])) {
+      |                                                                         ~~~~    ^
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:179:94: warning: implicit conversion changes signedness: 'int' to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  179 |                         if (gain > choiceGain || (gain == choiceGain && used[k][v] < used[k][choice])) {
+      |                                                                                      ~~~~    ^~~~~~
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:193:23: warning: implicit conversion changes signedness: 'value_type' (aka 'int') to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  193 |             ++used[i][best[i]];
+      |               ~~~~    ^~~~~~~
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:195:45: warning: implicit conversion changes signedness: 'value_type' (aka 'int') to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  195 |                 if (!covered[i][j][best[i]][best[j]]) {
+      |                      ~~~~~~~                ^~~~~~~
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:195:36: warning: implicit conversion changes signedness: 'value_type' (aka 'int') to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  195 |                 if (!covered[i][j][best[i]][best[j]]) {
+      |                      ~~~~~~~       ^~~~~~~
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:196:44: warning: implicit conversion changes signedness: 'value_type' (aka 'int') to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  196 |                     covered[i][j][best[i]][best[j]] = true;
+      |                     ~~~~~~~                ^~~~~~~
+/private/tmp/ceres-publish-main-20261019/Tests/ParameterMatrix.h:196:35: warning: implicit conversion changes signedness: 'value_type' (aka 'int') to 'size_type' (aka 'unsigned long') [-Wsign-conversion]
+  196 |                     covered[i][j][best[i]][best[j]] = true;
+      |                     ~~~~~~~       ^~~~~~~
+17 warnings generated.
+[100%] Linking CXX executable CeresParameterMatrixTests
+[100%] Built target CeresParameterMatrixTests
+[  2%] Building VST3 manifest helper for Ceres
+[  7%] Built target CeresDSP
+[ 12%] Built target clap_juce_extensions
+-- The CXX compiler identification is AppleClang 21.0.0.21000101
+[ 70%] Built target Ceres
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (1.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /private/tmp/ceres-publish-main-20261019/build-plugin/vst3_helpers/Ceres
+make[4]: warning: jobserver unavailable: using -j1.  Add `+' to parent make rule.
+[ 50%] Building CXX object CMakeFiles/vst3_helper.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/VST3/juce_VST3ManifestHelper.cpp.o
+[100%] Linking CXX executable vst3_helper
+[100%] Built target vst3_helper
+[ 70%] Built target Ceres_vst3_helper
+[ 72%] Generating Ceres_artefacts/JuceLibraryCode/Ceres_VST3/PkgInfo
+[ 72%] Building CXX object CMakeFiles/Ceres_VST3.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o
+[ 75%] Building CXX object CMakeFiles/Ceres_VST3.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o
+[ 77%] Building CXX object CMakeFiles/Ceres_VST3.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o
+[ 80%] Building CXX object CMakeFiles/Ceres_VST3.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o
+[ 82%] Building CXX object CMakeFiles/Ceres_VST3.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o
+[ 87%] Building CXX object CMakeFiles/Ceres_VST3.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o
+[ 87%] Building CXX object CMakeFiles/Ceres_VST3.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o
+[ 90%] Building CXX object CMakeFiles/Ceres_VST3.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o
+[ 92%] Building CXX object CMakeFiles/Ceres_VST3.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o
+[ 95%] Building CXX object CMakeFiles/Ceres_VST3.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o
+[ 97%] Building CXX object CMakeFiles/Ceres_VST3.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o
+[100%] Linking CXX CFBundle shared module Ceres_artefacts/Release/VST3/Ceres.vst3/Contents/MacOS/Ceres
+/private/tmp/ceres-publish-main-20261019/build-plugin/Ceres_artefacts/Release/VST3/Ceres.vst3: code has no resources but signature indicates they must be present
+-- Replacing invalid signature with ad-hoc signature
+/private/tmp/ceres-publish-main-20261019/build-plugin/Ceres_artefacts/Release/VST3/Ceres.vst3: replacing existing signature
+removing moduleinfo.json
+creating /private/tmp/ceres-publish-main-20261019/build-plugin/Ceres_artefacts/Release/VST3/Ceres.vst3/Contents/Resources/moduleinfo.json
+[100%] Built target Ceres_VST3
+[  5%] Built target clap_juce_extensions
+[ 10%] Built target CeresDSP
+[ 69%] Built target Ceres
+[ 71%] Generating Ceres_artefacts/JuceLibraryCode/Ceres_AU/PkgInfo
+[ 76%] Building CXX object CMakeFiles/Ceres_AU.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o
+[ 79%] Building CXX object CMakeFiles/Ceres_AU.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o
+[ 79%] Building CXX object CMakeFiles/Ceres_AU.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o
+[ 79%] Building CXX object CMakeFiles/Ceres_AU.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o
+[ 82%] Building CXX object CMakeFiles/Ceres_AU.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o
+[ 84%] Building CXX object CMakeFiles/Ceres_AU.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o
+[ 87%] Building CXX object CMakeFiles/Ceres_AU.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o
+[ 89%] Building CXX object CMakeFiles/Ceres_AU.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o
+[ 92%] Building CXX object CMakeFiles/Ceres_AU.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o
+[ 94%] Building CXX object CMakeFiles/Ceres_AU.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o
+[ 97%] Building CXX object CMakeFiles/Ceres_AU.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o
+[100%] Linking CXX CFBundle shared module Ceres_artefacts/Release/AU/Ceres.component/Contents/MacOS/Ceres
+[100%] Built target Ceres_AU
+[ 10%] Built target CeresDSP
+[ 13%] Built target clap_juce_extensions
+[ 93%] Built target Ceres
+[ 96%] Building CXX object CMakeFiles/Ceres_CLAP.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/clap_juce_extensions-src/src/wrapper/clap-juce-mac.mm.o
+[100%] Linking CXX CFBundle shared module Ceres_artefacts/Release/CLAP/Ceres.clap/Contents/MacOS/Ceres
+[100%] Built target Ceres_CLAP
+[  5%] Built target CeresDSP
+[ 10%] Built target clap_juce_extensions
+[ 69%] Built target Ceres
+[ 71%] Generating Ceres_artefacts/JuceLibraryCode/Ceres_Standalone/PkgInfo
+[ 74%] Building CXX object CMakeFiles/Ceres_Standalone.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o
+[ 74%] Building CXX object CMakeFiles/Ceres_Standalone.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o
+[ 76%] Building CXX object CMakeFiles/Ceres_Standalone.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o
+[ 79%] Building CXX object CMakeFiles/Ceres_Standalone.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o
+[ 82%] Building CXX object CMakeFiles/Ceres_Standalone.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o
+[ 84%] Building CXX object CMakeFiles/Ceres_Standalone.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o
+[ 87%] Building CXX object CMakeFiles/Ceres_Standalone.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o
+[ 89%] Building CXX object CMakeFiles/Ceres_Standalone.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o
+[ 92%] Building CXX object CMakeFiles/Ceres_Standalone.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o
+[ 94%] Building CXX object CMakeFiles/Ceres_Standalone.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o
+[ 97%] Building CXX object CMakeFiles/Ceres_Standalone.dir/Users/vojta/Dev/virtual-instrument-youknow/build-ci-clap/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o
+Copying OS X content Ceres_artefacts/Release/Standalone/Ceres.app/Contents/Resources/RecentFilesMenuTemplate.nib
+[100%] Linking CXX executable Ceres_artefacts/Release/Standalone/Ceres.app/Contents/MacOS/Ceres
+[100%] Built target Ceres_Standalone

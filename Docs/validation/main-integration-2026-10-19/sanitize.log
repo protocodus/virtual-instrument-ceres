@@ -1,0 +1,22 @@
+Test project /private/tmp/ceres-publish-main-20261019/build-sanitize
+    Start  1: Ceres.oscillator_circuit_contracts
+1/7 Test  #1: Ceres.oscillator_circuit_contracts .......   Passed    1.38 sec
+    Start  2: Ceres.native_dsp_contracts
+2/7 Test  #2: Ceres.native_dsp_contracts ...............   Passed   70.82 sec
+    Start  4: Ceres.capacitor_continuity_contracts
+3/7 Test  #4: Ceres.capacitor_continuity_contracts .....   Passed    4.02 sec
+    Start  5: Ceres.ring_carrier_circuit_contracts
+4/7 Test  #5: Ceres.ring_carrier_circuit_contracts .....   Passed    2.98 sec
+    Start  6: Ceres.ring_switching_circuit_contracts
+5/7 Test  #6: Ceres.ring_switching_circuit_contracts ...   Passed    4.16 sec
+    Start  8: Ceres.embedded_allocation_contract
+6/7 Test  #8: Ceres.embedded_allocation_contract .......   Passed    2.11 sec
+    Start 13: Ceres.DSP
+7/7 Test #13: Ceres.DSP ................................   Passed    0.49 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+unit    =  85.96 sec*proc (7 tests)
+
+Total Test time (real) =  85.98 sec

@@ -1,4 +1,11 @@
 /build*/
-/.DS_Store
+/out/
+/cmake-build-*/
+CMakeUserPresets.json
+compile_commands.json
+.DS_Store
+.idea/
+.vscode/
 __pycache__/
 *.pyc
+/Tools/Audio/

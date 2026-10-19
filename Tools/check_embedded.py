@@ -13,11 +13,17 @@ def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--build-dir',type=Path,default=ROOT/'build')
+    parser.add_argument('--native',type=Path,help='Exact native executable from the CMake target')
+    parser.add_argument('--embedded',type=Path,help='Exact embedded executable from the CMake target')
     parser.add_argument('--baseline-source',type=Path)
     parser.add_argument('--report',type=Path)
     args=parser.parse_args()
     build=args.build_dir.resolve()
-    programs={'native':build/'ceres_native_parity','embedded':build/'ceres_embedded_parity'}
+    def executable(name):
+        plain=build/name
+        return plain if plain.exists() else plain.with_suffix('.exe')
+    programs={'native':args.native or executable('ceres_native_parity'),
+              'embedded':args.embedded or executable('ceres_embedded_parity')}
     evidence={}
     with tempfile.TemporaryDirectory(prefix='ceres-parity-') as name:
         temp=Path(name)

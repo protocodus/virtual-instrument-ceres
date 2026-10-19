@@ -1,28 +1,42 @@
 # Ceres
 
-This temporary worktree contains the [19 October audible circuit experiment](Docs/audible-circuits/README.md): source-timed VCO conditioning, filter/envelope capacitor continuity and a physically scaled ring-carrier switching stage. It passes12 Release and6 targeted sanitizer checks; the frozen recording comparison remains mixed and does not establish a faithful full hardware match.
+Ceres is a four-voice, sample-free Yamaha CS-50 research synthesizer with a reusable C++17 circuit engine. This repository also contains the existing JUCE VST3/AU/CLAP/Standalone scaffold: that plug-in still uses its separate silent placeholder engine and is **not yet connected** to the circuit synthesizer. The Reason Rack Extension consumes the shared DSP through a pinned submodule in its separate adapter repository.
 
-Ceres is a four-voice, sample-free CS-50 research synthesizer core. This repository owns the reusable C++17 DSP. The Reason Rack Extension consumes it through a pinned `Instrument` Git submodule; host code, panel assets and Rack patches belong to that separate project.
+![Ceres editor scaffold](Docs/screenshots/ceres.png)
 
-Product version **0.1.0** imports the canonical **v0.10.0 research model**. The core also implements the global ring modulator, five internal SUB waveforms, SUSTAIN I/II key-voltage behavior, shared brilliance/resonance offsets and a separate common VCA level, with an embedded build interface. This is a reduced circuit model with provisional component/control calibration, not a verified transistor-level recreation or a completed hardware match. No hardware recordings, manuals or sampled instrument data are required at runtime.
+## Audio demos
 
-## Build and test
+The CI-generated section below belongs to the JUCE scaffold. Its factory-preset list is empty, so that demo renderer and `Ceres.AudioDemos` currently fail by design. The standalone circuit engine can render procedural audio with `ceres_render`; its research preset table is not a calibrated hardware bank or a JUCE plug-in preset bank.
 
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j 4
-ctest --test-dir build --output-on-failure
-```
+<!-- audio-demos-begin -->
+<!-- audio-demos-end -->
 
-The build creates `ceres` and `ceres_embedded` static libraries, the standalone `ceres_render`, and native tests. CTest currently has12 entries covering the core DSP, oscillator/filter/envelope/ring circuit contracts, expression, zero post-construction allocations for all57 keys, and exact native/embedded audio through active controls and live capacitor edits. Python3 is required for the parity checks.
+## Version history
 
-```sh
-cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCERES_SANITIZE=ON
-cmake --build build-asan -j 4
-ASAN_OPTIONS=detect_leaks=0 ctest --test-dir build-asan --output-on-failure
-```
+### Unreleased — 0.1.0 — circuit engine and existing plug-in scaffold
 
-## Use the core
+- Adds the tested four-voice oscillator/filter/envelope/ring model and embedded interface alongside the existing plug-in scaffold.
+- Retains the source-timed VCO conditioning, Q/idle-envelope capacitor continuity and physically scaled ring switching described in the [audible-circuit review](Docs/audible-circuits/README.md). The hardware-recording comparison remains mixed; this is not a verified full hardware match.
+
+### Unreleased — 0.0.1 — scaffold
+
+- Repository, silent plug-in front end, test tiers and CI set up to the portfolio standard.
+
+## Downloads
+
+<!-- build-download-begin -->
+<!-- build-download-end -->
+
+---
+
+## How it works
+
+`Source/DSP/ceres.cpp` and `ceres.hpp` implement the standalone circuit engine and its sample-by-sample API. `Source/DSP/CeresEngine.*` remains the distinct silent placeholder used by `Source/Plugin*`; this merge does not silently change the plug-in's sound, controls or saved-state contract. The native and embedded circuit libraries do not depend on JUCE, samples, hardware recordings or manuals at runtime.
+
+Product version 0.1.0 imports the canonical v0.10.0 research model and subsequent documented circuit changes. It is a reduced circuit model with provisional control calibration, not a transistor-exact recreation. No existing historical validation report is relabelled as a validation of this merged build.
+
+### Use the standalone core
+
 
 Compile `Source/DSP/ceres.cpp` and include `Source/DSP/ceres.hpp`. For a Rack target define **`CERES_EMBEDDED_TARGET=1` consistently for the core and all consumers** and use C++17. The macro changes `Patch`'s layout, so native and embedded objects must never be mixed across an ABI boundary.
 
@@ -44,7 +58,7 @@ The embedded interface has a numeric `Patch`, a C-string parameter setter, no ex
 
 The output is mono. All four physical voices and their capacitor states continue running when no note is held. `activeVoices()==0` does **not** imply silence: the common output bus has a roughly 0.888-second time constant. `allNotesOff()` honors the MIDI pedal; `allSoundOff()` clears audio states while preserving controllers; `reset()` also restores seeded oscillator/controller state. The FIR has nominal group delay 31 host samples, with the decimator's sampling phase affecting event alignment.
 
-## Ring, SUB and SUSTAIN controls
+### Ring, SUB and SUSTAIN controls
 
 | Key | Range | Default | Meaning |
 | --- | --- | --- | --- |
@@ -64,7 +78,7 @@ In Sustain II, released/free boards follow the last assigned key in both oscilla
 
 The ring/SUB/Sustain additions preserved the earlier audio path in their recorded same-build regression. The subsequent unequal SUB filter route intentionally changes nonzero `filter_lfo` patches. Controls and circuit uncertainties are detailed in [DSP_SOURCE.md](Docs/DSP_SOURCE.md).
 
-## Global sound-path controls
+### Global sound-path controls
 
 | Key | Range | Default | Meaning |
 | --- | --- | --- | --- |
@@ -77,7 +91,7 @@ The first two controls use an explicitly anchored stiff-source model, not recove
 
 Neutral offsets, common level 1 and output trim 0 preserve the prior paths when the intentionally corrected SUB filter route is inactive. The output trim is a modern linear utility, not part of the analog model; it adds no limiter and cannot promise a fixed peak under arbitrary MIDI. The [source audit](Docs/sound-path-gap-audit.md) distinguishes known resistor/capacitor relationships from provisional control calibration.
 
-## Velocity expression
+### Velocity expression
 
 `expression_source` selects **0 = channel aftertouch** (the legacy default) or **1 = note-on velocity**. Values clamp to 0..1 and round to the nearest integer. The existing `pressure_volume`, `pressure_filter` and `pressure_vibrato` depths then use the selected source. This optional velocity mode is a modern DAW mapping, not a claim about the original hardware.
 
@@ -85,17 +99,51 @@ Velocity is latched independently for each allocated voice and stays with its re
 
 Level gain is `1 − pressure_volume*(1 − expression)`; filter expression adds `expression*pressure_filter` octaves to each filter's variable conductance above its fixed resistor floor; vibrato adds `expression*pressure_vibrato` cents of the selected SUB waveform. The separate native `velocity_sensitivity` gain remains multiplicative and backward-compatible: leave it at zero when using only the selected expression level depth. All native research presets retain source 0. Hosts should default missing saved properties to 0 to preserve old patches, and explicitly save 1 for velocity-oriented patches.
 
-## Standalone render
+
+## Known gaps
+
+- The JUCE plug-in remains a silent placeholder with a plain editor; connecting the actual instrument and controls is separate work. Its source, identity codes, release helpers and shared portfolio tools are preserved.
+- The plug-in's empty preset list makes its existing audio/demo tier fail. The full suite and CI must not be described as green while this remains unresolved.
+- Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
+- Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
+- No external modulation input is implemented. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
+
+## Build
+
+CMake 3.22+, a C++17/20 compiler and Python3 are required for the full unit suite. The circuit targets explicitly compile as C++17; the existing JUCE scaffold uses C++20. Build the standalone DSP without JUCE:
 
 ```sh
-./build/ceres_render --events Examples/init.events.tsv --preset init \
+cmake -S . -B build-dsp -DCMAKE_BUILD_TYPE=Release -DCERES_BUILD_PLUGIN=OFF -DBUILD_TESTING=ON
+cmake --build build-dsp --parallel
+ctest --test-dir build-dsp -L '^unit$' --output-on-failure
+./build-dsp/ceres_render --events Examples/init.events.tsv --preset init \
   --rate 48000 --frames 288000 --seed 50 --output /tmp/ceres-init.wav
 ```
 
-Events are sorted `frame type note value` rows; supported types are `on`, `off`, `bend` (semitones), `pressure`, `sustain`, `alloff`, `panic` and `reset`. Values for note-on velocity/pressure/pedal are normalized to 0..1. The output is mono float32 WAV with no normalization. `--patch path` applies `key=value` overrides to the selected native preset. `--build-info` prints the compiled source identity.
+`ceres` and `ceres_embedded` are the circuit libraries. `ceres_render` writes mono float32 WAV without normalization; sorted event rows are `frame type note value`. It supports note-on/off, bend, pressure, pedal, all-notes-off, panic and reset. `--patch path` reads key=value overrides and `--build-info` reports the exact compiled sources including the merged CMake file. The native research preset API is excluded from the embedded ABI.
 
-The native research preset table is retained for regression and is excluded from the embedded target. Its presence does not establish a calibrated hardware preset bank or require that the Rack product expose it.
+The 12 circuit checks cover oscillator/filter/envelope/ring contracts, expression, all 57 keys with zero post-construction allocations, and native/embedded parity. They are named `Ceres.<Suite>` and labelled `unit` alongside the existing scaffold unit tests. Test executables are resolved by CMake target paths for single- and multi-configuration generators. Existing `audio`, `render` and `fuzz` tiers remain separate and unmodified.
 
-See [DSP source and model limits](Docs/DSP_SOURCE.md), [import provenance](Docs/EXPERIMENT_IMPORT.json), historical [initial validation](Docs/validation/initial-core.json), [panel-control validation](Docs/validation/panel-controls.json), [sound-path implementation validation](Tests/Reports/soundpath/validation.json), and current [expression validation](Tests/Reports/expression/validation.json). Historical reports are preserved with their original source hashes.
+```sh
+cmake -S . -B build-sanitize -DCMAKE_BUILD_TYPE=Debug -DCERES_BUILD_PLUGIN=OFF -DCERES_SANITIZE=ON
+cmake --build build-sanitize --parallel
+ASAN_OPTIONS=detect_leaks=0 ctest --test-dir build-sanitize -L '^unit$' --output-on-failure
+```
 
-To reproduce the explicit prior-core comparison, use `python3 Tests/check_expression_legacy.py --build-dir build`. It builds frozen commit `b22dda696090a754f0018f2646bf92b259de406f` and compares 384,000 samples with nonzero pressure depths and mixed note/controller events against the current default-source path. For the current validation recorder, retain CTest output as `Tests/Reports/expression/{release,sanitizer}.log`, run `python3 Tests/check_expression_performance.py build` for the bounded default timing measurement, then run `python3 Tests/record_expression_validation.py` (with build-directory options if needed). The recorder binds completed checks; it does not replace them.
+`CERES_SANITIZE` is a compatibility alias for the existing `CERES_ENABLE_SANITIZERS`; either instruments development targets with ASan/UBSan. `CERES_BUILD_TOOLS=OFF` excludes both renderer tools without dropping core tests. `CERES_BUILD_LIBFUZZER` retains the existing scaffold fuzz target.
+
+The separate plug-in build fetches pinned JUCE 8.0.14 and clap-juce-extensions unless `CERES_JUCE_PATH` and `CERES_CLAP_JUCE_EXTENSIONS_PATH` point to local checkouts. `CERES_BUILD_CLAP` controls the CLAP wrapper; on macOS `CERES_BUILD_UNIVERSAL` defaults to ON. Linux dependencies are listed in `.github/workflows/ci.yml`.
+
+```sh
+cmake -S . -B build-plugin -DCMAKE_BUILD_TYPE=Release -DCERES_BUILD_PLUGIN=ON -DBUILD_TESTING=ON
+cmake --build build-plugin --parallel
+ctest --test-dir build-plugin -L '^unit$' --output-on-failure
+# Full suite additionally includes the known pre-existing empty-bank failure:
+ctest --test-dir build-plugin --output-on-failure
+```
+
+On multi-configuration generators add `--config Release` to the build and `-C Release` to CTest; command-line executables are then in the corresponding configuration directory. `scripts/build-macos.sh` retains the existing universal build and full-suite behavior.
+
+## Licensing
+
+Ceres's source code is MIT-licensed; see [LICENSE](LICENSE). The plug-in builds with JUCE (AGPLv3 or a commercial JUCE licence) and clap-juce-extensions; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). No Reason/Jukebox SDK, third-party hardware capture, firmware or ROM data is part of the standalone runtime.
