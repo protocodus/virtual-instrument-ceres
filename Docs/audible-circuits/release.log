@@ -1,0 +1,27 @@
+Test project /private/tmp/ceres-audible-integrated-20261019/build
+      Start  1: oscillator_circuit_contracts
+ 1/11 Test  #1: oscillator_circuit_contracts .......   Passed    0.62 sec
+      Start  2: native_dsp_contracts
+ 2/11 Test  #2: native_dsp_contracts ...............   Passed    7.02 sec
+      Start  3: sound_path_circuit_contracts
+ 3/11 Test  #3: sound_path_circuit_contracts .......   Passed    1.16 sec
+      Start  4: capacitor_continuity_contracts
+ 4/11 Test  #4: capacitor_continuity_contracts .....   Passed    0.71 sec
+      Start  5: ring_carrier_circuit_contracts
+ 5/11 Test  #5: ring_carrier_circuit_contracts .....   Passed    0.39 sec
+      Start  6: voice_expression_contracts
+ 6/11 Test  #6: voice_expression_contracts .........   Passed    0.39 sec
+      Start  7: embedded_allocation_contract
+ 7/11 Test  #7: embedded_allocation_contract .......   Passed    0.45 sec
+      Start  8: native_embedded_audio_parity
+ 8/11 Test  #8: native_embedded_audio_parity .......   Passed    3.69 sec
+      Start  9: active_sound_path_audio_parity
+ 9/11 Test  #9: active_sound_path_audio_parity .....   Passed    2.67 sec
+      Start 10: expression_audio_parity
+10/11 Test #10: expression_audio_parity ............   Passed    2.69 sec
+      Start 11: capacitor_native_embedded_parity
+11/11 Test #11: capacitor_native_embedded_parity ...   Passed    2.60 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Total Test time (real) =  22.40 sec

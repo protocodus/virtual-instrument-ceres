@@ -1,5 +1,7 @@
 # Ceres
 
+This temporary worktree contains the [19 October audible circuit experiment](Docs/audible-circuits/README.md): source-timed VCO conditioning, filter/envelope capacitor continuity and a physically scaled ring-carrier switching stage. It passes12 Release and6 targeted sanitizer checks; the frozen recording comparison remains mixed and does not establish a faithful full hardware match.
+
 Ceres is a four-voice, sample-free CS-50 research synthesizer core. This repository owns the reusable C++17 DSP. The Reason Rack Extension consumes it through a pinned `Instrument` Git submodule; host code, panel assets and Rack patches belong to that separate project.
 
 Product version **0.1.0** imports the canonical **v0.10.0 research model**. The core also implements the global ring modulator, five internal SUB waveforms, SUSTAIN I/II key-voltage behavior, shared brilliance/resonance offsets and a separate common VCA level, with an embedded build interface. This is a reduced circuit model with provisional component/control calibration, not a verified transistor-level recreation or a completed hardware match. No hardware recordings, manuals or sampled instrument data are required at runtime.
@@ -12,7 +14,7 @@ cmake --build build -j 4
 ctest --test-dir build --output-on-failure
 ```
 
-The build creates `ceres` and `ceres_embedded` static libraries, the standalone `ceres_render`, and native tests. CTest includes 26 existing DSP groups, five sound-path/utility-gain groups and five expression groups, a 64-frame embedded allocation contract for all 57 keys, and three exact native/embedded audio comparisons. Python 3 is required for the parity checks.
+The build creates `ceres` and `ceres_embedded` static libraries, the standalone `ceres_render`, and native tests. CTest currently has12 entries covering the core DSP, oscillator/filter/envelope/ring circuit contracts, expression, zero post-construction allocations for all57 keys, and exact native/embedded audio through active controls and live capacitor edits. Python3 is required for the parity checks.
 
 ```sh
 cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCERES_SANITIZE=ON

@@ -1,0 +1,118 @@
+{
+  "status": "pass",
+  "scope": "Completed audible-gap research/implementation/evaluation experiment. This does not certify an exact or fully calibrated CS-50 clone.",
+  "implementation_commit": "28ddadca6b546f2f81b18adc2d060449214c4da3",
+  "compiled_source_sha256": {
+    "Source/DSP/ceres.hpp": "e90e883a9a41a61ce596d5fc316e3cca3f0f2fa03422ea4744e61d70faa17952",
+    "Source/DSP/ceres.cpp": "3fe87405e051b6bfade6b37324789eb1567f83e61cd8a493d4c5a1e0a6c6fa31",
+    "Tools/render_main.cpp": "25bee66eb014d2575cdac4f836a9fc69435b945569ca14eb4351af7c652a52eb",
+    "Tools/build_identity.hpp.in": "6f1f6f52eb98835e1fa5e5dc89c128d024423cea9bd94a173b0643a982f1876b",
+    "CMakeLists.txt": "3d922bcfbe24bf253e6338ab32a9348830cb0ef21cd8f74607c8ed06c5151b6d"
+  },
+  "renderer_sha256": "59964a09832bb14772976e5dd53e2b61f5f65de6278d46767948800669dc3a3a",
+  "release_tests": 12,
+  "targeted_asan_ubsan_tests": 6,
+  "asan_options": "detect_leaks=0",
+  "native_render_count": 33,
+  "component_native_render_count": 25,
+  "public_recording_native_render_count": 8,
+  "parameter_key_count": 57,
+  "parameter_changes": "Existing reset_microseconds upper engineering bound50->60 and default6->59.7286us; no added keys.",
+  "no_runtime_sample_playback": true,
+  "requirements": [
+    {
+      "requirement": "Research audible oscillator/filter/envelope/ring omissions against primary documentation.",
+      "evidence": "Yamaha service/IC diagrams plus original Fairchild equivalent circuit; source audits and independent review bindings.",
+      "status": "proven"
+    },
+    {
+      "requirement": "Implement the supported audible gaps in standalone circuit DSP without sample playback.",
+      "evidence": "Two runtime source files, four integrated circuit groups, physical source/RC/thermal equations,33 native renders; no sample input or GUI in runtime build.",
+      "status": "proven"
+    },
+    {
+      "requirement": "Verify implementation and expose audible consequences.",
+      "evidence": "12 Release and6 targeted ASan/UBSan entries; native/embedded and allocation tests; fixed-gain before/after scenes; static controls and declared bypass parity.",
+      "status": "proven"
+    },
+    {
+      "requirement": "Evaluate simulation accuracy without replacing the objective with a fitted surrogate.",
+      "evidence": "Unchanged8-case public plan,45 inputs,16 recomputed metric trees, unchanged gains/gates/masks, retained adverse/mixed results. No broad hardware-match claim.",
+      "status": "proven"
+    },
+    {
+      "requirement": "Preserve the experiment scope and account for unidentified circuit terms.",
+      "evidence": "Source remains in /tmp; existing reports and parents retained; result lists uncalibrated VCO shaping, chip/source loads, EG idle rate, Q scale, ring audio/DC/gain. These are model limitations, not claimed implemented calibrations.",
+      "status": "proven"
+    }
+  ],
+  "component_manifest_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/manifest.json": "575b7a02895b17fc26a9169a2fce79f4eba0b0a5699ff2d61d567b58022097e1",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/manifest.json": "7384fb56f3dadf030b4f5057dda635d35f026b4aa5a1e39e21d521822a81a64c",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/manifest.json": "86e9ef0174cac404d35fa2313d8d38628e483fcc00bf64a9017320157ea848f9",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-switch-run-001/manifest.json": "94ff9e2f57376c64f6d8f801f66d2232ba75eb07a866ab96b972a18dc8b74855"
+  },
+  "native_wav_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-lp_q_step.wav": "72dbe5913173ff43c155903d884fb2bde9b0e01bcf74150c7441e5490aed5e6b",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-lp_q_static.wav": "88513f02cbc4175832b34d9be8a4f01fe11643f84b84e34edc803929e223df29",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-hp_q_step.wav": "c7fafebe81a1c5cfa870ea5441e1dd30d2cd59ecc7327be4b707234159d76c9c",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-idle_il.wav": "499a8360fa6d1a278055273a1a21476c84224735a5e2a74066814612077613e1",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/parent-il_static.wav": "4803ff23591d31ed998276db1126adb6da1a47d6a72cb1519b82c1dd4b5c5e64",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-lp_q_step.wav": "df83c5a1ef23b90e8f504f2f5148d73e6a4a6389eeef21332180156a533c46f1",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-lp_q_static.wav": "88513f02cbc4175832b34d9be8a4f01fe11643f84b84e34edc803929e223df29",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-hp_q_step.wav": "69e5054a9d3f0b2b25121ad9a0d7a46a47c034f2f91da2aaef070312c31f69e1",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-idle_il.wav": "618010f27a64a8beaa3f4d6686489908acf3a2ae3931b9c4d73cdaa612c2948f",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/capacitor-run-001/capacitors-il_static.wav": "4803ff23591d31ed998276db1126adb6da1a47d6a72cb1519b82c1dd4b5c5e64",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/parent-saw.wav": "4ca033e4f3e5a1d4656ba59afc97a65e46508f9f0df03e10064d3cd71a423670",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/parent-sine.wav": "69af9c4869b712038905455a3fb93b22fff6bae85a8d6dcdb345e0e049a57525",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/parent-pulse.wav": "123f178a451edcf62b79be0e99e662fb7a0fa80edb73c2d53ebe0a6ace5f412f",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/oscillator-saw.wav": "d9c808083232f44ae1e7e695e477eb81902a8177964f395377ba03524533ca34",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/oscillator-sine.wav": "ecfba22adc1905a3e12959902ffe4957b7fae6f59688c8b90d0bf254457b57c7",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/oscillator-run-001/oscillator-pulse.wav": "123f178a451edcf62b79be0e99e662fb7a0fa80edb73c2d53ebe0a6ace5f412f",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/parent-1.wav": "414a4e4a5792f552b148bfa01dcdb019f5eaddd5b46bf8a54575c87006356282",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/parent-30.wav": "35198aefb053a22296f02087c8f69a9adaec420e8f166210f3c64896e264364e",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/parent-220.wav": "8968b61eb2e43166a23e01b050fdc5a48a9be35b93d5e03a8befcad8b383b11a",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/ring-1.wav": "589783c4dfc7dd8c854045bc0200b6168a341f80839c4f4ca34335d4adc88193",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/ring-30.wav": "22f456a3613f56d028562b184ee84af5fe75720416d74bad2c83920cf4db334c",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-run-001/ring-220.wav": "a5b91c301174dc154948f7262ce2ef33872c114175660a740787c50b47f05da8",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-switch-run-001/switching-1.wav": "d9c9751ec4b2e62470a5143c8ac773392bd950a3fd7d0fb1e9a14cb5989686d7",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-switch-run-001/switching-30.wav": "2495b83d2f6e5c5db06dc2029a2b18126380a21afa1b5a33237a7ecfc531dcac",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/ring-switch-run-001/switching-220.wav": "c25a8b616ac0150902cd52b6c26a5ad9e6ebc9d9aa872a0faa2106f86a683c6b",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen/runs/audible-final/flute-high-factory-physical.wav": "405d45f15aeca9b53abf43f4774deee076411f57fe71689c93ea0231dd7322f6",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen/runs/audible-final/flute-high-effective-compensated.wav": "766c219bbdebb833a5b54bc9d26d7c8f0a2e45ee6a2bcf9eba9332dc2ead26c3",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen/runs/audible-final/flute-lower-factory-physical.wav": "60b99617d98044dcb03dca7dde58096d20b78b574714463fe55ca61fb337b353",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen/runs/audible-final/flute-lower-effective-compensated.wav": "6f753bba27b99a334b149b245eb73b624f0aa9205fe26497c4de92a9ade0ee8a",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen/runs/audible-final/brass-history20.wav": "e992df17a7fe50f300b0b58af4d3a4734e8ad8ffab835871dac233914440b3f0",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen/runs/audible-final/brass-history10.wav": "10dfe3d9a66c81adc8c51c6233fdee79afdb1fe673939d6573989a842e93b910",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen/runs/audible-final/dry-sawtooth.wav": "e653ae47545349e8832939b877db224af3f04f1027c230f989e62fdfc7ff8daa",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen/runs/audible-final/dry-square.wav": "9654d20841422ba9f016ea9e63794538a8d5b68b7af8ae31158ab77c0ed9fbe2"
+  },
+  "verified_file_sha256": {
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/RESULT.md": "27a10fa6e774d4470e40e15b83817aa1b97c7d9c077f0aff1528c6929372f820",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/montage-plan.json": "ab89829fa0438c1b9fb692044749746c396bf5babcdc1adc27c786965df8c630",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/montage.json": "f16fb53512f5d972dd5b2f6add1a944ee41c350ee3e96b3baccc2396874e2b73",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/assemble_montage.py": "b4795c415f0f2151c128aa3f328b8b8e24c29b0c0fc5eb75b360aae999a18445",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen/integrity.json": "e8dff661f4e6952be5aebfda7b931d5384f439cb7f37b124990207ef5f8eef4b",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen/comparison.json": "855a330e5b31548598ab62a429b5a8aaf87e293515d6a2c677d02f13eceb6ed4",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-frozen/README.md": "ceb016ed67324f674a5a9d3bcad30ba33ee3e9ca5856c663ce0a3321ff4e204b",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/evaluate_public.py": "ef5ddcce1e3d644e8718228bd18cd7dc049150c747c3259e8ed95139f117d585",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/public-evaluation-plan.json": "34bd7b5e340a5b999002fe95cc5154db9f171931c29f83560cdcc94300c6ff57",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/filter-eg-capacitor-continuity/source-audit.md": "4febb599e7b01dfdfdf8276a4749c4454f58b0a044986ec71547f29807f84028",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/filter-eg-capacitor-continuity/implementation-review-rebind-001.json": "8158b856ca8f091365f9b4fedb37fa403d896f8d6fe45aeddee18220218bd19f",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/source-review.md": "ebc209139290d3e25690248e842907cc3442f781c432d541c95c66dafff80002",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-osc-ring/oscillator-implementation-review.json": "01c1cb4d7c562af0807828473fa7e0c34d7f19770cd26af20aaf03e3c10cceb2",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/source-audit.md": "81ee1895440b7b504b374b397a0b88aaaa72baed242aedecff514b09553d7eaa",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/evidence.json": "d023d975ce4edaa5ee6adc32f04914b66424e486f6e0431520d0dfdf2dbba030",
+    "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/ring-carrier-nonlinearity-20261019/implementation-review.json": "3adaf5f0ae9d6ec38401588b3a0bbc96e17c631b4941ca8a3bb9e38c0c45d3c1",
+    "/private/tmp/ceres-audible-integrated-20261019/README.md": "35272db3511e290c2ad3e371fdaffbe548234584df7b13fb4e2a1e531fc64bdb",
+    "/private/tmp/ceres-audible-integrated-20261019/Docs/DSP_SOURCE.md": "85d68756f50c531f297565b44a16eb473621149a369299dce3c841d08dbd432a",
+    "/private/tmp/ceres-audible-integrated-20261019/Tests/record_audible_validation.py": "47ad0bea1c4005b94ede246a4a1b2ea8d749c16f0a1f936d02de7b33c539ef83",
+    "/private/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/README.md": "ab2ccc13b44a89be690e1f65b1784f6ddadb0f0a6d7a4aff4d3aea9272407726",
+    "/private/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/release-final.log": "b6aff7eecd1ccf5a681b1caa8a2500f97760cceb5a27a895e6c0eaab06d624b3",
+    "/private/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/sanitize-final.log": "0edbf388939d893543837ffa2ff87e6e8f924a0e701ec779ede6c20925b8ca53",
+    "/private/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/ring-alias-final.json": "fed953c9d8f3180bad2b4611558b54486cfe94a450bb828aaf7369e1fbef3bf1",
+    "/private/tmp/ceres-audible-integrated-20261019/Docs/audible-circuits/performance/comparison.json": "c3ff66941e34b1276f35189228f11f620d29d47d0a61f51eae7a8e158c3c36bf"
+  },
+  "accuracy": "Small mixed changes. Raw factory Flute remains19-22dB spectral ratio error; no known-settings/original-MIDI holdout; public ring path untested.",
+  "final_listening": "/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019/comparison-circuits.wav"
+}
