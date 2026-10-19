@@ -1,0 +1,14 @@
+PASS 01-init: 12.0 s, peak -11.09 dBFS
+PASS 02-string1: 12.0 s, peak -9.52 dBFS
+PASS 03-string2: 12.0 s, peak -13.44 dBFS
+PASS 04-brass1: 12.0 s, peak -13.60 dBFS
+PASS 05-brass2: 12.0 s, peak -14.80 dBFS
+PASS 06-flute: 12.0 s, peak -9.42 dBFS
+PASS 07-electric-piano: 12.0 s, peak -10.80 dBFS
+PASS 08-clavichord: 12.0 s, peak -16.51 dBFS
+PASS 09-harpsichord: 12.0 s, peak -12.84 dBFS
+PASS 10-guitar1: 12.0 s, peak -10.22 dBFS
+PASS 11-guitar2: 12.0 s, peak -12.44 dBFS
+PASS 12-funky1: 12.0 s, peak -12.53 dBFS
+PASS 13-funky2: 12.0 s, peak -8.26 dBFS
+PASS 14-funky3: 12.0 s, peak -10.06 dBFS

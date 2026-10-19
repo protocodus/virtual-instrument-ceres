@@ -6,7 +6,7 @@ Ceres is a four-voice, sample-free Yamaha CS-50 research synthesizer with a reus
 
 ## Audio demos
 
-The CI-generated section below belongs to the JUCE scaffold. Its factory-preset list is empty, so that demo renderer and `Ceres.AudioDemos` currently fail by design. The standalone circuit engine can render procedural audio with `ceres_render`; its research preset table is not a calibrated hardware bank or a JUCE plug-in preset bank.
+The CI-generated demos below use the **standalone circuit engine's existing 14 research presets**, including Init, without preset edits, gain normalization or external audio. They do not demonstrate the still-silent JUCE plug-in, which has no instrument preset bank yet. The source phrases are original committed MIDI, not recovered hardware performances; names inherited from the research table do not establish calibrated Yamaha preset matches.
 
 <!-- audio-demos-begin -->
 <!-- audio-demos-end -->
@@ -16,6 +16,7 @@ The CI-generated section below belongs to the JUCE scaffold. Its factory-preset 
 ### Unreleased — 0.1.0 — circuit engine and existing plug-in scaffold
 
 - Adds the tested four-voice oscillator/filter/envelope/ring model and embedded interface alongside the existing plug-in scaffold.
+- The README demo renderer now exercises the existing circuit research presets with fixed original MIDI; the separate JUCE plug-in remains unchanged.
 - Retains the source-timed VCO conditioning, Q/idle-envelope capacitor continuity and physically scaled ring switching described in the [audible-circuit review](Docs/audible-circuits/README.md). The hardware-recording comparison remains mixed; this is not a verified full hardware match.
 
 ### Unreleased — 0.0.1 — scaffold
@@ -103,7 +104,7 @@ Level gain is `1 − pressure_volume*(1 − expression)`; filter expression adds
 ## Known gaps
 
 - The JUCE plug-in remains a silent placeholder with a plain editor; connecting the actual instrument and controls is separate work. Its source, identity codes, release helpers and shared portfolio tools are preserved.
-- The plug-in's empty preset list makes its existing audio/demo tier fail. The full suite and CI must not be described as green while this remains unresolved.
+- The plug-in still has no preset bank. The audio tier checks the separately identified circuit research presets; passing it does not establish audible JUCE plug-in functionality.
 - Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
 - No external modulation input is implemented. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
@@ -122,7 +123,14 @@ ctest --test-dir build-dsp -L '^unit$' --output-on-failure
 
 `ceres` and `ceres_embedded` are the circuit libraries. `ceres_render` writes mono float32 WAV without normalization; sorted event rows are `frame type note value`. It supports note-on/off, bend, pressure, pedal, all-notes-off, panic and reset. `--patch path` reads key=value overrides and `--build-info` reports the exact compiled sources including the merged CMake file. The native research preset API is excluded from the embedded ABI.
 
-The 12 circuit checks cover oscillator/filter/envelope/ring contracts, expression, all 57 keys with zero post-construction allocations, and native/embedded parity. They are named `Ceres.<Suite>` and labelled `unit` alongside the existing scaffold unit tests. Test executables are resolved by CMake target paths for single- and multi-configuration generators. Existing `audio`, `render` and `fuzz` tiers remain separate and unmodified.
+The 12 circuit checks cover oscillator/filter/envelope/ring contracts, expression, all 57 keys with zero post-construction allocations, and native/embedded parity. They are named `Ceres.<Suite>` and labelled `unit` alongside the existing scaffold unit tests. Test executables are resolved by CMake target paths for single- and multi-configuration generators. The `audio`, `render` and `fuzz` tiers remain separate; the unchanged audio contract now renders the actual circuit preset list twice.
+
+```sh
+ctest --test-dir build-dsp -L '^audio$' --output-on-failure
+./build-dsp/RenderCeresPresetDemos --jobs 4 Docs/audio/midi build-dsp/demo-audio
+```
+
+The demo tool uses the shared fixed 48 kHz/256-frame/seed protocol and the original [MIDI phrase definitions](Docs/audio/midi/README.md). It duplicates the mono engine into two identical channels without gain changes. Every 12 s raw render must be finite, audible, below 0 dBFS and identical on repetition. MP3 export uses ffmpeg; no captured sound or preset-specific level adjustment is involved. Historical empty-bank failure evidence remains frozen in the [initial integration report](Docs/validation/main-integration-2026-10-19/report.json); the subsequent [demo integration validation](Docs/validation/research-demos-2026-10-19/report.json) records the resolved audio path and its new build identity.
 
 ```sh
 cmake -S . -B build-sanitize -DCMAKE_BUILD_TYPE=Debug -DCERES_BUILD_PLUGIN=OFF -DCERES_SANITIZE=ON
@@ -138,7 +146,7 @@ The separate plug-in build fetches pinned JUCE 8.0.14 and clap-juce-extensions u
 cmake -S . -B build-plugin -DCMAKE_BUILD_TYPE=Release -DCERES_BUILD_PLUGIN=ON -DBUILD_TESTING=ON
 cmake --build build-plugin --parallel
 ctest --test-dir build-plugin -L '^unit$' --output-on-failure
-# Full suite additionally includes the known pre-existing empty-bank failure:
+# Full suite also includes circuit audio, editor rendering and fuzz tiers:
 ctest --test-dir build-plugin --output-on-failure
 ```
 

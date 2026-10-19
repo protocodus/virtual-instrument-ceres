@@ -236,11 +236,12 @@ if(CERES_BUILD_PLUGIN)
 endif()
 
 if(CERES_BUILD_TOOLS)
-    # One README demo per factory preset from Docs/audio/midi (Tools/
-    # PresetDemoRenderer.h is the shared portfolio copy; do not edit it here).
+    # Existing standalone circuit research presets, not the separate silent
+    # plugin scaffold. PresetDemoRenderer.h is the unchanged portfolio copy.
     add_executable(RenderCeresPresetDemos Tools/RenderPresetDemos.cpp)
     find_package(Threads REQUIRED)
-    target_link_libraries(RenderCeresPresetDemos PRIVATE CeresDSP Threads::Threads)
+    target_link_libraries(RenderCeresPresetDemos PRIVATE ceres Threads::Threads)
+    set_target_properties(RenderCeresPresetDemos PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
     if(MSVC)
         target_compile_options(RenderCeresPresetDemos PRIVATE /W4 /permissive-)
     else()

@@ -152,7 +152,7 @@ ctest --test-dir build-dsp -L unit --output-on-failure
 Use a separate `build-plugin` directory (`-DCERES_BUILD_PLUGIN=ON`, the
 default) for the processor, editor and packaging. Every test is
 `Ceres.<Suite>` with one tier label: `unit`, `audio` (`Ceres.AudioDemos`,
-every preset's demo rendered twice; it fails until the first preset exists),
+every existing standalone circuit research preset rendered twice),
 `render` (`Ceres.EditorRender`, the editor screenshot) or `fuzz` (`Ceres.DspFuzz`; `Ceres.ParameterMatrix` in
 the plug-in build). Select the suites that cover a change with `-R`, then run
 the full suite before a substantive DSP change is called done.
