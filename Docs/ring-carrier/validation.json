@@ -1,6 +1,6 @@
 {
   "status": "pass",
-  "created_utc": "2026-10-19T07:42:45.166342+00:00",
+  "created_utc": "2026-10-19T07:43:58.452588+00:00",
   "parent_commit": "d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43",
   "compiled_source_sha256": {
     "Source/DSP/ceres.hpp": "bd785967fea79ed0df68bc0fb70f6c063c44439eac975c96357eb71bcdcaa10f",
@@ -55,10 +55,10 @@
     "Tests/RingCarrierTests.cpp": "913e2b8e37e0cf2e08afe22069db462529d4b88aa2a095d4bf60dc60f8aa4bf9",
     "Tests/ParityDriver.cpp": "940cbe8f10c1cd1baaebb23059d27ccf39f616a27f843cbe556485f1c5a83427",
     "Tests/check_ring_bypass_parent.py": "b51552d498916fc8747c24174eca22cfb573ab3559bf32d6dd0db36ab46b53b9",
-    "Tests/record_ring_carrier_validation.py": "2bc370b6c27772c3c67666c7b5a4c912a35897e67d96b4ac3e6150f32716b492",
+    "Tests/record_ring_carrier_validation.py": "6036a6455b7466bd6688a1330edca34bdb850e013916c3e1e5b79bf8e0bb2797",
     "Docs/DSP_SOURCE.md": "9a2a488a3cd4a5d4455ca856a562292ea3b65f732f03a124809601688f1e275d",
     "Docs/ring-carrier/README.md": "2a4df42f9f4fc83fdf6b7a9e65cf79289268787d2cf7fef1af26d94215c74fce",
-    "Docs/ring-carrier/source.patch": "9022e122d8f2d6d8d25b34e18e3705c3276c2e60fe4afd2b1c541fe202b434f1",
+    "Docs/ring-carrier/source.patch": "6d24a9c925c27567ac8b60a99b9cf41125e5f947ed5e79c094a9a26ccf033c64",
     "Docs/ring-carrier/configure.log": "28bedef07f305ae5cc2a06099ab3d48c2474672f31354fd35e4bdefb30a7e308",
     "Docs/ring-carrier/build.log": "e217e1cba473cb3a75180a9285ec2c2f930ab4027c4a857c13e7c9f1572476d2",
     "Docs/ring-carrier/release.log": "847ea7f64c53688dd94755447ace1b5c5012ee6ff27a101b006cccfa3ddf4962",
