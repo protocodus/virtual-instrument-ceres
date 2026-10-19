@@ -299,6 +299,54 @@ struct OutputCoupling {
     }
 };
 
+// Direct CS-50 PRA: four 100uF capacitors around the uA796 carrier input.
+// Nodes x=pin7, b=pin8, a=audio-bias, s=bypassed local supply. This passive
+// limit assumes an ideal sine source and zero incremental IC input currents.
+// It does not identify the multiplier's transistor law or wet-gain trim.
+struct RingCarrierCoupling {
+    std::array<std::array<double,4>,4> inverse{};
+    std::array<double,4> memory{};
+    void configure(double fs) {
+        std::array<std::array<double,4>,4> g{};
+        auto ground=[&](unsigned i,double r){g[i][i]+=1/r;};
+        auto edge=[&](unsigned i,unsigned j,double r){
+            const double y=1/r;g[i][i]+=y;g[j][j]+=y;g[i][j]-=y;g[j][i]-=y;
+        };
+        ground(0,33000);edge(0,1,100);edge(1,2,820);edge(1,3,1200);
+        ground(2,1000);ground(3,390);
+        // TPT capacitor coordinates w=(x-source,b,a,s):
+        // (I+G/(2fsC))*v=memory+(source,0,0,0), memory'=2w-memory.
+        // Factor once at construction, not in the sample callback.
+        std::array<std::array<double,8>,4> augmented{};
+        for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j) {
+            augmented[i][j]=(i==j?1.:0.)+g[i][j]/(2*fs*100e-6);
+            augmented[i][j+4]=(i==j?1.:0.);
+        }
+        for(unsigned col=0;col<4;++col) {
+            unsigned pivot=col;
+            for(unsigned row=col+1;row<4;++row)
+                if(std::abs(augmented[row][col])>std::abs(augmented[pivot][col]))pivot=row;
+            std::swap(augmented[col],augmented[pivot]);
+            const double diagonal=augmented[col][col];
+            for(double& value:augmented[col])value/=diagonal;
+            for(unsigned row=0;row<4;++row)if(row!=col) {
+                const double multiplier=augmented[row][col];
+                for(unsigned j=0;j<8;++j)augmented[row][j]-=multiplier*augmented[col][j];
+            }
+        }
+        for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j)inverse[i][j]=augmented[i][j+4];
+        clear();
+    }
+    void clear() {memory.fill(0);}
+    double process(double source) {
+        auto rhs=memory;rhs[0]+=source;
+        std::array<double,4> nodes{};
+        for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j)nodes[i]+=inverse[i][j]*rhs[j];
+        for(unsigned i=0;i<4;++i)memory[i]=2*(nodes[i]-(i==0?source:0.))-memory[i];
+        return nodes[0]-nodes[1]; // actual differential carrier; no gain normalization
+    }
+};
+
 // IG00159 VCA-EG and IG00152 VCF-EG (CS-50 service manual, pp.20–21):
 // a sequencer switches a variable
 // resistance into an integrating capacitor. Each segment below is the exact
@@ -535,6 +583,8 @@ struct Synth::Impl {
     Envelope ringEnvelope;
     std::array<double,4> ringCoefficients{};
     double ringPhase = 0, ringCarrier = 0, ringFrequency = 30;
+    double ringCoupledCarrier=0;
+    RingCarrierCoupling ringCarrierCoupling;
     OutputCoupling ringWetCoupling;
     int lastAssignedKey = 60;
     bool pedal = false;
@@ -558,6 +608,7 @@ struct Synth::Impl {
         qControlCoefficient=-std::expm1(-1/(internalFs*qControlTau));
         subNoiseG=1/(2*internalFs*22e3*.1e-6);
         subNoiseGain=.25*std::sqrt(3*(1+subNoiseG)/subNoiseG);
+        ringCarrierCoupling.configure(internalFs);
         updateCoefficients();
         reset();
     }
@@ -612,6 +663,7 @@ struct Synth::Impl {
         physicalKeys.fill(0); physicalKeyPresses=0; lastAssignedKey=60;
         subNoiseMemory=0; ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={};
+        ringCarrierCoupling.clear();ringCoupledCarrier=0;
         qVoltageOffset=0;
         hpResonanceAnchor=patch.hpResonance; lpResonanceAnchor=patch.lpResonance;
         hasProcessed=false;
@@ -724,15 +776,17 @@ struct Synth::Impl {
         const double bus=busCoupling.process(mixed,outputCouplingTau[2],internalFs);
         // One global processor, after the voice bus and before expression/
         // output. Ideal balanced multiplier models the uA796 functional
-        // topology; carrier leak, transistor transfer, input coupling and
-        // wet-gain trim are unidentified. Direct PRA/Overall wet output uses
+        // topology; carrier leak, transistor transfer, audio-input loading
+        // and wet-gain trim remain unidentified. Direct PRA/Overall wet output uses
         // 10uF into10k (Guide differs): retain that physical RC at tau=.1s.
         const double ringControl=ringEnvelope.advance(0,1,0,.01,0,
             ringCoefficients[0],0,ringCoefficients[1],ringCoefficients[2]);
         ringFrequency=clamp(patch.ringRate*std::exp2(patch.ringDepth*ringControl),.2,220);
         ringCarrier=std::sin(2*pi*ringPhase);
         ringPhase=wrap(ringPhase+ringFrequency*dt);
-        const double wet=ringWetCoupling.process(bus*ringCarrier,.1,internalFs);
+        // Keep this free-running passive network connected even at mix0.
+        ringCoupledCarrier=ringCarrierCoupling.process(ringCarrier);
+        const double wet=ringWetCoupling.process(bus*ringCoupledCarrier,.1,internalFs);
         // Explicit bypass avoids even a rounding change for old patches.
         const double ringed=patch.ringMix==0 ? bus : bus+patch.ringMix*(wet-bus);
         const double rail=.9*std::tanh(ringed*.18*patch.volume/.9);
@@ -831,6 +885,7 @@ void Synth::allNotesOff() {
 }
 void Synth::allSoundOff() {
     impl_->keysOff(); impl_->ringEnvelope={}; impl_->ringWetCoupling={};
+    impl_->ringCarrierCoupling.clear();impl_->ringCoupledCarrier=0;
     for (auto& voice : impl_->voices) {
         voice.held = voice.pedalHeld = false;
         voice.amp = {};
@@ -867,12 +922,23 @@ std::array<Synth::VoiceState,Synth::voiceCount> Synth::voiceState() const {
 }
 Synth::ModulationState Synth::modulationState() const {
     return {impl_->lastSub,impl_->ringEnvelope.voltage,impl_->ringFrequency,
-        impl_->ringCarrier,impl_->physicalKeyPresses};
+        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier};
 }
 Synth::SoundPathState Synth::soundPathState() const {
     return {impl_->qVoltageOffset,impl_->effectiveHpResonance,
         impl_->effectiveLpResonance,impl_->commonVcaGain,
         impl_->hpResonanceAnchor,impl_->lpResonanceAnchor,impl_->hasProcessed};
+}
+std::vector<double> ringCarrierResponse(double fs,const std::vector<double>& input) {
+    if(!std::isfinite(fs)||fs<100||fs>1536000)
+        throw std::invalid_argument("Invalid ring carrier probe sample rate");
+    RingCarrierCoupling coupling;coupling.configure(fs);
+    std::vector<double> result;result.reserve(input.size());
+    for(double value:input) {
+        if(!std::isfinite(value))throw std::invalid_argument("Nonfinite ring carrier probe input");
+        result.push_back(coupling.process(value));
+    }
+    return result;
 }
 // Individual normalized section, using the same RC class/constants as voices.
 std::vector<double> outputCouplingImpulse(unsigned stage,double fs,std::size_t frames) {
