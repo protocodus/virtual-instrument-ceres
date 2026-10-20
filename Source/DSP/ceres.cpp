@@ -17,10 +17,11 @@ constexpr double filterCapacitance = 1.5e-9, filterFeedResistance = 4.7e6;
 constexpr double filterFrequencyFloor = 1/(2*pi*filterCapacitance*filterFeedResistance);
 // Cutoff lever law: the printed IG00156 law fc=125*Kv*2^Vfc (guide printed
 // p.34; SM1 printed p.19, "VK .25V, Vf 5V -> 1kHz") is one octave per volt
-// of Vfc. Vfc is read at the FH/FL lever, ahead of its 39k into pin 4; that
-// is the one inference (guide printed p.33 draws Vfc reaching pin 4 through
-// a resistor; see preset()). Chosen by ear 2026-10-20 (listening test
-// 2026-10-20-vcf-printed-law). The same slope serves HP and LP.
+// of Vfc. Vfc is read on the FH/FL lever bus (R7 pins 19/20), ahead of its
+// 39k into pin 4; that is the one inference (guide printed p.33 draws Vfc
+// reaching pin 4 through a resistor; see preset()). Chosen by ear 2026-10-20
+// (listening test 2026-10-20-vcf-printed-law). The same slope serves HP and
+// LP.
 constexpr double leverOctavesPerVolt=1;
 // Direct R7 matrix, CS-50 service1 PDF8/printed14: every other cutoff input
 // shares the lever's node through its own resistor, so it moves the cutoff
@@ -1924,9 +1925,10 @@ Patch preset(const std::string& name) {
     // bus through a series resistor, a 1S1555 and a 10k to ground. The printed
     // table is the bare divider -- 1.3k gives 10*10/11.3 = 8.85V, exactly as
     // printed -- so the diode's drop is not in it, and the real pin sits that
-    // much lower. The destinations are op-amp inputs, which is why the printed
-    // table matches a 10k-only load, so the drop just lowers the source:
-    // Vpin = Videal*(10-Vd)/10 with Vd taken at I = Vpin/10k.
+    // much lower. Where a row drives a high-impedance input the 10k is its
+    // whole load, so the drop just lowers the source:
+    // Vpin = Videal*(10-Vd)/10 with Vd taken at I = Vpin/10k. The four filter
+    // rows drive passive R7 networks instead (loadedPresetPin below).
     // ESTIMATE: the 1S1555's forward curve is not published, so it is modelled
     // as the 1N4148-class silicon switching diode its ratings describe (35V,
     // 100mA, 4ns): Is = 2.52nA, N = 1.75 at 300K. That is 0.58V at the
@@ -1940,6 +1942,42 @@ Patch preset(const std::string& name) {
         // Each pass moves the drop by under half a percent of the last.
         for (int i=0;i<8;++i)
             pin=ideal*(presetSupply-presetDiodeVt*std::log(pin/(presetLoad*presetDiodeIs)))/presetSupply;
+        return pin;
+    };
+    // Filter rows g-j are loaded beyond that 10k. The board wiring lists (SM2
+    // printed p.11 T71, p.15 R7) run T-board outputs g and i straight to R7
+    // FH (19) and FL (20), and h and j to QH (52) and QL (50), with no buffer
+    // between; the PRA followers (fHO, fLO) drive only T71 inputs 7 and 9,
+    // the PANEL levers' diodes. R7 (SM1 printed p.14) takes each cutoff bus
+    // through four 39k, one per board, to a pin-4 node that the M board holds
+    // near ground (SM2 printed p.16: R6 2.2k HP, R7 2.4k LP at rank B, beside
+    // the trim's 330k plus its centred B-100k's 25k; BR 680k/220k, SUB/TBR/VCF
+    // 150k/47k each, EG 220k/47k on Overall): about 10.3k in all, as much as
+    // the T-board's own 10k. (Docs/accuracy/preset-dc-loading solved the same
+    // network under the earlier, unsourced anchors and slopes.) Each Q bus
+    // feeds four 220k to pin-7 nodes that return through 220k to RES: 110k to
+    // the RES bus, which is the T71 +10V at the presets' RESONANCE MIN. The
+    // row V then solves (10 - Vd - V)/Rs = V/10k + (V - Vret)/Rload, the
+    // diode's current, with Rs recovered from the printed bare divider,
+    // Rs = 10k(10/Videal - 1); a zero column leaves the row at the load's own
+    // Thevenin voltage. ESTIMATE: pin 4 is taken as a high-impedance input and
+    // the VR7/VR9 trims as centred; a virtual-ground pin 4 (bare 39k
+    // branches) or a trim at either rail moves a cutoff bus by at most .06V.
+    // Each pin 7 is taken to draw no current.
+    constexpr double hpCutoffNode=1/(1/2.2e3+1/355e3+1/680e3+3/150e3+1/220e3);
+    constexpr double lpCutoffNode=1/(1/2.4e3+1/355e3+1/220e3+3/47e3+1/47e3);
+    constexpr double fhBusLoad=(39e3+hpCutoffNode)/4, flBusLoad=(39e3+lpCutoffNode)/4;
+    constexpr double qBusLoad=(220e3+220e3)/4;
+    const auto loadedPresetPin=[](double ideal,double load,double loadReturn) {
+        // Thevenin of the 10k and the load: vl behind rl.
+        const double rl=presetLoad*load/(presetLoad+load);
+        const double vl=loadReturn*presetLoad/(presetLoad+load);
+        if (ideal<=0) return vl;
+        const double share=rl/(presetLoad*(presetSupply/ideal-1)+rl);
+        double pin=vl+(presetSupply-vl-.5)*share;
+        // Each pass scales the error by Vd's slope over Rs+rl, under 1%.
+        for (int i=0;i<8;++i)
+            pin=vl+(presetSupply-vl-presetDiodeVt*std::log((pin-vl)/(rl*presetDiodeIs)))*share;
         return pin;
     };
     std::string canonical = name;
@@ -1968,6 +2006,7 @@ Patch preset(const std::string& name) {
         auto cv = factory.v;
         for (const auto& correction : corrections)
             if (canonical == correction.name) cv[correction.column]=correction.voltage;
+        const auto ideal=cv;
         for (auto& voltage : cv) voltage=presetPin(voltage);
         Patch p; p.name=canonical;
         // Guide p.49 calibrates actual PWM VC1 to 0.2/6.7/222 Hz at
@@ -1988,7 +2027,9 @@ Patch preset(const std::string& name) {
         // through 39k into the CS-50's 1.8-3.0k rank resistor (SM2 printed
         // p.16; R6 HP, R7 LP) puts only .4-.6V there, and guide printed p.33
         // draws Vfc reaching pin 4 through a variable resistor, the rank-set
-        // network. So Vfc is read at the lever, ahead of its 39k. One slope
+        // network. So Vfc is read on the FH/FL bus, ahead of the 39k; the
+        // PANEL lever reaches that bus through a PRA follower and a T71 diode,
+        // a preset through its loaded divider (loadedPresetPin). One slope
         // serves both levers: the CS-50 rank column (SM2 printed p.16,
         // "CS50,60": R7 3.0k/2.4k/2.0k beside R6 2.7k/2.2k/1.8k; p.18
         // NA03655) is exactly the E24 set nearest equal 39k-lever gain into
@@ -1999,14 +2040,17 @@ Patch preset(const std::string& name) {
         // Patch API expects total integrator Hz, so include the resistor
         // contribution once. See Docs/research/vcf-authenticity-2026-10-20.md.
         constexpr double gmHzAtMiddleC=125*.5;
-        p.hpCutoff=filterFrequencyFloor+gmHzAtMiddleC*std::exp2(leverOctavesPerVolt*cv[6]);
-        p.lpCutoff=filterFrequencyFloor+gmHzAtMiddleC*std::exp2(leverOctavesPerVolt*cv[8]);
+        const double fhBus=loadedPresetPin(ideal[6],fhBusLoad,0);
+        const double flBus=loadedPresetPin(ideal[8],flBusLoad,0);
+        p.hpCutoff=filterFrequencyFloor+gmHzAtMiddleC*std::exp2(leverOctavesPerVolt*fhBus);
+        p.lpCutoff=filterFrequencyFloor+gmHzAtMiddleC*std::exp2(leverOctavesPerVolt*flBus);
         // Overall schematic: passive FH/FL buses feed each cutoff via 39k;
         // the shared EG uses 220k for HP and 47k for LP, so at the levers'
         // 1 oct/V the EG moves the cutoffs 39/220 and 39/47 octave per EG
-        // volt. The ratio is relative to actual loaded FH/FL voltage, not
-        // proven to equal the T-board pin above: four-voice loading remains
-        // unresolved.
+        // volt, relative to the loaded bus voltage above. A board's EG also
+        // lifts its pin-4 node, which unloads the shared passive bus and so
+        // raises every board's cutoff a little: at most .03 octave per board
+        // at +5V LP EG on a weak column, .1 with all four. Not modelled.
         p.hpEnvelopeScale=leverOctavesPerVolt*39/220;
         p.lpEnvelopeScale=leverOctavesPerVolt*39/47;
         // Q columns h (HP) and j (LP): each pin 7 takes its preset Q bus P
@@ -2019,8 +2063,12 @@ Patch preset(const std::string& name) {
         // 2026-10-20-brilliance-resonance-preset-q-divider, B). Before, the
         // bus went straight to the pin, r=(10-P)/10, which no single lever
         // position gives for every preset. resonance_offset is then the RES
-        // change from MIN: 0 to -10V.
-        p.hpResonance=(10-cv[7])/20; p.lpResonance=(10-cv[9])/20;
+        // change from MIN: 0 to -10V. P is the loaded row (loadedPresetPin):
+        // the four pin-7 networks pull it toward RES's +10V, so a zero column
+        // sits at .83V, not ground. Away from MIN that pull follows RES, so
+        // the pin moves up to 13/24 of each RES volt, not 1/2; not modelled.
+        p.hpResonance=(10-loadedPresetPin(ideal[7],qBusLoad,presetSupply))/20;
+        p.lpResonance=(10-loadedPresetPin(ideal[9],qBusLoad,presetSupply))/20;
         // VCF-EG levels at TP1 (EG OUT). The IG00152 pin sheet (SM1 p.20)
         // gives AL 0..10V -> LC up to +5V and IL 0..10V -> 0..-5V, but the
         // alignment of the same M board (Yamaha CS-60 Service Manual p.37,

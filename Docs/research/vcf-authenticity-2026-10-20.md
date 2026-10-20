@@ -415,6 +415,101 @@ the bus on the pin, against the exponential law through the divider):
 
 These are nominal chip Q at the pin, before the source-loading correction.
 
+### The preset filter buses are loaded (schematic, not by ear)
+
+The round-1 conversion read each factory column as the T-board divider into
+its row's own 10k alone, on the premise that the destinations are op-amp
+inputs, and the preset EG note left "four-voice loading" open. The board
+wiring lists settle it for the four filter rows.
+
+- **Route.** The board wiring lists print it: R7 FH (19) ← T72-g (27),
+  FL (20) ← T72-i (24), QH (52) ← T72-h (26), QL (50) ← T72-j (23) (SM2
+  p.15 / PDF 11), and T71 g (27) → T72-g (27), one wire, the T-boards'
+  outputs being bussed (SM2 p.11 / PDF 9). No buffer sits on the preset
+  path; the Overall diagram, traced at 300 dpi, agrees. The PRA "Buff Amp"
+  (IC9, two followers) serves only the PANEL HPF and LPF levers: T71 inputs
+  7 (26') and 9 (23') come from PRA fHO (59) and fLO (57) (SM2 p.11 / PDF 9),
+  and a diode ORs each onto the same row as the preset columns (SM2 p.10 /
+  PDF 8 shows that input diode and the 10k to E on every row; Guide p.63 /
+  PDF 72: "input to terminals 1 to 22 ... output to terminals a to v
+  through diodes"). The R7 block diagram (Guide p.59 / PDF 68) names those
+  inputs "HPF lever" and "LPF lever" whichever source drives them.
+- **Cutoff load.** R7 (SM1 p.14 / PDF 8) takes each cutoff bus through four
+  39k, one per board, to fH1–fH4 / fL1–fL4, which the M board wires straight
+  to pin 4 (SM2 p.16 / PDF 12: f1 meets R6, 0.01 µF, the 330k trim feed and
+  Vfc). Each pin-4 node holds R6 2.2k (HP) or R7 2.4k (LP) at rank B beside
+  the node's other inputs (the 330k trim feed behind its centred B-100k,
+  355k; BR 680k / 220k; SUB/TBR/VCF 150k / 47k each; EG 220k / 47k on
+  Overall): 2.07k and 1.96k. Each cutoff row therefore carries
+  (39k + 2.07k)/4 = 10.27k (HP) or 10.24k (LP) beside its own 10k, 5.07k in
+  all: half the load the printed table was computed for.
+- **Earlier work.** `Docs/accuracy/preset-dc-loading/` (2026-10-19) solved
+  this same five-node network, as a hypothesis for the old 12/180 Hz
+  anchors and .7/.65 slopes reinterpreted on the actual bus, and compared
+  it with four public recordings: loading at BR −15 V improved the Flute
+  spectra but worsened its level trajectory and both Brass clips, so no
+  mapping changed then. Those anchors and slopes are gone; under the
+  printed law the actual bus is the only reading the circuit offers, since
+  the bare divider voltage exists nowhere in it. The recordings were not
+  re-run under the new law.
+- **Q load.** QH and QL feed four 220k into pin-7 nodes that return through
+  220k to RES: 110k to the RES bus, +10 V at the presets' RESONANCE MIN.
+  A zero Q column, which has no matrix path, sits at 10/12 = 0.83 V, not at
+  ground.
+- **Solve.** `preset()` now solves each filter row with its 1S1555 (the same
+  estimated curve) against the 10k and its R7 load, recovering the column
+  resistor from the printed bare divider, `Rs = 10k · (10/V − 1)`. The printed
+  values are those dividers to their rounding: string1 g 5.00 V is 10k, flute
+  g 1.18 V is 75k (SM2 p.10 / PDF 8), harpsichord g 6.41 V is 5.6k (T72,
+  SM2 p.12 / PDF 10).
+- **Uncertainty.** Pin 4's input impedance is not printed; it is taken as
+  high, as Guide p.33 / PDF 42 draws Vfc reaching the chip through a
+  resistor. A virtual-ground pin 4 would make each branch a bare 39k and
+  lower a cutoff bus by at most 0.061 V. The VR7/VR9 trims, set by ear per
+  board, are taken as centred; at either rail they move a bus by at most
+  0.05 V. Rank A or C instead of B moves it by under 0.01 V. The factory
+  cutoffs are therefore good to about ±0.1 octave on this account. Pin 7 is
+  still taken to draw no current.
+- **Not modelled.** (1) The buses are shared and passive, so a board's EG
+  (or BR), by lifting its own pin-4 node, unloads the bus and raises every
+  board's cutoff: at most 0.03 octave per board at +5 V of LP EG on a weak
+  column, 0.1 with all four, a quarter of that on HP. (2) Away from MIN, the
+  RES lever also drags each Q row through the 110k, so a pin moves up to
+  13/24 of each RES volt (zero columns) rather than 1/2; stiff columns stay
+  at 1/2. (3) The PANEL follower is stiff, but the T71 diode still drops
+  about 0.5–0.6 V, so a front end that shows the HPF/LPF levers should feed
+  the printed law with the lever volts less that drop (effectively nothing
+  below about 0.4 V), not the raw lever volts.
+
+Factory filter values at middle C, unloaded reading (previous commit)
+against loaded rows; cutoffs in total Hz with the 22.6 Hz feed floor, Q
+nominal at the pin:
+
+| Preset | FH V | HP Hz | FL V | LP Hz | Q HP | Q LP |
+| --- | --- | --- | --- | --- | --- | --- |
+| string1 | 4.73 → 3.17 | 1676 → 586 | 8.20 → 7.26 | 18408 → 9584 | 0.81 → 0.80 | 0.53 → 0.53 |
+| string2 | 2.21 → 1.26 | 312 → 173 | 5.62 → 4.02 | 3093 → 1036 | 0.53 → 0.53 | 0.53 → 0.53 |
+| brass1 | 0.00 → 0.00 | 85.1 → 85.1 | 5.39 → 3.79 | 2649 → 890 | 0.53 → 0.53 | 0.85 → 0.83 |
+| brass2 | 2.06 → 1.17 | 283 → 163 | 3.64 → 2.27 | 803 → 325 | 1.04 → 1.00 | 0.67 → 0.67 |
+| flute | 1.12 → 0.60 | 159 → 118 | 4.95 → 3.38 | 1956 → 671 | 1.07 → 1.03 | 1.23 → 1.16 |
+| electric_piano | 1.22 → 0.66 | 168 → 121 | 1.44 → 0.79 | 193 → 131 | 0.79 → 0.78 | 1.10 → 1.05 |
+| clavichord | 4.95 → 3.38 | 1956 → 672 | 5.39 → 3.79 | 2649 → 890 | 0.83 → 0.81 | 0.96 → 0.93 |
+| harpsichord | 6.05 → 4.48 | 4166 → 1413 | 7.42 → 6.13 | 10738 → 4398 | 0.53 → 0.53 | 0.63 → 0.63 |
+| guitar1 | 3.64 → 2.28 | 803 → 325 | 5.62 → 4.02 | 3093 → 1036 | 0.87 → 0.85 | 1.20 → 1.14 |
+| guitar2 | 2.37 → 1.37 | 346 → 184 | 2.56 → 1.49 | 391 → 199 | 1.58 → 1.44 | 1.58 → 1.44 |
+| funky1 | 4.73 → 3.17 | 1676 → 586 | 5.62 → 4.02 | 3093 → 1036 | 0.81 → 0.80 | 1.58 → 1.44 |
+| funky2 | 5.39 → 3.80 | 2649 → 892 | 6.93 → 5.50 | 7662 → 2844 | 1.58 → 1.44 | 1.58 → 1.44 |
+| funky3 | 3.78 → 2.39 | 884 → 349 | 4.50 → 2.97 | 1436 → 513 | 1.20 → 1.14 | 1.12 → 1.07 |
+
+Factory cutoffs fall 0.5–1.6 octaves (brass1's empty HP column stays at its
+floor). This is a correction from printed parts, not a choice between
+candidates, so it ships without a listening test.
+
+- **Fixture:** `VcfKeyVoltageTests` now solves each row by bisection on its
+  own node equation, with R7's draw written out as the explicit pin-4 and
+  pin-7 node solutions, and requires every factory cutoff and Q anchor to
+  match. The earlier 10k-only expectation encoded the unloaded premise.
+
 ## What would close the gap
 
 1. A measured CS-50 (or CS-60/CS-80 IG00156) cutoff against lever voltage at
@@ -423,7 +518,9 @@ These are nominal chip Q at the pin, before the source-loading correction.
    the printed-law reading chosen by ear.
 2. Pin-4 input characteristic of the IG00156 (voltage/current at the pin
    against cutoff), or any chip-level datasheet. The test circuit behind
-   the pin sheet's "Vf 5 V gives 1 kHz" would settle the printed-law reading.
+   the pin sheet's "Vf 5 V gives 1 kHz" would settle the printed-law reading;
+   the input impedance alone would also pin the preset-bus loading, now
+   bounded to ±0.06 V.
 3. Q against VQ at three or more voltages on one chip, to confirm or
    correct the exponential converter law chosen by ear.
 4. Signal amplitude at IG00156 pin 15/10 for a known WSC input, or the onset

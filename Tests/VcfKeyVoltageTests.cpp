@@ -5,7 +5,8 @@
 // variable-gm cutoff follows the sounding key exactly, octave for octave,
 // except that transposition moves the oscillator and not the filters. The
 // factory presets convert their cutoff columns with the same printed law,
-// and their Q columns through the pin-7 divider.
+// and their Q columns through the pin-7 divider, each column as the voltage
+// its T-board row actually holds under R7's load.
 // Expected values come from those laws, not from the engine's own formulas.
 #include "ceres.hpp"
 #include <cmath>
@@ -91,20 +92,51 @@ void glideMovesFilters() {
     if(!moved)throw std::runtime_error("Glide was observed mid-travel");
 }
 
-// A T-board pin sits a 1S1555 drop below the printed ideal divider value
-// (preset() models the diode as 1N4148-class: Is 2.52nA, N 1.75, 10k load
-// from a 10V source). Solved here by bisection on the node equation, not by
-// the engine's fixed-point pass.
-double presetPin(double ideal) {
-    if(ideal<=0)return 0;
-    const double vt=1.75*25.85e-3;
-    double low=0,high=ideal;
+// A T-board row is the bare divider the guide prints, less a 1S1555 drop
+// (preset() models the diode as 1N4148-class: Is 2.52nA, N 1.75), with the
+// row's 10k to ground and whatever R7 draws from it beside. The column's
+// series resistor is recovered from the printed divider value. Solved here by
+// bisection on the row's node equation, with R7's draw given as a function of
+// the row voltage, not by the engine's Thevenin fixed point.
+template<class Draw> double presetRow(double ideal,Draw r7Draw) {
+    const double vt=1.75*25.85e-3,is=2.52e-9;
+    double low=0,high=10;
+    if(ideal<=0) {
+        // No matrix path: the row settles where the 10k takes what R7 gives.
+        for(int i=0;i<200;++i) {
+            const double mid=(low+high)/2;
+            (mid/10e3+r7Draw(mid)<0 ? low : high)=mid;
+        }
+        return (low+high)/2;
+    }
+    const double rs=10e3*(10/ideal-1);
     for(int i=0;i<200;++i) {
-        const double mid=(low+high)/2;
-        ((10-vt*std::log(mid/(10e3*2.52e-9)))*ideal/10>mid ? low : high)=mid;
+        const double mid=(low+high)/2,current=mid/10e3+r7Draw(mid);
+        const bool below=current<=0 || 10-rs*current-vt*std::log(current/is)>mid;
+        (below ? low : high)=mid;
     }
     return (low+high)/2;
 }
+// R7 (SM1 printed p.14) feeds each cutoff bus through 39k into each of the
+// four boards' pin-4 nodes. Each node's other paths to ground (SM2 printed
+// p.16 and Overall): rank-B shunt R6 2.2k (HP) or R7 2.4k (LP), the 330k
+// trim feed behind its centred B-100k (25k), BR 680k/220k, SUB/TBR/VCF
+// 150k/47k each, EG 220k/47k; pin 4 itself taken as high impedance, every
+// source at 0V.
+double cutoffDraw(double bus,double shunt,double br,double sub,double eg) {
+    const double g=1/shunt+1/(330e3+100e3/4)+1/br+3/sub+1/eg;
+    const double node=(bus/39e3)/(1/39e3+g);
+    return 4*(bus-node)/39e3;
+}
+// Each Q bus feeds four 220k into pin-7 nodes that return through 220k to the
+// RES bus, +10V at RESONANCE MIN; pin 7 taken to draw nothing.
+double qDraw(double bus) {
+    const double pin=(bus/220e3+10/220e3)/(2/220e3);
+    return 4*(bus-pin)/220e3;
+}
+double fhBus(double g) { return presetRow(g,[](double v){return cutoffDraw(v,2.2e3,680e3,150e3,220e3);}); }
+double flBus(double i) { return presetRow(i,[](double v){return cutoffDraw(v,2.4e3,220e3,47e3,47e3);}); }
+double qBus(double q) { return presetRow(q,qDraw); }
 // Guide printed p.64 (PDF 73), CS-50 tone-preset table, columns g (HP
 // cutoff), h (HP Q), i (LP cutoff) and j (LP Q) in volts, with the two
 // T-board errata that preset() applies (string1 i 8.70, brass2 i 3.85).
@@ -118,16 +150,19 @@ const FactoryFilterColumns factoryFilterColumns[]={
     {"funky3",4,2.50,4.76,3.13}};
 
 void factoryCutoffsFollowPrintedLaw() {
-    // fc=125*Kv*2^Vfc with Vfc read at the lever, ahead of its 39k into
+    // fc=125*Kv*2^Vfc with Vfc read on the FH/FL bus, ahead of its 39k into
     // pin 4 (guide printed pp.33-34): 62.5Hz of gm at middle C for 0V and
     // one octave per lever volt, the same for HP and LP. The fixed 4.7M feed
-    // adds its floor once. Chosen by ear 2026-10-20 (vcf-printed-law).
+    // adds its floor once. Chosen by ear 2026-10-20 (vcf-printed-law). The
+    // T-board rows g and i drive R7 directly (Overall circuit diagram), so a
+    // preset's bus is its divider loaded by four 39k branches as well as the
+    // row's own 10k.
     for(const auto& row:factoryFilterColumns) {
         const auto p=ceres::preset(row.name);
-        near(std::log2((p.hpCutoff-floorHz)/(125*kvMiddleC)),presetPin(row.g),1e-12,
-             "Factory HP cutoff follows the printed law at 1 oct/V");
-        near(std::log2((p.lpCutoff-floorHz)/(125*kvMiddleC)),presetPin(row.i),1e-12,
-             "Factory LP cutoff follows the printed law at 1 oct/V");
+        near(std::log2((p.hpCutoff-floorHz)/(125*kvMiddleC)),fhBus(row.g),1e-12,
+             "Factory HP cutoff follows the printed law on the loaded FH bus");
+        near(std::log2((p.lpCutoff-floorHz)/(125*kvMiddleC)),flBus(row.i),1e-12,
+             "Factory LP cutoff follows the printed law on the loaded FL bus");
         // The filter EG enters through 220k (HP) and 47k (LP) beside the
         // 39k lever (Overall circuit diagram), so 39/220 and 39/47 oct/V.
         near(p.hpEnvelopeScale,39./220,1e-15,"Factory HP EG at 39k/220k of 1 oct/V");
@@ -150,11 +185,12 @@ void factoryQThroughDivider() {
     // presets assume RESONANCE at MIN, RES = +10V (chosen by ear 2026-10-20,
     // brilliance-resonance-preset-q-divider). The engine coordinate r is
     // 1 - VQ/10 (r = 1 is VQ 0V, Q 5). Until then presets put the bus
-    // straight on the pin, r = 1 - P/10.
+    // straight on the pin, r = 1 - P/10. P is the row as loaded by the four
+    // pin-7 networks returning to RES, so a zero column sits at 10/12V.
     for(const auto& row:factoryFilterColumns) {
         const auto p=ceres::preset(row.name);
-        near(p.hpResonance,1-(presetPin(row.h)+10)/2/10,1e-13,"Factory HP Q pin at (P + RES MIN)/2");
-        near(p.lpResonance,1-(presetPin(row.j)+10)/2/10,1e-13,"Factory LP Q pin at (P + RES MIN)/2");
+        near(p.hpResonance,1-(qBus(row.h)+10)/2/10,1e-13,"Factory HP Q pin at (P + RES MIN)/2");
+        near(p.lpResonance,1-(qBus(row.j)+10)/2/10,1e-13,"Factory LP Q pin at (P + RES MIN)/2");
     }
 }
 }
