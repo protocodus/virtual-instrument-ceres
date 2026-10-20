@@ -48,6 +48,9 @@ double leverFraction(double x,double ratio) { return x/(1+x*(1-x)*ratio); }
 // and straightens the taper; that coupling is not modelled.
 constexpr double ringMixLoad=1/(1/(68e3/2+2.2e3)+1/(10e3+330));
 constexpr double ringMixLeverRatio=10e3/ringMixLoad;
+// Each pin 7 has 220k to its preset Q bus, 220k to RES and 10uF (SM1 p.14;
+// SM2 p.16): 1.1s with stiff sources. The lever's own track adds 8*Rs to the
+// common-mode RES path, 1.15s at mid-travel on the parts-list B-10K; kept stiff.
 constexpr double qControlTau=10e-6*(220e3/2);
 // KAS gate/integrator, one per channel (SM2 p.3; guide printed p.24). The D-A
 // output reaches the channel's .033uF hold capacitor through a permanent 3.3M
@@ -758,6 +761,45 @@ bool setParameter(Patch& patch, const char* key, double value) {
         }
     }
     return false;
+}
+
+namespace {
+// PN2 lever wiring (SM2 p.26 PN2 sheet; overall circuit diagram, which also
+// numbers TVR6). Both are B-10K (SM1 parts p.9; CS-60 parts p.9, same part
+// numbers, marked common to the CS-50): TVR6 terminal 1 takes the T71 +10 V bus, terminal 3 ground,
+// wiper to R7 RES (51). TVR7 terminal 1 takes M4 -15 V, terminal 3 +15 V,
+// centre tap 5 ground, wiper to R7 BR (29). BRILLIANCE MAX raises both
+// cutoffs (guide printed p.5), so terminal 3 is the MAX end; RESONANCE MAX at
+// that same end puts 0 V on the Q pins, which is the Q5 end (SM1 p.19), so
+// the two levers agree on orientation.
+// Loads are the R7 matrix (SM1 p.14): BR drives four 680k (HP) and four 220k
+// (LP) into cutoff nodes held near ground by the M-board R6/R7 shunts (about
+// 2k, SM2 p.16); RES drives eight 220k into pin-7 nodes that sit, in steady
+// state, halfway between RES and their own preset bus.
+constexpr double brillianceLeverLoad=1/(4/680e3+4/220e3);
+constexpr double resonanceLeverLoad=440e3/8;
+// A wiper at fraction a of a track R between sources Ea (a=0) and Eb (a=1)
+// is Ea+(Eb-Ea)a behind R*a*(1-a); the load returns to Vload.
+double loadedWiper(double ea,double eb,double a,double track,double load,double vload) {
+    const double source=ea+(eb-ea)*a, series=track*a*(1-a);
+    return source+(vload-source)*series/(load+series); // exact at both ends
+}
+} // namespace
+
+double brillianceLeverVolts(double travel) {
+    if (!std::isfinite(travel)) return std::numeric_limits<double>::quiet_NaN();
+    const double t=std::min(1.0,std::max(0.0,travel));
+    // Each half of the centre-tapped B-10K is 5k between the tap and its rail.
+    return t>=.5 ? loadedWiper(0,15,2*t-1,5e3,brillianceLeverLoad,0)
+                 : loadedWiper(0,-15,1-2*t,5e3,brillianceLeverLoad,0);
+}
+
+double resonanceLeverVolts(double travel, double presetMeanVolts) {
+    if (!std::isfinite(travel) || !std::isfinite(presetMeanVolts))
+        return std::numeric_limits<double>::quiet_NaN();
+    // Fraction of the 10k track between the wiper and terminal 3 (ground, MAX).
+    const double a=1-std::min(1.0,std::max(0.0,travel));
+    return loadedWiper(0,10,a,10e3,resonanceLeverLoad,presetMeanVolts);
 }
 
 #if !defined(CERES_EMBEDDED_TARGET)
@@ -1595,6 +1637,10 @@ Patch preset(const std::string& name) {
         // scales are an effective/manual-slope estimate.
         p.hpEnvelopeScale=.7*39/220;
         p.lpEnvelopeScale=.65*39/47;
+        // The pin takes (Q bus + RES)/2 through the 220k pair, so the hardware
+        // is r=1-(P+R)/20 for RESONANCE lever volts R. This maps the bus
+        // straight to the pin, which matches it only at R=P; the lever
+        // position the factory voicing assumed is unknown (A-Z test pending).
         p.hpResonance=(10-cv[7])*.1; p.lpResonance=(10-cv[9])*.1;
         p.filterInitial=-cv[10]*.5; p.filterPeak=cv[11]*.5;
         // Service-manual endpoints: attack 1ms..1s; decay/release 10ms..10s.
