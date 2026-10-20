@@ -18,10 +18,10 @@ struct Patch {
 #if !defined(CERES_EMBEDDED_TARGET)
     std::string name = "init";
 #endif
-    // Audio noise is the binary limiter source (guide p.32), band-limited at
-    // an estimated 14kHz after the pick-up amplifier's 33.86Hz input coupling,
-    // and scaled so its density is the same at every quality and host rate.
-    // SUB noise filters the same sample.
+    // Audio noise is the limiter source (guide p.32): the pick-up noise,
+    // band-limited at an estimated 14kHz after its 33.86Hz input coupling,
+    // clipped to the rails with an estimated 1V/us slew. Its density is the
+    // same at every quality and host rate. SUB noise filters the same sample.
     double saw = 1.0, pulse = 0.0, sine = 0.0, noise = 0.0;
     // PW is the comparator's logical timing window (50..90%), modulated by
     // PWM with its fixed cycle edge retained. The completed audio pulse has
@@ -111,8 +111,8 @@ struct Patch {
     double lfoRate = 5.0, vibratoCents = 0.0, tremolo = 0.0, filterLfo = 0.0;
     // Shared SUB source: 0 sine, 1 down saw, 2 up saw, 3 square, 4 noise.
     // Noise uses the sourced22k/.1uF low-pass loaded by SUI's100k on the
-    // +/-15V limiter: an estimated .47 RMS (limiter bandwidth from a datasheet
-    // GBW, after the 33.86Hz pick-up coupling), within +/-8.2, independent of rate/audio Noise mix. The free-running PWM sine source is separate and is unaffected.
+    // +/-15V limiter: an estimated .77 RMS (limiter bandwidth and slew rate
+    // from datasheet typicals, after the 33.86Hz pick-up coupling), within +/-8.2, independent of rate/audio Noise mix. The free-running PWM sine source is separate and is unaffected.
     double lfoWaveform = 0.0;
     // One global balanced ring multiplier after the voice bus. Base carrier
     // Hz, positive frequency-envelope excursion in octaves, initial-to-peak

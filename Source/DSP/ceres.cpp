@@ -444,21 +444,28 @@ double blamp(double phase, double step) {
     return 0;
 }
 
-// Noise limiter (guide printed p.32; SM2 p.8 SUB board). The limiter hard-
-// clips the zener noise to +/-15V, so its output is the sign of the pick-up
-// amplifier's band-limited noise. That bandwidth is NOT documented: ESTIMATE
-// it as IC11-1's closed-loop pole, NJM4558 typical GBW 3MHz / (1+1M/4.7k) =
-// 14.03kHz (datasheet typical, not a measured unit); IC11-2's slew limit is
-// ignored. Sampling the one-pole Gaussian process exactly gives an AR(1)
-// with pole exp(-dt/tc); the sign of it has R(n)=(2/pi)asin(pole^n), while
-// the continuous process has low-frequency two-sided density 2*tc*ln2 per
-// peak^2. limiterLevel scales the sampled sign so that density survives
-// every internal rate, which makes noise level independent of host rate.
+// Noise limiter (guide printed p.32; SM2 p.8 SUB board). IC11-2 (gain
+// 10M/10k) is driven into its +/-15V rails by the pick-up amplifier's
+// band-limited noise. That bandwidth is NOT documented: ESTIMATE it as
+// IC11-1's closed-loop pole, NJM4558 typical GBW 3MHz / (1+1M/4.7k) =
+// 14.03kHz (datasheet typical, not a measured unit). The one-pole Gaussian
+// process is sampled exactly, an AR(1) with pole exp(-dt/tc).
 constexpr double limiterTau=1/(2*pi*(3e6/(1+1e6/4.7e3)));
+// IC11-2 cannot follow that sign: at the NJM4558's typical 1V/us slew rate
+// (ESTIMATE, datasheet typical) a rail-to-rail swing takes 30us, while the
+// sign of the 14kHz process flips about every 18us, so most short excursions
+// turn back before the rail. "Driven to saturation" makes this the large-
+// overdrive limit: the output slews at full rate toward the rail the
+// input's sign selects. Against an ideal sign the body (up to 3kHz) gains
+// about 3.4dB and the top loses 1.2dB at 10kHz, 4.4dB at 15kHz, 7dB at
+// 20kHz. The limiter runs at >=768kHz substeps, within .3dB of a 20MHz
+// reference at every rate, averaged over each internal sample.
+constexpr double limiterSlew=1e6/15, limiterSubstepRate=768e3;
 // The zener reaches IC11-1's + input through .047uF with 100k to ground (SM2
-// p.8), a 33.86Hz high-pass ahead of the limiter. By the arcsine law the sign
-// keeps that shelf: about 11dB less density at DC, -1.3dB of SUB-N RMS. The
-// limiter's own 10uF/(10k||100k) coupling (1.75Hz) is negligible beside it.
+// p.8), a 33.86Hz high-pass ahead of the limiter. The limiter keeps it as a
+// shelf (an ideal sign has 11dB less density at DC, by the arcsine law); it
+// takes 1.2dB off SUB-N RMS. The limiter's own 10uF/(10k||100k) coupling
+// (1.75Hz) is negligible beside it.
 constexpr double pickupCouplingTau=100e3*.047e-6;
 // SUB-N: N through 22k/.1uF loaded by SUI's 100k, in SUB units (the 3Vpp
 // SUI waveforms, 1.5V peak): the +/-15V swing times the 100/122 divider.
@@ -676,7 +683,12 @@ struct Synth::Impl {
     bool hasProcessed=false;
     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
     double outputTrimGain=1;
-    double limiterInput=0, limiterPole=0, limiterInnovation=0, limiterLevel=1;
+    double limiterInput=0, limiterOutput=0, limiterPole=0, limiterInnovation=0;
+    double limiterRate=0, limiterStep=0;
+    unsigned limiterSteps=1;
+    // Substeps after the first draw from their own stream, so the shared
+    // stream keeps one draw per sample and drift is unchanged.
+    Random limiterRandom{1};
     OutputCoupling pickupCoupling;
     // Guide printed32: SUB-N is the limiter output N through22k/.1uF,
     // independent of audio NO level: the documented single low-pass (called
@@ -719,14 +731,11 @@ struct Synth::Impl {
     }
     void configureRate() {
         internalFs=fs*rateFactor;
-        limiterPole=std::exp(-1/(internalFs*limiterTau));
+        limiterSteps=static_cast<unsigned>(std::ceil(limiterSubstepRate/internalFs));
+        limiterRate=internalFs*limiterSteps;
+        limiterPole=std::exp(-1/(limiterRate*limiterTau));
         limiterInnovation=std::sqrt(1-limiterPole*limiterPole);
-        // Sampled density (1/internalFs)*(1+2*sum R(n)) includes aliases;
-        // scale it back to the continuous 2*tc*ln2.
-        double correlationSum=1;
-        for (double power=limiterPole; power>1e-15; power*=limiterPole)
-            correlationSum+=2*(2/pi)*std::asin(power);
-        limiterLevel=std::sqrt(2*limiterTau*std::log(2.0)*internalFs/correlationSum);
+        limiterStep=limiterSlew/limiterRate;
         // SM2 p.8 touch pre-amplifier: VR3's wiper reaches IC1-2 through
         // 100k with .1uF to the +15V rail, a 10ms RC. Velocity has no
         // hardware path and keeps its own 5ms digital smoothing.
@@ -796,7 +805,8 @@ struct Synth::Impl {
         pedal = false; busCoupling={}; lineCoupling={};
         physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
         physicalKeyPresses=0; lastAssignedKey=60;
-        subNoiseMemory=limiterInput=0; pickupCoupling={}; ringEnvelope={}; ringPhase=ringCarrier=0;
+        subNoiseMemory=limiterInput=limiterOutput=0; pickupCoupling={};
+        limiterRandom=Random(seed^0xd1b54a32d192ed03ULL); ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={};
         ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
         ringCarrierCoupling.clear();ringCoupledCarrier=0;
@@ -860,12 +870,18 @@ struct Synth::Impl {
         // Guide printed p.32: the limiter amplifier drives the zener noise to
         // saturation (30Vpp), "white noise of constant amplitude", and VR10
         // trims it to 3Vpp, the WSC waveforms' 3Vpp. So the one shared source
-        // is the binary sign of the band-limited pick-up signal, scaled by
-        // limiterLevel (near 1 at high internal rates; see limiterTau).
-        limiterInput=limiterPole*limiterInput
-            + limiterInnovation*inverseNormal(random.unit()+0x1.0p-54);
-        const double pickup=pickupCoupling.process(limiterInput,pickupCouplingTau,internalFs);
-        const double noise = pickup<0 ? -limiterLevel : limiterLevel;
+        // is the slew-limited sign of the band-limited pick-up signal, in
+        // units of the rails (see limiterSlew).
+        double limiterSum=0;
+        for (unsigned step=0; step<limiterSteps; ++step) {
+            const double draw=step ? limiterRandom.unit() : random.unit();
+            limiterInput=limiterPole*limiterInput+limiterInnovation*inverseNormal(draw+0x1.0p-54);
+            const double pickup=pickupCoupling.process(limiterInput,pickupCouplingTau,limiterRate);
+            limiterOutput=pickup<0 ? std::max(-1.0,limiterOutput-limiterStep)
+                : std::min(1.0,limiterOutput+limiterStep);
+            limiterSum+=limiterOutput;
+        }
+        const double noise=limiterSum/limiterSteps;
         const double subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
         subNoiseMemory=2*subNoise-subNoiseMemory;
         const double lfo = subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,

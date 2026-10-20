@@ -8,9 +8,9 @@
 #include <initializer_list>
 #include <vector>
 
-// The noise source is the limiter's band-limited binary process, scaled to
-// its continuous low-frequency density at every internal rate, so its level
-// must not depend on quality or host rate. Independent radix2 DFT/Parseval band powers on long, stationary, low-drive
+// The noise source is the limiter's band-limited, slew-limited process,
+// simulated at >=768kHz substeps at every internal rate, so its level must
+// not depend on quality or host rate. Independent radix2 DFT/Parseval band powers on long, stationary, low-drive
 // full-engine output catch a source-variance change without measuring peaks.
 namespace {
 constexpr double pi=3.14159265358979323846;

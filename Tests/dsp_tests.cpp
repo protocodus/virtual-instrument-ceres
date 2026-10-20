@@ -4,6 +4,7 @@
 #include <complex>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -873,25 +874,35 @@ void subOscillatorRoutes() {
         if(n>2000){sum+=x;sum2+=x*x;cross+=x*previous;}
         previous=x;
     }
-    // +/-15V limiter with estimated 3MHz/(1+1M/4.7k) bandwidth a, after the
-    // .047uF/100k pick-up coupling b: by the arcsine law the sign's
-    // autocorrelation is (2/pi)asin(rho), rho=(a e^-a|t|-b e^-b|t|)/(a-b).
-    // SUB-N is that sign through 22k||100k with .1uF (c, 88.26Hz) and the
-    // 100/122 divider, in 1.5V SUB units: covariance against the RC's
-    // autocorrelation kernel (c/2)e^-c|t-lag|.
-    const double a=2*pi*3e6/(1+1e6/4.7e3),b=1/(100e3*.047e-6),c=1/((22e3*100/122)*.1e-6);
-    const auto covariance=[&](double lag){
-        double total=0;constexpr double h=2e-7;
-        for(int i=-300000;i<=300000;++i){
-            const double t=i*h,rho=(a*std::exp(-a*std::abs(t))-b*std::exp(-b*std::abs(t)))/(a-b);
-            total+=h*(2/pi)*std::asin(rho)*c/2*std::exp(-c*std::abs(t-lag));
+    // Independent reference: the continuous circuit simulated directly at
+    // 6MHz with its own generator. One-pole Gaussian noise at the estimated
+    // 3MHz/(1+1M/4.7k) bandwidth, the .047uF/100k pick-up coupling, IC11-2
+    // slewing at an estimated 1V/us between +/-15V, then 22k||100k with .1uF
+    // and the 100/122 divider, in 1.5V SUB units. 750 steps is 1/8000s.
+    double expectedRms=0,expectedLag=0;
+    {
+        const double h=1/6e6,tc=1/(2*pi*3e6/(1+1e6/4.7e3));
+        const double a=std::exp(-h/tc),g=std::sqrt(1-a*a),coupling=std::exp(-h/(100e3*.047e-6));
+        const double rc=std::exp(-h/((22e3*100/122)*.1e-6)),slew=1e6*h;
+        std::mt19937_64 generator(3);
+        const auto uniform=[&]{return (static_cast<double>(generator()>>11)+.5)*0x1.0p-53;};
+        constexpr unsigned lag=750;std::vector<double> history(lag);
+        double x=0,pickup=0,limiter=0,smoothed=0,power=0,lagged=0;
+        for(unsigned i=0;i<36000000;++i){
+            // Box-Muller keeps the reference identical on every platform.
+            const double gaussian=std::sqrt(-2*std::log(uniform()))*std::cos(2*pi*uniform());
+            const double next=a*x+g*gaussian;pickup=coupling*(pickup+next-x);x=next;
+            limiter=pickup<0 ? std::max(-15.,limiter-slew) : std::min(15.,limiter+slew);
+            smoothed=rc*smoothed+(1-rc)*limiter;
+            const double v=smoothed*(100./122)/1.5;double& old=history[i%lag];
+            if(i>=600000){power+=v*v;lagged+=v*old;}
+            old=v;
         }
-        return 100*(100./122)*(100./122)*total;
-    };
-    const double expectedRms=std::sqrt(covariance(0)),expectedLag=covariance(1/fs)/covariance(0);
+        expectedRms=std::sqrt(power/(36000000-600000));expectedLag=lagged/power;
+    }
     const double rms=std::sqrt(sum2/17999);
     require(std::abs(rms/expectedRms-1)<.1 && std::abs(sum/17999)<.1*expectedRms,"SUB noise has the limiter's loaded RC level");
-    require(std::abs(cross/sum2-expectedLag)<.03,"Loaded1.8ms noise RC must smooth the coupled limiter at8kHz");
+    require(std::abs(cross/sum2-expectedLag)<.03,"Loaded1.8ms noise RC must smooth the slewed limiter at8kHz");
     // Selecting SUB alone must not change either the VCO waveform/PWM clock
     // or random draws when the three SUB destinations and touch vibrato are0.
     p=sinePatch();p.sine=0;p.pulse=1;p.pwmDepth=.2;p.pwmRate=7;p.lfoRate=29;

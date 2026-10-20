@@ -39,6 +39,7 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 - Tremolo (`tremolo`, the SUB VCA lever) now swings the common VCA around LEVEL by the R7 resistor ratio, ±0.34 of full LEVEL at full lever, instead of dipping up to the whole LEVEL below it. Tremolo patches become shallower and no longer lose average loudness.
 - Channel pressure now follows the touch pre-amplifier's 10 ms RC (100k and 0.1 µF), twice the previous 5 ms, so touch swells are slightly softer. Velocity smoothing is unchanged.
 - The noise now passes the pick-up amplifier's input coupling (0.047 µF into 100k, a 34 Hz high-pass) before the limiter. NOISE loses most of its sub-bass rumble (about 11 dB less at DC) and SUB-N its slowest wander, which also makes SUB-N 1.3 dB shallower: 5.4 dB deeper than 0.3.0 rather than 6.7 dB.
+- The noise limiter now slews: at the op-amp's datasheet 1 V/µs it needs 30 µs to cross between its rails, so short noise spikes turn back before reaching them. NOISE gains about 3.5 dB below 3 kHz while its top falls (−1 dB at 10 kHz, −4 dB at 15 kHz), a fuller, less fizzy hiss, and SUB-N is 4.3 dB deeper (0.77 RMS). Both rest on datasheet-typical slew rate and gain-bandwidth; at 1.7 V/µs the gain would be about 2.5 dB.
 
 ### Unreleased — 0.3.0 — hardware realism
 
@@ -126,7 +127,7 @@ The 4× path retains its original 249-tap FIR. The 2× path has a 125-tap FIR wi
 
 Additional voices are a virtual extension of the four-board model. The calibrated common bus and per-voice gain remain unchanged; no voice-count normalization or limiter is added. Larger chords can increase rail saturation and output level. Extra voices use a separate initialization stream; at the default four-voice setting the original shared noise/drift stream remains exact. See [configuration validation](Docs/validation/poly-quality/README.md).
 
-Audio noise is a binary ±1 source, the hard-limited "white noise of constant amplitude" the guide describes (printed p.32), trimmed to the same 3 Vpp as the waveforms. It is the sign of the limiter's band-limited input, with the bandwidth estimated at 14 kHz from the pick-up op-amp's datasheet gain-bandwidth, and its amplitude is scaled so its in-band density is the same at every quality and host sample rate. SUB noise filters the same signal. Different quality settings can still differ through filter discretization, nonlinear processing and alias rejection; this is not hardware gain calibration. See [noise-quality validation](Docs/validation/noise-quality/README.md).
+Audio noise is the hard-limited "white noise of constant amplitude" the guide describes (printed p.32), trimmed to the same 3 Vpp as the waveforms. It is the limiter's band-limited input driven into the ±15 V rails, with the bandwidth estimated at 14 kHz from the pick-up op-amp's datasheet gain-bandwidth and the limiter's slew rate at the datasheet's 1 V/µs, simulated at 768 kHz or more so its density is the same at every quality and host sample rate. SUB noise filters the same signal. Different quality settings can still differ through filter discretization, nonlinear processing and alias rejection; this is not hardware gain calibration. See [noise-quality validation](Docs/validation/noise-quality/README.md).
 
 The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults `4` and `4`. Host adapters may choose and save different defaults independently of the 60 hardware/engineering patch keys.
 
@@ -196,7 +197,7 @@ Touch LEVEL adds to the common VCA gain: `amp_level + 1.08*pressure_volume*expre
 - Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
 - No external modulation input is implemented. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
-- The portamento/glissando clock rate, the KAS note-ladder intonation and the noise limiter's bandwidth are not calibrated.
+- The portamento/glissando clock rate, the KAS note-ladder intonation and the noise limiter's bandwidth and slew rate are not calibrated.
 
 ## Build
 
