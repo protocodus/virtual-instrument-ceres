@@ -40,6 +40,7 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 - Channel pressure now follows the touch pre-amplifier's 10 ms RC (100k and 0.1 µF), twice the previous 5 ms, so touch swells are slightly softer. Velocity smoothing is unchanged.
 - The noise now passes the pick-up amplifier's input coupling (0.047 µF into 100k, a 34 Hz high-pass) before the limiter. NOISE loses most of its sub-bass rumble (about 11 dB less at DC) and SUB-N its slowest wander, which also makes SUB-N 1.3 dB shallower: 5.4 dB deeper than 0.3.0 rather than 6.7 dB.
 - The noise limiter now slews: at the op-amp's datasheet 1 V/µs it needs 30 µs to cross between its rails, so short noise spikes turn back before reaching them. NOISE gains about 3.5 dB below 3 kHz while its top falls (−1 dB at 10 kHz, −4 dB at 15 kHz), a fuller, less fizzy hiss, and SUB-N is 4.3 dB deeper (0.77 RMS). Both rest on datasheet-typical slew rate and gain-bandwidth; at 1.7 V/µs the gain would be about 2.5 dB.
+- Keys pressed together are stored highest first, as the key coder encodes them: a five-note chord whose notes arrive in the same sample keeps its four highest notes in any MIDI order, instead of the first four received. Sequenced chords of five or more notes keep their top line.
 
 ### Unreleased — 0.3.0 — hardware realism
 
@@ -177,7 +178,7 @@ The CS-50 builds each board's key voltage in the KAS board (Servicing Guide prin
 
 Free channels carry the last-pressed key, so a newly assigned board glides from the previous key. While its key is down, or in Sustain II, the sample-hold follows the glide. In Sustain I it freezes the pitch at key-off. The guide's 470 kΩ/3.3 MΩ/1 µF integrator and the comparator table fix the topology but not the clock: the counter oscillator's control law is not printed, so `glide_rate` is an engineering rate, not a calibrated lever.
 
-The assigner only writes a new key into a channel whose code differs from that key and whose key is up (guide pp.17–18). A released board that still holds the pressed key is therefore re-keyed first, then an idle board, then the quietest released board, then the oldest damper-held board (its key is up). A key pressed while every board's key is down is not stored (guide p.19 timing chart): it does not sound, and it does not start later when a board frees.
+The assigner only writes a new key into a channel whose code differs from that key and whose key is up (guide pp.17–18). A released board that still holds the pressed key is therefore re-keyed first, then an idle board, then the quietest released board, then the oldest damper-held board (its key is up). A key pressed while every board's key is down is not stored (guide p.19 timing chart): it does not sound, and it does not start later when a board frees. Keys pressed together are encoded higher note first (guide p.16), so a key arriving in the same sample as a lower stored key takes that key's board: a simultaneous five-note chord keeps its four highest notes, whatever order the MIDI events arrive in.
 
 ### Velocity expression
 

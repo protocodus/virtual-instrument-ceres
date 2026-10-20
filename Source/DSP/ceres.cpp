@@ -652,6 +652,10 @@ struct Synth::Impl {
         std::uint32_t pressTicket = 0;
         unsigned driftCountdown = 0;
         std::uint64_t age = 0;
+        // Host sample (plus one) of the last assignment, and whether the board
+        // was silent before it, so a same-sample assignment can be replaced.
+        std::uint64_t assignedAt = 0;
+        bool assignedSilent = false;
         Oscillator osc;
         FilterChain filters;
         // Physical board capacitor histories persist across allocation and Idle.
@@ -662,7 +666,7 @@ struct Synth::Impl {
 #endif
     };
     double fs, internalFs;
-    std::uint64_t seed, age = 0;
+    std::uint64_t seed, age = 0, hostSamples = 0;
     Random random;
     Patch patch;
     std::array<Voice,Synth::maxVoiceCount> voices;
@@ -799,7 +803,7 @@ struct Synth::Impl {
     }
     void reset() {
         random = Random(seed);
-        voices = {};
+        voices = {}; hostSamples = 0;
         age = 0; lfoPhase = 0; pwmPhase = 0; lastSub=0;
         pressureTarget = pressureValue = bend = 0;
         pedal = false; busCoupling={}; lineCoupling={};
@@ -1068,7 +1072,10 @@ void Synth::noteOn(int note, double velocity) {
     // pedal-held one (its key is up). A key pressed while every board's key is
     // down is not stored (guide printed p.19 timing chart): it sounds neither
     // now nor when a board frees, though its press still counts for the ring
-    // trigger. Overlapping presses of a still-held note occupy separate voices.
+    // trigger. Keys pressed together are encoded higher note first (guide
+    // printed p.16), so a key pressed in the same sample as a lower stored key
+    // takes that board instead: a simultaneous chord keeps its highest notes.
+    // Overlapping presses of a still-held note occupy separate voices.
     for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it)
         if (it->note==note && !it->held && !it->pedalHeld) {
             selected=&*it; break;
@@ -1086,12 +1093,20 @@ void Synth::noteOn(int note, double velocity) {
     if (!selected)
         for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it)
             if (!it->held && (!selected || it->age < selected->age)) selected = &*it;
+    bool replacing=false;
+    if (!selected)
+        for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it)
+            if (it->assignedAt==state.hostSamples+1 && it->note<note && (!selected || it->note<selected->note)) {
+                selected=&*it; replacing=true;
+            }
     if (!selected) return;
     state.lastAssignedKey=note;
     // I/II changes the held keyboard voltage of released physical boards;
     // it does not re-gate their VCF/VCA or reset any oscillator/filter state.
     state.followFreeKeys();
-    const bool silent=selected->amp.stage==Envelope::Idle || selected->amp.voltage==0;
+    const bool silent=replacing ? selected->assignedSilent
+        : selected->amp.stage==Envelope::Idle || selected->amp.voltage==0;
+    selected->assignedAt=state.hostSamples+1; selected->assignedSilent=silent;
     selected->note = selected->keyNote = note;
     selected->velocity = clamp(velocity,0,1);
     if (silent) selected->velocityValue=selected->velocity;
@@ -1174,6 +1189,7 @@ std::size_t Synth::activeVoices() const {
 }
 double Synth::sampleRate() const { return impl_->fs; }
 float Synth::process() {
+    ++impl_->hostSamples;
     for (unsigned i = 0; i < impl_->rateFactor; ++i) impl_->decimator.push(impl_->sample(),impl_->rateFactor);
     const double output=impl_->decimator.output(impl_->rateFactor);
     // Post-circuit/post-FIR utility gain: no change to analog state, timing,

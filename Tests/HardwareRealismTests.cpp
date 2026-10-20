@@ -3,6 +3,8 @@
 // values are recomputed here from the documented laws, not read back from
 // the engine's own state.
 #include "ceres.hpp"
+#include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdio>
 #include <stdexcept>
@@ -116,6 +118,34 @@ void sameKeyReuse() {
     require(held==2,"An overlapping press of a held key takes another board");
 }
 
+// Keys pressed together are encoded higher note first (guide printed p.16):
+// a simultaneous five-key chord keeps its four highest notes in any arrival
+// order, the dropped key's note-off releases nothing, and a later fifth key
+// is still not stored.
+void simultaneousKeysKeepHighest() {
+    for(const auto& order:{std::array<int,5>{48,52,55,60,64},std::array<int,5>{64,60,55,52,48},
+                           std::array<int,5>{55,64,48,60,52}}) {
+        ceres::Synth s(48000,5),reference(48000,5);auto p=plain();s.setPatch(p);reference.setPatch(p);
+        for(int note:order)s.noteOn(note,.2+.01*note);
+        unsigned held=0;
+        std::array<int,4> notes{};
+        for(unsigned i=0;i<4;++i){const auto v=s.allVoiceState()[i];held+=v.held;notes[i]=v.note;}
+        // Idle boards fill in order, so pressing the stored keys alone, board
+        // by board, is the never-stored witness.
+        for(int note:notes)reference.noteOn(note,.2+.01*note);
+        std::sort(notes.begin(),notes.end());
+        require(held==4&&notes==std::array<int,4>{52,55,60,64},"Simultaneous chord keeps its four highest keys");
+        s.noteOff(48);held=0;for(const auto& v:s.allVoiceState())held+=v.held;
+        require(held==4,"Dropped key's note-off releases nothing");
+        for(unsigned n=0;n<64;++n){
+            const double a=s.process(),b=reference.process();
+            require(a==b,"Replaced boards start as if the dropped key was never stored");
+        }
+        s.noteOn(72);
+        for(const auto& v:s.allVoiceState())require(v.note!=72,"A later key is still not stored");
+    }
+}
+
 void touchRoutes() {
     ceres::Patch p=plain();p.expressionSource=1;p.pressureWah=1.5;p.pressureFilter=.8;
     p.pressureVibrato=30;p.lfoRate=3;p.keyTrack=0;p.hpCutoff=90;p.lpCutoff=900;
@@ -143,7 +173,7 @@ void keys() {
 int main() {
     try {
         keys();offIsUnchanged();glissandoSteps();portamentoIntegratesHz();sustainModesAtRelease();
-        freeBoardGlidesFromLastKey();sameKeyReuse();touchRoutes();
+        freeBoardGlidesFromLastKey();sameKeyReuse();simultaneousKeysKeepHighest();touchRoutes();
     } catch(const std::exception& e) {std::fprintf(stderr,"FAIL %s\n",e.what());return 1;}
     std::puts("PASS glide, same-key reuse and touch-route contracts");
 }
