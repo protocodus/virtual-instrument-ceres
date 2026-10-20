@@ -41,6 +41,7 @@ amounts the boards' checks allow.
 | Yamaha CS-60 Service Manual | project sources (`cs60-service-manual.pdf`, SHA-256 `4b03579a...106636`) | section VI alignment of the shared M board |
 | Yamaha CS-80 "Adjustment Procedures and updates" | `https://www.therogoffs.com/cs80/CS80%20Adjustment%20Procedures%20and%20updates.PDF` (36-page scan, SHA-256 `eea101eb...276ba`) | the same trims with printed tolerances (printed pp.3-15 / PDF 5-17); Service News E-46 (PDF 33-36) |
 | CS-80 parts list | `https://www.therogoffs.com/cs80/cs80_parts_list.pdf` (SHA-256 `eaea3c1b...aabe28`) | checked for capacitor tolerances: none printed |
+| Soundgas CS-50 listing, "Engineer's report" | `https://soundgas.com/products/yamaha-cs-50` (page created 2024-02-13, published 2024-06-05; fetched 2026-10-20, SHA-256 `cb818990...badfb9`) | a restorer's service of one CS-50: qualitative only, no numbers |
 
 None of these files is in the repository. CS-80 procedure pages are cited as
 "printed p.N" (PDF page N+2).
@@ -154,6 +155,10 @@ lies is unknown: no measurement of IG00153 or CS-50/60/80 pitch against
 time was found. E-46 gives temperature coefficients only, the service
 documents warm-up times and tolerances; owner and dealer accounts online
 describe temperature-sensitive tuning and long warm-ups without numbers.
+A restorer's service of one CS-50 (Soundgas engineer's report, 2024) did
+"Remake the thermal bonding on all 4 x VCO III devices" and "Replace
+temperature compensation diode on card M3": E-46's thermal coupling again,
+with no pitch figures.
 
 **Time behaviour: it does not match the documented mechanism, and is not
 changed.** The documented instability is thermal. E-46 is titled
@@ -203,7 +208,9 @@ does print numbers (its VCF alignment, printed p.11 / PDF 13, holds FH and FL
 at 4.0 and 3.3 V, turns VR7/VR9 for maximum amplitude at the C1 key and sets
 VR8/VR10 to 4.3 and 2.2 +/-1 Vpp at CP3), but that is a different procedure
 on a CS-80 R7 and bus, so its bands do not carry over to a CS-50 aligned by
-ear.
+ear. A restorer servicing one CS-50 found its "Filters well matched"
+(Soundgas engineer's report): consistent with a small ear-matched residual,
+but not a number.
 
 Strictly, the static cutoff away from the trim setting would also move by
 (sensitivity - 1) times its distance from the trim point in volts. Ceres's
@@ -265,6 +272,9 @@ error.
   incoherently), `V = sqrt(4 / sum s^2)` over the four physical boards.
   VR6's own band (0 +/-1 dBm) is an instrument's level, not a board
   difference, and is not modelled.
+- The same restorer's report: "VCA levels trimmed so that the amplitude of
+  all M cards the same". Board-level VCA differences are what a service
+  trims out; the report gives no residual.
 
 ## Not modelled: no printed tolerance
 
@@ -291,6 +301,14 @@ above: its B scaled the whole VCA EG by the +/-2% check band, where the
 shipping envelope amount follows the documented VR14 trim at full sustain.
 That correction is the procedure's, not a listening choice; the next set
 plays it as its A.
+
+`/mnt/project-files/ceres/listening/2026-10-20-voice-variation-eg-time-vca/`,
+letters A-D with `key.md`: A the shipping engine (verdict B, `drift_cents`
+1) against the envelope-time and VCA amounts, alone and together. Material:
+factory `electric_piano` (pulse and sine, long decays), seed 50, the same
+unisons and chord; whole-file RMS matched. It decides whether those two
+amounts ship. `board_temperature_rise` is not a candidate: its default would
+be an invented temperature.
 
 ## Verification
 
