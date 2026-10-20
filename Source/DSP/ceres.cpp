@@ -708,6 +708,47 @@ struct OutputRate {
 };
 } // namespace
 
+// SUB-OSCILLATOR lever laws. Guide printed p.55 / PDF 64: the SUB is VCO II,
+// an IG00150; SPEED (PN3 SVR1, B-10k between 0 and +10V; SM2 p.27) drives VC2,
+// which reaches pin 1 through 180k, with 330k from pin 1 to the +15V pin 4.
+// Pin 1 is a current input: the PWM oscillator, the same IG00150, takes VC1
+// through 110k (guide printed p.49) and spans log2(222/.2)=10.12 octaves over
+// 10V, the SUB log2(50/.8)=5.97; 110k/180k predicts the ratio 1.636 and the
+// table gives 1.695 (3.5%), while a voltage-input divider (330k to +15 V here,
+// to -15 V there) predicts 1.16. So the rate is exponential in VC2 and the
+// lever works into 180k. Calibration (VR7 trim) is .8+/-.16, 6.7+/-1.3 and
+// 50+/-10 Hz at 0/5/10 V. As for the PWM clock in preset() below, the law runs
+// exponentially through the end points; it gives 6.325 Hz at 5 V, 5.6% under
+// the printed nominal and inside its tolerance.
+double subSpeedHz(double vc2Volts) {
+    return .8*std::pow(50/.8,clamp(vc2Volts,0.,10.)/10);
+}
+double subSpeedLeverHz(double travel) {
+    return subSpeedHz(10*leverFraction(clamp(travel,0.,1.),10e3/180e3));
+}
+// VCO lever (PN3 SVR2, B-10k between SUO and ground) -> R7 V1 -> 100k into
+// each board's VB node, which also takes the touch vibrato V2 through 100k
+// (SM1 printed p.14) and drives IG00153 pin 15 directly (SM2 printed p.16),
+// "50 cent/1.5V" (guide printed p.27). With pin 15 drawing no current, VB is
+// the mean of V1 and V2, so the full-lever 1.5V-peak SUB is .75V there:
+// 25 cents. The wiper sees four 100k+100k paths to the low-impedance V2
+// outputs, 50k. Pin 15's input impedance is not published; any finite value
+// would lower the 25 cents.
+double subVibratoLeverCents(double travel) {
+    return 25*leverFraction(clamp(travel,0.,1.),10e3/50e3);
+}
+// VCF lever (PN3 SVR3, B-10k between SUO and ground) -> R7 SUB -> 47k LP and
+// 150k HP on each of four boards (SM1 printed p.14): 8.95k load. LP octaves per
+// SUB unit at full lever are 1.5V through 47k against the manual FL's .65 oct/V
+// through 39k, the same provisional slope as lpBrillianceScale. HP follows at
+// hpSubRelativeScale inside the engine. The f-node resistors to ground (R6/R7,
+// 1.8-3.0k by chip rank, SM2 p.16) are neglected against 47k/150k, as the LC
+// node is for tremolo; they would ease the sag by about 4%.
+double subFilterLeverOctaves(double travel) {
+    constexpr double load=1/(4/47e3+4/150e3);
+    return .65*39/47*1.5*leverFraction(clamp(travel,0.,1.),10e3/load);
+}
+
 bool setParameter(Patch& patch, const char* key, double value) {
     if (!key || !std::isfinite(value)) return false;
     for (const auto& parameter : parameters) {
