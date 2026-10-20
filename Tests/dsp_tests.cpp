@@ -687,11 +687,23 @@ void factoryEnvelopeTiming() {
         }
         return (low+high)/2;
     };
+    // Release CVs then pass the SUB-board sustain-control follower (SM2 p.8:
+    // 10k+1k into a 2SC458, 10k to -15V; VBE .67V at 2mA, hFE 283), solved
+    // by bisection. Before 2026-10-20 this fixture fed the bare lever CV to
+    // the pin law, which omitted that follower.
+    const auto follower=[](double lever) {
+        double low=lever-2,high=lever;
+        for (int i=0;i<200;++i) {
+            const double mid=(low+high)/2, emitter=(mid+15)/10e3;
+            (mid>lever-emitter/284*11e3-(.67+25.85e-3*std::log(emitter/2e-3)) ? high : low)=mid;
+        }
+        return (low+high)/2;
+    };
     const auto p=ceres::preset("flute");
     for (bool filter : {false,true}) {
         const double nominalA=std::pow(10,-.3*pin(filter ? 3.57 : 3.13));
         const double nominalD=10*std::pow(10,-.3*pin(filter ? 1.64 : 0.0));
-        const double nominalR=10*std::pow(10,-.3*pin(filter ? 7.35 : 7.19));
+        const double nominalR=10*std::pow(10,-.3*follower(pin(filter ? 7.35 : 7.19)));
         const double initial=filter ? p.filterInitial : 0;
         const double peak=filter ? p.filterPeak : 1;
         const double sustained=filter ? 0 : p.ampSustain;

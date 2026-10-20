@@ -79,8 +79,9 @@ struct Patch {
     // attack/decay and the release targets are unchanged. Zero adds no
     // extension and preserves existing patches. This is the ideal CS-50
     // minimum-CV selector expressed through a common monotone timing law,
-    // not a calibrated panel position or literal SHORT-end voltage. Diode,
-    // transistor and source-loading offsets remain unmodeled. Changes via
+    // not a calibrated panel position or literal SHORT-end voltage. Both
+    // times are taken at the EG pin; the lever-side follower drop belongs to
+    // the factory CV conversion (ceres.cpp preset()). Changes via
     // setPatch affect active releases without resetting capacitor state.
     double globalRelease = 0.0;
     // I retains released-board key CV; II lets released/free boards follow
