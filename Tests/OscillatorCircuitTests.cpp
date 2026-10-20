@@ -93,11 +93,57 @@ void conditionedWaveforms() {
 void extrapolationAndRate() {
     ceres::Patch p;
     p.pulseWidth=.5;p.pwmDepth=.4;p.pwmPhase=.75;p.pwmRate=17;
-    auto shortReset=p;shortReset.resetMicroseconds=.1;
-    const auto deep=ceres::oscillatorTrace(192000,3520,p,4096);
-    const auto deepShort=ceres::oscillatorTrace(192000,3520,shortReset,4096);
-    for(std::size_t i=0;i<deep.size();++i)
-        check(deep[i].pulse==deepShort[i].pulse,"Independent fixed-edge WSC reduction must remain stable when deep PWM overlaps reset plateau");
+    // The comparator reads the conditioned T1 ramp (SM2 p.16 wiring, p.21
+    // pin sheet). Its level is crossed at phase d on the ramp, but not while
+    // the one-shot holds the plateau: the logical pulse falls at max(d,r).
+    // The former fixed-edge reduction asserted that deep PWM ignores the
+    // plateau; that contradicted the wiring and is replaced, not loosened.
+    {
+        constexpr double fs=192000,f=3520;
+        const double tau=p.resetMicroseconds*1e-6,r=f*tau,dt=f/fs;
+        const auto deep=ceres::oscillatorTrace(fs,f,p,4096);
+        std::size_t swallowed=0;
+        for(std::size_t i=0;i<deep.size();++i) {
+            const double phase=std::fmod(i*dt,1.0);
+            const double pwm=std::sin(2*pi*(std::fmod(i*p.pwmRate/fs,1.0)+p.pwmPhase));
+            const double d=std::clamp(p.pulseWidth+p.pwmDepth*pwm,.01,.99);
+            const double edge=std::max(d,r);
+            if(d<r)++swallowed;
+            // Two samples of guard either side of each band-limited edge.
+            const double near=2.5*dt;
+            if(phase<near||phase>1-near||std::abs(phase-edge)<near)continue;
+            // Audio pulse is the negated logical comparator output.
+            const double logical=phase<edge?1.:-1.;
+            check(deep[i].pulse==-logical,"Deep PWM: comparator on the conditioned ramp falls at max(duty, one-shot fraction)");
+        }
+        check(swallowed>400,"Deep-PWM probe must actually place the threshold above the ramp start");
+        auto shortReset=p;shortReset.resetMicroseconds=.1;
+        const auto deepShort=ceres::oscillatorTrace(fs,f,shortReset,4096);
+        double difference=0;
+        for(std::size_t i=0;i<deep.size();++i)difference+=std::abs(deep[i].pulse-deepShort[i].pulse);
+        check(difference>10,"A finite one-shot must widen deep-PWM pulses at upper notes");
+    }
+    // r=f*tau holds up to the CS-50's own top (C6 on 4', PITCH at TU 6V,
+    // +14 cents: 6.33kHz, r=.378) and beyond; the old .35 clamp cut it at
+    // 5.86kHz. Check the plateau length directly at 6.33kHz and 10kHz.
+    for(double f:{4186.*1.5*std::exp2(14/1200.),10000.}) {
+        ceres::Patch q;q.pwmDepth=0;q.pulseWidth=.5;
+        constexpr double fs=1536000;
+        const double r=f*q.resetMicroseconds*1e-6,dt=f/fs;
+        check(r>.35&&r<.9,"High-pitch probe must exceed the former reset clamp");
+        const auto wave=ceres::oscillatorTrace(fs,f,q,std::size_t(fs/f));
+        std::size_t plateau=0,ramp=0;
+        for(std::size_t i=0;i<wave.size();++i) {
+            const double phase=i*dt;
+            if(phase>2*dt&&phase<r-2*dt){++plateau;check(wave[i].saw==-1&&wave[i].sine==1,"Plateau lasts the physical one-shot fraction f*tau");}
+            if(phase>r+2*dt&&phase<1-2*dt){++ramp;check(std::abs(wave[i].saw-(2*phase-1))<1e-12,"Ramp after the physical one-shot keeps its fixed slope");
+}
+            const double edge=std::max(.5,r);
+            if(phase>2*dt&&phase<1-2*dt&&std::abs(phase-edge)>2*dt)
+                check(wave[i].pulse==(phase<edge?-1.:1.),"Logical pulse falls at max(50% duty, plateau step)");
+        }
+        check(plateau>10&&ramp>10,"Both segments sampled");
+    }
     for(double fs:{32000.,176400.,192000.,384000.,1536000.})
         for(double f:{27.5,440.,3520.,8372.,20000.,100000.}) {
             const auto wave=ceres::oscillatorTrace(fs,f,p,512,.997);
