@@ -159,11 +159,24 @@ void commonVcaPlacement() {
     double deltaEnergy=0;
     for(unsigned n=0;n<1000;++n){const double delta=level.process()-master.process();deltaEnergy+=delta*delta;}
     require(deltaEnergy>1e-7,"Common level acts before bus/ring charge while master is later");
-    const std::array<double,13> levels={1,.847,1,.8333,1,1,.699,1,.833,.641,.5,.680,.595};
+    // The guide's final-column voltages are ideal divider values; the T-board
+    // pin they reach sits a 1S1555 drop below, solved here by bisection on
+    // the node equation rather than by the engine's fixed-point pass.
+    const std::array<double,13> ideal={10,8.47,10,8.333,10,10,6.99,10,8.33,6.41,5,6.80,5.95};
+    const auto pin=[](double v) {
+        const double vt=1.75*25.85e-3;
+        double low=0,high=v;
+        for(int i=0;i<200;++i) {
+            const double mid=(low+high)/2;
+            // 10V source, series resistor set by the ideal ratio, 10k load.
+            ((10-vt*std::log(mid/(10e3*2.52e-9)))*v/10>mid ? low : high)=mid;
+        }
+        return (low+high)/2;
+    };
     const auto names=ceres::presetNames();
-    for(unsigned i=0;i<levels.size();++i) {
+    for(unsigned i=0;i<ideal.size();++i) {
         const auto factory=ceres::preset(names[i+1]);
-        near(factory.ampLevel,levels[i],1e-15,"Factory final CV maps to common VCA LEVEL");
+        near(factory.ampLevel,pin(ideal[i])/10,1e-12,"Factory final CV maps to common VCA LEVEL");
         near(factory.volume,.55,0,"Factory LEVEL must not be folded into final master volume");
     }
 }

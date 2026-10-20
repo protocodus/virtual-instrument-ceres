@@ -673,14 +673,25 @@ void envelopeCurrentLimit() {
             "Zero saturation must retain exact legacy RC mode");
 }
 void factoryEnvelopeTiming() {
-    // Flute CVs independently transcribed from Yamaha's preset table.
-    // Verify capacitor trajectories, not only the parameter conversion.
+    // Flute CVs independently transcribed from Yamaha's preset table, then
+    // taken down to the T-board pin by its 1S1555, solved here by bisection
+    // on the node equation rather than by the engine's fixed-point pass.
     constexpr double fs=48000;
+    const auto pin=[](double ideal) {
+        if (ideal<=0) return ideal;
+        const double vt=1.75*25.85e-3;
+        double low=0,high=ideal;
+        for (int i=0;i<200;++i) {
+            const double mid=(low+high)/2;
+            ((10-vt*std::log(mid/(10e3*2.52e-9)))*ideal/10>mid ? low : high)=mid;
+        }
+        return (low+high)/2;
+    };
     const auto p=ceres::preset("flute");
     for (bool filter : {false,true}) {
-        const double nominalA=std::pow(10,-.3*(filter ? 3.57 : 3.13));
-        const double nominalD=10*std::pow(10,-.3*(filter ? 1.64 : 0.0));
-        const double nominalR=10*std::pow(10,-.3*(filter ? 7.35 : 7.19));
+        const double nominalA=std::pow(10,-.3*pin(filter ? 3.57 : 3.13));
+        const double nominalD=10*std::pow(10,-.3*pin(filter ? 1.64 : 0.0));
+        const double nominalR=10*std::pow(10,-.3*pin(filter ? 7.35 : 7.19));
         const double initial=filter ? p.filterInitial : 0;
         const double peak=filter ? p.filterPeak : 1;
         const double sustained=filter ? 0 : p.ampSustain;
@@ -802,7 +813,14 @@ void pwmSourceBehavior() {
     require(ceres::setParameter(p,"pwm_rate",222) && p.pwmRate==222,
             "PWM must support documented 222Hz endpoint");
     const auto funky=ceres::preset("funky1");
-    const double expected=.2*std::exp(std::log(222/.2)*2.33/10);
+    // 2.33V is the table's ideal divider value; the pin it reaches is a
+    // 1S1555 lower, solved here by bisection on the node equation.
+    double low=0,high=2.33;
+    for (int i=0;i<200;++i) {
+        const double mid=(low+high)/2;
+        ((10-1.75*25.85e-3*std::log(mid/(10e3*2.52e-9)))*2.33/10>mid ? low : high)=mid;
+    }
+    const double expected=.2*std::exp(std::log(222/.2)*(low+high)/20);
     require(std::abs(funky.pwmRate-expected)<1e-12,
             "Factory PWM rate must use sourced exponential VC1 calibration");
     require(std::abs(ceres::preset("electric_piano").pwmRate-.2)<1e-14,

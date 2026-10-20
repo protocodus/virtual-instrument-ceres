@@ -1404,6 +1404,29 @@ Patch preset(const std::string& name) {
         {"funky2", {0,0,6.62,0,10,0,5.71,0,7.35,0,9.09,9.59,6.41,5.49,9.30,10,5.24,10,0,4.76,10,6.80}},
         {"funky3", {0,0,0,10,0,0,4,2.50,4.76,3.13,0,9.47,6.17,4,7.19,10,0,7.19,10,8.47,7.35,5.95}}
     };
+    // T71/T72 tone-preset matrix (SM2 pp.10-11). A pressed tablet puts the
+    // board's own 10V regulator on one preset bus; each output pin takes that
+    // bus through a series resistor, a 1S1555 and a 10k to ground. The printed
+    // table is the bare divider -- 1.3k gives 10*10/11.3 = 8.85V, exactly as
+    // printed -- so the diode's drop is not in it, and the real pin sits that
+    // much lower. The destinations are op-amp inputs, which is why the printed
+    // table matches a 10k-only load, so the drop just lowers the source:
+    // Vpin = Videal*(10-Vd)/10 with Vd taken at I = Vpin/10k.
+    // ESTIMATE: the 1S1555's forward curve is not published, so it is modelled
+    // as the 1N4148-class silicon switching diode its ratings describe (35V,
+    // 100mA, 4ns): Is = 2.52nA, N = 1.75 at 300K. That is 0.58V at the
+    // stiffest column and 0.44V at the weakest, so pins land 4.2-5.8% low.
+    // A zero column has no matrix path at all and stays at ground.
+    constexpr double presetSupply=10, presetLoad=10e3;
+    constexpr double presetDiodeIs=2.52e-9, presetDiodeVt=1.75*25.85e-3;
+    const auto presetPin=[](double ideal) {
+        if (ideal<=0) return ideal;
+        double pin=ideal;
+        // Each pass moves the drop by under half a percent of the last.
+        for (int i=0;i<8;++i)
+            pin=ideal*(presetSupply-presetDiodeVt*std::log(pin/(presetLoad*presetDiodeIs)))/presetSupply;
+        return pin;
+    };
     std::string canonical = name;
     if (canonical == "strings_1" || canonical == "strings1" || canonical == "string_1") canonical="string1";
     if (canonical == "strings_2" || canonical == "strings2" || canonical == "string_2") canonical="string2";
@@ -1412,8 +1435,8 @@ Patch preset(const std::string& name) {
     if (canonical == "electric-piano") canonical="electric_piano";
     // Preserve the Guide transcription above. These separate corrections
     // require agreement between the original T-board table and its resistor
-    // matrix; see research/preset-cv-errata.json. Voltages remain ideal
-    // divider values, not measurements of the loaded preset buses.
+    // matrix; see research/preset-cv-errata.json. These are the table's ideal
+    // divider values; the matrix diode below takes them to the pin.
     struct Correction { const char* name; std::size_t column; double voltage; };
     static const Correction corrections[] = {
         {"string1", 8, 8.70},
@@ -1430,6 +1453,7 @@ Patch preset(const std::string& name) {
         auto cv = factory.v;
         for (const auto& correction : corrections)
             if (canonical == correction.name) cv[correction.column]=correction.voltage;
+        for (auto& voltage : cv) voltage=presetPin(voltage);
         Patch p; p.name=canonical;
         // Guide p.49 calibrates actual PWM VC1 to 0.2/6.7/222 Hz at
         // 0/5/10 V. An exponential through the endpoints predicts 6.663 Hz
@@ -1450,9 +1474,9 @@ Patch preset(const std::string& name) {
         // is Rmanual/REG times the manual CV slope. Those slopes (.7/.65
         // oct/V) remain provisional; this corrects the supported resistor
         // ratio without claiming absolute pin-4 CV calibration. The ratio is
-        // relative to actual loaded FH/FL voltage, not proven to equal the raw
-        // preset table: T71/T72, diode drops and four-voice loading remain
-        // unresolved. Factory scales are an effective/manual-slope estimate.
+        // relative to actual loaded FH/FL voltage, not proven to equal the
+        // T-board pin above: four-voice loading remains unresolved. Factory
+        // scales are an effective/manual-slope estimate.
         p.hpEnvelopeScale=.7*39/220;
         p.lpEnvelopeScale=.65*39/47;
         p.hpResonance=(10-cv[7])*.1; p.lpResonance=(10-cv[9])*.1;
