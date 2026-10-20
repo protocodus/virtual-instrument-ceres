@@ -93,11 +93,20 @@ under 2 % (`Ceres.ring_switching_circuit_contracts`).
 - **Wet buffer.** IC1-2 is non-inverting, gain 1 + VR4/10k, with VR4 a
   B-100K trimmer (SM2 p.22, overall, CS-60 PDF 15). **No document gives its
   setting**: the CS-60 alignment trims VR3, VR7 and VR5 on this board, not
-  VR4. The engine assumes VR4 is trimmed level-neutral: wet RMS equals dry
-  RMS for a steady midband carrier. That needs 57.8k, inside the trimmer's
-  range, and keeps the previous wet loudness. The peak-matched alternative
-  (38.0k, 3 dB less wet) went into a listening test. That the level-neutral
-  trim lands mid-range is what independently supports the 330 Ω reading.
+  VR4. Two trims are defensible for a steady midband carrier:
+  - wet RMS equal to dry RMS: VR4 = 57.8k, gain 6.78 (shipped in 0.5.0);
+  - the two sidebands together peaking at the dry peak, each half the dry
+    tone: VR4 = 38.0k, gain 4.80, 3.0 dB less wet.
+
+  The owner chose the peak-matched trim **by ear** (listening test
+  ring-wet-trim, 2026-10-20), so the engine uses 38.0k. That is a choice
+  between two defensible trims, not a measurement of VR4. Both trims land
+  inside the trimmer's range, while the 330K reading would need a buffer
+  gain of about 2000 against the trimmer's maximum of 11. That is what
+  independently supports the 330 Ω reading.
+  `Ceres.native_dsp_contracts` reads VR4 back off the engine's wet level
+  through an independently derived chain and checks it is 38.0k and
+  reachable.
 - **Signal-pair nonlinearity.** The degenerated pair limits at 0.56 V peak on
   pin 1. CS-60 SM p.39 (VI-4) aligns the CS-50 voice output to 0.6 V
   ("CS-50 is 0.6V"). At pin 1 that is at most 0.35 V: 1.5 % peak
@@ -163,8 +172,9 @@ an all-keys-up → any-key-down transition, matches this and is unchanged.
 
 `/mnt/project-files/ceres/listening/2026-10-20-ring-wet-trim/` and
 `/mnt/project-files/ceres/listening/2026-10-20-ring-release/`, each with a
-`key.md` the listener reads after deciding. A is the shipping engine in both.
-No verdict yet; `Docs/decisions.md` takes it when one is given.
+`key.md` the listener reads after deciding. A was the 0.5.0 engine in both.
+The owner's verdicts go in `Docs/decisions.md`. The wet trim now follows
+the ring-wet-trim choice (§3).
 
 ## What still needs data
 

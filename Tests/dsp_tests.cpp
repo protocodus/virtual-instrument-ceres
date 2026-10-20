@@ -1090,24 +1090,42 @@ void ringAudioAndFreeCarrier() {
     for(unsigned h=2;h<=3;++h)
         require(std::abs(toneMagnitude(w,440-47*h,fs)/low-std::abs(coefficients[h]/coefficients[1]))<2e-4,
             "Even/odd carrier sidebands match physical BJT current-ratio oracle");
-    // Absolute wet level. VR4 is assumed trimmed level-neutral: wet RMS equal
-    // to dry RMS for a steady midband carrier, so each sideband sits at
-    // (sqrt2/2)*|c1|/(s_peak/2) of the dry tone, with s_peak the steering of
-    // the midband 4.71mV carrier. The pin-1 coupling (10uF into 330+463 ohm)
-    // and the pin-6 coupling (10uF into 2.53k+10k) act at 440 and 393Hz.
+    // Absolute wet level. VR4 is trimmed peak-neutral (chosen by ear,
+    // 2026-10-20; this fixture encoded the RMS-matched trim of 0.5.0, sqrt2
+    // higher): for a steady midband carrier the two sidebands together peak
+    // at the dry peak, so each sits at (1/2)*|c1|/(s_peak/2) of the dry tone,
+    // with s_peak the steering of the midband 4.71mV carrier. The pin-1
+    // coupling (10uF into 330+463 ohm) and the pin-6 coupling (10uF into
+    // 2.53k+10k) act at 440 and 393Hz.
     {
-        const double node=1/(1/470.+1/125000.+1/(beta*(470+2*vt/i5)));
+        const double re=vt/i5,node=1/(1/470.+1/125000.+1/(beta*(470+2*re)));
         const double peak=std::tanh(1.6*shunt/(33000+shunt)/(2*vt));
         const auto hp=[&](double f,double tau){
             const std::complex<double> s(0,2*(4*fs)*std::tan(pi*f/(4*fs)));
             return std::abs(s*tau/(1.+s*tau));
         };
-        const double expected=std::sqrt(2.)*std::abs(coefficients[1])/peak
-            *hp(440,10e-6*(330+node))*hp(393,10e-6*(1/(1/2700.+1/40e3)+10e3));
+        const double couplings=hp(440,10e-6*(330+node))*hp(393,10e-6*(1/(1/2700.+1/40e3)+10e3));
+        const double expected=std::abs(coefficients[1])/peak*couplings;
         const double measured=low/toneMagnitude(d,440,fs);
         if(std::abs(measured/expected-1)>2e-3)
             std::cerr<<"wet sideband/dry "<<measured<<" expected "<<expected<<'\n';
-        require(std::abs(measured/expected-1)<2e-3,"Wet level follows the derived chain and level-neutral VR4 trim");
+        require(std::abs(measured/expected-1)<2e-3,"Wet level follows the derived chain and peak-neutral VR4 trim");
+        // Read the trimmer back off the engine's output. The modulator's
+        // single-ended gain is divider(330 into the pin-1 node) times the
+        // pin-6 load (2.7k||40k||10k) over the degeneration 470+2re; the wet
+        // buffer adds 1+VR4/10k. Only their product reaches the output, so
+        // this pins the derivation the verdict's figures rest on: the VR4
+        // the engine implies must be a setting a B-100K trimmer can reach,
+        // and the peak-neutral trim must be the quoted 38.0k / gain 4.80
+        // (to their last printed digit). Same 2e-3 tolerance as above.
+        const double modulator=node/(330+node)/(1/2700.+1/40e3+1/10e3)/(470+2*re);
+        const double vr4=10e3*(measured/(std::abs(coefficients[1])*couplings*modulator)-1);
+        const double vr4Peak=10e3*(1/(modulator*peak)-1);
+        if(std::abs(vr4-vr4Peak)>2e-3*(10e3+vr4Peak))std::cerr<<"implied VR4 "<<vr4<<" expected "<<vr4Peak<<'\n';
+        require(vr4>0 && vr4<100e3 && std::abs(vr4-vr4Peak)<2e-3*(10e3+vr4Peak),
+            "Engine wet gain implies a reachable peak-neutral VR4");
+        require(std::abs(vr4Peak-38.0e3)<50 && std::abs(1+vr4Peak/10e3-4.80)<.005,
+            "Peak-neutral VR4 is the 38.0k / gain 4.80 the owner chose by ear");
     }
     require(toneMagnitude(d,440,fs)>low && toneMagnitude(d,393,fs)<.002*low,"Dry bypass retains fundamental without ring sidebands");
     // Carrier phase is independent of note gates, allocation and mix bypass.

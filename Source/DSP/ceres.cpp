@@ -146,14 +146,16 @@ double ringSpeedHz(double vc1Volts) {
 namespace {
 // The wet buffer IC1-2 is non-inverting with VR4 (B-100K trimmer) over 10k:
 // gain 1+VR4/10k, 1..11. Its factory setting is not printed anywhere in the
-// service documentation. ASSUMPTION: VR4 is trimmed so that the MODULATION
-// lever is level-neutral, the wet path's RMS equal to the dry signal's for a
-// steady midband carrier. That needs VR4=57.8k, inside its range, and keeps
-// this engine's earlier wet level. Matching peaks instead (VR4=38.0k) is the
-// other defensible trim; it was rendered as a listening candidate.
+// CS-50 or CS-60 service material (the CS-60 PRA alignment trims VR3, VR5 and
+// VR7 on this board, not VR4). Two trims are defensible for a steady midband
+// carrier: wet RMS equal to the dry signal's (VR4=57.8k), or the two
+// sidebands together peaking at the dry peak, each half the dry tone
+// (VR4=38.0k). The peak-matched trim is CHOSEN BY EAR (owner listening test
+// ring-wet-trim, 2026-10-20), not measured: buffer gain 4.80, inside VR4's
+// range, 3.0dB less wet than the RMS-matched trim shipped in 0.5.0.
 double ringWetBufferGain() {
     const double carrierPeak=ringSourcePeakVolts*ringCarrierPortShunt/(33000+ringCarrierPortShunt);
-    return std::sqrt(2.)/(ringModulatorGain*std::tanh(carrierPeak/(2*ringThermalVoltage)));
+    return 1/(ringModulatorGain*std::tanh(carrierPeak/(2*ringThermalVoltage)));
 }
 // The patch specifies TOTAL integrator Hz at middle C. Only variable gm
 // responds to exponential control; the parallel 4.7Mohm path stays fixed.
