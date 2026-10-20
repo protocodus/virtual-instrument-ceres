@@ -5,8 +5,11 @@
 //  - Guide printed pp.28-29 (PDF 37-38): VCO III is linear in the key
 //    voltage, so between trim points a board follows f = G*(Kv + Voff).
 //  - SM2 printed pp.17-18 (PDF 13-14) note 9: IG00156 rank resistors
-//    R6 2.7k/2.2k/1.8k, R7 3.3k/2.7k/2.2k; half a rank step bounds the
-//    cutoff residual.
+//    R6 2.7k/2.2k/1.8k, R7 3.3k/2.7k/2.2k on each filter's Vfc node (CS-60
+//    SM printed p.15, the "CS-60,50" M circuit); half a rank step bounds the
+//    control-sensitivity residual. Static cutoff and Q are trimmed by ear.
+//  - Sibling CS-60 SM printed pp.37-38 (PDF 39-40) alignment checks: VCF EG
+//    +5V +/-.5V at TP1, VCA EG 10V +/-.2V at TP2.
 #include "ceres.hpp"
 #include <algorithm>
 #include <array>
@@ -52,7 +55,8 @@ double error(std::uint64_t seed,ceres::Patch p,unsigned board,int key,double oct
 
 void defaultsAreIdenticalBoards() {
     const ceres::Patch defaults;
-    require(defaults.boardPitchTolerance==0 && defaults.boardFilterTolerance==0,
+    require(defaults.boardPitchTolerance==0 && defaults.boardFilterTolerance==0 &&
+            defaults.boardEnvelopeTolerance==0,
             "variation is off by default: existing patches keep identical boards");
     auto p=plain();
     for(unsigned board=1;board<4;++board) {
@@ -106,32 +110,95 @@ void linearVcoBetweenTrimPoints() {
     }
 }
 
-void filterRankResidual() {
-    // Half a rank step in octaves, from the printed rank resistor values.
-    const double r6=std::log2(std::sqrt(2.7/1.8))/2, r7=std::log2(std::sqrt(3.3/2.2))/2;
-    near(r6,r7,1e-15,"R6 and R7 ranks step by the same ratio");
-    auto p=plain();p.boardFilterTolerance=1;
-    auto half=p;half.boardFilterTolerance=.5;
-    auto ideal=p;ideal.boardFilterTolerance=0;
-    double widest=0;
-    for(std::uint64_t seed=1;seed<=60;++seed)for(unsigned board=0;board<4;++board) {
-        const auto s=play(seed,p,board,60),h=play(seed,half,board,60),i=play(seed,ideal,board,60);
-        const double hp=std::log2((s.hpFrequency-floorHz)/(i.hpFrequency-floorHz));
-        const double lp=std::log2((s.lpFrequency-floorHz)/(i.lpFrequency-floorHz));
-        require(std::abs(hp)<=r6+1e-12 && std::abs(lp)<=r6+1e-12,"cutoff residual within half a rank step");
-        near(std::log2((h.hpFrequency-floorHz)/(i.hpFrequency-floorHz)),hp/2,1e-12,"amount scales the octave offset");
-        near(std::log2((h.lpFrequency-floorHz)/(i.lpFrequency-floorHz)),lp/2,1e-12,"amount scales the octave offset");
-        require(s.oscillatorFrequency==i.oscillatorFrequency,"filter tolerance leaves the VCO alone");
-        widest=std::max({widest,std::abs(hp),std::abs(lp)});
-    }
-    require(widest>.13,"cutoff residuals span the rank bin");
+double variableOctaves(const ceres::Synth::VoiceState& a,const ceres::Synth::VoiceState& b,bool high) {
+    return high ? std::log2((a.hpFrequency-floorHz)/(b.hpFrequency-floorHz))
+                : std::log2((a.lpFrequency-floorHz)/(b.lpFrequency-floorHz));
 }
 
+// The board's Vfc response for one filter: octaves a BRILLIANCE step moves
+// the cutoff, relative to identical boards (the Vfc law itself cancels).
+double sensitivity(std::uint64_t seed,ceres::Patch p,unsigned board,bool high) {
+    auto bright=p;bright.brilliance=5;
+    auto ideal=p;ideal.boardFilterTolerance=ideal.boardEnvelopeTolerance=0;
+    auto idealBright=ideal;idealBright.brilliance=5;
+    return variableOctaves(play(seed,bright,board,60),play(seed,p,board,60),high)/
+           variableOctaves(play(seed,idealBright,board,60),play(seed,ideal,board,60),high);
+}
+
+void filterRankResidual() {
+    // Half a rank step in octaves, from the printed rank resistor values:
+    // CS-50 NA03574 R6 and R7, and the CS-60/50 schematic's R7 column.
+    const double half=std::log2(std::sqrt(2.7/1.8))/2;
+    near(half,std::log2(std::sqrt(3.3/2.2))/2,1e-15,"R6 and R7 ranks step by the same ratio");
+    near(half,std::log2(std::sqrt(3.0/2.0))/2,1e-15,"the CS-60/50 R7 column steps by the same ratio");
+    auto p=plain();p.boardFilterTolerance=1;p.boardEnvelopeTolerance=1;
+    auto halfAmount=p;halfAmount.boardFilterTolerance=.5;
+    auto ideal=p;ideal.boardFilterTolerance=ideal.boardEnvelopeTolerance=0;
+    double widest=0;
+    for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<4;++board) {
+        // Static cutoff and Q are trimmed by ear to match the other boards.
+        const auto s=play(seed,p,board,60),i=play(seed,ideal,board,60);
+        require(s.hpFrequency==i.hpFrequency && s.lpFrequency==i.lpFrequency,
+                "the trimmed static cutoff stays identical across boards");
+        require(s.oscillatorFrequency==i.oscillatorFrequency,"filter tolerance leaves the VCO alone");
+        for(bool high:{true,false}) {
+            const double scale=std::log2(sensitivity(seed,p,board,high));
+            require(std::abs(scale)<=half+1e-9,"control sensitivity within half a rank step");
+            near(std::log2(sensitivity(seed,halfAmount,board,high)),scale/2,1e-9,
+                 "amount scales the sensitivity residual in octaves");
+            widest=std::max(widest,std::abs(scale));
+        }
+    }
+    require(widest>.13,"sensitivity residuals span the rank bin");
+}
+
+void envelopeLevelResidual() {
+    // VCF EG: TP1 +5V +/-.5V and -4V +/-.5V (CS-60 SM printed p.37), one
+    // buffer for both filters. Measured as the octaves the initial level
+    // moves each cutoff, over the board's own Vfc sensitivity.
+    auto p=plain();p.boardFilterTolerance=1;p.boardEnvelopeTolerance=1;p.filterAttack=30;
+    auto ideal=p;ideal.boardFilterTolerance=ideal.boardEnvelopeTolerance=0;
+    auto low=p;low.filterInitial=-2;auto idealLow=ideal;idealLow.filterInitial=-2;
+    double widest=0;
+    for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<4;++board) {
+        double gains[2];
+        for(bool high:{true,false}) {
+            const double tolerant=variableOctaves(play(seed,low,board,60),play(seed,p,board,60),high);
+            const double nominal=variableOctaves(play(seed,idealLow,board,60),play(seed,ideal,board,60),high);
+            gains[high]=tolerant/nominal/sensitivity(seed,p,board,high);
+        }
+        near(gains[0],gains[1],1e-9,"one VCF EG buffer feeds both filters");
+        require(std::abs(gains[0]-1)<=.5/5+1e-9,"VCF EG level within the +/-.5V of 5V check band");
+        widest=std::max(widest,std::abs(gains[0]-1));
+    }
+    require(widest>.09,"VCF EG residuals span the band");
+}
+
+void ampEnvelopeResidual() {
+    // VCA EG: TP2 10V +/-.2V (CS-60 SM printed p.38). The VCA is linear in
+    // the EG and everything after the voices is linear at a tiny master
+    // volume, so a lone board's output scales by its residual. Board 0 of
+    // 40 instruments samples the same per-board draw.
+    auto p=plain();p.volume=1e-4;p.boardEnvelopeTolerance=1;
+    auto ideal=p;ideal.boardEnvelopeTolerance=0;
+    double widest=0;
+    for(std::uint64_t seed=1;seed<=40;++seed) {
+        ceres::Synth a(48000,seed),b(48000,seed);a.setPatch(p);b.setPatch(ideal);
+        a.noteOn(60);b.noteOn(60);
+        double xy=0,yy=0;std::array<double,2400> x{},y{};
+        for(unsigned n=0;n<x.size();++n){x[n]=a.process();y[n]=b.process();xy+=x[n]*y[n];yy+=y[n]*y[n];}
+        const double gain=xy/yy;
+        for(unsigned n=0;n<x.size();++n)near(x[n],gain*y[n],1e-6*std::sqrt(yy/x.size()),"a lone board scales by one gain");
+        require(std::abs(gain-1)<=.2/10+1e-6,"VCA EG level within the +/-.2V of 10V check band");
+        widest=std::max(widest,std::abs(gain-1));
+    }
+    require(widest>.015,"VCA EG residuals span the band");
+}
 void sharedStreamUntouched() {
     // SUB noise is the shared random stream; oscillator start phases are its
     // first draws. Neither may move when board tolerances are enabled.
     auto p=plain();p.lfoWaveform=4;
-    auto q=p;q.boardPitchTolerance=1;q.boardFilterTolerance=1;
+    auto q=p;q.boardPitchTolerance=1;q.boardFilterTolerance=1;q.boardEnvelopeTolerance=1;
     ceres::Synth a(48000,11),b(48000,11);a.setPatch(p);b.setPatch(q);
     for(unsigned i=0;i<4;++i)require(a.allVoiceState()[i].oscillatorPhase==b.allVoiceState()[i].oscillatorPhase,
                                      "seeded start phases unchanged");
@@ -143,7 +210,7 @@ void sharedStreamUntouched() {
 }
 
 void boardsAreFixedUnits() {
-    auto p=plain();p.boardPitchTolerance=1;p.boardFilterTolerance=1;
+    auto p=plain();p.boardPitchTolerance=1;p.boardFilterTolerance=1;p.boardEnvelopeTolerance=1;
     for(unsigned board=0;board<4;++board) {
         const auto four=play(5,p,board,60,4),sixteen=play(5,p,board,60,16);
         require(four.oscillatorFrequency==sixteen.oscillatorFrequency && four.hpFrequency==sixteen.hpFrequency &&
@@ -165,6 +232,8 @@ int main() {
         trimPointsHoldTheirBand();
         linearVcoBetweenTrimPoints();
         filterRankResidual();
+        envelopeLevelResidual();
+        ampEnvelopeResidual();
         sharedStreamUntouched();
         boardsAreFixedUnits();
     } catch(const std::exception& e) {std::fprintf(stderr,"FAIL %s\n",e.what());return 1;}

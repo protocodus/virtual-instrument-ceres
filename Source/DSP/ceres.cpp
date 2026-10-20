@@ -129,6 +129,7 @@ const Parameter parameters[] = {
     {"drift_cents", &Patch::driftCents, 0, 20},
     {"board_pitch_tolerance", &Patch::boardPitchTolerance, 0, 1},
     {"board_filter_tolerance", &Patch::boardFilterTolerance, 0, 1},
+    {"board_envelope_tolerance", &Patch::boardEnvelopeTolerance, 0, 1},
     {"lfo_waveform", &Patch::lfoWaveform, 0, 4},
     {"ring_mix", &Patch::ringMix, 0, 1}, {"ring_rate", &Patch::ringRate, .2, 220},
     {"ring_depth", &Patch::ringDepth, 0, 8},
@@ -251,30 +252,52 @@ struct Random {
 // ASSUMPTION: each residual is uniform over its band (a technician stops
 // anywhere inside it); the service guide prints only the band.
 //
-// Filter. The IG00156 cutoffs have no trimmer in the tuning method. Instead
-// the chips are sorted into ranks A/B/C and each rank gets its own fc-pin
-// resistor (SM2 printed pp.17-18, note 9: R6 2.7k/2.2k/1.8k for IC10, R7
-// 3.3k/2.7k/2.2k for IC11, board NA03574); pin 3 "sets the control current
-// of the cut off frequency" (SM1 printed p.19), i.e. scales the variable gm.
-// Successive rank resistors step by sqrt(2.7/1.8) = sqrt(3.3/2.2) = 1.2247,
-// so a chip anywhere in its bin is corrected to within half a step:
-// +/-log2(1.2247)/2 = +/-.14624 octave of variable gm, HP and LP independent.
-// INFERENCE: fc proportional to the pin-3 current (1/R), bins contiguous and
-// one step wide, chip uniform within its bin. The 4.7M feed path is not part
-// of the chip and keeps its nominal 22.58Hz floor.
+// The VCF, EG and VCA trims are not in the CS-50 guide. The CS-60 service
+// manual's section VI (printed pp.37-39 / PDF 39-41) aligns the same M board:
+// SM1's parts list gives the M board (NA04485) "Common Models: CS-60", the
+// CS-60 M schematic (printed p.15 / PDF 17) is drawn for "CS-60,50" with the
+// CS-50's transposition values, and the procedure itself gives the CS-50's
+// different output level (".24V (CS-50 is 0.6V)"). SIBLING EVIDENCE, below.
 //
-// Not modelled, because no tolerance is printed: Q (Qo trimmer, target Q=5
-// at Vq=0V, SM1 p.19), EG timing (.22uF caps, TR trimmers), VCA gain
-// (IG00151 pin-1 trim, Guide p.41), WSC levels, 1.5nF/4.7M part tolerance.
+// VCF sensitivity (filter amount). On that schematic the IG00156 rank
+// resistor is NOT on the fadj pin (220k, fixed): R6/R7 load each filter's Vfc
+// node, where the panel lever, the VCF EG (100k HP, 47k LP), SUB/touch and
+// the VR7/VR9 offset trim (150k) sum. R6 is ~2.2k against >=60k sources, so
+// the node's volts-per-input scale with R6: the rank sets each chip's control
+// SENSITIVITY. Ranks (SM2 printed pp.17-18 note 9; CS-60 p.15): R6
+// 2.7k/2.2k/1.8k, R7 3.3k/2.7k/2.2k (CS-60/50 column 3.0k/2.4k/2.0k); every
+// column spans x1.5 over two steps, so a chip lands within half a step of
+// nominal: octaves per Vfc volt scaled by 2^(u*.14624), |u|<=1, HP and LP
+// independent. The static cutoff is then trimmed (VR7 HP, VR9 LP) and Q
+// (VR8, VR10) until "the tone color ... may be the same as that of other M
+// circuit boards" (CS-60 p.38): matched by ear, no numeric residual, so the
+// static cutoff and Q stay identical here and only the Vfc-driven octaves
+// (EG, SUB, touch, BRILLIANCE) carry the sensitivity residual. INFERENCE:
+// chips uniform within contiguous one-step bins.
+//
+// EG output levels (envelope amount). The VCF EG check (CS-60 p.37): AL, IL
+// at 10V give TP1 +5V +/-.5V and -4V +/-.5V; only the offset is trimmed (VR18,
+// 0 +/-.01V). One buffer gain must meet both bands, so the VCF EG reaches HP
+// and LP within +/-10%. The VCA EG check (p.38): peak 10V +/-.2V at TP2, so
+// the amplitude EG is within +/-2%. Uniform within the band, as for pitch.
+// Attack trims (VR19, VR20: 125ms at 3V) and the VCA level trims (VR11,
+// VR12, VR3, VR14) carry no printed tolerance and are not modelled.
+//
+// Not modelled, no printed tolerance: Q and static cutoff (ear-matched), EG
+// times, VCA trims, WSC level (no per-board procedure), 1.5nF/4.7M parts.
 constexpr double boardTrimCents=1;          // Guide printed p.65, every trim
 constexpr double boardScaleKeyRatio=16;     // C6 key Kv / C2 key Kv, p.29
 constexpr double boardTrimKeyNormalHz=2093; // C6 key at NORMAL, p.29/p.65
 constexpr double boardFilterRankOctaves=.14624062518028906; // log2(1.5)/4
+constexpr double boardFilterEnvelopeBand=.5/5; // CS-60 p.37, TP1 +5V +/-.5V
+constexpr double boardAmpEnvelopeBand=.2/10;   // CS-60 p.38, TP2 10V +/-.2V
 struct BoardTolerance {
     // C6-key residual at transposition 2-down, 1-down, NORMAL, 1-up.
     std::array<double,4> transposeCents{};
     double offsetRatio=0, hpOctaves=0, lpOctaves=0;
-    double hpScale=1, lpScale=1; // cached 2^(amount*octaves)
+    double filterEnvelopeError=0, ampEnvelopeError=0;
+    // Cached at the patch's amounts; exactly 1 when an amount is 0.
+    double hpScale=1, lpScale=1, hpEnvelopeGain=1, lpEnvelopeGain=1, ampEnvelopeGain=1;
     void draw(Random& random) {
         const double low=boardTrimCents*random.bipolar();
         for (auto& cents : transposeCents) cents=boardTrimCents*random.bipolar();
@@ -282,6 +305,8 @@ struct BoardTolerance {
         offsetRatio=(r-1)/(boardScaleKeyRatio-r);
         hpOctaves=boardFilterRankOctaves*random.bipolar();
         lpOctaves=boardFilterRankOctaves*random.bipolar();
+        filterEnvelopeError=boardFilterEnvelopeBand*random.bipolar();
+        ampEnvelopeError=boardAmpEnvelopeBand*random.bipolar();
     }
     // octave: TRANSPOSE (-2..1); normalHz: the board's ideal NORMAL-position
     // frequency for its key voltage (key, PITCH and bend; not vibrato).
@@ -937,8 +962,13 @@ struct Synth::Impl {
     }
     void updateBoardScales() {
         for (auto& voice : voices) {
-            voice.board.hpScale=std::exp2(patch.boardFilterTolerance*voice.board.hpOctaves);
-            voice.board.lpScale=std::exp2(patch.boardFilterTolerance*voice.board.lpOctaves);
+            auto& board=voice.board;
+            board.hpScale=std::exp2(patch.boardFilterTolerance*board.hpOctaves);
+            board.lpScale=std::exp2(patch.boardFilterTolerance*board.lpOctaves);
+            const double envelope=1+patch.boardEnvelopeTolerance*board.filterEnvelopeError;
+            board.hpEnvelopeGain=envelope*board.hpScale;
+            board.lpEnvelopeGain=envelope*board.lpScale;
+            board.ampEnvelopeGain=1+patch.boardEnvelopeTolerance*board.ampEnvelopeError;
         }
     }
     void followFreeKeys() {
@@ -1145,18 +1175,22 @@ struct Synth::Impl {
             // R7 TBR and VCF (touch SUB) enter each cutoff node through 47k LP
             // and 150k HP, like SUB: the HP coupling is hpSubRelativeScale.
             const double touchOctaves=expression*(patch.pressureFilter+lfo*patch.pressureWah);
-            const double hpFactor=std::exp2(keyOctaves+filterEnvelope*patch.hpEnvelopeScale
-                + touchOctaves*hpSubRelativeScale+lfo*(patch.filterLfo*hpSubRelativeScale)
-                + patch.brilliance*hpBrillianceScale);
+            // Board tolerance (see BoardTolerance): each Vfc input's octaves
+            // scale with this board's rank residual; the EG also with its
+            // output-level residual. Every factor is exactly 1 when off.
+            const auto& board=v.board;
+            const double hpFactor=std::exp2(keyOctaves+filterEnvelope*board.hpEnvelopeGain*patch.hpEnvelopeScale
+                + touchOctaves*board.hpScale*hpSubRelativeScale+lfo*board.hpScale*(patch.filterLfo*hpSubRelativeScale)
+                + patch.brilliance*board.hpScale*hpBrillianceScale);
             const double lpFactor=patch.lpEnvelopeScale==patch.hpEnvelopeScale &&
-                patch.filterLfo==0 && patch.brilliance==0 && touchOctaves==0 ? hpFactor
-                : std::exp2(keyOctaves+filterEnvelope*patch.lpEnvelopeScale
-                    + touchOctaves+lfo*patch.filterLfo
-                    + patch.brilliance*lpBrillianceScale);
+                patch.filterLfo==0 && patch.brilliance==0 && touchOctaves==0 &&
+                board.hpEnvelopeGain==board.lpEnvelopeGain ? hpFactor
+                : std::exp2(keyOctaves+filterEnvelope*board.lpEnvelopeGain*patch.lpEnvelopeScale
+                    + touchOctaves*board.lpScale+lfo*board.lpScale*patch.filterLfo
+                    + patch.brilliance*board.lpScale*lpBrillianceScale);
             const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*noise;
-            // IG00156 rank residual scales this board's variable gm only.
-            const double hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor*v.board.hpScale);
-            const double lpFrequency=modulatedFilterFrequency(patch.lpCutoff,lpFactor*v.board.lpScale);
+            const double hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor);
+            const double lpFrequency=modulatedFilterFrequency(patch.lpCutoff,lpFactor);
 #if !defined(CERES_EMBEDDED_TARGET)
             v.oscillatorFrequency=frequency; v.hpFrequency=hpFrequency; v.lpFrequency=lpFrequency;
 #endif
@@ -1171,7 +1205,7 @@ struct Synth::Impl {
             // optional velocity term is zero in factory-derived presets.
             const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocityValue);
             const double touchLevel=patch.pressureVolume*expression*touchLevelScale;
-            mixed += beforeVca * ampEnvelope * velocityGain * std::max(0.0,levelControl+touchLevel);
+            mixed += beforeVca * ampEnvelope * board.ampEnvelopeGain * velocityGain * std::max(0.0,levelControl+touchLevel);
         }
         // Output rail saturation is a deliberately mild, uncalibrated op-amp
         // approximation; no hidden peak normalization or dynamics processor.

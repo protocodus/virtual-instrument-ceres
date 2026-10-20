@@ -63,7 +63,8 @@ int main(int argc,char** argv) {
         if(expressionControls && !ceres::setParameter(patch,"expression_source",1))return 8;
         // Board tolerances at full documented spread, on every board.
         if(boardControls && (!ceres::setParameter(patch,"board_pitch_tolerance",1) ||
-           !ceres::setParameter(patch,"board_filter_tolerance",1)))return 10;
+           !ceres::setParameter(patch,"board_filter_tolerance",1) ||
+           !ceres::setParameter(patch,"board_envelope_tolerance",1)))return 10;
         // Glide and touch-wah ride with the expression scenes: both are
         // per-board key/touch paths shared by the native and embedded cores.
         if(expressionControls && (!ceres::setParameter(patch,"glide_mode",scene%3) ||
