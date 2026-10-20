@@ -189,6 +189,25 @@ struct Patch {
 // Keys use snake_case (e.g. lp_cutoff, filter_initial, amp_attack). Finite values
 // are range-limited; false means an unknown key or a nonfinite input.
 bool setParameter(Patch&, const char* key, double value);
+
+// Panel 2 lever laws, for front ends that show the hardware levers. They do
+// not change what `brilliance` and `resonance_offset` mean: both stay loaded
+// bus volts. travel is lever travel, 0 at MIN and 1 at MAX, clamped; a
+// nonfinite input returns NaN, which setParameter rejects. Both levers are
+// B-10K slide pots (SM1 parts p.9, and the CS-60 parts list p.9 under the
+// same part numbers, marked common to the CS-50; the CS-50 PN2 sheet's
+// "C-100K" is the outlier). See Docs/research/brilliance-resonance-
+// authenticity-2026-10-20.md.
+// BRILLIANCE TVR7, centre-click type: -15 V at MIN, +15 V at MAX, grounded
+// centre tap, wiper loaded by 4x680k + 4x220k into the cutoff nodes.
+// Returns `brilliance` volts.
+double brillianceLeverVolts(double travel);
+// RESONANCE TVR6: +10 V at MIN, ground at MAX. In steady state the eight
+// pin-7 networks (220k to the preset Q bus, 220k to RES, 10 uF) load the
+// wiper with 55k returning to the mean of the HP and LP preset Q buses,
+// presetMeanVolts. Returns the loaded RES bus voltage, from which a front end
+// takes its own neutral to form `resonance_offset`.
+double resonanceLeverVolts(double travel, double presetMeanVolts);
 #if !defined(CERES_EMBEDDED_TARGET)
 bool setParameter(Patch&, const std::string& key, double value);
 Patch preset(const std::string& name);
