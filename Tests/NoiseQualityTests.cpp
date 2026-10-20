@@ -8,9 +8,9 @@
 #include <initializer_list>
 #include <vector>
 
-// A fixed host rate is intentional: retain legacy4x white-noise PSD, not
-// infer the hardware source voltage or promise cross-host-rate calibration.
-// Independent radix2 DFT/Parseval band powers on long, stationary, low-drive
+// The noise source is the limiter's band-limited binary process, scaled to
+// its continuous low-frequency density at every internal rate, so its level
+// must not depend on quality or host rate. Independent radix2 DFT/Parseval band powers on long, stationary, low-drive
 // full-engine output catch a source-variance change without measuring peaks.
 namespace {
 constexpr double pi=3.14159265358979323846;
@@ -63,8 +63,9 @@ void estimator(){
 }
 int main(){
     estimator();
+    std::array<std::array<std::array<double,3>,3>,2> hosts{};
     for(double fs:{48000.,96000.}){
-        std::array<std::array<double,3>,3> levels{};
+        auto& levels=hosts[fs>48000.];
         for(unsigned index=0;index<3;++index){
             const unsigned factor=1u<<index;
             ceres::Synth s(fs,50);require(s.configure(1,factor),"configure");
@@ -82,8 +83,7 @@ int main(){
                 std::printf("NOISE_POWER,%.0f,%u,%u,%.17g\n",fs,factor,band,levels[index][band]);
             }
         }
-        // Binary +/-1 (variance 1) at4fs means two-sided density1/(4fs).
-        // At lower factors variance must be factor/4 for the same density.
+        // A white source would gain 3dB per halving of the internal rate.
         // Different sequences/filter discretizations are not byte-identical;
         // .6dB allows finite-sample scatter and small-signal response error,
         // while decisively rejecting the original +3/+6dB variance defect.
@@ -92,6 +92,12 @@ int main(){
             std::printf("NOISE_DELTA_DB,%.0f,%u,%u,%.17g\n",fs,1u<<index,band,db);
             require(std::isfinite(db)&&std::abs(db)<.6,"quality preserves low-band audio-noise density within .6dB");
         }
+    }
+    // A white source at a fixed factor would lose 3dB at the doubled host rate.
+    for(unsigned index=0;index<3;++index)for(unsigned band=0;band<3;++band){
+        const double db=10*std::log10(hosts[1][index][band]/hosts[0][index][band]);
+        std::printf("NOISE_HOST_DB,%u,%u,%.17g\n",1u<<index,band,db);
+        require(std::isfinite(db)&&std::abs(db)<.6,"audio-noise density is independent of host rate within .6dB");
     }
     std::puts("PASS noise quality: full-engine stationary band powers at48/96k, independent FFT normalization");
 }

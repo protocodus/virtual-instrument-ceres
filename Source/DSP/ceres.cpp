@@ -444,20 +444,40 @@ double blamp(double phase, double step) {
     return 0;
 }
 
-// SUB-N level in SUB units (the 3Vpp SUI waveforms, 1.5V peak). The limiter
-// output N swings +/-15V (guide printed p.32: 30Vpp). Its bandwidth is NOT
-// documented: ESTIMATE it as the pick-up amplifier IC11-1's closed-loop pole,
-// NJM4558 typical GBW 3MHz / (1+1M/4.7k) = 14.03kHz (datasheet typical, not a
-// measured unit), ahead of the limiting stage. The sign of a one-pole
-// Gaussian process has R(t)=(2/pi)asin(exp(-|t|/tc)), so its low-frequency
-// two-sided density is 2*tc*ln2 per peak^2. Through the loaded RC (fc
-// 88.26Hz, DC gain 100/122) the variance is that density times pi*fc.
+// Noise limiter (guide printed p.32; SM2 p.8 SUB board). The limiter hard-
+// clips the zener noise to +/-15V, so its output is the sign of the pick-up
+// amplifier's band-limited noise. That bandwidth is NOT documented: ESTIMATE
+// it as IC11-1's closed-loop pole, NJM4558 typical GBW 3MHz / (1+1M/4.7k) =
+// 14.03kHz (datasheet typical, not a measured unit); IC11-2's slew limit is
+// ignored. Sampling the one-pole Gaussian process exactly gives an AR(1)
+// with pole exp(-dt/tc); the sign of it has R(n)=(2/pi)asin(pole^n), while
+// the continuous process has low-frequency two-sided density 2*tc*ln2 per
+// peak^2. limiterLevel scales the sampled sign so that density survives
+// every internal rate, which makes noise level independent of host rate.
+constexpr double limiterTau=1/(2*pi*(3e6/(1+1e6/4.7e3)));
+// SUB-N: N through 22k/.1uF loaded by SUI's 100k, in SUB units (the 3Vpp
+// SUI waveforms, 1.5V peak): the +/-15V swing times the 100/122 divider.
 constexpr double subNoiseResistance=22e3*100e3/122e3;
 constexpr double subNoiseRail=15*(100./122.)/1.5;
-double subNoiseRms() {
-    const double tc=1/(2*pi*(3e6/(1+1e6/4.7e3)));
-    const double fc=1/(2*pi*subNoiseResistance*.1e-6);
-    return subNoiseRail*std::sqrt(2*tc*std::log(2.0)*pi*fc);
+
+// Acklam's rational inverse normal CDF, relative error below 1.2e-9: one
+// uniform draw per Gaussian sample keeps the shared random sequence intact.
+double inverseNormal(double p) {
+    static constexpr double a[]={-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,
+        1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00};
+    static constexpr double b[]={-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,
+        6.680131188771972e+01,-1.328068155288572e+01};
+    static constexpr double c[]={-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,
+        -2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00};
+    static constexpr double d[]={7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,
+        3.754408661907416e+00};
+    const auto tail=[](double q) {
+        return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+    };
+    if (p<.02425) return tail(std::sqrt(-2*std::log(p)));
+    if (p>1-.02425) return -tail(std::sqrt(-2*std::log(1-p)));
+    const double q=p-.5, r=q*q;
+    return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
 }
 
 // One shared SUB source. Discontinuities use the same short analytic BLEP
@@ -650,14 +670,14 @@ struct Synth::Impl {
     double hpResonanceAnchor=0, lpResonanceAnchor=0;
     bool hasProcessed=false;
     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
-    double outputTrimGain=1, audioNoiseGain=1;
+    double outputTrimGain=1;
+    double limiterInput=0, limiterPole=0, limiterInnovation=0, limiterLevel=1;
     // Guide printed32: SUB-N is the limiter output N through22k/.1uF,
     // independent of audio NO level: the documented single low-pass (called
     // pink in the prose), not an invented ideal1/f filter. SM2 p.8 (PN3):
     // the FUNCTION switch puts N on SUI, a buffer with100k to ground, so the
-    // RC sees22k||100k (pole88.26Hz) and a100/122 divider. Its RMS is
-    // normalized across rates to subNoiseRms and bounded by the +/-15V rails.
-    double subNoiseMemory = 0, subNoiseG = 0, subNoiseGain = 0;
+    // RC sees22k||100k (pole88.26Hz) and a100/122 divider.
+    double subNoiseMemory = 0, subNoiseG = 0;
     Envelope ringEnvelope;
     std::array<double,4> ringCoefficients{};
     double ringPhase = 0, ringCarrier = 0, ringFrequency = 30;
@@ -693,11 +713,14 @@ struct Synth::Impl {
     }
     void configureRate() {
         internalFs=fs*rateFactor;
-        // Discrete white-noise PSD is variance/internalFs. Keep the 4x
-        // density at this host rate: variance scales by factor/4.
-        // Audio NO only; SUB-N has its own RC/RMS convention below and
-        // must continue to receive the original shared random sample.
-        audioNoiseGain=std::sqrt(rateFactor/4.0);
+        limiterPole=std::exp(-1/(internalFs*limiterTau));
+        limiterInnovation=std::sqrt(1-limiterPole*limiterPole);
+        // Sampled density (1/internalFs)*(1+2*sum R(n)) includes aliases;
+        // scale it back to the continuous 2*tc*ln2.
+        double correlationSum=1;
+        for (double power=limiterPole; power>1e-15; power*=limiterPole)
+            correlationSum+=2*(2/pi)*std::asin(power);
+        limiterLevel=std::sqrt(2*limiterTau*std::log(2.0)*internalFs/correlationSum);
         // SM2 p.8 touch pre-amplifier: VR3's wiper reaches IC1-2 through
         // 100k with .1uF to the +15V rail, a 10ms RC. Velocity has no
         // hardware path and keeps its own 5ms digital smoothing.
@@ -706,8 +729,6 @@ struct Synth::Impl {
         driftCoefficient = 1-std::exp(-1/(internalFs*.3));
         qControlCoefficient=-std::expm1(-1/(internalFs*qControlTau));
         subNoiseG=1/(2*internalFs*subNoiseResistance*.1e-6);
-        // Unit-variance binary source through the trapezoidal RC.
-        subNoiseGain=subNoiseRms()*std::sqrt((1+subNoiseG)/subNoiseG);
         ringCarrierCoupling.configure(internalFs);
         updateCoefficients();
     }
@@ -769,7 +790,7 @@ struct Synth::Impl {
         pedal = false; busCoupling={}; lineCoupling={};
         physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
         physicalKeyPresses=0; lastAssignedKey=60;
-        subNoiseMemory=0; ringEnvelope={}; ringPhase=ringCarrier=0;
+        subNoiseMemory=limiterInput=0; ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={};
         ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
         ringCarrierCoupling.clear();ringCoupledCarrier=0;
@@ -833,14 +854,15 @@ struct Synth::Impl {
         // Guide printed p.32: the limiter amplifier drives the zener noise to
         // saturation (30Vpp), "white noise of constant amplitude", and VR10
         // trims it to 3Vpp, the WSC waveforms' 3Vpp. So the one shared source
-        // is binary +/-1, not uniform: same peak as the saw, 4.77dB more RMS.
-        // The limiter's bandwidth is not documented; the sample stays white.
-        const double noise = random.unit()<.5 ? -1.0 : 1.0;
-        const double audioNoise=rateFactor==4 ? noise : noise*audioNoiseGain;
+        // is the binary sign of the band-limited pick-up signal, scaled by
+        // limiterLevel (near 1 at high internal rates; see limiterTau).
+        limiterInput=limiterPole*limiterInput
+            + limiterInnovation*inverseNormal(random.unit()+0x1.0p-54);
+        const double noise = limiterInput<0 ? -limiterLevel : limiterLevel;
         const double subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
         subNoiseMemory=2*subNoise-subNoiseMemory;
         const double lfo = subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
-            patch.lfoWaveform==4 ? clamp(subNoise*subNoiseGain,-subNoiseRail,subNoiseRail):0.);
+            patch.lfoWaveform==4 ? subNoise*subNoiseRail:0.);
         lastSub=lfo;
         // Exact zero-order-held RC update. Never bypass while offset returns
         // to zero: capacitor charge survives note allocation, patch edits,
@@ -917,7 +939,7 @@ struct Synth::Impl {
                 : std::exp2(keyOctaves+filterEnvelope*patch.lpEnvelopeScale
                     + touchOctaves+lfo*patch.filterLfo
                     + patch.brilliance*lpBrillianceScale);
-            const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*audioNoise;
+            const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*noise;
             const double hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor);
             const double lpFrequency=modulatedFilterFrequency(patch.lpCutoff,lpFactor);
 #if !defined(CERES_EMBEDDED_TARGET)
