@@ -305,6 +305,9 @@ if(BUILD_TESTING)
   target_link_libraries(ceres_envelope_circuit_tests PRIVATE ceres)
   set_target_properties(ceres_envelope_circuit_tests PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
   add_test(NAME Ceres.envelope_circuit_contracts COMMAND ceres_envelope_circuit_tests)
+  add_executable(ceres_board_tolerance_tests Tests/BoardToleranceTests.cpp)
+  target_link_libraries(ceres_board_tolerance_tests PRIVATE ceres)
+  add_test(NAME Ceres.board_tolerance_contracts COMMAND ceres_board_tolerance_tests)
   add_executable(ceres_embedded_contract Tests/EmbeddedContract.cpp)
   target_link_libraries(ceres_embedded_contract PRIVATE ceres_embedded)
   if(NOT MSVC)
@@ -338,6 +341,9 @@ if(BUILD_TESTING)
       --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
     add_test(NAME Ceres.expression_audio_parity COMMAND "${Python3_EXECUTABLE}"
       "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_expression_parity.py" "$<TARGET_FILE_DIR:ceres_native_parity>"
+      --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
+    add_test(NAME Ceres.board_tolerance_audio_parity COMMAND "${Python3_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_board_tolerance_parity.py" "$<TARGET_FILE_DIR:ceres_native_parity>"
       --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
     add_test(NAME Ceres.capacitor_native_embedded_parity COMMAND "${Python3_EXECUTABLE}"
       "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_capacitor_parity.py" "$<TARGET_FILE_DIR:ceres_native_parity>"
