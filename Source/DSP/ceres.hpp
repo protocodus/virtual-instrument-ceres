@@ -71,6 +71,8 @@ struct Patch {
     double filterAttackSaturation = 0.0;
     // Engineering decay/release times mean T60; attack means time to peak.
     // Factory voltage conversion is separate and provisional. See ceres.cpp.
+    // The VCA EG aims .02 of its peak below S while held and below zero
+    // after release (the aligned VR17 floor); the VCA closes below zero.
     double ampAttack = 0.01, ampDecay = 0.35, ampSustain = 0.8, ampRelease = 0.25;
     double ampAttackHeadroom = 0.01;
     double ampAttackSaturation = 0.0;
