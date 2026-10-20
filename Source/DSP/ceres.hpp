@@ -287,7 +287,8 @@ public:
     };
     struct ModulationState {
         // ringCarrier is the unchanged raw free-running oscillator sine.
-        // ringCoupledCarrier is pin7-pin8 after the passive carrier network.
+        // ringCoupledCarrier is pin7-pin8 after the passive carrier network,
+        // per volt of source sine (1.6V peak in production, so about .00295).
         double sub, ringEnvelope, ringFrequency, ringCarrier;
         std::size_t physicalKeyPresses;
         double ringCoupledCarrier;
@@ -318,7 +319,8 @@ private:
 std::vector<double> outputRateImpulse(unsigned factor, std::size_t hostFrames,
     unsigned inputSubframe = 0);
 // Exact production passive carrier network, zero initial incremental charge.
-// Ideal source, four100uF caps, zero incremental IC current; returns pin7-pin8.
+// Ideal source, four 100uF caps, 33k in series to pin 7, the uA796 carrier
+// port's rpi across the 100 ohm; returns pin7-pin8 per volt of source.
 std::vector<double> ringCarrierResponse(double sampleRate,const std::vector<double>& input);
 // Matched carrier-pair steering at25C, input in physical differential volts.
 // No source amplitude/DC offset is added by this pointwise diagnostic.

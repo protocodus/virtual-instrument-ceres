@@ -1170,10 +1170,13 @@ struct Synth::Impl {
         const double bus=busCoupling.process(mixed,outputCouplingTau[2],internalFs);
         // One global processor, after the voice bus and before expression/
         // output. The carrier uses the physical matched upper-BJT steering
-        // law at the pins 7-8 carrier; the signal pair is linear (its
-        // 470 ohm degeneration takes .56V peak at pin 1 before it limits, and
-        // the bus is not yet a calibrated voltage). Wet gain is the derived
-        // modulator gain times the wet buffer's VR4 trim (see above).
+        // law at the pins 7-8 carrier; the signal pair is kept linear. Its
+        // 470 ohm degeneration limits at .56V peak on pin 1; the CS-50 voice
+        // output aligns to .6V (CS-60 manual p.39, VI-4, "CS-50 is 0.6V"),
+        // which reaches pin 1 as at most .35V: 1.5% peak compression, third
+        // harmonic -48dB, and -62dB at half that. The engine's bus is not a
+        // calibrated voltage, so that bound is not applied. Wet gain is the
+        // derived modulator gain times the wet buffer's VR4 trim (see above).
         const double ringControl=ringEnvelope.advance(0,1,0,.01,0,
             ringCoefficients[0],0,ringCoefficients[1],ringCoefficients[2]);
         // Digital control dezippering only: retain the physical EG trajectory,
