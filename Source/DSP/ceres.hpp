@@ -117,6 +117,11 @@ struct Patch {
     // tremolo is SUB VCA lever travel, 0..1: R7 adds .3375 of the wiper's
     // share of SUB to LEVEL, and the B-10k lever into its 30k load delivers
     // x/(1+x(1-x)/3) of it, 7.7% low at mid-travel with exact endpoints.
+    // lfoRate is Hz, wider than the hardware's .8-50 Hz SPEED range;
+    // vibratoCents is cents per SUB unit (hardware full lever 25), filterLfo
+    // LP octaves per SUB unit (full lever .809). subSpeedLeverHz and its
+    // siblings below map the PN3 levers onto these. The one IG00150 clock
+    // free-runs: note events never reset its phase.
     double lfoRate = 5.0, vibratoCents = 0.0, tremolo = 0.0, filterLfo = 0.0;
     // Shared SUB source: 0 sine, 1 down saw, 2 up saw, 3 square, 4 noise.
     // Noise uses the sourced22k/.1uF low-pass loaded by SUI's100k on the
@@ -189,6 +194,18 @@ struct Patch {
 // Keys use snake_case (e.g. lp_cutoff, filter_initial, amp_attack). Finite values
 // are range-limited; false means an unknown key or a nonfinite input.
 bool setParameter(Patch&, const char* key, double value);
+
+// SUB-OSCILLATOR panel laws (PN3) for adapters that offer the hardware levers.
+// The Patch keeps its engineering meanings (Hz, cents and LP octaves per SUB
+// unit); these map a lever onto them. Travel is 0..1 and clamped. See ceres.cpp.
+// SPEED: VC2 terminal volts 0..10 -> lfo_rate Hz, .8 Hz at 0 V to 50 Hz at 10 V.
+double subSpeedHz(double vc2Volts);
+// SPEED lever travel -> lfo_rate Hz, including the lever's 180k load.
+double subSpeedLeverHz(double travel);
+// VCO lever travel -> vibrato_cents; 25 cents at full lever.
+double subVibratoLeverCents(double travel);
+// VCF lever travel -> filter_lfo (LP octaves per SUB unit).
+double subFilterLeverOctaves(double travel);
 #if !defined(CERES_EMBEDDED_TARGET)
 bool setParameter(Patch&, const std::string& key, double value);
 Patch preset(const std::string& name);
