@@ -302,6 +302,12 @@ double ringSwitchingResponse(double differentialVolts);
 // not measured VCA input impedances or external recording-chain loading.
 std::vector<double> outputCouplingImpulse(unsigned stage,double sampleRate,std::size_t frames);
 
+// Exact PRA output preamp as the engine applies it: the summed, expressed
+// signal times the .18 gain and VOLUME, hard-limited at the HA1452 rails
+// derived from its supply droppers (see ceres.cpp). Before the HO coupling
+// capacitor and the final line inversion.
+double outputPreampResponse(double volts,double volume);
+
 // Exposes the exact circuit used in the voices for independent measurements.
 // Input is a physical Thevenin source-voltage impulse in the common normalized
 // OTA voltage unit; no oscillator/VCA/decimator. This replaces v0.6's separately
