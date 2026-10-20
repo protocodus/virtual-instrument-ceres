@@ -136,6 +136,33 @@ Both under `/mnt/project-files/ceres/listening/`, each with `key.md`:
 - `2026-10-20-vcf-hp-lp-slope/`: the shipping .7/.65 split against both
   stages at .7 and both at .65 oct/V.
 
+## Second search (sibling and clone sources)
+
+Searched 2026-10-20 for published IG00156 measurements: the Pilve iG00156AP
+clone (2026), CS-80 restorer and DIY material, and Yamaha's own IC
+documentation. Nothing measured on an original chip turned up.
+
+- Yamaha "IC Guide Book" (synthesizer, combo keyboard, P.A.; scan at
+  manuals.fdiskc.com), section 2-5 / PDF 37: IG00156 "(+) VCF", made by
+  Mitsubishi. It prints the same block diagram as Guide p.33 and the same
+  pin list. It gives no transistor-level schematic and no numbers. Its CS-5
+  application (PDF 38) has the same arrangement as the CS-50: a 39k
+  cutoff input into the VF pin, with a rank resistor R1 to ground, and a
+  rank resistor R2 on the VQ pin as well. This supports the rank-shunt
+  reading above, but gives no transfer.
+- Pilve iG00156AP press coverage (Synth Anatomy, MATRIXSYNTH, 2026-08): it
+  says the chip was "re-engineered from the original" and has a "linear
+  cutoff voltage control input and an exponential keyboard-follower input".
+  That is the Guide's own labelling. No datasheet, measurements or
+  sensitivities are published, and a clone's design values would not be
+  original-chip evidence anyway.
+- Juergen Haible's CS-80 VCF SPICE analysis and the ModWiggler threads
+  ("Reverse Engineering Yamaha's IG00156", "Yamaha CS Filter Analysis")
+  could not be retrieved from this environment: the hosts are gone, and
+  the archive and forum returned 403. As quoted elsewhere, the ModWiggler
+  analysis is an idealised model (about 23 Hz offset, 7.6 kHz pole, gain
+  1.7), not a bench measurement.
+
 ## What would close the gap
 
 1. A measured CS-50 (or CS-60/CS-80 IG00156) cutoff against lever voltage at
