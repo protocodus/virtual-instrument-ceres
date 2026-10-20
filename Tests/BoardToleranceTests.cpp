@@ -464,9 +464,12 @@ void outputReferenceHolds() {
     // .98 each at full SUSTAIN and .18 at full VOLUME, Tests/OutputStageTests)
     // with every tolerance at full spread. VR14 and VR6 are trimmed with
     // these boards in place, so the instrument stays on its reference within
-    // that contract's 0.1 dB, and with identical boards' level to within the
-    // four notes' cross terms over the window.
-    const double referenceRms=.18*std::sqrt(4*.5)*.98;
+    // that contract's 0.1 dB, as identical boards do.
+    // The WSC sine is the differential-pair shaper tanh(k*tri)/tanh(k),
+    // k=1.4020, whose mean square is (1-tanh(k)/k)/tanh(k)^2 (OutputStageTests
+    // checks it by quadrature).
+    const double k=1.4020;
+    const double referenceRms=.18*std::sqrt(4*(1-std::tanh(k)/k)/std::pow(std::tanh(k),2))*.98;
     auto p=plain();p.saw=p.pulse=p.noise=0;p.sine=1;p.filterLevel=0;p.ampLevel=1;p.volume=1;
     const auto tolerant=everything(p);
     for(std::uint64_t seed:{3u,8u,21u}) {
@@ -478,6 +481,7 @@ void outputReferenceHolds() {
             for(int i=0;i<3*48000;++i){const double x=s.process();if(i>=48000)energy+=x*x;}
             rms[which]=std::sqrt(energy/(2*48000));
         }
+        require(std::abs(20*std::log10(rms[0]/referenceRms))<.1,"identical boards keep the 0 dBm reference");
         require(std::abs(20*std::log10(rms[1]/referenceRms))<.1,"the boards keep the 0 dBm reference");
     }
 }
