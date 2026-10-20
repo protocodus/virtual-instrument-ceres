@@ -61,6 +61,7 @@ void brillianceAndSubKcl() {
         ceres::Patch p;p.filterInitial=p.filterPeak=0;p.hpCutoff=100;p.lpCutoff=900;
         p.hpEnvelopeScale=.21;p.lpEnvelopeScale=2.1;p.filterLfo=1.3;p.lfoRate=7;
         p.keyTrack=tracking;p.tuneCents=230;p.brilliance=br;
+        p.boardFilterTolerance=0; // nominal IG00156 rank: the printed node ratios
         ceres::Synth s(8000,1);s.setPatch(p);s.noteOn(67);s.pitchBend(.3);
         for(unsigned n=0;n<250;++n) {
             s.process();const auto v=s.voiceState()[0];const double lfo=s.modulationState().sub;
@@ -78,6 +79,7 @@ void brillianceAndSubKcl() {
     // Full audio equivalence to the same physical static gm shift, not only
     // a disconnected diagnostic variable. No frequency boundary is active.
     ceres::Patch p;p.hpCutoff=150;p.lpCutoff=1800;p.brilliance=-8;
+    p.boardFilterTolerance=0; // nominal rank: BR and a static shift match
     auto equivalent=p;equivalent.brilliance=0;
     equivalent.hpCutoff=floorHz+(p.hpCutoff-floorHz)*std::exp2(-8*.7*39000/680000);
     equivalent.lpCutoff=floorHz+(p.lpCutoff-floorHz)*std::exp2(-8*.65*39000/220000);
@@ -191,6 +193,7 @@ void sharedSubPolarity() {
         p.ampLevel=.8;p.tremolo=.4;p.filterLfo=.4;
         p.filterInitial=p.filterPeak=0;p.keyTrack=0;
         p.hpCutoff=100;p.lpCutoff=1200;
+        p.boardFilterTolerance=0; // nominal rank: the printed SUB depth
         ceres::Synth active(8000,91),clock(8000,91);
         active.setPatch(p);clock.setPatch(p);
         unsigned positive=0,negative=0;

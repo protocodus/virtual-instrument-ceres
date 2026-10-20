@@ -31,6 +31,9 @@ ceres::Patch sinePatch() {
     auto p=ceres::preset("init");
     p.saw=p.pulse=p.noise=0; p.sine=1;
     p.ampAttack=.001; p.ampSustain=1; p.ampRelease=.03;
+    // Nominal boards: these contracts check the design laws; the shipping
+    // board tolerances have their own (BoardToleranceTests.cpp).
+    p.boardPitchTolerance=p.boardFilterTolerance=p.boardEnvelopeTolerance=0;
     return p;
 }
 std::complex<double> response(const std::vector<double>& impulse,double f,double fs) {
@@ -200,6 +203,7 @@ void fixedConductanceModulation() {
     a.hpResonance=.4; a.lpResonance=.7; a.drive=.05;
     a.filterInitial=-2; a.filterPeak=2; a.filterAttack=.3;
     a.hpEnvelopeScale=.2; a.lpEnvelopeScale=.8;
+    a.boardFilterTolerance=a.boardEnvelopeTolerance=0; // nominal EG octaves per volt
     auto b=a; b.filterInitial+=1; b.filterPeak+=1;
     b.hpCutoff=fixedHz+(a.hpCutoff-fixedHz)*std::pow(2.0,-a.hpEnvelopeScale);
     b.lpCutoff=fixedHz+(a.lpCutoff-fixedHz)*std::pow(2.0,-a.lpEnvelopeScale);
@@ -244,6 +248,9 @@ void masterPitchRouting() {
                 tuned.hpResonance=.4; tuned.lpResonance=.7; tuned.drive=.05;
                 tuned.filterInitial=-2; tuned.filterPeak=3; tuned.filterAttack=.015;
                 tuned.filterDecay=.12; tuned.hpEnvelopeScale=.2; tuned.lpEnvelopeScale=.8;
+                // A trimmed board's residual depends on Kv and TRANSPOSE
+                // separately: the PITCH/TRANSPOSE equivalence is nominal.
+                tuned.boardPitchTolerance=0;
                 auto equivalent=tuned;
                 equivalent.tuneCents=0;
                 equivalent.octave=cents/1200; // Separate FT path gives the same VCO pitch.

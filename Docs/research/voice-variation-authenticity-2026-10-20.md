@@ -7,16 +7,19 @@ symmetric spread) and `drift_cents` (a random walk), both VCO-only and
 default 0. Neither is a tolerance model.
 
 This pass adds the per-board variation the service documents bound, as
-amounts that default to 0 (identical boards, the shipping sound):
+amounts from 0 (four identical boards) to 1 (the documented spread). The
+owner chose the pitch, filter and envelope amounts by ear (verdict B on the
+listening set below), so those three ship at 1; the others ship at 0 until
+the owner has heard them:
 
-| Key | Range | 1 means |
-| --- | --- | --- |
-| `board_pitch_tolerance` | 0..1 | the VCO trim residual the tuning method allows |
-| `board_filter_tolerance` | 0..1 | the IG00156 rank-bin residual of each filter's control sensitivity |
-| `board_envelope_tolerance` | 0..1 | the EG level checks: VCF EG +/-10%, VCA EG peak +/-2% and floor -200 +/-20 mV, with VR14's full-sustain trim after them |
-| `board_envelope_time_tolerance` | 0..1 | both EGs' attack-time trims, +/-5% at 4 ms and 125 ms |
-| `board_vca_tolerance` | 0..1 | the VR11/VR12 CP4 level trims, with VR13/VR14 and VR6 after them |
-| `board_temperature_rise` | -25..25 K | the ambient change since tuning; each board's VCO drifts within the IG00153 temperature ranks |
+| Key | Range | Default | 1 means |
+| --- | --- | --- | --- |
+| `board_pitch_tolerance` | 0..1 | 1 | the VCO trim residual the tuning method allows |
+| `board_filter_tolerance` | 0..1 | 1 | the IG00156 rank-bin residual of each filter's control sensitivity |
+| `board_envelope_tolerance` | 0..1 | 1 | the EG level checks: VCF EG +/-10%, VCA EG peak +/-2% and floor -200 +/-20 mV, with VR14's full-sustain trim after them |
+| `board_envelope_time_tolerance` | 0..1 | 0 | both EGs' attack-time trims, +/-5% at 4 ms and 125 ms |
+| `board_vca_tolerance` | 0..1 | 0 | the VR11/VR12 CP4 level trims, with VR13/VR14 and VR6 after them |
+| `board_temperature_rise` | -25..25 K | 0 | the ambient change since tuning; each board's VCO drifts within the IG00153 temperature ranks |
 
 Each seed is one instrument: the offsets are drawn once per physical board
 slot, from two dedicated seeded streams (the first keeps the order of the
@@ -24,7 +27,9 @@ slot, from two dedicated seeded streams (the first keeps the order of the
 audio and drift stream, the oscillator start phases and the noise sequence
 are unchanged, and board *i* is the same unit at every polyphony and quality.
 `reset()` keeps the same boards. With every amount at 0 each factor is
-exactly the identical-board value, and the audio is byte-identical to 0.5.0.
+exactly the identical-board value, and the audio is byte-identical to 0.5.0;
+the shipping defaults therefore change the sound of every patch, by the
+amounts the boards' checks allow.
 
 ## Sources
 
@@ -227,16 +232,25 @@ error.
 ## Listening tests
 
 `/mnt/project-files/ceres/listening/2026-10-20-voice-variation-board-tolerance/`,
-letters A-D with `key.md` (revision 2): A the shipping engine (identical
-boards) against the 0.5.0 tolerance model and its parts. Material: factory
-`brass1`, seed 50, four-board unisons on MIDI 48 and 36 and a four-note
-chord; whole-file RMS matched.
+letters A-D with `key.md` (revision 2): A the then-shipping engine
+(identical boards) against the 0.5.0 tolerance model and its parts.
+Material: factory `brass1`, seed 50, four-board unisons on MIDI 48 and 36
+and a four-note chord; whole-file RMS matched.
+
+Verdict, by ear (2026-10-20): B, the pitch, filter and envelope amounts
+together at 1. They ship at 1. The set predates the VCA EG correction
+above: its B scaled the whole VCA EG by the +/-2% check band, where the
+shipping envelope amount follows the documented VR14 trim at full sustain.
+That correction is the procedure's, not a listening choice; the next set
+plays it as its A.
 
 ## Verification
 
 - `Ceres.board_tolerance_contracts` (Tests/BoardToleranceTests.cpp), every
   expected value rebuilt from the printed numbers:
-  - defaults keep identical boards;
+  - the defaults ship pitch, filter and envelope at 1 and the rest at 0,
+    the factory presets keep them, the shipping boards differ, and zero
+    amounts give identical boards;
   - every VCO trim point within +/-1 cent across 40 seeds x 4 boards, the
     C2-C6 range within 3 cents, and untrimmed keys on one linear VCO;
   - thermal drift at 25 K within +/-2.5 cents at C6 and +/-5 at C1, one
@@ -260,7 +274,24 @@ chord; whole-file RMS matched.
   - the shared noise stream and start phases unchanged; boards fixed across
     polyphony, reset and seed.
 - `Ceres.board_tolerance_audio_parity`: native and embedded produce identical
-  audio with every tolerance at full spread, and the tolerances change it.
+  audio with every tolerance at full spread, and the tolerances change it
+  (against the driver's `identical-boards` mode, the same panel controls
+  with the three shipping amounts at 0). Every other parity driver mode now
+  plays the shipping boards, and native and embedded still match exactly.
+- `Ceres.output_stage_contracts` runs on the shipping boards unchanged. VR6
+  is trimmed last, on the instrument's own four boards (CS-60 PRA III), but
+  by then VR14 has put each board's full-sustain output back on nominal and
+  the VCA amount is 0, so VR6 sees the nominal four-sine sum and keeps its
+  nominal setting; the pitch residual only detunes the incoherent sum.
+  Measured reference error, seeds 3, 8, 21, 50, 77, 101: -0.010..+0.014 dB
+  (identical boards -0.018..+0.006 dB), inside the contract's 0.1 dB.
+- Contracts that read a nominal design law back from the engine (the VCO
+  key law and clock, the printed filter node ratios and SUB depth, EG
+  octaves per volt, touch and vibrato depths) set the three shipping
+  amounts to 0, each with a comment; the board contracts above own the
+  tolerance itself. The idle VCA-EG floor contract checks each shipping
+  board's own floor (-200 +/-20 mV) and the exact -200 mV of identical
+  boards.
 - With every amount at 0, the native parity driver (all seven modes), the
   configuration parity driver and `ceres_render` of all 14 presets are
   byte-identical to 0.5.0 (`0f1d00f`).

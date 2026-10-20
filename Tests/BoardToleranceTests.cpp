@@ -124,12 +124,23 @@ Gain gainOf(const std::vector<double>& x,const std::vector<double>& y,std::size_
     return {g,std::sqrt(rr/yy)};
 }
 
-void defaultsAreIdenticalBoards() {
+void defaultsShipTheVerdict() {
+    // Listening verdict B (2026-10-20): the trimmed residuals ship; the
+    // later candidates stay off until the owner has heard them.
     const ceres::Patch defaults;
-    require(defaults.boardPitchTolerance==0 && defaults.boardFilterTolerance==0 &&
-            defaults.boardEnvelopeTolerance==0 && defaults.boardEnvelopeTimeTolerance==0 &&
+    require(defaults.boardPitchTolerance==1 && defaults.boardFilterTolerance==1 &&
+            defaults.boardEnvelopeTolerance==1 && defaults.boardEnvelopeTimeTolerance==0 &&
             defaults.boardVcaTolerance==0 && defaults.boardTemperatureRise==0,
-            "variation is off by default: existing patches keep identical boards");
+            "pitch, filter and envelope tolerances ship; time, VCA and temperature do not");
+    for(const char* name:{"init","brass1","string1"}) {
+        const auto preset=ceres::preset(name);
+        require(preset.boardPitchTolerance==1 && preset.boardFilterTolerance==1 &&
+                preset.boardEnvelopeTolerance==1,"factory presets play the shipping boards");
+    }
+    auto shipping=plain();
+    shipping.boardPitchTolerance=shipping.boardFilterTolerance=shipping.boardEnvelopeTolerance=1;
+    require(play(9,shipping,0,60).oscillatorFrequency!=play(9,shipping,1,60).oscillatorFrequency,
+            "the shipping boards differ");
     auto p=plain();
     for(unsigned board=1;board<4;++board) {
         const auto a=play(9,p,0,60),b=play(9,p,board,60);
@@ -502,7 +513,7 @@ void boardsAreFixedUnits() {
 
 int main() {
     try {
-        defaultsAreIdenticalBoards();
+        defaultsShipTheVerdict();
         trimPointsHoldTheirBand();
         linearVcoBetweenTrimPoints();
         thermalDriftWithinTheRanks();

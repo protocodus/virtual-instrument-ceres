@@ -22,6 +22,8 @@ void near(double a,double b,double tolerance,const char* why) {
 ceres::Patch plain() {
     ceres::Patch p;p.saw=1;p.ampAttack=.001;p.ampSustain=1;p.ampRelease=5;
     p.filterInitial=p.filterPeak=0;
+    // Nominal boards: key codes are read back from the design's VCO law.
+    p.boardPitchTolerance=p.boardFilterTolerance=p.boardEnvelopeTolerance=0;
     return p;
 }
 double key(const ceres::Synth& s,unsigned board) {

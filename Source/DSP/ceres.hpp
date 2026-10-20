@@ -116,8 +116,11 @@ struct Patch {
     // These modeled oscillator variations, like vibrato below, are VCO-only.
     double voiceSpreadCents = 0.0, driftCents = 0.0;
     // Board-to-board tolerance of the four M boards, each 0..1 of the
-    // documented spread; 0 (default) keeps the boards identical. Each seed is
-    // one fixed instrument: its offsets never move while it plays.
+    // documented spread; 0 keeps the boards identical. Pitch, filter and
+    // envelope ship at 1 (owner's listening verdict B, 2026-10-20, set
+    // 2026-10-20-voice-variation-board-tolerance); envelope time, VCA and
+    // temperature stay 0 until a verdict. Each seed is one fixed instrument:
+    // its offsets never move while it plays.
     // Pitch: the residual the service tuning trims leave (+/-1 cent at each
     // trim point, Guide printed p.65). Filter: the IG00156 rank-bin residual
     // of each filter's control sensitivity (+/-.146 oct per octave of Vfc
@@ -130,7 +133,7 @@ struct Patch {
     // CP4 sine and filtered-path trims (+/-2%, +/-2.5%); the output trims
     // after them keep the filtered path's level and the 0 dBm reference.
     // See ceres.cpp.
-    double boardPitchTolerance = 0.0, boardFilterTolerance = 0.0, boardEnvelopeTolerance = 0.0;
+    double boardPitchTolerance = 1.0, boardFilterTolerance = 1.0, boardEnvelopeTolerance = 1.0;
     double boardEnvelopeTimeTolerance = 0.0, boardVcaTolerance = 0.0;
     // Ambient temperature change since the boards were tuned, in kelvin
     // (-25..25; 0 is as tuned). Each board's VCO drifts by its own amount

@@ -57,7 +57,9 @@ void clockAndCoefficients(){
     for(double fs:{8000.,44100.,48000.,96000.,192000.,384000.})for(unsigned factor:{1u,2u,4u}){
         ceres::Synth s(fs,50);require(s.configure(1,factor),"rate configuration");
         ceres::Patch p;p.saw=0;p.sine=1;p.filterInitial=-2;p.filterAttack=.001;p.filterDecay=.3;
-        p.ampAttack=.001;p.ampDecay=.3;p.ampSustain=.4;p.ringMix=1;p.ringRate=220;s.setPatch(p);
+        p.ampAttack=.001;p.ampDecay=.3;p.ampSustain=.4;p.ringMix=1;p.ringRate=220;
+        p.boardPitchTolerance=0; // the clock check needs the nominal key frequency
+        s.setPatch(p);
         const auto before=s.allVoiceState()[0];s.noteOn(60);advance(s,100);
         const auto after=s.allVoiceState()[0];
         const double f=440*std::exp2((60.-69)/12);
