@@ -261,8 +261,14 @@ struct Random {
 // The frequency argument denotes total small-signal integrator frequency, so gm is
 // the requested total conductance minus 1/R, constrained nonnegative.
 // The service manual
-// specifies Q=.5 at VQ=10V and Q=5 at VQ=0V; linear damping interpolation
-// between those calibration endpoints is an explicitly provisional choice.
+// specifies Q=.5 at VQ=10V and Q=5 at VQ=0V (SM1 printed p.19; pin 6 sets
+// the standing Q current that gives Q=5 at 0V). Guide printed p.33 draws the
+// Q path as a variable-gm block (gm=K*Icont) between BP and FB, so damping is
+// proportional to its control current; damping LINEAR in VQ is the law for a
+// linear VQ-to-Icont converter. The sheet does not say whether that converter
+// is linear or exponential; an exponential one through the same endpoints is
+// the open alternative (listening test 2026-10-20-vcf-q-law; Docs/research/
+// vcf-authenticity-2026-10-20.md).
 // HP and LP have independent Q trims: the nominal endpoints are anchored at
 // their usual source loads (HP three mixer branches, LP one). Changing a
 // waveform gate changes the source load, not the Q transistor conductance.
@@ -1207,8 +1213,16 @@ struct Synth::Impl {
             const double ampEnvelope = v.amp.advance(0,1,patch.ampSustain,
                 patch.ampAttackHeadroom,patch.ampAttackSaturation,ampCoefficients[0],
                 ampCoefficients[3],ampCoefficients[1],ampCoefficients[2]);
-            // Guide p.34 fc=125*Kv*2^Vfc; octave-linear key CV. The measured
-            // panel-to-Vfc offset is currently replaced by cutoff-at-middle-C.
+            // Guide printed p.34: fc=125*Kv*2^Vfc. Kv is LINEAR in key Hz: the
+            // M board feeds IG00156 pin 2 from the same K terminal as VCO III
+            // pin 2 (SM2 p.16), 0.25V at 130.8Hz to 4V at 2093Hz (Yamaha's
+            // C2..C6; SM1 printed p.19, both pin sheets), so fc follows the
+            // key exactly one octave per octave, through glide and PITCH but
+            // not TRANSPOSITION (VCO III pin 1 FT only). keyTrack=1 is that hardware law. At Vfc=0 the printed law
+            // puts gm cutoff at 125*.5V = 62.5Hz at middle C; the patch's
+            // cutoff-at-middle-C reference does not yet use that zero point
+            // (listening test 2026-10-20-vcf-cutoff-zero-point; see
+            // Docs/research/vcf-authenticity-2026-10-20.md).
             // This law controls the OTA gm contribution. The independent
             // feed resistor contributes the same conductance at every CV.
             // Master PITCH routes PN2 VR1 -> SUB TU -> KAS67 -> SH -> M K37,
@@ -1716,15 +1730,25 @@ Patch preset(const std::string& name) {
         p.pulse=cv[3]/10; p.saw=cv[4]/10; p.noise=cv[5]/10;
         // The exponential voltage law controls variable gm, not the fixed
         // feed resistor. These 12/180Hz anchors and .7/.65oct/V slopes are
-        // still uncalibrated gm-component estimates. The Patch API expects
+        // still uncalibrated gm-component estimates. The printed IG00156 law
+        // puts 0V at 62.5Hz gm for BOTH stages at middle C (fc=125*Kv*2^Vfc,
+        // Kv=.5V; guide printed p.34, SM1 printed p.19); the slopes cannot
+        // be read off the board, because a 10V lever through 39k into the
+        // 1.8-3.3k rank resistor (SM2 pp.16,18 tables; R6 HP, R7 LP) gives
+        // about .5V at pin 4, half an octave at the pin sheet's 1V/oct. Pin 4's
+        // input current law is unpublished. The Patch API expects
         // total integrator Hz, so include the resistor contribution once.
         p.hpCutoff=filterFrequencyFloor+12*std::exp2(cv[6]*.7);
         p.lpCutoff=filterFrequencyFloor+180*std::exp2(cv[8]*.65);
         // Overall schematic: passive FH/FL buses feed each cutoff via 39k;
         // the shared EG uses 220k for HP and 47k for LP. Relative coupling
         // is Rmanual/REG times the manual CV slope. Those slopes (.7/.65
-        // oct/V) remain provisional; this corrects the supported resistor
-        // ratio without claiming absolute pin-4 CV calibration. The ratio is
+        // oct/V) remain provisional; the paired HP/LP rank shunts (SM2
+        // pp.16,18) give the 39k lever equal pin-4 gain within about 6%, so
+        // the two should be equal (listening test 2026-10-20-vcf-hp-lp-slope;
+        // Docs/research/vcf-authenticity-2026-10-20.md). This corrects the
+        // supported resistor ratio without claiming absolute pin-4 CV
+        // calibration. The ratio is
         // relative to actual loaded FH/FL voltage, not proven to equal the
         // T-board pin above: four-voice loading remains unresolved. Factory
         // scales are an effective/manual-slope estimate.
