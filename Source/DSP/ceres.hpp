@@ -475,4 +475,22 @@ std::vector<OscillatorFrame> oscillatorTrace(double sampleRate, double frequency
 
 #endif // !CERES_EMBEDDED_TARGET
 
+// Parameter descriptors (both targets, allocation-free): one entry for every
+// key setParameter accepts, in its table order, so a front end can build its
+// parameter list from the engine instead of a copy. minimum/maximum are the
+// limits setParameter clamps to, defaultValue is a default Patch's value, and
+// integer marks keys setParameter rounds to whole numbers.
+struct ParameterInfo {
+    const char* key; // static storage; nullptr past the end
+    double minimum, maximum, defaultValue;
+    bool integer;
+};
+std::size_t parameterCount() noexcept;
+// Index in [0, parameterCount()); past the end returns a nullptr key.
+ParameterInfo parameterInfo(std::size_t index) noexcept;
+// The value the engine applies for `key`: the Patch member range-limited and
+// rounded as setParameter would store it, or the default when nonfinite.
+// False, leaving `value` unchanged, for an unknown key.
+bool getParameter(const Patch&, const char* key, double& value) noexcept;
+
 } // namespace ceres

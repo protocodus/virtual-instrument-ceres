@@ -2326,4 +2326,34 @@ Patch preset(const std::string& name) {
     throw std::invalid_argument("Unknown Ceres preset: " + name);
 }
 #endif // !CERES_EMBEDDED_TARGET
+
+// Parameter descriptors read the setParameter table itself, so a key, range
+// or rounding rule added there reaches every front end with no second list.
+std::size_t parameterCount() noexcept {
+    return sizeof parameters/sizeof parameters[0];
+}
+
+ParameterInfo parameterInfo(std::size_t index) noexcept {
+    if (index>=parameterCount()) return {nullptr,0,0,0,false};
+    const Parameter& parameter=parameters[index];
+    const Patch defaults{};
+    // A key is integer when setParameter rounds it. Probe it with a value
+    // that is not a whole number for any integer-valued range (0.318... of
+    // the span): rounding then moves it, a continuous key keeps it.
+    const double probe=parameter.low+(parameter.high-parameter.low)*.3183098861837907;
+    const bool integer=parameterValue(parameter,probe)!=probe;
+    return {parameter.key,parameter.low,parameter.high,defaults.*(parameter.member),integer};
+}
+
+bool getParameter(const Patch& patch, const char* key, double& value) noexcept {
+    if (!key) return false;
+    for (const auto& parameter : parameters) {
+        if (std::strcmp(key,parameter.key)==0) {
+            const double stored=patch.*(parameter.member);
+            value=std::isfinite(stored) ? parameterValue(parameter,stored) : Patch{}.*(parameter.member);
+            return true;
+        }
+    }
+    return false;
+}
 } // namespace ceres
