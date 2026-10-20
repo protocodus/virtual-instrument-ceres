@@ -437,7 +437,10 @@ struct BoardTolerance {
 // linear VQ-to-Icont converter. The sheet does not say whether that converter
 // is linear or exponential; an exponential one through the same endpoints is
 // the open alternative (listening test 2026-10-20-vcf-q-law; Docs/research/
-// vcf-authenticity-2026-10-20.md).
+// vcf-authenticity-2026-10-20.md). Yamaha's own variable-gm cell of the
+// period (JP S59-49726 B2, priority 1976-01-12, figs. 5-6) drives its tail
+// current from a linear V-to-I amplifier, gm ~ Ic ~ Vc: sibling practice
+// that favours the linear law, not a measurement of the IG00156.
 // HP and LP have independent Q trims: the nominal endpoints are anchored at
 // their usual source loads (HP three mixer branches, LP one). Changing a
 // waveform gate changes the source load, not the Q transistor conductance.
@@ -1967,22 +1970,32 @@ Patch preset(const std::string& name) {
         // The exponential voltage law controls variable gm, not the fixed
         // feed resistor. These 12/180Hz anchors and .7/.65oct/V slopes are
         // still uncalibrated gm-component estimates. The printed IG00156 law
-        // puts 0V at 62.5Hz gm for BOTH stages at middle C (fc=125*Kv*2^Vfc,
-        // Kv=.5V; guide printed p.34, SM1 printed p.19); the slopes cannot
-        // be read off the board, because a 10V lever through 39k into the
-        // 1.8-3.3k rank resistor (SM2 pp.16,18 tables; R6 HP, R7 LP) gives
-        // about .5V at pin 4, half an octave at the pin sheet's 1V/oct. Pin 4's
-        // input current law is unpublished. The Patch API expects
+        // is fc=125*Kv*2^Vfc (guide printed p.34; SM1 printed p.19, "VK .25V,
+        // Vf 5V -> 1kHz"): 62.5Hz gm at middle C (Kv=.5V) for Vfc=0, BOTH
+        // stages, 1 oct/V. Vfc is not the pin-4 voltage: a 10V lever through
+        // 39k into the CS-50's 1.8-3.0k rank resistor (SM2 printed p.16; R6
+        // HP, R7 LP) puts only .4-.6V on pin 4, and guide printed p.33 draws
+        // Vfc reaching pin 4 through a variable resistor, the rank-set network.
+        // Read at the 39k lever, the printed law is 1 oct/V on both levers,
+        // but the series reference of the printed Vf is not printed, and with
+        // the printed zero it moves the factory HP presets up 1.3-4.1 octaves
+        // (string1, clavichord: HP near 1.7-2kHz at middle C). It is a
+        // listening test (2026-10-20-vcf-printed-law), not adopted; pin 4's
+        // own input law is unpublished. The Patch API expects
         // total integrator Hz, so include the resistor contribution once.
         p.hpCutoff=filterFrequencyFloor+12*std::exp2(cv[6]*.7);
         p.lpCutoff=filterFrequencyFloor+180*std::exp2(cv[8]*.65);
         // Overall schematic: passive FH/FL buses feed each cutoff via 39k;
         // the shared EG uses 220k for HP and 47k for LP. Relative coupling
         // is Rmanual/REG times the manual CV slope. Those slopes (.7/.65
-        // oct/V) remain provisional; the paired HP/LP rank shunts (SM2
-        // pp.16,18) give the 39k lever equal pin-4 gain within about 6%, so
-        // the two should be equal (listening test 2026-10-20-vcf-hp-lp-slope;
-        // Docs/research/vcf-authenticity-2026-10-20.md). This corrects the
+        // oct/V) remain provisional, and the two should be equal: the CS-50
+        // rank column (SM2 printed p.16, "CS50,60": R7 3.0k/2.4k/2.0k beside
+        // R6 2.7k/2.2k/1.8k; p.18 NA03655) is exactly the E24 set nearest
+        // equal 39k-lever gain into the two pin-4 nodes over the R7 inputs
+        // and trim (3.09k/2.45k/1.97k). Counting the EG paths too, the HP/LP
+        // gain ratio is 1.00-1.06 by rank; without them .99-1.02 (listening
+        // tests 2026-10-20-vcf-hp-lp-slope, -printed-law; Docs/research/
+        // vcf-authenticity-2026-10-20.md). This corrects the
         // supported resistor ratio without claiming absolute pin-4 CV
         // calibration. The ratio is
         // relative to actual loaded FH/FL voltage, not proven to equal the

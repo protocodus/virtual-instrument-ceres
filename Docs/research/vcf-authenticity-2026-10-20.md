@@ -45,7 +45,9 @@ poles, |H| = 1/(1 + (f/fc)²)).
 
 **The cutoff node.** SM2 p.16 and p.18 / PDF 12, 14: pin 4 has a rank resistor
 to ground (R6 HP 2.7k/2.2k/1.8k for chip ranks A/B/C; R7 LP 3.3k/2.7k/2.2k on
-NA03574, 3.0k/2.4k/2.0k on NA03655), 0.01 µF to ground, the R7-board inputs
+NA03574, 3.0k/2.4k/2.0k on NA03655; round 2: p.16 heads the same two columns
+"CS80" and "CS50,60", so the CS-50's R7 is 3.0k/2.4k/2.0k), 0.01 µF to
+ground, the R7-board inputs
 (SM1 p.14 / PDF 8: FH 39k, BR 680k, SUB/TBR/VCF 150k each; FL 39k, BR 220k,
 SUB/TBR/VCF 47k each), the trim, and the filter EG through 220k (HP) and 47k
 (LP) on Overall. The SM2 M sheet draws the EG line straight onto the HP node
@@ -100,7 +102,8 @@ both pin 4s with nearly the same gain. Counting every input on each node
 the HP and LP levers move their cutoffs by the same octaves per volt to within
 about ±6 %. The shipping .7/.65 split (1.077) is outside that band except for
 the NA03655 rank-A case. (First noticed by the BRILLIANCE/RESONANCE pass;
-recomputed here with the EG paths included.) Which common value is right is
+recomputed here with the EG paths included. Round 2 narrows this to the
+CS-50's own column; see below.) Which common value is right is
 the unsourced absolute slope above, so the split is put to a listening test
 and kept until a verdict. Any change must move every consumer of the two
 slopes together: `hpBrillianceScale`/`lpBrillianceScale`,
@@ -135,6 +138,10 @@ Both under `/mnt/project-files/ceres/listening/`, each with `key.md`:
   exponential in VQ, same endpoints.
 - `2026-10-20-vcf-hp-lp-slope/`: the shipping .7/.65 split against both
   stages at .7 and both at .65 oct/V.
+- `2026-10-20-vcf-printed-law/` (round 2): the shipping conversion against
+  the printed law in full, read at the 39k lever (62.5 Hz gm at middle C for
+  0 V, 1 oct/V on both levers, the EG at 39k/220k and 39k/47k oct/V). A
+  choice of B would supersede the zero-point and slope sets.
 
 ## Second search (sibling and clone sources)
 
@@ -163,13 +170,122 @@ documentation. Nothing measured on an original chip turned up.
   analysis is an idealised model (about 23 Hz offset, 7.6 kHz pole, gain
   1.7), not a bench measurement.
 
+## Round 2 (later on 2026-10-20)
+
+### Where the printed Vfc is measured
+
+Guide p.33 / PDF 42 draws pin 4 fed from "Vfc" through a variable-resistor
+symbol (pin 3 through a fixed resistor to ground, pin 6 through a variable
+resistor, pins 2 and 7 direct). So the `fc = 125 · Kv · 2^Vfc` of p.34, and
+the pin sheet's "VK 0.25 V and Vf 5 V gives 1 kHz" (SM1 p.19), describe the
+control voltage ahead of a set resistance, not the pin voltage. That removes
+the contradiction noted above: pin 4 is far more sensitive than 1 V/oct,
+and the resistance in front of it is the rank-selected divider. On the CS-50
+that divider is the 39k lever resistor into R6/R7, so read at the lever the
+printed law gives 1 oct/V on both levers and the 62.5 Hz zero point, every
+other input at 39k/Rx of that.
+
+It is not adopted, for two reasons:
+
+- The series reference behind the printed "Vf" is not printed. Rank shunts
+  imply that Yamaha set the lever gain per chip, but not that the IG00156
+  test circuit used the 39k lever path.
+- With the printed zero, it moves the factory HP settings (Guide p.64 /
+  PDF 73, column g) up 1.3–4.1 octaves. At middle C the HP lands at 1.7 kHz for
+  string1 (5.00 V), 2.0 kHz for clavichord (5.24 V) and 4.2 kHz for
+  harpsichord (6.41 V); shipping puts them at 141, 155 and 249 Hz. In the
+  middle of the range the LP lands within about 0.4 octave of shipping.
+  Whether Yamaha voiced its strings that thin is a question for the ear, so
+  this went to the listening test above (`2026-10-20-vcf-printed-law`).
+
+### HP against LP, CS-50 column only
+
+SM2 p.16 heads the rank table's two R7 columns "CS80" and "CS50,60" (p.18
+labels the same columns NA03574 and NA03655). So the CS-50 has R6
+2.7k/2.2k/1.8k against R7 3.0k/2.4k/2.0k. Over the R7 inputs and the trim
+(330k or 150k agree to 0.001), the HP/LP lever-gain ratio by rank
+A/B/C is:
+
+| EG paths included | Rank A | Rank B | Rank C |
+| --- | --- | --- | --- |
+| EG 220k HP / 47k LP (CS-50 Overall) | 1.063 | 1.051 | 1.013 |
+| EG 100k HP / 47k LP (CS-60 sheet) | 1.049 | 1.039 | 1.004 |
+| No EG paths | 1.023 | 1.018 | 0.986 |
+
+The LP shunts that would make the two gains exactly equal, without the EG
+paths, are 3.09k/2.45k/1.97k. Their nearest E24 values are exactly the printed
+3.0k/2.4k/2.0k. With the EG paths counted, E24 rounding would give
+3.3k/2.7k/2.0k (220k) or 3.3k/2.4k/2.0k (100k).
+
+So the CS-50/60 LP column reads as a deliberate equal-gain design, rounded to
+E24, with the EG paths left out of the calculation. Equal HP/LP slopes are
+the design intent. The as-built HP slope runs 0–6 % steeper with the EG
+loading. The shipping split, 1.077, sits 1.3–7 % above that band.
+
+The common absolute value is still unsourced unless the printed-law reading
+above is accepted. Equal slopes are therefore not implemented this round.
+The consumers to move together are unchanged:
+
+- `hpBrillianceScale` and `lpBrillianceScale`
+- `hpSubRelativeScale`
+- the preset `hp/lpEnvelopeScale`
+- `subFilterLeverOctaves`
+
+### Other printed details
+
+- **Pin sheet output levels.** SM1 p.19 labels the LP output "−6dB/1V" and
+  the BP output "−12dB/1V". A BP peak 6 dB below the LP passband is Q = 0.5,
+  which is consistent with Q = BP peak / LP passband and the minimum-Q end
+  of VQ. The test network is not printed, so these labels give no input
+  scale.
+- **The fL reference.** Guide p.59's fL = 0.64 V equals, to three figures,
+  the R7 LP network with the FL 39k left out: BR 220k plus three 47k into
+  1 kΩ gives 0.640 V. With FL in, the network gives 0.859 V. Its fH = 0.45 V
+  does include FH 39k (0.450 V). The cause is unknown; the R7 schematic
+  (FL 39k) is followed.
+
+### Third search (patents, mirrors, recordings)
+
+Nothing measured on an original IG00156 was found.
+
+- **Google Patents.** I scanned every Yamaha (Nippon Gakki) filing with
+  priority 1974–79 that matches "filter" and "control voltage": 196
+  documents, searched by keyword for filter-control terms. A search for
+  Mitsubishi "voltage controlled filter" filings in the same window returned
+  nothing. None of these describes the IG00156 internals.
+  - JP S59-49726 B2 (priority 1976-01-12, inventor Nagahama) is a Yamaha
+    voltage-controlled resistor and VCF built from gm cells. Their tail
+    current comes from a linear V-to-I amplifier, gm ∝ Ic ∝ Vc (figs. 5–6).
+    That is sibling design practice in favour of the shipping linear Q law,
+    not a measurement.
+  - JP S59-21546 Y2 (1977) is a diode-bridge filter and does not apply.
+- **Haible.** "Analyzing the CS-80 VCF" (J. Haible 2001, retrieved from
+  jhaible.com/legacy) is a linear SPICE model. Its gm and gq are free
+  parameters ("10uS == 1kHz", "approx. 20uS == minimum Q"). Its external
+  network, 4.7M, 1.5n, 33k, 1.2M ∥ 180p, 150k and 1µ, is already the
+  modelled one. It gives no control law. It drives the signal into the
+  op-amp's feedback node, whereas the Guide, the IC Guide Book and the CS-50
+  M sheet all put the input on AI, shared with FB. The model keeps Yamaha's
+  drawing. The servicing-guide images on the same site returned 403 from the
+  origin; they are pages of the Guide used here.
+- **MOTM-480 manual** (Synthesis Technology, 2005). It is a re-design ("the
+  exact circuit is not copied") that keeps the 1.2M ∥ 150p Q network and the
+  HP-into-LP cascade. It is not original-chip evidence.
+- **Other sources.** These gave nothing usable:
+  - cs80.com adjustment and service-bulletin pages: origin 403.
+  - The KVR "Yamaha CS filter: analysis" thread (2006): no figures.
+  - Old Crow's NE10500 notes: they describe the GX-1 filter.
+- **Recordings.** No public CS-50/60/80 recording with stated lever
+  positions turned up, so no cutoff measurement could be taken from one.
+
 ## What would close the gap
 
 1. A measured CS-50 (or CS-60/CS-80 IG00156) cutoff against lever voltage at
    one key: two points fix the slope; with the printed zero point that
    closes the panel-to-Hz law.
 2. Pin-4 input characteristic of the IG00156 (voltage/current at the pin
-   against cutoff), or any chip-level datasheet.
+   against cutoff), or any chip-level datasheet. The test circuit behind
+   the pin sheet's "Vf 5 V gives 1 kHz" would settle the printed-law reading.
 3. Q against VQ at three or more voltages on one chip, to choose the Q
    converter law.
 4. Signal amplitude at IG00156 pin 15/10 for a known WSC input, or the onset
