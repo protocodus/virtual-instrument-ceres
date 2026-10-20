@@ -8,6 +8,10 @@
 namespace {
 constexpr double pi=3.14159265358979323846;
 constexpr double floorHz=1/(2*pi*1.5e-9*4.7e6);
+// R7 TBR: 47k LP, 150k HP with the .7/.65 manual slopes (SM1 p.14).
+constexpr double hpTouch=(.7/.65)*(47./150.);
+// Touch level amplifier I centres the 3Vpp SUB on +.5V (guide p.56).
+constexpr double vibratoBias=1./3;
 void require(bool good,const char* why) {if(!good)throw std::runtime_error(why);}
 void near(double a,double b,double tolerance,const char* why) {
     if(!std::isfinite(a)||!std::isfinite(b)||std::abs(a-b)>tolerance) {
@@ -26,11 +30,12 @@ void advance(ceres::Synth& s,unsigned n=16) {
 void checkVoice(const ceres::Synth& s,unsigned board,double velocity,const ceres::Patch& p) {
     const auto v=s.voiceState()[board];
     const double key=(v.keyNote-60)*p.keyTrack/12+p.tuneCents/1200;
-    near(v.hpFrequency,floorHz+(p.hpCutoff-floorHz)*std::exp2(key+velocity*p.pressureFilter),1e-10,
+    near(v.hpFrequency,floorHz+(p.hpCutoff-floorHz)*std::exp2(key+velocity*p.pressureFilter*hpTouch),1e-10,
          "HP tracks the board's latched expression above the fixed gm floor");
     near(v.lpFrequency,floorHz+(p.lpCutoff-floorHz)*std::exp2(key+velocity*p.pressureFilter),1e-9,
          "LP tracks the board's latched expression above the fixed gm floor");
-    const double cents=s.modulationState().sub*(p.vibratoCents+velocity*p.pressureVibrato)+p.tuneCents;
+    const double cents=s.modulationState().sub*(p.vibratoCents+velocity*p.pressureVibrato)
+        +velocity*p.pressureVibrato*vibratoBias+p.tuneCents;
     near(v.oscillatorFrequency,440*std::exp2((v.keyNote-69+12*p.octave+cents*.01)/12),1e-10,
          "SUB vibrato uses each board's expression independently");
 }
@@ -133,11 +138,13 @@ void audioLawsAndZeroDepth() {
         auto equivalent=p;equivalent.expressionSource=0;
         if(route==0){equivalent.velocitySensitivity=p.pressureVolume;equivalent.pressureVolume=0;}
         if(route==1) {
-            equivalent.hpCutoff=floorHz+(p.hpCutoff-floorHz)*std::exp2(v*p.pressureFilter);
+            equivalent.hpCutoff=floorHz+(p.hpCutoff-floorHz)*std::exp2(v*p.pressureFilter*hpTouch);
             equivalent.lpCutoff=floorHz+(p.lpCutoff-floorHz)*std::exp2(v*p.pressureFilter);
             equivalent.pressureFilter=0;
         }
-        if(route==2){equivalent.vibratoCents=v*p.pressureVibrato;equivalent.pressureVibrato=0;}
+        // The touch vibrato's +.5V centre is a VCO-only offset, as TRANSPOSE is.
+        if(route==2){equivalent.vibratoCents=v*p.pressureVibrato;equivalent.pressureVibrato=0;
+            equivalent.octave=v*p.pressureVibrato*vibratoBias/1200;}
         ceres::Synth a(8000,6),b(8000,6);a.setPatch(p);b.setPatch(equivalent);a.noteOn(60,v);b.noteOn(60,v);
         double energy=0;
         for(unsigned n=0;n<1600;++n) {

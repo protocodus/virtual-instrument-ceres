@@ -21,6 +21,9 @@ constexpr double filterFrequencyFloor = 1/(2*pi*filterCapacitance*filterFeedResi
 // not raw preset-divider CV or a finite-impedance pot position.
 constexpr double hpBrillianceScale=.7*39/680, lpBrillianceScale=.65*39/220;
 constexpr double hpSubRelativeScale=(.7/.65)*(47./150.);
+// Guide printed p.56: touch level amplifier I is trimmed so a 0V-centred SUB
+// input leaves centred on +.5V; the SUB source is fixed at 3Vpp (p.55).
+constexpr double touchVibratoBias=.5/1.5;
 constexpr double qControlTau=10e-6*(220e3/2);
 // Fairchild uA796 upper carrier pairs have no emitter degeneration. In the
 // matched, forward-active/infinite-beta limit their current steering is
@@ -86,6 +89,9 @@ const Parameter parameters[] = {
     {"pressure_volume", &Patch::pressureVolume, 0, 1},
     {"pressure_filter", &Patch::pressureFilter, 0, 5},
     {"pressure_vibrato", &Patch::pressureVibrato, 0, 100},
+    {"pressure_wah", &Patch::pressureWah, 0, 5},
+    {"glide_mode", &Patch::glideMode, 0, 2},
+    {"glide_rate", &Patch::glideRate, 1, 200},
     {"expression_source", &Patch::expressionSource, 0, 1},
     {"velocity_sensitivity", &Patch::velocitySensitivity, 0, 1},
     {"drive", &Patch::drive, .05, 8},
@@ -98,7 +104,7 @@ double parameterValue(const Parameter& parameter, double value) {
                    parameter.member==&Patch::filterAttackSaturation))
         value=std::max(.001,value);
     if (parameter.member==&Patch::lfoWaveform || parameter.member==&Patch::sustainMode ||
-        parameter.member==&Patch::expressionSource)
+        parameter.member==&Patch::expressionSource || parameter.member==&Patch::glideMode)
         value=std::round(value);
     return value;
 }
@@ -579,6 +585,11 @@ bool setParameter(Patch& patch, const std::string& key, double value) {
 struct Synth::Impl {
     struct Voice {
         int note = 60, keyNote = 60;
+        // Glide state: counter key code, its accumulated step phase, the
+        // integrated key voltage (relative Hz, 1 at C4) and the sounding key.
+        int glideCode = 60;
+        double glideSteps = 0, glideVoltage = 1, keyPitch = 60;
+        bool glideReady = false;
         bool held = false, pedalHeld = false;
         double velocity = 1, velocityValue = 1, drift = 0, driftTarget = 0;
         std::uint32_t pressTicket = 0;
@@ -750,6 +761,39 @@ struct Synth::Impl {
             voice.driftCountdown = static_cast<unsigned>(internalFs * (.1 + initialRandom.unit()*.5));
         }
     }
+    // KAS key voltage path (guide printed pp.22-25): assigner code -> glissando
+    // counter -> integrating gate -> sample-hold -> VCO and filter key CV.
+    // Free channels carry the last-pressed key (p.23), so a newly assigned
+    // board glides from the previous key. The sample-hold tracks while its key
+    // is down or in Sustain II and holds the gliding value at key-off in I.
+    double advanceGlide(Voice& v,double dt) {
+        const int target=v.held || v.pedalHeld ? v.note : lastAssignedKey;
+        if (patch.glideMode==0) {
+            v.glideCode=target; v.glideSteps=0; v.glideReady=false;
+            return v.keyPitch=v.keyNote;
+        }
+        if (!v.glideReady) {
+            v.glideCode=static_cast<int>(std::lround(v.keyPitch));
+            v.glideVoltage=std::exp2((v.keyPitch-60)/12);
+            v.glideReady=true;
+        }
+        if (v.glideCode==target) v.glideSteps=0;
+        else {
+            v.glideSteps+=patch.glideRate*dt;
+            while (v.glideSteps>=1 && v.glideCode!=target) {
+                v.glideCode+=v.glideCode<target ? 1 : -1;
+                v.glideSteps-=1;
+            }
+        }
+        const double stepped=std::exp2((v.glideCode-60)/12.0);
+        // Hz-linear key voltage: the integrator's RC glide is exponential in
+        // Hz, so a wide glide covers its last semitones more slowly in pitch.
+        v.glideVoltage=patch.glideMode==2 ? stepped
+            : v.glideVoltage+(stepped-v.glideVoltage)*-std::expm1(-patch.glideRate*dt);
+        if (v.held || v.pedalHeld || patch.sustainMode==2)
+            v.keyPitch=60+12*std::log2(v.glideVoltage);
+        return v.keyPitch;
+    }
     double sample() {
         hasProcessed=true;
         const double dt = 1 / internalFs;
@@ -801,8 +845,10 @@ struct Synth::Impl {
             }
             v.drift += (v.driftTarget-v.drift) * driftCoefficient;
             const double cents = patch.tuneCents + (static_cast<double>(i)-1.5)*patch.voiceSpreadCents
-                + v.drift*patch.driftCents + lfo*(patch.vibratoCents + expression*patch.pressureVibrato);
-            const double frequency = 440 * std::exp2((v.keyNote-69 + bend + 12*patch.octave + cents*.01)/12);
+                + v.drift*patch.driftCents + lfo*(patch.vibratoCents + expression*patch.pressureVibrato)
+                + expression*patch.pressureVibrato*touchVibratoBias;
+            const double key=advanceGlide(v,dt);
+            const double frequency = 440 * std::exp2((key-69 + bend + 12*patch.octave + cents*.01)/12);
             const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
                                             patch.resetMicroseconds*1e-6,internalFs);
             const double filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
@@ -821,14 +867,17 @@ struct Synth::Impl {
             // -5..+7 semitones. It remains a shared master offset even when
             // the engineering-only keyTrack slope is changed. TRANSPOSE FT,
             // VIB15 and the modeled oscillator drift/spread remain VCO-only.
-            const double keyOctaves=(v.keyNote-60+bend)*patch.keyTrack/12+patch.tuneCents/1200;
+            const double keyOctaves=(key-60+bend)*patch.keyTrack/12+patch.tuneCents/1200;
+            // R7 TBR and VCF (touch SUB) enter each cutoff node through 47k LP
+            // and 150k HP, like SUB: the HP coupling is hpSubRelativeScale.
+            const double touchOctaves=expression*(patch.pressureFilter+lfo*patch.pressureWah);
             const double hpFactor=std::exp2(keyOctaves+filterEnvelope*patch.hpEnvelopeScale
-                + expression*patch.pressureFilter+lfo*(patch.filterLfo*hpSubRelativeScale)
+                + touchOctaves*hpSubRelativeScale+lfo*(patch.filterLfo*hpSubRelativeScale)
                 + patch.brilliance*hpBrillianceScale);
             const double lpFactor=patch.lpEnvelopeScale==patch.hpEnvelopeScale &&
-                patch.filterLfo==0 && patch.brilliance==0 ? hpFactor
+                patch.filterLfo==0 && patch.brilliance==0 && touchOctaves==0 ? hpFactor
                 : std::exp2(keyOctaves+filterEnvelope*patch.lpEnvelopeScale
-                    + expression*patch.pressureFilter+lfo*patch.filterLfo
+                    + touchOctaves+lfo*patch.filterLfo
                     + patch.brilliance*lpBrillianceScale);
             const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*audioNoise;
             const double hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor);
@@ -930,8 +979,16 @@ void Synth::noteOn(int note, double velocity) {
     if (!state.keyOn(note,ticket)) return;
     state.lastAssignedKey=note;
     Impl::Voice* selected = nullptr;
-    // Use an idle voice first, then the quietest released voice, then oldest
-    // held voice. Repeated same-note presses can occupy separate voices.
+    // KAS gate control (guide printed pp.17-18) writes a new key only into a
+    // channel whose code differs and whose key is up; a released channel that
+    // still holds this key is re-keyed. Reuse that board first. Otherwise use
+    // an idle voice, then the quietest released voice, then the oldest held
+    // voice. Overlapping presses of a still-held note occupy separate voices.
+    for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it)
+        if (it->note==note && !it->held && !it->pedalHeld) {
+            selected=&*it; break;
+        }
+    if (!selected)
     for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it) {
         auto& voice=*it;
         if (voice.amp.stage == Envelope::Idle && (!selected || voice.age < selected->age)) selected = &voice;

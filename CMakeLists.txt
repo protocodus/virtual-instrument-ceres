@@ -22,7 +22,7 @@ endif()
 
 # C is required in addition to C++: JUCE's macOS plug-in wrappers (AU and
 # Standalone) compile C/Objective-C sources with non-Xcode generators too.
-project(Ceres VERSION 0.2.2 LANGUAGES C CXX)
+project(Ceres VERSION 0.3.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -286,6 +286,9 @@ if(BUILD_TESTING)
   add_executable(ceres_fast_note_envelope_tests Tests/FastNoteEnvelopeTests.cpp)
   target_link_libraries(ceres_fast_note_envelope_tests PRIVATE ceres)
   add_test(NAME Ceres.fast_note_envelope_contracts COMMAND ceres_fast_note_envelope_tests)
+  add_executable(ceres_hardware_realism_tests Tests/HardwareRealismTests.cpp)
+  target_link_libraries(ceres_hardware_realism_tests PRIVATE ceres)
+  add_test(NAME Ceres.hardware_realism_contracts COMMAND ceres_hardware_realism_tests)
   add_executable(ceres_embedded_contract Tests/EmbeddedContract.cpp)
   target_link_libraries(ceres_embedded_contract PRIVATE ceres_embedded)
   if(NOT MSVC)
