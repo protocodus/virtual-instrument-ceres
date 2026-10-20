@@ -3,7 +3,8 @@
 // same node that feeds VCO III pin 2 (SM2 p.16), after the KAS glide and the
 // PITCH master offset. TRANSPOSITION enters VCO III pin 1 (FT) only. So the
 // variable-gm cutoff follows the sounding key exactly, octave for octave,
-// except that transposition moves the oscillator and not the filters.
+// except that transposition moves the oscillator and not the filters. The
+// factory presets convert their cutoff columns with the same printed law.
 // Expected values come from those laws, not from the engine's own formulas.
 #include "ceres.hpp"
 #include <cmath>
@@ -88,11 +89,65 @@ void glideMovesFilters() {
     }
     if(!moved)throw std::runtime_error("Glide was observed mid-travel");
 }
+
+// A T-board pin sits a 1S1555 drop below the printed ideal divider value
+// (preset() models the diode as 1N4148-class: Is 2.52nA, N 1.75, 10k load
+// from a 10V source). Solved here by bisection on the node equation, not by
+// the engine's fixed-point pass.
+double presetPin(double ideal) {
+    if(ideal<=0)return 0;
+    const double vt=1.75*25.85e-3;
+    double low=0,high=ideal;
+    for(int i=0;i<200;++i) {
+        const double mid=(low+high)/2;
+        ((10-vt*std::log(mid/(10e3*2.52e-9)))*ideal/10>mid ? low : high)=mid;
+    }
+    return (low+high)/2;
+}
+// Guide printed p.64 (PDF 73), CS-50 tone-preset table, columns g (HP
+// cutoff), h (HP Q), i (LP cutoff) and j (LP Q) in volts, with the two
+// T-board errata that preset() applies (string1 i 8.70, brass2 i 3.85).
+struct FactoryFilterColumns { const char* name; double g,h,i,j; };
+const FactoryFilterColumns factoryFilterColumns[]={
+    {"string1",5,6.17,8.70,10},{"string2",2.33,10,5.95,10},{"brass1",0,10,5.71,5.71},
+    {"brass2",2.17,3.85,3.85,7.87},{"flute",1.18,3.57,5.24,2.33},
+    {"electric_piano",1.28,6.41,1.52,3.33},{"clavichord",5.24,5.95,5.71,4.55},
+    {"harpsichord",6.41,10,7.87,8.47},{"guitar1",3.85,5.49,5.95,2.50},
+    {"guitar2",2.50,0,2.70,0},{"funky1",5,6.17,5.95,0},{"funky2",5.71,0,7.35,0},
+    {"funky3",4,2.50,4.76,3.13}};
+
+void factoryCutoffsFollowPrintedLaw() {
+    // fc=125*Kv*2^Vfc with Vfc read at the lever, ahead of its 39k into
+    // pin 4 (guide printed pp.33-34): 62.5Hz of gm at middle C for 0V and
+    // one octave per lever volt, the same for HP and LP. The fixed 4.7M feed
+    // adds its floor once. Chosen by ear 2026-10-20 (vcf-printed-law).
+    for(const auto& row:factoryFilterColumns) {
+        const auto p=ceres::preset(row.name);
+        near(std::log2((p.hpCutoff-floorHz)/(125*kvMiddleC)),presetPin(row.g),1e-12,
+             "Factory HP cutoff follows the printed law at 1 oct/V");
+        near(std::log2((p.lpCutoff-floorHz)/(125*kvMiddleC)),presetPin(row.i),1e-12,
+             "Factory LP cutoff follows the printed law at 1 oct/V");
+        // The filter EG enters through 220k (HP) and 47k (LP) beside the
+        // 39k lever (Overall circuit diagram), so 39/220 and 39/47 oct/V.
+        near(p.hpEnvelopeScale,39./220,1e-15,"Factory HP EG at 39k/220k of 1 oct/V");
+        near(p.lpEnvelopeScale,39./47,1e-15,"Factory LP EG at 39k/47k of 1 oct/V");
+    }
+    // The pin sheet's own check point (SM1 printed p.19): VK .25V (C3) with
+    // Vf 5V gives 1kHz of gm, here through the engine's key tracking.
+    ceres::Synth s(48000,3);auto p=plain();
+    p.hpCutoff=p.lpCutoff=floorHz+125*kvMiddleC*std::exp2(5.);
+    s.setPatch(p);s.noteOn(48);
+    for(int n=0;n<64;++n)s.process();
+    const auto v=s.allVoiceState()[0];
+    near(v.lpFrequency-floorHz,1000,1e-9,"VK .25V, Vf 5V gives 1kHz (LP)");
+    near(v.hpFrequency-floorHz,1000,1e-9,"VK .25V, Vf 5V gives 1kHz (HP)");
+}
 }
 
 int main() {
     try {
         tracksKeyVoltage();transpositionLeavesFilters();pitchMovesFilters();glideMovesFilters();
+        factoryCutoffsFollowPrintedLaw();
         std::puts("VCF key-voltage contracts passed");
         return 0;
     } catch(const std::exception& e) {std::fprintf(stderr,"%s\n",e.what());return 1;}

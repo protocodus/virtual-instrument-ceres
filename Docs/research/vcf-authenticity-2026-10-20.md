@@ -125,9 +125,10 @@ AI-to-OTA attenuation and the OTA linear range are not published, so
 
 **Q converter law.** As above.
 
-## Listening tests (rendered, verdicts pending)
+## Listening tests
 
-Both under `/mnt/project-files/ceres/listening/`, each with `key.md`:
+All under `/mnt/project-files/ceres/listening/`, each with `key.md`. The
+owner chose B in all four later on 2026-10-20; see Round 3.
 
 - `2026-10-20-vcf-cutoff-zero-point/`: the shipping preset conversion against
   the printed 62.5 Hz zero point with the same provisional slopes. Only the
@@ -278,11 +279,79 @@ Nothing measured on an original IG00156 was found.
 - **Recordings.** No public CS-50/60/80 recording with stated lever
   positions turned up, so no cutoff measurement could be taken from one.
 
+## Round 3: owner verdicts (later on 2026-10-20)
+
+The owner chose B in every listening set ("B meaning - use candidates
+everywhere"). These are choices made by ear between candidates that each
+rest on printed values; no measurement decided them, and the coordinator
+records the verdicts in `Docs/decisions.md`.
+
+### The printed cutoff law (`vcf-printed-law` B)
+
+Factory cutoffs now follow `fc = 125 · Kv · 2^Vfc` in full: 62.5 Hz of gm at
+middle C for 0 V and 1 oct/V on both levers. This supersedes
+`vcf-cutoff-zero-point` and `vcf-hp-lp-slope`, whose B letters pointed the
+same way.
+
+- **Printed:** the law (Guide p.34 / PDF 43; SM1 p.19 / PDF 9, "VK 0.25 V,
+  Vf 5 V → 1 kHz"); the 39k lever and every other input resistor (SM1 p.14 /
+  PDF 8; Overall); the CS-50 rank shunts (SM2 p.16 / PDF 12).
+- **The one inference:** Vfc is measured at the FH/FL lever, ahead of its
+  39k into pin 4 (Guide p.33 / PDF 42 draws Vfc reaching pin 4 through a
+  resistor). Neither the series reference behind the pin sheet's Vf nor
+  pin 4's own input law is printed.
+- **One slope for both levers:** the rank shunts are the E24 values nearest
+  equal lever gain (Round 2). As built, the HP slope may run up to 6 %
+  steeper with the EG paths; the model uses the design value.
+
+Every consumer of the old .7/.65 oct/V slopes moved with it:
+
+| Constant | Was | Now |
+| --- | --- | --- |
+| `hpBrillianceScale` | .7 · 39/680 | 39/680 |
+| `lpBrillianceScale` | .65 · 39/220 | 39/220 |
+| `hpSubRelativeScale` (SUB, touch, `pressure_wah`) | (.7/.65) · 47/150 = 0.3374 | 47/150 = 0.3133 |
+| preset `hpEnvelopeScale` | .7 · 39/220 | 39/220 |
+| preset `lpEnvelopeScale` | .65 · 39/47 | 39/47 |
+| `subFilterLeverOctaves(1)` | .65 · 39/47 · 1.5 = 0.809 | 39/47 · 1.5 = 1.245 |
+
+The SUB pass's figures of 0.809 LP and 0.273 HP octaves per SUB unit at full
+lever (`sub-authenticity-2026-10-20.md`) are the old slope's; at 1 oct/V they
+are 1.245 and 0.390.
+
+Factory cutoffs at middle C, total Hz including the 22.6 Hz feed floor, from
+the diode-loaded column g/i pin volts (Guide p.64 / PDF 73):
+
+| Preset | HP was | HP now | LP was | LP now |
+| --- | --- | --- | --- | --- |
+| string1 | 141 | 1676 | 7264 | 18408 |
+| string2 | 57.6 | 312 | 2285 | 3093 |
+| brass1 | 34.6 | 85.1 | 2067 | 2649 |
+| brass2 | 55.2 | 283 | 952 | 803 |
+| flute | 43.3 | 159 | 1698 | 1956 |
+| electric_piano | 44.2 | 168 | 368 | 193 |
+| clavichord | 155 | 1956 | 2067 | 2649 |
+| harpsichord | 249 | 4166 | 5121 | 10738 |
+| guitar1 | 92.9 | 803 | 2285 | 3093 |
+| guitar2 | 60.5 | 346 | 593 | 391 |
+| funky1 | 141 | 1676 | 2285 | 3093 |
+| funky2 | 187 | 2649 | 4115 | 7662 |
+| funky3 | 97.8 | 884 | 1389 | 1436 |
+
+Fixtures that encoded the old slopes now encode the printed one, each with a
+comment saying so: the touch and SUB HP ratio (`ExpressionTests`,
+`HardwareRealismTests`, `SoundPathTests`), the BR and SUB nodal sums
+(`SoundPathTests`), the SUB VCF lever (`SubOscillatorTests`) and the factory
+EG scales (`dsp_tests`). `VcfKeyVoltageTests` adds a contract that every
+factory cutoff equals the printed law at its independently solved pin volts,
+and the pin sheet's 1 kHz check point through key tracking.
+
 ## What would close the gap
 
 1. A measured CS-50 (or CS-60/CS-80 IG00156) cutoff against lever voltage at
    one key: two points fix the slope; with the printed zero point that
-   closes the panel-to-Hz law.
+   closes the panel-to-Hz law. Since Round 3 this would confirm or correct
+   the printed-law reading chosen by ear.
 2. Pin-4 input characteristic of the IG00156 (voltage/current at the pin
    against cutoff), or any chip-level datasheet. The test circuit behind
    the pin sheet's "Vf 5 V gives 1 kHz" would settle the printed-law reading.

@@ -50,7 +50,9 @@ void brillianceAndSubKcl() {
     for(double extra:{0.,1/3000.,1/1800.,.1}) {
         for(bool hp:{false,true}) {
             const double rm=39000,rb=hp?680000:220000,rs=hp?150000:47000;
-            const double slope=hp?.7:.65;
+            // Both levers: the printed IG00156 law, 1 oct/V at the 39k lever
+            // (guide p.34), replacing the provisional .7/.65 on 2026-10-20.
+            const double slope=1;
             const double total=1/rm+1/rb+1/rs+extra;
             const double duManual=(1/rm)/total;
             near(((1/rb)/total)/duManual*slope,slope*rm/rb,1e-14,"BR nodal ratio");
@@ -67,8 +69,8 @@ void brillianceAndSubKcl() {
             const double key=(67-60+.3)*tracking/12+230./1200;
             const double hpOct=std::log2((v.hpFrequency-floorHz)/(p.hpCutoff-floorHz))-key;
             const double lpOct=std::log2((v.lpFrequency-floorHz)/(p.lpCutoff-floorHz))-key;
-            near(hpOct,br*.7*39000/680000+lfo*1.3*(.7/.65)*(47000./150000),2e-14,"HP actual summed control currents");
-            near(lpOct,br*.65*39000/220000+lfo*1.3,2e-14,"LP actual summed control currents");
+            near(hpOct,br*39000/680000+lfo*1.3*(47000./150000),2e-14,"HP actual summed control currents");
+            near(lpOct,br*39000/220000+lfo*1.3,2e-14,"LP actual summed control currents");
         }
         // At zero variable gm, neither BR nor SUB may scale the fixed feed.
         p.hpCutoff=p.lpCutoff=5;s.setPatch(p);s.process();
@@ -79,8 +81,8 @@ void brillianceAndSubKcl() {
     // a disconnected diagnostic variable. No frequency boundary is active.
     ceres::Patch p;p.hpCutoff=150;p.lpCutoff=1800;p.brilliance=-8;
     auto equivalent=p;equivalent.brilliance=0;
-    equivalent.hpCutoff=floorHz+(p.hpCutoff-floorHz)*std::exp2(-8*.7*39000/680000);
-    equivalent.lpCutoff=floorHz+(p.lpCutoff-floorHz)*std::exp2(-8*.65*39000/220000);
+    equivalent.hpCutoff=floorHz+(p.hpCutoff-floorHz)*std::exp2(-8*39000./680000);
+    equivalent.lpCutoff=floorHz+(p.lpCutoff-floorHz)*std::exp2(-8*39000./220000);
     ceres::Synth a(8000,71),b(8000,71);a.setPatch(p);b.setPatch(equivalent);a.noteOn(60);b.noteOn(60);
     for(unsigned i=0;i<2000;++i)near(a.process(),b.process(),2e-7,"BR must affect actual filter audio at correct gm position");
 }
@@ -215,7 +217,7 @@ void sharedSubPolarity() {
             const double wiper=.4/(1+.4*.6*(10e3/30e3));
             near(gain,.8+wiper*(1.5/120e3)/(10/270e3)*source,2e-16,"Common gain swings around LEVEL by the loaded R7 120k/270k ratio");
             near(lpOct,.4*source,2e-14,"Selected SUB feeds actual LP variable-gm control");
-            near(hpOct,.4*source*(.7/.65)*(47./150.),2e-14,"Selected SUB feeds actual HP variable-gm control");
+            near(hpOct,.4*source*(47./150.),2e-14,"Selected SUB feeds actual HP variable-gm control");
             if(source>.05) {
                 ++positive;require(gain>.8 && hpOct>0 && lpOct>0,"Positive shared SUB raises gain and both cutoffs");
             }

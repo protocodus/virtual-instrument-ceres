@@ -12,7 +12,8 @@
 namespace {
 constexpr double pi=3.14159265358979323846;
 constexpr double floorHz=1/(2*pi*1.5e-9*4.7e6);
-constexpr double hpShare=(.7/.65)*(47./150.);
+// 150k HP against 47k LP at equal (printed 1 oct/V) lever slopes.
+constexpr double hpShare=47./150.;
 void require(bool good,const char* why) {if(!good)throw std::runtime_error(why);}
 void near(double a,double b,double tolerance,const char* why) {
     if(!std::isfinite(a)||std::abs(a-b)>tolerance) {

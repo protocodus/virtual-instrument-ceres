@@ -54,13 +54,14 @@ void depthLevers() {
     }
     near(ceres::subVibratoLeverCents(1),25,1e-12,"Full VCO lever is 25 cents");
     // VCF: four 47k + four 150k; LP octaves per SUB unit as the 47k current
-    // against FL's .65 oct/V through 39k.
+    // against FL's 1 oct/V through 39k (the printed IG00156 law read at the
+    // lever, guide p.34; it replaced the provisional .65 oct/V on 2026-10-20).
     const double load=1/(4/47e3+4/150e3);
     for(double x=0;x<=1.0001;x+=.05) {
         const double lpCurrent=wiper(1.5,x,load)/47e3;
-        near(ceres::subFilterLeverOctaves(x),.65*39e3*lpCurrent,1e-12,"VCF lever LP octaves");
+        near(ceres::subFilterLeverOctaves(x),39e3*lpCurrent,1e-12,"VCF lever LP octaves");
     }
-    near(ceres::subFilterLeverOctaves(1),.65*39/47*1.5,1e-12,"Full VCF lever");
+    near(ceres::subFilterLeverOctaves(1),39./47*1.5,1e-12,"Full VCF lever");
     require(ceres::subFilterLeverOctaves(.5)<.4*ceres::subFilterLeverOctaves(1),
             "The heavily loaded VCF lever sags more than 20% at mid-travel");
     near(ceres::subVibratoLeverCents(-1),0,0,"Lever travel clamps low");

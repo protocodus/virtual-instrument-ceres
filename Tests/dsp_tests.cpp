@@ -767,11 +767,12 @@ void filterEnvelopeCoupling() {
         const double fixedHz=1/(2*pi*1.5e-9*4.7e6);
         require(p.hpCutoff>fixedHz && p.lpCutoff>fixedHz,
                 "Finite factory cutoff CV must retain nonzero gm and respond to envelope modulation");
-        // Independent documented resistor ratio relative to the existing
-        // provisional manual slope; no claim of absolute cutoff calibration.
-        require(std::abs(p.hpEnvelopeScale/.7-39000.0/220000.0)<1e-14,
+        // Independent documented resistor ratio at the levers' printed
+        // 1 oct/V (guide p.34, read at the 39k lever). Until 2026-10-20 this
+        // divided out the provisional .7/.65 manual slopes instead.
+        require(std::abs(p.hpEnvelopeScale-39000.0/220000.0)<1e-14,
                 "Factory HP envelope must use 39k/220k relative coupling");
-        require(std::abs(p.lpEnvelopeScale/.65-39000.0/47000.0)<1e-14,
+        require(std::abs(p.lpEnvelopeScale-39000.0/47000.0)<1e-14,
                 "Factory LP envelope must use 39k/47k relative coupling");
     }
     auto p=ceres::preset("init"); p.filterInitial=-2; p.filterPeak=3;

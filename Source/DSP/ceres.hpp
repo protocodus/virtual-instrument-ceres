@@ -42,8 +42,9 @@ struct Patch {
     double hpCutoff = 30.0, lpCutoff = 6000.0;
     double hpResonance = 0.0, lpResonance = 0.0, keyTrack = 1.0;
     // Actual loaded BR-bus voltage relative to the calibrated neutral, V.
-    // The 39k/(680k HP,220k LP) network uses provisional .7/.65 oct/V
-    // manual slopes; it is not the position/taper of the passive panel pot.
+    // Through 680k (HP) and 220k (LP) beside the levers' 39k it moves the
+    // cutoffs 39/680 and 39/220 octave per volt at the printed 1 oct/V lever
+    // law (ceres.cpp); it is not the position/taper of the passive panel pot.
     double brilliance = 0.0; // [-15,15]
     // Change of loaded RES-bus voltage around the existing effective Q
     // calibration, V. Positive lowers Q. The signed [-10,10] engineering
@@ -56,7 +57,8 @@ struct Patch {
     double resonanceOffset = 0.0;
     // Separate envelope coupling in octaves per EG unit. Defaults retain
     // direct octave-valued engineering patches. Factory EG units are volts;
-    // its scales use documented resistor ratios and provisional manual slopes.
+    // its scales are the documented 39k/220k (HP) and 39k/47k (LP) ratios
+    // at the levers' printed 1 oct/V.
     double hpEnvelopeScale = 1.0, lpEnvelopeScale = 1.0;
     // VCF EG: negative IL -> positive AL -> fixed zero sustain -> IL.
     double filterInitial = -2.0, filterPeak = 2.0; // EG units; octaves at scale 1
@@ -126,14 +128,15 @@ struct Patch {
     // VCA EG (+/-2%) output-level check bands of the sibling CS-60 alignment
     // (CS-60 SM printed pp.37-38). See ceres.cpp.
     double boardPitchTolerance = 0.0, boardFilterTolerance = 0.0, boardEnvelopeTolerance = 0.0;
-    // filterLfo is LP octave depth. HP gets .3374358974 times that depth:
-    // (.7/.65)*(47k/150k), independent of user-editable EG coupling scales.
+    // filterLfo is LP octave depth. HP gets .3133333333 times that depth:
+    // 47k/150k at equal lever slopes, independent of user-editable EG
+    // coupling scales.
     // tremolo is SUB VCA lever travel, 0..1: R7 adds .3375 of the wiper's
     // share of SUB to LEVEL, and the B-10k lever into its 30k load delivers
     // x/(1+x(1-x)/3) of it, 7.7% low at mid-travel with exact endpoints.
     // lfoRate is Hz, wider than the hardware's .8-50 Hz SPEED range;
     // vibratoCents is cents per SUB unit (hardware full lever 25), filterLfo
-    // LP octaves per SUB unit (full lever .809). subSpeedLeverHz and its
+    // LP octaves per SUB unit (full lever 1.245). subSpeedLeverHz and its
     // siblings below map the PN3 levers onto these. The one IG00150 clock
     // free-runs: note events never reset its phase.
     double lfoRate = 5.0, vibratoCents = 0.0, tremolo = 0.0, filterLfo = 0.0;
@@ -166,11 +169,11 @@ struct Patch {
     double ringAttack = 0.01, ringDecay = 0.35;
     // Touch response (CS-50 panel 2, guide printed pp.55-56). pressureFilter is
     // touch BRILLIANCE in LP octaves; R7 feeds TBR through 47k LP / 150k HP, so
-    // HP moves .3374358974 times as far, as for SUB. pressureVibrato is SUB
+    // HP moves .3133333333 times as far, as for SUB. pressureVibrato is SUB
     // vibrato cents per unit touch; level amplifier I is trimmed to centre the
     // 3Vpp SUB on +.5V, so touch vibrato rises by a third of its depth.
     // pressureWah is touch-scaled SUB filter depth (level amplifier II -> R7
-    // VCF pin70), LP octaves with the same .3374 HP ratio. pressureVolume is
+    // VCF pin70), LP octaves with the same .3133 HP ratio. pressureVolume is
     // touch LEVEL: R7 adds its current to LEVEL's at common VCA2, so full depth
     // and full touch add 1.08 times full amp_level; zero touch leaves amp_level.
     // Uncalibrated filter and vibrato depths.

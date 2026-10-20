@@ -15,12 +15,21 @@ namespace {
 constexpr double pi = 3.141592653589793238462643383279502884;
 constexpr double filterCapacitance = 1.5e-9, filterFeedResistance = 4.7e6;
 constexpr double filterFrequencyFloor = 1/(2*pi*filterCapacitance*filterFeedResistance);
-// Direct R7 matrix, CS-50 service1 PDF8/printed14. These ratios are known;
-// .7/.65 oct/V manual slopes remain the existing provisional calibration.
+// Cutoff lever law: the printed IG00156 law fc=125*Kv*2^Vfc (guide printed
+// p.34; SM1 printed p.19, "VK .25V, Vf 5V -> 1kHz") is one octave per volt
+// of Vfc. Vfc is read at the FH/FL lever, ahead of its 39k into pin 4; that
+// is the one inference (guide printed p.33 draws Vfc reaching pin 4 through
+// a resistor; see preset()). Chosen by ear 2026-10-20 (listening test
+// 2026-10-20-vcf-printed-law). The same slope serves HP and LP.
+constexpr double leverOctavesPerVolt=1;
+// Direct R7 matrix, CS-50 service1 PDF8/printed14: every other cutoff input
+// shares the lever's node through its own resistor, so it moves the cutoff
+// 39k/Rin times as far per volt as the lever.
 // Interpret BR as actual loaded voltage with stiff preset/source nodes,
 // not raw preset-divider CV or a finite-impedance pot position.
-constexpr double hpBrillianceScale=.7*39/680, lpBrillianceScale=.65*39/220;
-constexpr double hpSubRelativeScale=(.7/.65)*(47./150.);
+constexpr double hpBrillianceScale=leverOctavesPerVolt*39/680, lpBrillianceScale=leverOctavesPerVolt*39/220;
+// LP-octave depths (SUB, touch) reach HP through 150k against LP's 47k.
+constexpr double hpSubRelativeScale=47./150.;
 // Guide printed p.56: touch level amplifier I is trimmed so a 0V-centred SUB
 // input leaves centred on +.5V; the SUB source is fixed at 3Vpp (p.55).
 constexpr double touchVibratoBias=.5/1.5;
@@ -1026,14 +1035,14 @@ double subVibratoLeverCents(double travel) {
 }
 // VCF lever (PN3 SVR3, B-10k between SUO and ground) -> R7 SUB -> 47k LP and
 // 150k HP on each of four boards (SM1 printed p.14): 8.95k load. LP octaves per
-// SUB unit at full lever are 1.5V through 47k against the manual FL's .65 oct/V
-// through 39k, the same provisional slope as lpBrillianceScale. HP follows at
-// hpSubRelativeScale inside the engine. The f-node resistors to ground (R6/R7,
+// SUB unit at full lever are 1.5V through 47k against the FL lever's 1 oct/V
+// through 39k (leverOctavesPerVolt, as for lpBrillianceScale): 1.245. HP
+// follows at hpSubRelativeScale inside the engine. The f-node resistors to ground (R6/R7,
 // 1.8-3.0k by chip rank, SM2 p.16) are neglected against 47k/150k, as the LC
 // node is for tremolo; they would ease the sag by about 4%.
 double subFilterLeverOctaves(double travel) {
     constexpr double load=1/(4/47e3+4/150e3);
-    return .65*39/47*1.5*leverFraction(clamp(travel,0.,1.),10e3/load);
+    return leverOctavesPerVolt*39/47*1.5*leverFraction(clamp(travel,0.,1.),10e3/load);
 }
 
 bool setParameter(Patch& patch, const char* key, double value) {
@@ -1445,10 +1454,9 @@ struct Synth::Impl {
             // C2..C6; SM1 printed p.19, both pin sheets), so fc follows the
             // key exactly one octave per octave, through glide and PITCH but
             // not TRANSPOSITION (VCO III pin 1 FT only). keyTrack=1 is that hardware law. At Vfc=0 the printed law
-            // puts gm cutoff at 125*.5V = 62.5Hz at middle C; the patch's
-            // cutoff-at-middle-C reference does not yet use that zero point
-            // (listening test 2026-10-20-vcf-cutoff-zero-point; see
-            // Docs/research/vcf-authenticity-2026-10-20.md).
+            // puts gm cutoff at 125*.5V = 62.5Hz at middle C; factory presets
+            // convert their lever volts with it (preset()), and the patch's
+            // hp/lpCutoff stay the cutoffs at middle C.
             // This law controls the OTA gm contribution. The independent
             // feed resistor contributes the same conductance at every CV.
             // Master PITCH routes PN2 VR1 -> SUB TU -> KAS67 -> SH -> M K37,
@@ -1967,42 +1975,37 @@ Patch preset(const std::string& name) {
         p.pwmRate=.2*std::pow(1110.0,cv[0]/10); p.pwmDepth=.4*cv[1]/10;
         p.pulseWidth=.5+.4*cv[2]/10;
         p.pulse=cv[3]/10; p.saw=cv[4]/10; p.noise=cv[5]/10;
-        // The exponential voltage law controls variable gm, not the fixed
-        // feed resistor. These 12/180Hz anchors and .7/.65oct/V slopes are
-        // still uncalibrated gm-component estimates. The printed IG00156 law
-        // is fc=125*Kv*2^Vfc (guide printed p.34; SM1 printed p.19, "VK .25V,
-        // Vf 5V -> 1kHz"): 62.5Hz gm at middle C (Kv=.5V) for Vfc=0, BOTH
-        // stages, 1 oct/V. Vfc is not the pin-4 voltage: a 10V lever through
-        // 39k into the CS-50's 1.8-3.0k rank resistor (SM2 printed p.16; R6
-        // HP, R7 LP) puts only .4-.6V on pin 4, and guide printed p.33 draws
-        // Vfc reaching pin 4 through a variable resistor, the rank-set network.
-        // Read at the 39k lever, the printed law is 1 oct/V on both levers,
-        // but the series reference of the printed Vf is not printed, and with
-        // the printed zero it moves the factory HP presets up 1.3-4.1 octaves
-        // (string1, clavichord: HP near 1.7-2kHz at middle C). It is a
-        // listening test (2026-10-20-vcf-printed-law), not adopted; pin 4's
-        // own input law is unpublished. The Patch API expects
-        // total integrator Hz, so include the resistor contribution once.
-        p.hpCutoff=filterFrequencyFloor+12*std::exp2(cv[6]*.7);
-        p.lpCutoff=filterFrequencyFloor+180*std::exp2(cv[8]*.65);
+        // Cutoff columns g (HP) and i (LP): the printed IG00156 law in full,
+        // fc=125*Kv*2^Vfc (guide printed p.34; SM1 printed p.19, "VK .25V,
+        // Vf 5V -> 1kHz"): 62.5Hz of gm at middle C (Kv=.5V) for 0V and one
+        // octave per volt, both stages. Chosen by ear 2026-10-20 (listening
+        // test 2026-10-20-vcf-printed-law, which supersedes the zero-point
+        // and HP/LP-slope sets). Every number is printed; the one inference
+        // is where Vfc is measured. It cannot be pin 4 itself: a 10V lever
+        // through 39k into the CS-50's 1.8-3.0k rank resistor (SM2 printed
+        // p.16; R6 HP, R7 LP) puts only .4-.6V there, and guide printed p.33
+        // draws Vfc reaching pin 4 through a variable resistor, the rank-set
+        // network. So Vfc is read at the lever, ahead of its 39k. One slope
+        // serves both levers: the CS-50 rank column (SM2 printed p.16,
+        // "CS50,60": R7 3.0k/2.4k/2.0k beside R6 2.7k/2.2k/1.8k; p.18
+        // NA03655) is exactly the E24 set nearest equal 39k-lever gain into
+        // the two pin-4 nodes (3.09k/2.45k/1.97k); with the EG paths the
+        // as-built HP/LP gain ratio is 1.00-1.06 by rank. Not printed: the
+        // series reference behind the pin sheet's Vf, and pin 4's own input
+        // law. The law moves variable gm, not the fixed 4.7M feed, and the
+        // Patch API expects total integrator Hz, so include the resistor
+        // contribution once. See Docs/research/vcf-authenticity-2026-10-20.md.
+        constexpr double gmHzAtMiddleC=125*.5;
+        p.hpCutoff=filterFrequencyFloor+gmHzAtMiddleC*std::exp2(leverOctavesPerVolt*cv[6]);
+        p.lpCutoff=filterFrequencyFloor+gmHzAtMiddleC*std::exp2(leverOctavesPerVolt*cv[8]);
         // Overall schematic: passive FH/FL buses feed each cutoff via 39k;
-        // the shared EG uses 220k for HP and 47k for LP. Relative coupling
-        // is Rmanual/REG times the manual CV slope. Those slopes (.7/.65
-        // oct/V) remain provisional, and the two should be equal: the CS-50
-        // rank column (SM2 printed p.16, "CS50,60": R7 3.0k/2.4k/2.0k beside
-        // R6 2.7k/2.2k/1.8k; p.18 NA03655) is exactly the E24 set nearest
-        // equal 39k-lever gain into the two pin-4 nodes over the R7 inputs
-        // and trim (3.09k/2.45k/1.97k). Counting the EG paths too, the HP/LP
-        // gain ratio is 1.00-1.06 by rank; without them .99-1.02 (listening
-        // tests 2026-10-20-vcf-hp-lp-slope, -printed-law; Docs/research/
-        // vcf-authenticity-2026-10-20.md). This corrects the
-        // supported resistor ratio without claiming absolute pin-4 CV
-        // calibration. The ratio is
-        // relative to actual loaded FH/FL voltage, not proven to equal the
-        // T-board pin above: four-voice loading remains unresolved. Factory
-        // scales are an effective/manual-slope estimate.
-        p.hpEnvelopeScale=.7*39/220;
-        p.lpEnvelopeScale=.65*39/47;
+        // the shared EG uses 220k for HP and 47k for LP, so at the levers'
+        // 1 oct/V the EG moves the cutoffs 39/220 and 39/47 octave per EG
+        // volt. The ratio is relative to actual loaded FH/FL voltage, not
+        // proven to equal the T-board pin above: four-voice loading remains
+        // unresolved.
+        p.hpEnvelopeScale=leverOctavesPerVolt*39/220;
+        p.lpEnvelopeScale=leverOctavesPerVolt*39/47;
         // The pin takes (Q bus + RES)/2 through the 220k pair, so the hardware
         // is r=1-(P+R)/20 for RESONANCE lever volts R. This maps the bus
         // straight to the pin, which matches it only at R=P; the lever
