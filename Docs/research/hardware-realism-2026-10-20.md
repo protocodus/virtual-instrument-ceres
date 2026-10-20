@@ -58,3 +58,11 @@ Sources as above, plus the KAS, SUB, M and PRA schematics in SM2 (pp.3, 8, 16, 2
 - **Key coder priority.** For keys in different octaves pressed together, the coder outputs the higher note first (Guide p.16 / PDF 25), so a simultaneous chord of five or more keys keeps its four highest notes. Not implemented here: it changes the key assigner, which the other realism thread owns, and needs same-sample event batching.
 - **Expression pedal.** The CdS photo-coupler network (68k–0.33 µF+2.2k–68k, 0.0033 µF; SM2 p.22) shapes tone as well as volume when a pedal is used. Not implemented: `Synth` has no expression input and the PS88 CdS resistance law is not documented.
 - **Already faithful:** PW 680k and PWM 100k sum into the WSC at equal full-scale currents, matching ±40 % (SM2 p.16); VCO II is exponential at 0.2/6.7/222 Hz (Guide p.58); the SUB square's 15k/1.8k divider meets the sine's 1.5 V peak; the pulse's leading edge is fixed and only the fall moves (Guide p.31).
+
+## Third pass (0.4.0)
+
+Sources as above, read for circuitry still between the documented parts and the engine: the SUB board's noise chain, KAS clock and integrator, PRA expression network, PN1–PN3 lever wiring and the T71/T72 tone-preset boards.
+
+| # | Hardware behaviour | Source | Change | Estimated? |
+|---|---|---|---|---|
+| 17 | **Noise pick-up coupling.** The zener noise reaches IC11-1's + input through 0.047 µF with 100k to ground, a 33.86 Hz high-pass ahead of the limiter. | SM2 p.8 (SUB board noise generator) | The Gaussian sample passes a trapezoidal RC high-pass before its sign is taken. By the arcsine law the sign keeps it as a shelf: about 11 dB less density at DC. NOISE loses its sub-bass rumble; SUB-N loses its slowest wander and 1.3 dB of RMS (0.541 → 0.466 continuous, measured 0.47–0.49). | No for the corner. SUB-N's absolute level still rests on row 16's estimated bandwidth. |

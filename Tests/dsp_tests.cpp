@@ -873,15 +873,25 @@ void subOscillatorRoutes() {
         if(n>2000){sum+=x;sum2+=x*x;cross+=x*previous;}
         previous=x;
     }
-    // +/-15V limiter, estimated 3MHz/(1+1M/4.7k) bandwidth: arcsine-law
-    // density 2*tc*ln2, through 22k||100k with .1uF and the 100/122 divider,
-    // in 1.5V SUB units.
-    const double tc=1/(2*pi*3e6/(1+1e6/4.7e3)),fc=1/(2*pi*(22e3*100/122)*.1e-6);
-    const double expectedRms=10*(100./122)*std::sqrt(2*tc*std::log(2.)*pi*fc);
+    // +/-15V limiter with estimated 3MHz/(1+1M/4.7k) bandwidth a, after the
+    // .047uF/100k pick-up coupling b: by the arcsine law the sign's
+    // autocorrelation is (2/pi)asin(rho), rho=(a e^-a|t|-b e^-b|t|)/(a-b).
+    // SUB-N is that sign through 22k||100k with .1uF (c, 88.26Hz) and the
+    // 100/122 divider, in 1.5V SUB units: covariance against the RC's
+    // autocorrelation kernel (c/2)e^-c|t-lag|.
+    const double a=2*pi*3e6/(1+1e6/4.7e3),b=1/(100e3*.047e-6),c=1/((22e3*100/122)*.1e-6);
+    const auto covariance=[&](double lag){
+        double total=0;constexpr double h=2e-7;
+        for(int i=-300000;i<=300000;++i){
+            const double t=i*h,rho=(a*std::exp(-a*std::abs(t))-b*std::exp(-b*std::abs(t)))/(a-b);
+            total+=h*(2/pi)*std::asin(rho)*c/2*std::exp(-c*std::abs(t-lag));
+        }
+        return 100*(100./122)*(100./122)*total;
+    };
+    const double expectedRms=std::sqrt(covariance(0)),expectedLag=covariance(1/fs)/covariance(0);
     const double rms=std::sqrt(sum2/17999);
     require(std::abs(rms/expectedRms-1)<.1 && std::abs(sum/17999)<.1*expectedRms,"SUB noise has the limiter's loaded RC level");
-    // Loaded pole 88.26Hz: lag-one correlation exp(-2pi*88.26/8000)=.933.
-    require(cross/sum2>.90 && cross/sum2<.96,"Loaded1.8ms noise RC must smooth white noise at8kHz");
+    require(std::abs(cross/sum2-expectedLag)<.03,"Loaded1.8ms noise RC must smooth the coupled limiter at8kHz");
     // Selecting SUB alone must not change either the VCO waveform/PWM clock
     // or random draws when the three SUB destinations and touch vibrato are0.
     p=sinePatch();p.sine=0;p.pulse=1;p.pwmDepth=.2;p.pwmRate=7;p.lfoRate=29;

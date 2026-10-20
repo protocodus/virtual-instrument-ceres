@@ -455,6 +455,11 @@ double blamp(double phase, double step) {
 // peak^2. limiterLevel scales the sampled sign so that density survives
 // every internal rate, which makes noise level independent of host rate.
 constexpr double limiterTau=1/(2*pi*(3e6/(1+1e6/4.7e3)));
+// The zener reaches IC11-1's + input through .047uF with 100k to ground (SM2
+// p.8), a 33.86Hz high-pass ahead of the limiter. By the arcsine law the sign
+// keeps that shelf: about 11dB less density at DC, -1.3dB of SUB-N RMS. The
+// limiter's own 10uF/(10k||100k) coupling (1.75Hz) is negligible beside it.
+constexpr double pickupCouplingTau=100e3*.047e-6;
 // SUB-N: N through 22k/.1uF loaded by SUI's 100k, in SUB units (the 3Vpp
 // SUI waveforms, 1.5V peak): the +/-15V swing times the 100/122 divider.
 constexpr double subNoiseResistance=22e3*100e3/122e3;
@@ -672,6 +677,7 @@ struct Synth::Impl {
     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
     double outputTrimGain=1;
     double limiterInput=0, limiterPole=0, limiterInnovation=0, limiterLevel=1;
+    OutputCoupling pickupCoupling;
     // Guide printed32: SUB-N is the limiter output N through22k/.1uF,
     // independent of audio NO level: the documented single low-pass (called
     // pink in the prose), not an invented ideal1/f filter. SM2 p.8 (PN3):
@@ -790,7 +796,7 @@ struct Synth::Impl {
         pedal = false; busCoupling={}; lineCoupling={};
         physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
         physicalKeyPresses=0; lastAssignedKey=60;
-        subNoiseMemory=limiterInput=0; ringEnvelope={}; ringPhase=ringCarrier=0;
+        subNoiseMemory=limiterInput=0; pickupCoupling={}; ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={};
         ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
         ringCarrierCoupling.clear();ringCoupledCarrier=0;
@@ -858,7 +864,8 @@ struct Synth::Impl {
         // limiterLevel (near 1 at high internal rates; see limiterTau).
         limiterInput=limiterPole*limiterInput
             + limiterInnovation*inverseNormal(random.unit()+0x1.0p-54);
-        const double noise = limiterInput<0 ? -limiterLevel : limiterLevel;
+        const double pickup=pickupCoupling.process(limiterInput,pickupCouplingTau,internalFs);
+        const double noise = pickup<0 ? -limiterLevel : limiterLevel;
         const double subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
         subNoiseMemory=2*subNoise-subNoiseMemory;
         const double lfo = subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
