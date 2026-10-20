@@ -633,7 +633,7 @@ struct Synth::Impl {
     OutputRate decimator;
     double lfoPhase = 0, pwmPhase = 0, pressureTarget = 0, pressureValue = 0, bend = 0;
     OutputCoupling busCoupling, lineCoupling;
-    double pressureCoefficient = 0, driftCoefficient = 0;
+    double pressureCoefficient = 0, velocityCoefficient = 0, driftCoefficient = 0;
     std::array<double,4> ampCoefficients{}, filterCoefficients{};
     double hpSourceBranches = 3, lastSub = 0;
     // Eight equal pin7 networks reduce exactly to one common delta state
@@ -693,7 +693,11 @@ struct Synth::Impl {
         // Audio NO only; SUB-N has its own RC/RMS convention below and
         // must continue to receive the original shared random sample.
         audioNoiseGain=std::sqrt(rateFactor/4.0);
-        pressureCoefficient = 1-std::exp(-1/(internalFs*.005));
+        // SM2 p.8 touch pre-amplifier: VR3's wiper reaches IC1-2 through
+        // 100k with .1uF to the +15V rail, a 10ms RC. Velocity has no
+        // hardware path and keeps its own 5ms digital smoothing.
+        pressureCoefficient = 1-std::exp(-1/(internalFs*.01));
+        velocityCoefficient = 1-std::exp(-1/(internalFs*.005));
         driftCoefficient = 1-std::exp(-1/(internalFs*.3));
         qControlCoefficient=-std::expm1(-1/(internalFs*qControlTau));
         subNoiseG=1/(2*internalFs*subNoiseResistance*.1e-6);
@@ -865,7 +869,7 @@ struct Synth::Impl {
             // its capacitor/oscillator histories remain connected. Use the
             // existing 5ms controller RC clock; silent assignments precharge in
             // noteOn. This digital adaptation does not slew the keyboard CV.
-            v.velocityValue+=(v.velocity-v.velocityValue)*pressureCoefficient;
+            v.velocityValue+=(v.velocity-v.velocityValue)*velocityCoefficient;
             const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
             if (v.driftCountdown-- == 0) {
                 v.driftTarget = random.bipolar();

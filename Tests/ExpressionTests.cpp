@@ -117,7 +117,7 @@ void pressureIsolationAndLiveSelection() {
         if(n==700){a.allNotesOff();b.allNotesOff();}
         require(a.process()==b.process(),"Channel pressure cannot affect velocity mode, including release");
     }
-    // Pressure still runs its legacy 5ms smoothing while velocity is selected.
+    // Pressure still runs its 10ms touch RC while velocity is selected.
     a.reset();b.reset();a.setPatch(p);p.expressionSource=0;b.setPatch(p);
     a.pressure(.8);b.pressure(.8);advance(a,800);advance(b,800);
     a.noteOn(60,.25);b.noteOn(60,.25);advance(a,100);advance(b,100);
@@ -129,6 +129,17 @@ void pressureIsolationAndLiveSelection() {
     near(a.voiceState()[0].hpFrequency,b.voiceState()[0].hpFrequency,0,
          "Returning to aftertouch uses uninterrupted channel pressure smoothing");
     p.expressionSource=1;a.setPatch(p);a.process();checkVoice(a,0,.25,p);
+}
+// SM2 p.8 touch pre-amplifier: VR3's wiper reaches IC1-2 through 100k with
+// .1uF to the +15V rail, so touch follows a 10ms RC. Velocity keeps 5ms.
+void touchRc() {
+    auto p=patch();p.expressionSource=0;p.lfoRate=0;p.pressureVibrato=0;
+    ceres::Synth s(8000,6);s.setPatch(p);s.noteOn(60,.9);advance(s,40);
+    checkVoice(s,0,0,p);s.pressure(.8);
+    for(unsigned n=1;n<=400;++n) {
+        s.process();
+        if(n%25==0)checkVoice(s,0,.8*-std::expm1(-4.*n/(32000*.01)),p);
+    }
 }
 void audioLawsAndZeroDepth() {
     for(unsigned route=0;route<3;++route) {
@@ -181,6 +192,7 @@ int main() {
         polyphonyIsolation();std::cout<<"PASS mixed-velocity polyphony oscillator/filter/audio isolation\n";
         lifecycle();std::cout<<"PASS expression release, repeated notes, pedal, Sustain II, steal, panic and reset\n";
         pressureIsolationAndLiveSelection();std::cout<<"PASS pressure isolation and state-preserving live source selection\n";
+        touchRc();std::cout<<"PASS touch follows the 10ms pre-amplifier RC\n";
         audioLawsAndZeroDepth();std::cout<<"PASS independent expression audio laws, zero-depth parity and legacy velocity gain\n";
     } catch(const std::exception& e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
 }

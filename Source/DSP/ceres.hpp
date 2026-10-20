@@ -146,8 +146,9 @@ struct Patch {
     // controlling the key code data"). The counter clock's PS-voltage law is
     // not printed, so glideRate is an engineering rate, not lever calibration.
     double glideMode = 0.0, glideRate = 24.0;
-    // Modern optional expression routing: 0=smoothed channel aftertouch
-    // (legacy/default), 1=each board's latched note-on velocity. The three
+    // Modern optional expression routing: 0=channel aftertouch (default),
+    // through the touch pre-amplifier's 10ms RC, 1=each board's latched
+    // note-on velocity. The three
     // pressure* depths above consume this selected value. Velocity remains
     // unchanged through release, pedal and Sustain II pitch-following; only
     // assigning/retriggering a board replaces its target. On an audible board,

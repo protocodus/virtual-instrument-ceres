@@ -119,3 +119,7 @@ Sources, verdicts and rejected items are in [hardware realism research](research
 Same-key reuse runs before the idle search: a released, non-damper board whose note equals the pressed key is re-keyed. Touch BRILLIANCE and `pressure_wah` share the `hpSubRelativeScale` coupling. Touch vibrato adds `pressure_vibrato·expression/3` cents. `Ceres.hardware_realism_contracts` recomputes the counter, the Hz-domain integrator, both sustain modes, reuse and the touch laws independently. The expression, note-reuse and fast-note contracts now read touch from the LP cutoff, which carries the full depth.
 
 Touch LEVEL adds `touchLevelScale·pressure_volume·expression` to the common VCA gain, with `touchLevelScale=(6/150k)/(10/270k)=1.08` from the R7 LC matrix and the 6.0 V touch calibration; zero depth is bit-identical. A note-on that finds every board held returns after the physical-key ledger records it, so it still counts for the ring trigger and its later note-off consumes only its own press. The expression and note-reuse contracts check touch LEVEL against an equivalent `amp_level` and legacy velocity gain; the configuration, note-reuse and fast-note contracts check the ignored press.
+
+## Circuit details (0.4.0)
+
+Channel pressure follows the touch pre-amplifier's RC: service manual 2 p.8 shows VR3's wiper reaching IC1-2 through 100k with 0.1 µF to the +15 V rail, τ = 10 ms. Velocity has no hardware path and keeps its 5 ms digital smoothing. `Ceres.voice_expression_contracts` checks the 10 ms step response on the LP cutoff.
