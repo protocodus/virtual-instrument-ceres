@@ -122,10 +122,22 @@ struct Patch {
     // trim point, Guide printed p.65). Filter: the IG00156 rank-bin residual
     // of each filter's control sensitivity (+/-.146 oct per octave of Vfc
     // input, SM2 printed pp.17-18 rank table; the static cutoff and Q are
-    // trimmed by ear and stay identical). Envelope: the VCF EG (+/-10%) and
-    // VCA EG (+/-2%) output-level check bands of the sibling CS-60 alignment
-    // (CS-60 SM printed pp.37-38). See ceres.cpp.
+    // trimmed by ear and stay identical). Envelope: the EG level checks of
+    // the sibling CS-60/CS-80 alignments of the same board: VCF EG level
+    // (+/-10%), VCA EG peak (+/-2%) and floor (-200 +/-20mV); the output trim
+    // after them keeps each board's full-sustain level. Envelope time: both
+    // EGs' time trims (+/-5% at the 4ms and 125ms attack trims). VCA: the
+    // CP4 sine and filtered-path trims (+/-2%, +/-2.5%); the output trims
+    // after them keep the filtered path's level and the 0 dBm reference.
+    // See ceres.cpp.
     double boardPitchTolerance = 0.0, boardFilterTolerance = 0.0, boardEnvelopeTolerance = 0.0;
+    double boardEnvelopeTimeTolerance = 0.0, boardVcaTolerance = 0.0;
+    // Ambient temperature change since the boards were tuned, in kelvin
+    // (-25..25; 0 is as tuned). Each board's VCO drifts by its own amount
+    // within the IG00153 temperature ranks one instrument may mix (Yamaha
+    // Service News E-46, 1978: 25 -> 50 C moves C6 within one 5-cent rank and
+    // C1 within two neighbouring ranks); the drift they share is left out.
+    double boardTemperatureRise = 0.0;
     // filterLfo is LP octave depth. HP gets .3374358974 times that depth:
     // (.7/.65)*(47k/150k), independent of user-editable EG coupling scales.
     // tremolo is SUB VCA lever travel, 0..1: R7 adds .3375 of the wiper's

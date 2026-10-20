@@ -6,40 +6,72 @@ differences were the engineering controls `voice_spread_cents` (a fixed
 symmetric spread) and `drift_cents` (a random walk), both VCO-only and
 default 0. Neither is a tolerance model.
 
-This pass adds the per-board variation the service documents bound, as three
+This pass adds the per-board variation the service documents bound, as
 amounts that default to 0 (identical boards, the shipping sound):
 
 | Key | Range | 1 means |
 | --- | --- | --- |
 | `board_pitch_tolerance` | 0..1 | the VCO trim residual the tuning method allows |
 | `board_filter_tolerance` | 0..1 | the IG00156 rank-bin residual of each filter's control sensitivity |
-| `board_envelope_tolerance` | 0..1 | the VCF EG (+/-10%) and VCA EG (+/-2%) output-level check bands |
+| `board_envelope_tolerance` | 0..1 | the EG level checks: VCF EG +/-10%, VCA EG peak +/-2% and floor -200 +/-20 mV, with VR14's full-sustain trim after them |
+| `board_envelope_time_tolerance` | 0..1 | both EGs' attack-time trims, +/-5% at 4 ms and 125 ms |
+| `board_vca_tolerance` | 0..1 | the VR11/VR12 CP4 level trims, with VR13/VR14 and VR6 after them |
+| `board_temperature_rise` | -25..25 K | the ambient change since tuning; each board's VCO drifts within the IG00153 temperature ranks |
 
 Each seed is one instrument: the offsets are drawn once per physical board
-slot, from a dedicated seeded stream, in a fixed order. The shared audio and
-drift stream, the oscillator start phases and the noise sequence are
-unchanged, and board *i* is the same unit at every polyphony and quality.
-`reset()` keeps the same boards.
+slot, from two dedicated seeded streams (the first keeps the order of the
+0.5.0 draws, so a seed keeps the boards it had), in a fixed order. The shared
+audio and drift stream, the oscillator start phases and the noise sequence
+are unchanged, and board *i* is the same unit at every polyphony and quality.
+`reset()` keeps the same boards. With every amount at 0 each factor is
+exactly the identical-board value, and the audio is byte-identical to 0.5.0.
 
-## What the hardware trims, and what it does not
+## Sources
 
-The four M boards carry their own trimmers (VR1-VR21, Guide printed p.65 /
-PDF 74 board drawing). The CS-50 guide prints a procedure and a tolerance
-for the VCO only; the VCF, EG and VCA come from the sibling CS-60 manual
-below.
+| Document | Where | Used for |
+| --- | --- | --- |
+| Yamaha CS Series Servicing Guide | project sources (`servicing-guide.pdf`) | VCO law (printed pp.27-29), tuning method (p.65 / PDF 74) |
+| CS-50 Service Manual 1/2, 2/2 | project sources (`sm1.pdf`, `sm2.pdf`) | M board parts and rank tables |
+| Yamaha CS-60 Service Manual | project sources (`cs60-service-manual.pdf`, SHA-256 `4b03579a...106636`) | section VI alignment of the shared M board |
+| Yamaha CS-80 "Adjustment Procedures and updates" | `https://www.therogoffs.com/cs80/CS80%20Adjustment%20Procedures%20and%20updates.PDF` (36-page scan, SHA-256 `eea101eb...276ba`) | the same trims with printed tolerances (printed pp.3-15 / PDF 5-17); Service News E-46 (PDF 33-36) |
+| CS-80 parts list | `https://www.therogoffs.com/cs80/cs80_parts_list.pdf` (SHA-256 `eaea3c1b...aabe28`) | checked for capacitor tolerances: none printed |
 
-### VCO: trimmed, residual +/-1 cent at each trim point
+None of these files is in the repository. CS-80 procedure pages are cited as
+"printed p.N" (PDF page N+2).
+
+## The boards are one family
+
+The CS-50 guide prints a procedure and a tolerance for the VCO only. Two
+sibling documents align the same M board:
+
+- SM1 parts list p.2 (PDF 14): M circuit board NA04485, "Common Models:
+  CS-60". The CS-60 SM's M schematic (printed p.15 / PDF 17) is headed
+  "CS-60,50" with the CS-50's own transposition values and rank columns; its
+  trimmer layout (printed p.37) is the CS-50 guide's p.65 board drawing.
+- The CS-60 section VI text names its siblings where they differ: "2
+  OCT-DOWN (16' for CS-80)", "NORMAL (8' for CS-80)" (VI.1-2, printed p.38 /
+  PDF 40), "Alignment by 0.24V (CS-50 is 0.6V)" (VI.4, printed p.39 / PDF 41).
+- SM2 printed p.16 lists the CS-80's M-board differences: the transposition
+  circuit (R1-R5, VR4-VR6) and the rank resistor R7, nothing in the EGs or
+  VCAs. Where the CS-80 procedure trims the same trimmer to the CS-60's
+  target, it prints the tolerance the CS-60 leaves out.
+
+Every value below from the CS-60 or CS-80 documents is labelled sibling
+evidence in the code.
+
+## VCO: trimmed, residual +/-1 cent at each trim point
 
 - IG00153 is a **linear** converter: the one-shot/integrator gives
   `f = I/(Iref*tau)` with `I = Kv/Rn` (Guide printed pp.27-29 / PDF 36-38).
   The NORMAL table maps Kv 250 mV, 500 mV, 1 V, 2 V, 4 V to 130.8, 261.6,
   523.2, 1046, 2093 Hz (p.29), so Kv is proportional to the NORMAL frequency
   and the C2 key's Kv is 1/16 of the C6 key's.
-- Tuning method (Guide printed p.65 / PDF 74), per board: at OCT-UP, C6 key
-  to C7 (4186 Hz) and C2 key to C3 (261.6 Hz), each **+/-1 cent**, repeating
-  (VR2 offset, VR3 scale; the p.29 figure names the two trims). Then the C6
-  key at NORMAL to 2093 Hz (VR4), 1 OCT DOWN to 1046 Hz (VR5) and 2 OCT DOWN
-  to 523.2 Hz (VR6), each **+/-1 cent**.
+- Tuning method (Guide printed p.65 / PDF 74), per board, after "10 minutes
+  or longer" of warm-up: at OCT-UP, C6 key to C7 (4186 Hz) and C2 key to C3
+  (261.6 Hz), each **+/-1 cent**, repeating (VR2 offset, VR3 scale). Then the
+  C6 key at NORMAL to 2093 Hz (VR4), 1 OCT DOWN to 1046 Hz (VR5) and 2 OCT
+  DOWN to 523.2 Hz (VR6), each **+/-1 cent**. The CS-80 procedure trims its
+  VCOs to the same "Within +/-1 cent" (printed p.5).
 - The transposition resistors are B-mark 0.1% metal film and the timing
   resistors G-mark 2% (SM2 printed p.17, note 7; SM1 parts list p.3 / PDF 15
   confirms 0.1% 20k/40k/80k/160k). They sit inside these trims, so their own
@@ -56,121 +88,182 @@ C6 key, its error largest at the bottom of the keyboard. Kv carries the key
 (including glide), master PITCH and the MIDI bend; vibrato enters the FT pin
 separately and is not scaled. TRANSPOSE values between switch positions
 interpolate the gain residual linearly (the hardware has only the four
-positions).
+positions). Assumption: uniform within the printed band (the guide prints
+the band, not how technicians land inside it).
 
-Assumption: uniform within the printed band. The guide prints the band, not
-how technicians land inside it. Post-trim ageing and temperature drift are
-not printed (the method only says to warm up 10 minutes) and are not
-modelled; `drift_cents` stays the separate engineering control it was.
+## VCO thermal drift: Service News E-46
 
-### Sibling evidence: the CS-60 alignment of the same M board
+Yamaha Service News bulletin E-46 (January 1978, "CS-50 / CS-60 / CS-80",
+"Countermeasures for stabilizing the pitch in combo synthesizer series",
+PDF pp.33-36 of the CS-80 procedure scan):
 
-The CS-50 guide prints only the VCO tuning. The CS-60 service manual's
-section VI (printed pp.37-39 / PDF 39-41) aligns the VCF, EG and VCA of the
-M board, and that board is the CS-50's:
+- "The IC IG00153 (VCOIII) on each M circuit board (VCO circuit) is ranked
+  by temperature characteristics", by "the degree of change in the musical
+  interval on C1 and C6 affected by the ambient temperature change from 25
+  to 50 C", one figure per 5 cents: C1 0-45 cents (figures 1-9), C6 0-30
+  cents (1-6). Example: 12 and 6 cents rank "32" (the bulletin prints the
+  units as degrees, a typo).
+- "Only the same figure representing the interval change on C6 can be used.
+  Only the neighboring figure representing the interval change on C1 can be
+  used in pairs at the same time for an instrument" (e.g. "54" with "64").
+  So over that 25 K step one instrument's boards differ by less than 5 cents
+  at C6 and less than 10 at C1.
+- The 1S1555 temperature-compensating diode is moved onto IC8 with silicone
+  grease. It applies to CS-50 #1546 on (November 1977) and to the earlier
+  serials it lists.
+- C1 and C6 are Kv 125 mV and 4 V: the CS-80 procedure sets the C1 key's Kv
+  to 125.0 mV against a 4.000 V reference (TUNING, printed p.3), and the
+  CS-50's C6 key is 4 V (Guide p.29). C1 is x = 1/32.
 
-- SM1 parts list p.2 (PDF 14): M circuit board NA04485, "Common Models:
-  CS-60".
-- CS-60 SM printed p.15 (PDF 17), "M (Master) Circuit": its resistor tables
-  are headed "CS-60,50" (R1-R4 0.1% 20k/40k/80k/160k, VR4-VR6 B-1k/2k/5k,
-  the values on the CS-50's own M sheet, SM2 p.17) and "Constant value of R6,
-  R7 in IC10,11 according to rank" with the same CS-50,60 column.
-- The trimmer layout drawn on CS-60 p.37 is the CS-50 guide's p.65 board
-  drawing (VR7-VR10, VR19, VR15 / VR18, VR20, VR16, VR17 / VR11-VR14, VR21).
-- The procedure states the CS-50's own difference where there is one
-  (p.39: VR14 output alignment ".24V (CS-50 is 0.6V)").
+Model (`board_temperature_rise`, kelvin). Each board sits uniformly in its
+window about the window's centre, C6 +/-2.5 and C1 +/-5 cents per 25 K, and
+between them it drifts as one linear VCO, in the trims' gain-and-offset form
+with the ratio 32 for 16. The drift the boards share (the windows' centres,
+up to tens of cents) moves the instrument, not a board, and is left out.
+Conventions, labelled in the code: uniform in the window; linear in the
+temperature change (E-46 gives only the 25 -> 50 C step); the same at every
+transposition (the IC is ranked, not the Rn resistors). 0 K is the
+temperature the boards were tuned at.
 
-Every value below that comes from the CS-60 manual is labelled sibling
-evidence in the code.
+## VCF: sensitivity binned by chip rank; cutoff and Q trimmed by ear
 
-### VCF: sensitivity binned by chip rank; cutoff and Q trimmed by ear
-
-The "CS-60,50" schematic corrects the first pass of this work: the rank
-resistors are not on the IG00156 fadj pin (a fixed 220k) but load each
-filter's **Vfc node** (R6 on IC10's f1 node, R7 on IC11's f2 node, each with
-0.01 uF). The panel lever, the VCF EG buffer (100k HP, 47k LP), SUB/touch via
-R7, and the VR7 (HP) / VR9 (LP) B-100k offset trims through 150k all sum
-there. R6/R7 (~2.2k) are small beside those sources (60k or more in
-parallel), so the node voltage per input scales with R6/R7: the rank sets the
-chip's control **sensitivity** (octaves per volt).
+The "CS-60,50" schematic puts the rank resistors not on the IG00156 fadj pin
+(a fixed 220k) but on each filter's **Vfc node** (R6 on IC10's f1 node, R7
+on IC11's f2 node, each with 0.01 uF). The panel lever, the VCF EG buffer
+(100k HP, 47k LP), SUB/touch via R7, and the VR7 (HP) / VR9 (LP) B-100k
+offset trims through 150k all sum there. R6/R7 (~2.2k) are small beside
+those sources (60k or more in parallel), so the node voltage per input
+scales with R6/R7: the rank sets the chip's control **sensitivity**.
 
 - Ranks (SM2 printed pp.17-18 note 9; CS-60 p.15): R6 2.7k/2.2k/1.8k, R7
   3.3k/2.7k/2.2k (CS-60/50 column 3.0k/2.4k/2.0k). Every column spans x1.5
   over two steps, a step of sqrt(1.5) = 1.2247.
 - A chip lands within half a step: Vfc octaves scaled by 2^(u*0.14624),
   |u| <= 1, HP and LP independent.
-- Alignment (CS-60 p.38, III-IV): HPF lever centre, LPF and RES high; "adjust
-  VR7 for cut off frequency and VR8 for Q so that the tone color of the M
-  circuit board may be the same as that of other M circuit boards"; for the
-  LPF, VR9 likewise. Matched by ear, with no numeric tolerance, so the static
-  cutoff and Q stay identical across boards here.
+- Alignment (CS-60 p.38, III-IV): "adjust VR7 for cut off frequency and VR8
+  for Q so that the tone color of the M circuit board may be the same as
+  that of other M circuit boards"; for the LPF, VR9 likewise. Matched by ear.
 
-Model. Each board scales the octaves of its Vfc-driven terms (VCF EG, SUB,
-touch, BRILLIANCE) by its own HP or LP factor. The static panel cutoff and Q
-are unchanged. Inference, labelled: node gain proportional to R6/R7 (exact
-to the ~3% the parallel sources add), and chips uniform within contiguous
-one-step bins. Strictly, the static cutoff away from the trim setting would
-also move by (sensitivity - 1) times its distance from the trim point in
-volts. Ceres's static cutoff is defined in Hz at C4, not in panel volts, so
-that term is left out. It is listed as a gap.
+Static cutoff and Q stay identical. No printed number bounds the ear match:
+the trimmers' range bounds what can be corrected, not what is left. The CS-80
+does print numbers (its VCF alignment, printed p.11 / PDF 13, holds FH and FL
+at 4.0 and 3.3 V, turns VR7/VR9 for maximum amplitude at the C1 key and sets
+VR8/VR10 to 4.3 and 2.2 +/-1 Vpp at CP3), but that is a different procedure
+on a CS-80 R7 and bus, so its bands do not carry over to a CS-50 aligned by
+ear.
 
-### EG output levels: check bands
+Strictly, the static cutoff away from the trim setting would also move by
+(sensitivity - 1) times its distance from the trim point in volts. Ceres's
+static cutoff is defined in Hz at C4, not in panel volts, so that term is
+left out and listed as a gap.
+
+## EG output levels
 
 - VCF EG (CS-60 p.37, II): with AL, IL at 10 V, TP1 must show +5 V +/-0.5 V
-  and -4 V +/-0.5 V; only the offset is trimmed (VR18, 0 +/-0.01 V). One
-  buffer gain must meet both bands, so the VCF EG reaches both filters within
-  **+/-10%** (the tighter band). It is one gain for HP and LP (one buffer,
-  TP1).
-- VCA EG (CS-60 p.38, V): peak 10 V **+/-0.2 V** at TP2 (+/-2%). The VCA is
-  linear in the EG (Guide p.41), so this is a per-board level of +/-0.17 dB.
-- Uniform within each band, as for pitch.
+  and -4 V +/-0.5 V; only the offset is trimmed (VR18, 0 +/-0.01 V, also
+  CS-80 printed p.7). One buffer gain must meet both bands, so the VCF EG
+  reaches both filters within **+/-10%**, one gain for HP and LP.
+- VCA EG (CS-60 p.38, V; CS-80 printed p.13): the attack ends where the
+  sequencer's comparator trips, TP2 **10 V +/-0.2 V**: a peak of each
+  board's own. The held and released levels sit VR17's offset below the
+  panel's, trimmed to **-200 +/-20 mV** at SL 0.
+- VR14 is trimmed after both, with A, D, R short and S at 10 (CS-60 VI.4,
+  "CS-50 is 0.6V"): every board gives the nominal output at full sustain.
 
-### Not modelled: no printed tolerance
+Correction to 0.5.0. The 0.5.0 model scaled each board's whole VCA EG by its
++/-2% peak residual. That ignored the trim order: VR14 comes last and is set
+at full sustain, so a full-sustain note is back at the nominal level. What
+remains is the attack peak relative to the held level, and the floor's
+residual, which shows below full sustain: at SUSTAIN 3 a board sits within
++/-0.5% of nominal, at full sustain on it.
+
+## EG times
+
+Each EG is one exponential converter: TC reaches the IG00151's EI through
+82k + VR19 (VCF) or VR20 (VCA), with the VR15/VR16 offsets through 100k (SM2
+p.16). The CS-60 trims them to an attack of 4 ms at 8 V and 125 ms at 3 V
+(pp.37-38). The CS-80 trims the same VR15/VR19 (VCF EG, printed p.7 / PDF 9)
+and VR16/VR20 (VCA EG, printed p.13 / PDF 15) to the same two times and
+prints **"(+/-5%)"** for each.
+
+Model (`board_envelope_time_tolerance`). Each trim point is uniform in
++/-5%, per EG and board. An exponential converter's log-time error is linear
+in its control voltage, so between and beyond the trim points it is linear
+in log time. Decay and release drive the same converter
+(Docs/research/envelopes-authenticity-2026-10-20.md); preset()'s factory
+conversion makes an attack 5 RC and a D/R time a T60 of ln(1000) RC, so a
+T60 shares the RC of an attack of 5*T60/ln(1000), and takes that attack's
+error.
+
+## VCA levels and the 0 dBm trim
+
+- VR11 trims the sine to 1 Vpp and VR12 the filtered pulse to 800 mVpp at
+  CP4 (CS-60 VI.1-2); the CS-80 trims the same VR11 and VR12 to **1.00
+  +/-.02 Vpp** and **800 +/-20 mVpp** (printed p.15 / PDF 17).
+- VR13 (CP5) and VR14 (O) act after CP4. The CS-60/50 trims them on the
+  filtered pulse ("With the above condition", VI.3-4), restoring its level,
+  so a board's sine keeps `s = (1+e11)/(1+e12)` of its level. (The CS-80
+  trims its VR13/VR14 on the sine instead, to its own 400 and 80 mVpp: the
+  CS-50 follows the CS-60 here.)
+- PRA III (CS-60 printed p.39): VR6 is trimmed last, in the finished
+  instrument, with the sine, SUSTAIN and LEVEL at maximum and all keys down,
+  for 0 dBm at OUT. It takes the four boards' sine error out of the common
+  gain: with the engine reference's assumptions (RMS meter, notes adding
+  incoherently), `V = sqrt(4 / sum s^2)` over the four physical boards.
+  VR6's own band (0 +/-1 dBm) is an instrument's level, not a board
+  difference, and is not modelled.
+
+## Not modelled: no printed tolerance
 
 | Mechanism | What the documents give | Why left out |
 | --- | --- | --- |
-| Static cutoff and Q | VR7, VR9 (cutoff), VR8, VR10 (Q) matched by ear (CS-60 p.38) | no numeric residual |
-| EG attack time | VR19, VR20: lengthen if longer than 125 ms at 3 V (CS-60 pp.37-38) | trim direction only, no tolerance |
-| EG decay/release times | .22 uF caps, IG00152/159 ranks A-D | no rank table, no tolerance |
-| VCA levels | VR11 1 Vpp, VR12 800 mVpp, VR3, VR14 0.6 V on the CS-50 (CS-60 pp.38-39) | alignment targets with no tolerance |
-| VCA-EG floor | TP2 -200 +/-20 mV at SL 0 (CS-60 p.38) | below the VCA's zero point; no audible spread at sustain 0 |
+| Static cutoff and Q | VR7, VR9 (cutoff), VR8, VR10 (Q) matched by ear (CS-60 p.38) | no numeric residual for the CS-50 procedure |
+| VR14's own residual | 0.6 V on the CS-50 (CS-60 VI.4), no band | the CS-80's 80 +/-5 mVpp is a different target on the sine |
+| VR6's own residual | 0 +/-1 dBm (CS-60 PRA III) | an instrument level, not a board difference |
 | WSC level | no per-board procedure in either manual | no data |
-| 1.5 nF, 4.7 M, 180 pF | unmarked capacitors; "solid" 4.7 M resistors (SM1 parts list p.3) | no tolerance printed |
+| 1.5 nF, 4.7 M, 180 pF, .22 uF | no tolerance in the CS-50 or CS-80 parts lists; the CS-80 M-board photo is too coarse to read markings | no data |
+| KAS sample-holds | no per-channel procedure | no data |
 
-## Listening test
+## Listening tests
 
 `/mnt/project-files/ceres/listening/2026-10-20-voice-variation-board-tolerance/`,
-letters A-D, `key.md` alongside (revision 2: the whole set was re-rendered
-after the sibling-evidence revision). A is the shipping engine (identical
-boards). The candidates are:
-
-- the full documented model;
-- the untrimmed or check-band parts only (filter sensitivity and EG levels);
-- the trimmed part only (VCO).
-
-Material: factory `brass1`, seed 50, four-board unisons on MIDI 48 and 36
-and a four-note chord; whole-file RMS matched. The default stays at
-identical boards until the owner chooses.
+letters A-D with `key.md` (revision 2): A the shipping engine (identical
+boards) against the 0.5.0 tolerance model and its parts. Material: factory
+`brass1`, seed 50, four-board unisons on MIDI 48 and 36 and a four-note
+chord; whole-file RMS matched.
 
 ## Verification
 
-- `Ceres.board_tolerance_contracts` (Tests/BoardToleranceTests.cpp):
+- `Ceres.board_tolerance_contracts` (Tests/BoardToleranceTests.cpp), every
+  expected value rebuilt from the printed numbers:
   - defaults keep identical boards;
-  - every VCO trim point within +/-1 cent across 40 seeds x 4 boards, and the
-    C2-C6 range within 3 cents;
-  - untrimmed keys follow one linear VCO, rebuilt independently from the
-    OCT-UP trim points;
-  - static cutoffs identical, and each filter's control sensitivity (the
-    cutoff octaves a BRILLIANCE step moves) within half a rank step,
-    recomputed from both printed R7 columns and scaling with the amount;
+  - every VCO trim point within +/-1 cent across 40 seeds x 4 boards, the
+    C2-C6 range within 3 cents, and untrimmed keys on one linear VCO;
+  - thermal drift at 25 K within +/-2.5 cents at C6 and +/-5 at C1, one
+    instrument's spread under 5 and 10 cents, one linear VCO's gain and
+    offset drift between and above (rebuilt from C1 and C6), linear in the
+    temperature change, independent of TRANSPOSE and additive to the trim;
+  - static cutoffs identical, and each filter's control sensitivity within
+    half a rank step;
   - one VCF EG level factor for both filters, within +/-10%;
-  - a lone board's output scaled by one VCA EG factor within +/-2%;
-  - the shared noise stream and start phases unchanged;
-  - boards fixed across polyphony, reset and seed.
+  - VCA EG peak within 10 +/-0.2 V and floor within -200 +/-20 mV; a lone
+    board's held output, once the attack has left the output couplings, at
+    the VR14-predicted gain at SUSTAIN 10 (1) and 3 (from its own floor);
+  - attack times within +/-5% at 4 ms and 125 ms for both EGs, a 1 s attack
+    and the decay and release on the log-linear converter line through
+    them, measured from the EG steps;
+  - each board's sine balance within the VR11/VR12 bands, the filtered path
+    changed only by the common VR6 gain, and `V^2 sum s^2 = 4`;
+  - the 0 dBm reference within the output-stage contract's 0.1 dB with every
+    tolerance at full spread (measured -0.005..+0.003 dB for seeds 3, 8, 21,
+    against -0.011..+0.003 dB with identical boards);
+  - the shared noise stream and start phases unchanged; boards fixed across
+    polyphony, reset and seed.
 - `Ceres.board_tolerance_audio_parity`: native and embedded produce identical
-  audio with all three tolerances at 1, and the tolerances change it.
-- With all amounts at 0, the native parity driver (all seven modes) and the
-  configuration parity driver are byte-identical to `0845146`.
+  audio with every tolerance at full spread, and the tolerances change it.
+- With every amount at 0, the native parity driver (all seven modes), the
+  configuration parity driver and `ceres_render` of all 14 presets are
+  byte-identical to 0.5.0 (`0f1d00f`).
 
 ## What would close the gap
 
@@ -178,7 +271,8 @@ identical boards until the owner chooses.
   measured cutoff and Q of the four boards of one aligned CS-50.
 - The panel-lever-to-Vfc law, so the sensitivity residual can also move the
   static cutoff away from the trim setting.
-- EG time tolerances (attack trim band; decay/release spread of the .22 uF /
-  IG00152/159 ranks), and VCA/WSC level tolerances.
+- Decay/release spread of the .22 uF capacitors and IG00152/159 ranks beyond
+  the converter's trim line, and a WSC level tolerance.
 - Measured per-board pitch error of a calibrated unit across the keyboard,
-  to replace the uniform-in-band assumption, and a documented thermal drift.
+  to replace the uniform-in-band assumption, and the temperature course of
+  a board between the 25 and 50 C points E-46 gives.
