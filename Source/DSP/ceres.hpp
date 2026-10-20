@@ -93,6 +93,13 @@ struct Patch {
     // SUB AM subtracts an additive normalized control current from ampLevel,
     // with gain closure at zero; the inherited AM/DC scale is uncalibrated.
     double filterLevel = 1.0, ampLevel = 1.0, volume = 0.55;
+    // EXPRESSION pedal, 1 fully open (no pedal, the hardware's own default)
+    // down to 0 fully closed. It is the PRA photo-coupler between MI and MO,
+    // not a gain: closing it leaves the 68k-2.2k/0.33uF leg and the 0.0033uF
+    // at MO in charge, which lifts the bottom and rolls off the top. 1
+    // bypasses the network exactly. The pedal's travel-to-level law is the
+    // guide's printed curve, read off the graph; see ceres.cpp.
+    double expression = 1.0;
     // Utility calibration gain AFTER the complete circuit and FIR. This is
     // not an original Yamaha control and cannot change internal drive/state.
     // Zero bypasses the gain exactly; [-24,+24] dB, with no limiter/AGC.

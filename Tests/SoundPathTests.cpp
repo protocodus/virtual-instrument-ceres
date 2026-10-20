@@ -1,5 +1,6 @@
 #include "ceres.hpp"
 #include <algorithm>
+#include <complex>
 #include <array>
 #include <cmath>
 #include <iostream>
@@ -229,6 +230,64 @@ void sharedSubPolarity() {
         }
     }
 }
+// The expression pedal is the PRA photo-coupler network, not a gain. A fully
+// open pedal leaves the signal path untouched bit for bit; a closed one
+// follows the guide's printed level curve at midband and, because the leg
+// that then carries the signal is a 68k-2.2k/0.33uF divider into 0.0033uF,
+// lifts the bottom and rolls off the top around it.
+void expressionNetwork() {
+    constexpr double fs=48000;
+    {   // Open: every sample identical to a patch without the field.
+        auto bare=ceres::preset("flute"); auto open=bare; open.expression=1;
+        ceres::Synth a(fs,7),b(fs,7);
+        require(a.configure(4,4)&&b.configure(4,4),"Configure expression witnesses");
+        a.setPatch(bare); b.setPatch(open); a.noteOn(60); b.noteOn(60);
+        for(unsigned n=0;n<4096;++n)
+            require(a.process()==b.process(),"A fully open pedal is a bare wire");
+    }
+    // Closed: the network's own transfer function, built here from the
+    // printed component values with the cell solved from the printed curve.
+    const double arm=68e3,shunt=2.2e3,shuntCap=.33e-6,outCap=.0033e-6,load=10e3+330;
+    const double g=1/arm,gs=1/shunt,gl=1/load;
+    const auto response=[&](double hz,double decibels) {
+        const double pass=g*g/(2*g+gs);
+        const double gain=std::pow(10,decibels/20);
+        const double cell=(gain*(g-pass+gl)-pass)/(1-gain);
+        const std::complex<double> s(0,2*pi*hz);
+        const std::complex<double> ys=s*shuntCap/(1.0+s*shunt*shuntCap),d=2*g+ys;
+        return std::abs((cell+g*g/d)/(cell+g+gl+s*outCap-g*g/d));
+    };
+    // Travel .3, .5 and 1 of the graph's 28 degrees, and its levels there.
+    for(auto band:{std::make_pair(.7,-7.2),std::make_pair(.5,-16.5),std::make_pair(0.,-39.8)}) {
+        std::array<double,3> magnitude{};
+        for(unsigned i=0;i<3;++i) {
+            const int note=36+24*int(i);
+            const double hz=440*std::exp2((note-69)/12.);
+            ceres::Synth s(fs,7); require(s.configure(4,4),"Configure closed witness");
+            auto p=ceres::preset("flute"); p.expression=band.first; s.setPatch(p); s.noteOn(note);
+            std::complex<double> sum=0; double n=0;
+            for(unsigned k=0;k<unsigned(fs);++k) {
+                const double y=s.process();
+                if(k>=unsigned(fs*.3)) {sum+=y*std::exp(std::complex<double>(0,-2*pi*hz*k/fs)); n+=1;}
+            }
+            // Against the open pedal at the same pitch, so only the network
+            // is measured; the shared soft rail leaves about 0.2% of level.
+            ceres::Synth o(fs,7); require(o.configure(4,4),"Configure open witness");
+            auto q=ceres::preset("flute"); o.setPatch(q); o.noteOn(note);
+            std::complex<double> reference=0;
+            for(unsigned k=0;k<unsigned(fs);++k) {
+                const double y=o.process();
+                if(k>=unsigned(fs*.3)) reference+=y*std::exp(std::complex<double>(0,-2*pi*hz*k/fs));
+            }
+            magnitude[i]=std::abs(sum)/std::abs(reference);
+            near(magnitude[i],response(hz,band.second),response(hz,band.second)*.01,
+                 "A closed pedal follows the printed curve through the network");
+        }
+        if(band.second<-30)
+            require(magnitude[0]/magnitude[2]>1.6,"A closed pedal leaves 65Hz well above 1kHz");
+    }
+}
+
 void postCircuitOutputTrim() {
     for(double db:{-24.,-6.020599913279624,0.,6.020599913279624,24.}) {
         ceres::Patch p;p.sine=.3;p.drive=2;p.ringMix=.73;p.ringRate=53;
@@ -263,5 +322,6 @@ int main() {
         commonVcaPlacement();std::cout<<"PASS additive common VCA, sine path, downstream bus/ring state and factory LEVEL\n";
         sharedSubPolarity();std::cout<<"PASS all five shared SUB polarities, continuous clock, lifecycle and reset\n";
         postCircuitOutputTrim();std::cout<<"PASS post-FIR utility trim linearity, neutral bypass and state/latency independence\n";
+        expressionNetwork();std::cout<<"PASS expression photo-coupler bypass, printed level curve and its tone shaping\n";
     } catch(const std::exception& e) {std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
 }

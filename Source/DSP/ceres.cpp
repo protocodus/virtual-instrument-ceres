@@ -109,6 +109,7 @@ const Parameter parameters[] = {
     {"sustain_mode", &Patch::sustainMode, 1, 2},
     {"filter_level", &Patch::filterLevel, 0, 1}, {"amp_level", &Patch::ampLevel, 0, 1},
     {"volume", &Patch::volume, 0, 1},
+    {"expression", &Patch::expression, 0, 1},
     {"output_trim_db", &Patch::outputTrimDb, -24, 24},
     {"octave", &Patch::octave, -2, 1}, {"tune_cents", &Patch::tuneCents, -500, 700},
     {"voice_spread_cents", &Patch::voiceSpreadCents, 0, 30},
@@ -348,6 +349,60 @@ struct OutputCoupling {
         const double high=(x-memory)/(1+g);
         memory+=2*g*high;
         return high;
+    }
+};
+
+// CS-50 expression network (PRA, SM2 p.22; guide printed pp.45-46). The foot
+// controller's voltage becomes a current through the 820 ohm leg of IC3-1/2
+// and lights the PS88-G50.201B, whose CdS cell sits between MI (the
+// MODULATION lever wiper) and MO (the top of the A-10k VOLUME track, whose
+// foot returns to earth through 330 ohm). In parallel with the cell: 68k to a
+// midpoint, 0.33uF with 2.2k from there to ground, 68k on to MO, and 0.0033uF
+// from MO to ground. So a closed pedal does not simply turn the signal down.
+// It hands the signal to that leg, which passes DC at -23dB but only -48dB
+// above the midpoint's 219Hz corner, and whose 9k source into 0.0033uF puts a
+// pole at 5.4kHz: the quieter it gets, the more bottom-heavy and the duller.
+//
+// Only the cell's resistance is unknown, and the guide prints what it does:
+// level against pedal travel, 0 to -40dB over about 28 degrees, +/-5dB. The
+// table below is that curve read off the printed graph at 600dpi; the cell's
+// resistance is then whatever makes the network's midband match it (1.5 Mohm
+// at the -40dB floor), so no CdS law is invented. The pedal's own level is
+// measured, not estimated; its placement on the travel axis is the graph's.
+constexpr double expressionArm=68e3, expressionShunt=2.2e3;
+constexpr double expressionShuntCap=.33e-6, expressionOutCap=.0033e-6;
+constexpr double expressionLoad=10e3+330;
+// Decibels at travel 0, .1, ... 1 of the graph's 28 degrees.
+constexpr double expressionCurve[]={0,-1.4,-3.8,-7.2,-11.5,-16.5,-22,-27.3,-32.4,-37.1,-39.8};
+// H(s) = (n0+n1.s)/(d0+d1.s+d2.s^2) for the two-node network above, bilinear.
+struct ExpressionNetwork {
+    double b0=1,b1=0,b2=0,a1=0,a2=0;
+    double x1=0,x2=0,y1=0,y2=0;
+    void clear() { x1=x2=y1=y2=0; }
+    void configure(double expression,double fs) {
+        const double travel=clamp(1-expression,0.0,1.0)*10;
+        const auto index=static_cast<std::size_t>(travel<10 ? travel : 9);
+        const double decibels=expressionCurve[index]
+            +(expressionCurve[index+1]-expressionCurve[index])*(travel-index);
+        // Invert the midband (0.33uF a short, 0.0033uF open) for the cell.
+        const double g=1/expressionArm, gs=1/expressionShunt, gl=1/expressionLoad;
+        const double pass=g*g/(2*g+gs), shunted=g-pass;
+        const double gain=std::pow(10,decibels/20);
+        const double cell=(gain*(shunted+gl)-pass)/(1-gain);
+        const double tau=expressionShunt*expressionShuntCap;
+        const double sum=cell+g+gl;
+        const double n0=2*g*cell+g*g, n1=(2*g*cell+g*g)*tau+cell*expressionShuntCap;
+        const double d0=2*g*sum-g*g;
+        const double d1=sum*(2*g*tau+expressionShuntCap)+2*g*expressionOutCap-g*g*tau;
+        const double d2=expressionOutCap*(2*g*tau+expressionShuntCap);
+        const double k=2*fs, a0=d0+d1*k+d2*k*k;
+        b0=(n0+n1*k)/a0; b1=2*n0/a0; b2=(n0-n1*k)/a0;
+        a1=(2*d0-2*d2*k*k)/a0; a2=(d0-d1*k+d2*k*k)/a0;
+    }
+    double process(double x) {
+        const double y=b0*x+b1*x1+b2*x2-a1*y1-a2*y2;
+        x2=x1; x1=x; y2=y1; y1=y;
+        return y;
     }
 };
 
@@ -712,6 +767,7 @@ struct Synth::Impl {
     bool hasProcessed=false;
     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
     double outputTrimGain=1;
+    ExpressionNetwork expression;
     double limiterInput=0, limiterOutput=0, limiterPole=0, limiterInnovation=0;
     double limiterRate=0, limiterStep=0;
     unsigned limiterSteps=1;
@@ -778,6 +834,7 @@ struct Synth::Impl {
     }
     void updateCoefficients() {
         outputTrimGain=std::pow(10,patch.outputTrimDb/20);
+        if (patch.expression<1) expression.configure(patch.expression,internalFs);
         // M-board mixer: fixed 150k ground, 150k noise input, and one 150k
         // branch per enabled waveform gate. Ideal low-Z WSC/noise outputs,
         // negligible enabled-FET resistance; disabled gates are open.
@@ -845,7 +902,7 @@ struct Synth::Impl {
         hasProcessed=false;
         effectiveHpResonance=patch.hpResonance; effectiveLpResonance=patch.lpResonance;
         commonVcaGain=patch.ampLevel;
-        decimator.clear();
+        decimator.clear(); expression.clear();
         // Preserve the original four-board random initialization and shared
         // audio/drift stream exactly. Extra virtual boards never consume that
         // stream during setup; they use a separate deterministic seed stream.
@@ -1051,9 +1108,12 @@ struct Synth::Impl {
         const double wet=ringWetCoupling.process(bus*ringSwitchGain,.1,internalFs);
         // Explicit bypass avoids even a rounding change for old patches.
         const double ringed=patch.ringMix==0 ? bus : bus+patch.ringMix*(wet-bus);
-        const double rail=.9*std::tanh(ringed*.18*patch.volume/.9);
+        // MI to MO. A fully open pedal is the fully conducting cell, which is
+        // the path this engine was calibrated on, so it stays a bare wire.
+        const double expressed=patch.expression>=1 ? ringed : expression.process(ringed);
+        const double rail=.9*std::tanh(expressed*.18*patch.volume/.9);
         // Unloaded HIGH output 33uF/5260ohm and documented inverting preamp.
-        // Expression assumes an ideal fully conducting CdS; no recording EQ.
+        // No recording EQ.
         return -lineCoupling.process(rail,outputCouplingTau[3],internalFs);
     }
 };
@@ -1199,7 +1259,7 @@ void Synth::allSoundOff() {
         voice.filter.voltage = impl_->patch.filterInitial;
         voice.filters = {}; voice.filteredCoupling={}; voice.commonCoupling={};
     }
-    impl_->decimator.clear();
+    impl_->decimator.clear(); impl_->expression.clear();
     impl_->busCoupling={}; impl_->lineCoupling={};
 }
 void Synth::reset() { impl_->reset(); }
