@@ -139,21 +139,76 @@ constexpr double ringCollectorLoad=1/(1/ringCollectorSource+1/10e3);
 constexpr double ringWetCouplingTau=10e-6*(ringCollectorSource+10e3);
 constexpr double ringModulatorGain=ringSignalDivider*ringCollectorLoad/ringSignalDegeneration;
 double ringSteering(double volts) { return std::tanh(volts/(2*ringThermalVoltage)); }
+// Volts at O1 per unit of the engine's voice bus. The M-board alignment sets
+// the sine at CP4 to 1Vpp (CS-60 manual p.38, VI.1), the engine's +/-1, so a
+// unit is .5V at CP4. VI.4 sets a CS-50 voice output O to "0.6V" (its figure
+// marks peak to peak) for the .8Vpp filtered pulse of VI.2 with the VCA EG at
+// full SUSTAIN, .98 of its peak (ampEnvelopeFloor): .75/.98 per unit of
+// envelope. The four O outputs reach I1 through 1k each into 47k, and IC1
+// follows I1 to O1 (SM2 p.22). Sibling procedure, CS-50 value; see
+// outputPreampGain for the same anchor read at the HO terminal.
+constexpr double ringBusVolts=.5*(.75/.98)/(4+1e3/47e3);
+constexpr double ringPinOneVolts=ringBusVolts*ringSignalDivider;
+// Signal pair: 470 ohm between the emitters (pins 2-3), each emitter on its
+// own I5 sink (uA796 equivalent circuit), so V1-V4 = 2VT*atanh(x)+x*I5*470
+// for the current split x. It limits near I5*(470+2re) = .56V at pin 1.
+// Four voices at the VI.4 level, in phase, reach .17V there (H3 -62dB);
+// four-note chords on the factory presets reach .12-.31V, at most 1.1%
+// instantaneous compression; touch LEVEL and virtual voices beyond the
+// CS-50's four go further. The 470 ohm pin-1 node keeps the pair's own
+// beta*(470+2re) at its small-signal value (under 1.1% of the node).
+// Returns the bus-unit input a linear pair would need for the same split,
+// so small signals and the derived modulator gain are unchanged. Halley in
+// u=atanh(x), from the series inverse (or, past the knee and for any input
+// whose cube overflows, the limiting asymptote), stops once a step is under
+// 1e-5 of u, where the remaining error is third order: at most three tanh
+// evaluations land within 4e-16 of the exact split anywhere up to +/-20V at
+// pin 1, one or two at playing levels.
+double ringSignalPair(double signal) {
+    constexpr double a=2*ringThermalVoltage, b=ringBiasCurrent*470, c=a+b;
+    const double volts=ringPinOneVolts*signal, w=volts/c;
+    double u=w*(1+b/(3*c)*w*w);
+    const double limiting=(std::abs(volts)-b)/a;
+    if (limiting>std::abs(u) || !std::isfinite(u)) u=std::copysign(limiting,volts);
+    double split=0;
+    for (int i=0;i<8;++i) {
+        // tanh(u) = -m/(2+m) and 1-tanh(u)^2 = 4(1+m)/(2+m)^2 from one
+        // m = expm1(-2|u|), exact down to the smallest signals.
+        const double m=std::expm1(-2*std::abs(u)), t=std::copysign(-m/(2+m),u);
+        const double d=4*(1+m)/((2+m)*(2+m)), f=a*u+b*t-volts, slope=a+b*d;
+        const double step=f/(slope+f*b*t*d/slope);   // f'' = -2b*t*d
+        split=t-d*step*(1+t*step);                   // tanh(u-step), 2nd order
+        if (std::abs(step)<=1e-5*std::abs(u)) break;
+        u-=step;
+    }
+    return split*c/ringPinOneVolts;
+}
 } // namespace
 double ringSpeedHz(double vc1Volts) {
     return ringSpeedReferenceHz*std::exp2(ringSpeedOctavesPerVolt*(vc1Volts-5));
 }
+// PRA envelope lever laws: the IG00159 pin-sheet times scaled by the PRA's
+// 31ms alignment (sources, the slope assumption and the by-ear choice are
+// beside the declarations in ceres.hpp).
+double ringAttackSeconds(double atVolts) {
+    return ringEnvelopeTrim*std::pow(10.,-.3*atVolts);
+}
+double ringDecaySeconds(double dtVolts) {
+    return ringEnvelopeTrim*10*std::pow(10.,-.3*dtVolts)*std::log(1000.)/5;
+}
 namespace {
 // The wet buffer IC1-2 is non-inverting with VR4 (B-100K trimmer) over 10k:
 // gain 1+VR4/10k, 1..11. Its factory setting is not printed anywhere in the
-// service documentation. ASSUMPTION: VR4 is trimmed so that the MODULATION
-// lever is level-neutral, the wet path's RMS equal to the dry signal's for a
-// steady midband carrier. That needs VR4=57.8k, inside its range, and keeps
-// this engine's earlier wet level. Matching peaks instead (VR4=38.0k) is the
-// other defensible trim; it was rendered as a listening candidate.
+// CS-50 or CS-60 service material (the CS-60 PRA alignment trims VR3, VR5 and
+// VR7 on this board, not VR4). Two trims are defensible for a steady midband
+// carrier: wet RMS equal to the dry signal's (VR4=57.8k), or the two
+// sidebands together peaking at the dry peak, each half the dry tone
+// (VR4=38.0k). The peak-matched trim is CHOSEN BY EAR (owner listening test
+// ring-wet-trim, 2026-10-20), not measured: buffer gain 4.80, inside VR4's
+// range, 3.0dB less wet than the RMS-matched trim shipped in 0.5.0.
 double ringWetBufferGain() {
     const double carrierPeak=ringSourcePeakVolts*ringCarrierPortShunt/(33000+ringCarrierPortShunt);
-    return std::sqrt(2.)/(ringModulatorGain*std::tanh(carrierPeak/(2*ringThermalVoltage)));
+    return 1/(ringModulatorGain*std::tanh(carrierPeak/(2*ringThermalVoltage)));
 }
 // The patch specifies TOTAL integrator Hz at middle C. Only variable gm
 // responds to exponential control; the parallel 4.7Mohm path stays fixed.
@@ -1365,6 +1420,7 @@ struct Synth::Impl {
     unsigned ringDepthRemaining = 0;
     double ringCoupledCarrier=0;
     double ringSwitchGain=ringSteering(ringDifferentialDc);
+    double ringSignalInput=0, ringSignalOutput=0;
     RingCarrierCoupling ringCarrierCoupling;
     OutputCoupling ringSignalCoupling, ringWetCoupling;
     double ringWetGain=ringModulatorGain*ringWetBufferGain();
@@ -1423,13 +1479,13 @@ struct Synth::Impl {
         filterCoefficients = envelopeCoefficients(internalFs,patch.filterAttack,
             patch.filterDecay,effectiveRelease(patch.filterRelease,patch.globalRelease),
             patch.filterAttackHeadroom,patch.filterAttackSaturation);
-        // Direct CS-50 PRA RT divider: +15V through6.8k,3.3k toground.
-        // Its unloaded4.901V mapped by the existing nominal five-RC law
-        // implies .46781044s T60. External timing gain is not calibrated;
-        // this fixed key-off return is separate from the M-board global SUS.
-        constexpr double ringRelease=.4678104397473947;
+        // Direct CS-50 PRA 2DT divider: +15V through 6.8k, 3.3k to ground.
+        // Its unloaded 4.901V on the PRA-aligned DECAY TIME law gives 14.50s
+        // T60 (CS-60 sibling trim, fixed-100k slope assumption; chosen by ear
+        // 2026-10-20 over the untrimmed .4678s; see ceres.hpp). This fixed
+        // key-off return is separate from the M-board global SUS.
         ringCoefficients=envelopeCoefficients(internalFs,patch.ringAttack,
-            patch.ringDecay,ringRelease,.01,0);
+            patch.ringDecay,ringDecaySeconds(ringReleaseVolts),.01,0);
         updateBoardScales();
     }
     void updateBoardScales() {
@@ -1523,6 +1579,7 @@ struct Synth::Impl {
         ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
         ringCarrierCoupling.clear();ringCoupledCarrier=0;
         ringSwitchGain=ringSteering(ringDifferentialDc);
+        ringSignalInput=ringSignalOutput=0;
         qVoltageOffset=0;
         hpResonanceAnchor=patch.hpResonance; lpResonanceAnchor=patch.lpResonance;
         hasProcessed=false;
@@ -1763,13 +1820,10 @@ struct Synth::Impl {
         const double bus=busCoupling.process(mixed,outputCouplingTau[2],internalFs);
         // One global processor, after the voice bus and before expression/
         // output. The carrier uses the physical matched upper-BJT steering
-        // law at the pins 7-8 carrier; the signal pair is kept linear. Its
-        // 470 ohm degeneration limits at .56V peak on pin 1; the CS-50 voice
-        // output aligns to .6V (CS-60 manual p.39, VI-4, "CS-50 is 0.6V"),
-        // which reaches pin 1 as at most .35V: 1.5% peak compression, third
-        // harmonic -48dB, and -62dB at half that. The engine's bus is not a
-        // calibrated voltage, so that bound is not applied. Wet gain is the
-        // derived modulator gain times the wet buffer's VR4 trim (see above).
+        // law at the pins 7-8 carrier, and the degenerated signal pair its
+        // large-signal law at the aligned bus level (ringSignalPair). Wet
+        // gain is the derived modulator gain times the wet buffer's VR4
+        // trim (see above).
         const double ringControl=ringEnvelope.advance(0,1,0,.01,0,
             ringCoefficients[0],0,ringCoefficients[1],ringCoefficients[2]);
         // Digital control dezippering only: retain the physical EG trajectory,
@@ -1791,8 +1845,9 @@ struct Synth::Impl {
         // Pin 1 sees the bus through 10uF into 330+463 ohm (20Hz); pin 6 and
         // the wet buffer are coupled through 10uF into 2.5k+10k (1.27Hz).
         // Both run even at mix 0, like the carrier network.
-        const double signal=ringSignalCoupling.process(bus,ringSignalCouplingTau,internalFs);
-        const double wet=ringWetGain*ringWetCoupling.process(signal*ringSwitchGain,ringWetCouplingTau,internalFs);
+        ringSignalInput=ringSignalCoupling.process(bus,ringSignalCouplingTau,internalFs);
+        ringSignalOutput=ringSignalPair(ringSignalInput);
+        const double wet=ringWetGain*ringWetCoupling.process(ringSignalOutput*ringSwitchGain,ringWetCouplingTau,internalFs);
         // Explicit bypass avoids even a rounding change for old patches.
         const double ringed=patch.ringMix==0 ? bus
             : (bus+patch.ringMix*(wet-bus))/(1+patch.ringMix*(1-patch.ringMix)*ringMixLeverRatio);
@@ -1941,6 +1996,7 @@ void Synth::allNotesOff() {
 }
 void Synth::allSoundOff() {
     impl_->keysOff(); impl_->ringEnvelope={}; impl_->ringWetCoupling={}; impl_->ringSignalCoupling={};
+    impl_->ringSignalInput=impl_->ringSignalOutput=0;
     impl_->ringCarrierCoupling.clear();impl_->ringCoupledCarrier=0;
     impl_->ringSwitchGain=ringSteering(ringDifferentialDc);
     for (auto& voice : impl_->voices) {
@@ -2014,7 +2070,8 @@ std::array<Synth::VoiceState,Synth::maxVoiceCount> Synth::allVoiceState() const 
 }
 Synth::ModulationState Synth::modulationState() const {
     return {impl_->lastSub,impl_->ringEnvelope.voltage,impl_->ringFrequency,
-        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier,impl_->ringSwitchGain,impl_->ringDepthValue};
+        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier,impl_->ringSwitchGain,impl_->ringDepthValue,
+        impl_->ringSignalInput,impl_->ringSignalOutput};
 }
 Synth::SoundPathState Synth::soundPathState() const {
     return {impl_->qVoltageOffset,impl_->effectiveHpResonance,

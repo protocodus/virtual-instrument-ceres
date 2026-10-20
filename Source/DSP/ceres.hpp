@@ -179,14 +179,16 @@ struct Patch {
     // Hz, positive frequency-envelope excursion in octaves, initial-to-peak
     // attack seconds and decay T60. These are the quantities at the carrier;
     // the panel levers map onto them through the laws below the struct
-    // (ringSpeedHz, ringDepthOctavesPerLever). Attack/decay stay seconds:
-    // the PRA envelope is the M-board VCA-EG chip pair, so its lever law is
-    // that EG's, offset by the PRA's own trim (31ms attack at AT=10V, CS-60
-    // PRA alignment). Total carrier is bounded .2..220Hz (guide p.53's
-    // printed range), so rate/depth interact at the top.
+    // (ringSpeedHz, ringDepthOctavesPerLever, ringAttackSeconds,
+    // ringDecaySeconds). Attack/decay stay seconds: the PRA envelope is the
+    // M-board VCA-EG chip pair, so its lever law is that EG's, offset by the
+    // PRA's own trim (31ms attack at AT=10V, CS-60 PRA alignment). Total
+    // carrier is bounded .2..220Hz (guide p.53's printed range), so rate/depth
+    // interact at the top.
     // Trigger once per physical all-keys-up -> any-key-down transition; final
-    // key-up uses a fixed nominal .46781044s T60 return, independent of MIDI
-    // pedal/globalRelease. Retrigger retains capacitor charge, not phase reset.
+    // key-up uses the fixed 2DT's 14.50s T60 return (ringReleaseVolts),
+    // independent of MIDI pedal/globalRelease. Retrigger retains capacitor
+    // charge, not phase reset.
     // mix=0 preserves the previous signal path exactly; carrier phase is free.
     // mix is MODULATION lever travel: the B-10k crossfades dry against wet and
     // its own track loads the 8.04k it works into, so the whole mix sits
@@ -265,6 +267,31 @@ constexpr double ringEnvelopePeakVolts = 10.0;
 constexpr double ringDepthOctavesPerLever = ringDepthOctavesPerVolt * ringEnvelopePeakVolts;
 // Carrier Hz for a VC1 voltage (0..10V is the SPEED lever's travel times 10).
 double ringSpeedHz(double vc1Volts);
+// ATTACK TIME and DECAY TIME are TVR1 and TVR2, B-10k from +10V to ground,
+// wipers to the PRA's AT and DT pins (SM2 p.26, PN2); 10V is the SHORT end
+// (CS-60 manual p.39). IC7 IG00159 with IC6 IG00151 into .22uF is the M-board
+// VCA-EG pair (SM2 p.16), whose pin sheets give attack 10^(-.3V)s to the peak
+// and decay 10*10^(-.3V)s as five-RC durations (SM2 p.21); the CS-60 M-board
+// alignment confirms .3 decade/V (4ms at 8V, 125ms at 3V, manual p.38).
+// The PRA EG is aligned 31 times slower: CS-60 PRA alignment I (sibling
+// evidence, the same board; manual p.39) puts the EO peak 31ms after key-on
+// at AT=DT=10V, where the pin sheet gives 1ms. Every segment drives the one
+// TC->EI exponential converter, so the factor applies to all of them.
+// ASSUMPTION: the PRA's fixed 100k span into EI gives the M board's trimmed
+// .3 decade/V (the M board's span is 82k+VR20, B-50K, so .246...396 decade/V
+// is possible). The fixed release follows this law: CHOSEN BY EAR over the
+// untrimmed pin-sheet law (owner listening test ring-release, 2026-10-20).
+// Over 10..0V attack runs 31ms..31s and decay .428..428s T60; ring_attack and
+// ring_decay stop at 10s (AT below 1.64V, DT below 5.44V) and also allow
+// times shorter than the hardware's 31ms and .428s.
+constexpr double ringEnvelopeTrim = 0.031 / 0.001;
+// Attack seconds, key-on to peak, for an AT pin voltage (0..10V).
+double ringAttackSeconds(double atVolts);
+// Decay T60 seconds toward the grounded SL for a DT pin voltage (0..10V).
+double ringDecaySeconds(double dtVolts);
+// 2DT (release) is fixed by 6.8k from +15V and 3.3k to ground (SM2 p.22):
+// every final key-up returns over ringDecaySeconds(4.901V) = 14.50s T60.
+constexpr double ringReleaseVolts = 15.0 * 3.3 / (6.8 + 3.3);
 
 // Keys use snake_case (e.g. lp_cutoff, filter_initial, amp_attack). Finite values
 // are range-limited; false means an unknown key or a nonfinite input.
@@ -391,6 +418,10 @@ public:
         double ringCoupledCarrier;
         double ringSwitchGain; // matched upper-pair steering, includes nominal DC bias
         double ringDepth; // actual interpolated digital Depth coordinate
+        // Last processed sample at pin 1, in bus units: the coupled bus, and
+        // the linear-pair equivalent of the signal pair's current split
+        // (equal for small signals; the pair limits near .56V at pin 1).
+        double ringSignalInput, ringSignalOutput;
     };
     struct SoundPathState {
         double resonanceVoltageOffset, hpResonance, lpResonance;
