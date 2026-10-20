@@ -31,6 +31,18 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 
 ## Version history
 
+### Unreleased — 0.5.0 — component authenticity
+
+- The ring modulator now multiplies by a sine instead of switching a square: the 33k sits in series between the carrier's 100 µF and the multiplier, as the PRA schematic draws it, so the µA796 stays in its linear region. You hear the two sum and difference tones without square-wave sidebands, and slow SPEED settings are no longer up to 38 dB weaker. Some dry signal leaks through, about 5 dB below each sideband, as a typical µA796 does. The wet path now loses lows below about 20 Hz. Wet loudness at full MODULATION is unchanged.
+- The output stage no longer squashes loud chords. It is now the PRA board's linear preamp, clipping hard at rails derived from its parts, about 12 dB above the 0 dBm reference. At high VOLUME, chords keep their attack peaks (up to 6 dB more on loud presets); at the default VOLUME 0.55 presets change by at most about 0.5 dB. Full VOLUME with touch LEVEL and tremolo can now exceed digital full scale; there is no limiter, so set the host level with Output Trim.
+- The amplitude envelope now sits 2 % of its peak below its target, as the M board is aligned (TP2 at −200 mV with sustain at zero). Releases and zero-sustain decays end in true silence after about four time constants, and a full-sustain note holds at 98 % of its attack peak.
+- Factory release CVs now pass the sustain-control transistor follower, as the release levers do on the CS-50, so every preset's release is about 1.7× longer (Brass 1's amp release T60 goes from 0.021 s to 0.035 s). Manual patches are unchanged.
+- Factory filter initial levels follow the M-board alignment (−4 V at full IL instead of −5 V), so presets start their filter sweep 20 % less far down.
+- Deep pulse-width modulation on upper notes follows the WSC comparator: the pulse cannot get narrower than the oscillator's reset time, so very thin PWM above about 1.7 kHz widens slightly instead of thinning to a needle. The top octave above 5.9 kHz keeps the real reset timing instead of a software clamp.
+- New board tolerance controls (`board_pitch_tolerance`, `board_filter_tolerance`, `board_envelope_tolerance`, all off by default) let the four voices differ the way calibrated CS-50 boards do: a cent or two off pitch, most at the bottom of the keyboard; slightly more or less filter response to envelope, SUB, touch and BRILLIANCE; envelope depth within ±10 % and amplitude envelope level within ±2 %. Each seed is one fixed instrument. Existing patches sound exactly as before.
+- Front ends get the hardware's panel lever laws: SUB SPEED runs exponentially from 0.8 to 50 Hz, full VCO lever is ±25 cents of vibrato, the VCF lever sags at mid-travel, BRILLIANCE is a B-10K lever from −15 V to +15 V about a grounded centre detent, and RESONANCE runs +10 V at MIN to 0 V at MAX. Saved parameters keep their meaning.
+- Research for each component is in `Docs/research/*-authenticity-2026-10-20.md`.
+
 ### Unreleased — 0.4.0 — circuit details
 
 - The noise source is now hard-limited, as the CS-50's limiter amplifier makes it: a binary ±1 signal at the waveforms' peak level instead of uniform random values. Audio NOISE is 4.8 dB louder at the same lever setting; its spectrum is unchanged and SUB-N keeps its level. Patches using NOISE change sound.
