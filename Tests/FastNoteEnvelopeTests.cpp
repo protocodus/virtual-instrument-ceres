@@ -66,7 +66,7 @@ void rapidVelocityAndGates() {
     for(double fs:{8000.,48000.,96000.})for(unsigned factor:{1u,2u,4u})
         for(bool fast:{false,true})for(bool ring:{false,true})for(bool same:{false,true}) {
             ceres::Synth synth(fs,50);require(synth.configure(1,factor),"Configure rapid CV witness");
-            auto p=base();p.hpCutoff=100;p.keyTrack=0;p.filterInitial=p.filterPeak=0;
+            auto p=base();p.hpCutoff=100;p.lpCutoff=1000;p.keyTrack=0;p.filterInitial=p.filterPeak=0;
             p.filterLfo=0;p.pressureVolume=.7;p.ringMix=ring?.73:0;
             // Keep a nonzero sustain between rapid re-gates. Zero-sustain
             // retirement is separately exercised by the burst matrix below.
@@ -85,7 +85,8 @@ void rapidVelocityAndGates() {
                 for(unsigned f=0;f<13;++f) {
                     expected=target+(expected-target)*std::exp(-1/(fs*.005));
                     require(std::isfinite(synth.process()),"Finite rapid CV sample");
-                    const double actual=std::log2((synth.allVoiceState()[0].hpFrequency-floorHz)/(100-floorHz));
+                    // LP carries the full touch-brilliance depth (R7 TBR 47k).
+                    const double actual=std::log2((synth.allVoiceState()[0].lpFrequency-floorHz)/(1000-floorHz));
                     near(actual,expected,4e-12,"Rapid velocity retarget follows elapsed-time five-ms RC");
                 }
             }

@@ -31,6 +31,13 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 
 ## Version history
 
+### Unreleased — 0.3.0 — hardware realism
+
+- Adds the CS-50's PORTAMENTO/GLISSANDO (`glide_mode`, `glide_rate`): a semitone counter, plus an Hz-domain integrator for portamento, on the key voltage shared by the oscillator and both filters. In Sustain II a released note keeps gliding. Off by default; existing patches are unchanged.
+- A repeated key now retriggers its own released voice, as the key assigner does, instead of starting an idle one.
+- Touch BRILLIANCE now moves the high-pass a third as far as the low-pass, following the hardware resistor matrix. Touch vibrato is centred slightly above pitch, as Yamaha trimmed it. A new `pressure_wah` adds the hardware's touch-controlled SUB filter route.
+- Patches with nonzero `pressure_filter` or `pressure_vibrato` change sound. See the [research write-up](Docs/research/hardware-realism-2026-10-20.md) and the [previews](Docs/audio/previews/2026-10-20-hardware-realism/).
+
 ### Unreleased — 0.2.2 — waveform mixing
 
 - Corrects the relative pulse audio polarity so equal-level saw/pulse blends reinforce their fundamentals, following a public hardware-recording comparison. Shared oscillator phase and PWM timing remain unchanged.
@@ -110,7 +117,7 @@ Additional voices are a virtual extension of the four-board model. The calibrate
 
 Audio noise scales by `sqrt(factor/4)` before the waveform mixer. This corrects the increased in-band noise density that unscaled random samples would produce at lower internal rates. The 4× source is unchanged, and SUB noise retains its own RC normalization. Different quality settings can still differ through filter discretization, nonlinear processing and alias rejection; this is not hardware gain calibration. See [noise-quality validation](Docs/validation/noise-quality/README.md).
 
-The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults `4` and `4`. Host adapters may choose and save different defaults independently of the 57 hardware/engineering patch keys.
+The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults `4` and `4`. Host adapters may choose and save different defaults independently of the 60 hardware/engineering patch keys.
 
 ### Ring, SUB and SUSTAIN controls
 
@@ -147,6 +154,19 @@ The first two controls use an explicitly anchored stiff-source model, not recove
 
 Neutral offsets, common level 1 and output trim 0 preserve the prior paths when the intentionally corrected SUB filter route is inactive. The output trim is a modern linear utility, not part of the analog model; it adds no limiter and cannot promise a fixed peak under arbitrary MIDI. The [source audit](Docs/sound-path-gap-audit.md) distinguishes known resistor/capacitor relationships from provisional control calibration.
 
+### Portamento, glissando and the key assigner
+
+| Key | Range | Default | Meaning |
+| --- | --- | --- | --- |
+| `glide_mode` | 0..2 | 0 | Off, Portamento, Glissando |
+| `glide_rate` | 1..200 semitones/s | 24 | Glissando counter clock |
+
+The CS-50 builds each board's key voltage in the KAS board (Servicing Guide printed pp.22–25). The assigner's key code passes a glissando counter, an integrating gate and a sample-hold, then reaches the VCO and both filters. Ceres follows that order. The counter steps one semitone at a time toward the board's assigner key at `glide_rate`. Glissando sends each step straight on. Portamento integrates the stepped key voltage with a time constant of one step period, which matches the guide's statement that the integrating rate is matched to the counter rate. The key voltage is linear in Hz, so the glide approaches its target exponentially in Hz rather than in pitch.
+
+Free channels carry the last-pressed key, so a newly assigned board glides from the previous key. While its key is down, or in Sustain II, the sample-hold follows the glide. In Sustain I it freezes the pitch at key-off. The guide's 470 kΩ/3.3 MΩ/1 µF integrator and the comparator table fix the topology but not the clock: the counter oscillator's control law is not printed, so `glide_rate` is an engineering rate, not a calibrated lever.
+
+The assigner only writes a new key into a channel whose code differs from that key and whose key is up (guide pp.17–18). A released board that still holds the pressed key is therefore re-keyed first. After that, allocation keeps the idle/quietest/oldest software order. The hardware ignores a fifth held key; Ceres still steals, as a DAW adaptation.
+
 ### Velocity expression
 
 `expression_source` selects **0 = channel aftertouch** (the legacy default) or **1 = note-on velocity**. Values clamp to 0..1 and round to the nearest integer. The existing `pressure_volume`, `pressure_filter` and `pressure_vibrato` depths then use the selected source. This optional velocity mode is a modern DAW mapping, not a claim about the original hardware.
@@ -155,7 +175,7 @@ Velocity is latched independently for each allocated voice and stays with its re
 
 Each physical note press also retains a FIFO identity after its board is stolen. Its eventual key-up consumes that press alone; a newer overlapping press of the same pitch keeps sounding until its own key-up. These velocity and MIDI ownership policies are software adaptations, not recovered CS-50 keyboard circuitry. See [the rapid-note validation](Docs/validation/note-reuse/README.md).
 
-Level gain is `1 − pressure_volume*(1 − expression)`; filter expression adds `expression*pressure_filter` octaves to each filter's variable conductance above its fixed resistor floor; vibrato adds `expression*pressure_vibrato` cents of the selected SUB waveform. The separate native `velocity_sensitivity` gain remains multiplicative and backward-compatible: leave it at zero when using only the selected expression level depth. All native research presets retain source 0. Hosts should default missing saved properties to 0 to preserve old patches, and explicitly save 1 for velocity-oriented patches.
+Level gain is `1 − pressure_volume*(1 − expression)`. Filter expression is touch BRILLIANCE: `expression*pressure_filter` octaves on the low-pass variable conductance above its fixed resistor floor, and 0.3374 times that on the high-pass. The R7 matrix feeds TBR through 47k to LP and 150k to HP, the same split as SUB. `pressure_wah` scales the selected SUB waveform by touch into the same two nodes: `expression*SUB*pressure_wah` LP octaves, the hardware's level amplifier II → R7 VCF route. Vibrato adds `expression*pressure_vibrato*(SUB + 1/3)` cents. Yamaha trims level amplifier I so the 3 Vpp SUB leaves centred on +0.5 V (guide p.56), so touch vibrato bends slightly upward on average. The 1/3 offset assumes that centring scales with the touch gain. The separate native `velocity_sensitivity` gain remains multiplicative and backward-compatible: leave it at zero when using only the selected expression level depth. All native research presets retain source 0. Hosts should default missing saved properties to 0 to preserve old patches, and explicitly save 1 for velocity-oriented patches.
 
 
 ## Known gaps
@@ -165,6 +185,8 @@ Level gain is `1 − pressure_volume*(1 − expression)`; filter expression adds
 - Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
 - No external modulation input is implemented. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
+- Touch LEVEL still multiplies the common VCA gain, although R7 adds it into the LEVEL node. Voice stealing still replaces the hardware's ignored fifth key. Both await an owner decision; see the [hardware realism research](Docs/research/hardware-realism-2026-10-20.md).
+- The portamento/glissando clock rate, the KAS note-ladder intonation and the limited noise source's amplitude statistics are not calibrated.
 
 ## Build
 
@@ -180,7 +202,7 @@ ctest --test-dir build-dsp -L '^unit$' --output-on-failure
 
 `ceres` and `ceres_embedded` are the circuit libraries. `ceres_render` writes mono float32 WAV without normalization; sorted event rows are `frame type note value`. It supports note-on/off, bend, pressure, pedal, all-notes-off, panic and reset. `--patch path` reads key=value overrides and `--build-info` reports the exact compiled sources including the merged CMake file. The native research preset API is excluded from the embedded ABI.
 
-The 12 circuit checks cover oscillator/filter/envelope/ring contracts, expression, all 57 keys with zero post-construction allocations, and native/embedded parity. They are named `Ceres.<Suite>` and labelled `unit` alongside the existing scaffold unit tests. Test executables are resolved by CMake target paths for single- and multi-configuration generators. The `audio`, `render` and `fuzz` tiers remain separate; the unchanged audio contract now renders the actual circuit preset list twice.
+The 12 circuit checks cover oscillator/filter/envelope/ring contracts, expression, all 60 keys with zero post-construction allocations, and native/embedded parity. They are named `Ceres.<Suite>` and labelled `unit` alongside the existing scaffold unit tests. Test executables are resolved by CMake target paths for single- and multi-configuration generators. The `audio`, `render` and `fuzz` tiers remain separate; the unchanged audio contract now renders the actual circuit preset list twice.
 
 ```sh
 ctest --test-dir build-dsp -L '^audio$' --output-on-failure

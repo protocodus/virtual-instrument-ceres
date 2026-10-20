@@ -26,7 +26,8 @@ ceres::Patch patch() {
 double velocity(const ceres::Synth& s) {
     // The actual production filter CV provides an independent readout of the
     // effective expression coordinate; no test-only DSP mutator is needed.
-    return std::log2((s.allVoiceState()[0].hpFrequency-floorHz)/(100-floorHz));
+    // LP receives the full touch-brilliance depth; HP gets the R7 47k/150k share.
+    return std::log2((s.allVoiceState()[0].lpFrequency-floorHz)/(1000-floorHz));
 }
 unsigned held(const ceres::Synth& s) {
     unsigned count=0;for(const auto& v:s.allVoiceState())if(v.held)++count;return count;

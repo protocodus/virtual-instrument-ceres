@@ -124,7 +124,24 @@ struct Patch {
     // DAW-control policy, not a measured component or physical timing law.
     double ringMix = 0.0, ringRate = 30.0, ringDepth = 0.0;
     double ringAttack = 0.01, ringDecay = 0.35;
+    // Touch response (CS-50 panel 2, guide printed pp.55-56). pressureFilter is
+    // touch BRILLIANCE in LP octaves; R7 feeds TBR through 47k LP / 150k HP, so
+    // HP moves .3374358974 times as far, as for SUB. pressureVibrato is SUB
+    // vibrato cents per unit touch; level amplifier I is trimmed to centre the
+    // 3Vpp SUB on +.5V, so touch vibrato rises by a third of its depth.
+    // pressureWah is touch-scaled SUB filter depth (level amplifier II -> R7
+    // VCF pin70), LP octaves with the same .3374 HP ratio. Uncalibrated depths.
     double pressureVolume = 0.0, pressureFilter = 0.0, pressureVibrato = 0.0;
+    double pressureWah = 0.0;
+    // PORTAMENTO/GLISSANDO (panel 3; guide printed pp.23-25, KAS YM26700):
+    // 0 off, 1 portamento, 2 glissando. A per-board counter steps the key code
+    // one semitone at a time toward its assigner key at glideRate semitones/s.
+    // Glissando sends the steps to the sample-hold; portamento integrates the
+    // stepped key voltage, which is linear in Hz, with tau equal to one step
+    // period (the guide's "adjust the integrating rate to the rate of
+    // controlling the key code data"). The counter clock's PS-voltage law is
+    // not printed, so glideRate is an engineering rate, not lever calibration.
+    double glideMode = 0.0, glideRate = 24.0;
     // Modern optional expression routing: 0=smoothed channel aftertouch
     // (legacy/default), 1=each board's latched note-on velocity. The three
     // pressure* depths above consume this selected value. Velocity remains

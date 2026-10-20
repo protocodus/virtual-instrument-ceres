@@ -60,6 +60,11 @@ int main(int argc,char** argv) {
                !ceres::setParameter(patch,"output_trim_db",-24+scene*48./7))return 7;
         }
         if(expressionControls && !ceres::setParameter(patch,"expression_source",1))return 8;
+        // Glide and touch-wah ride with the expression scenes: both are
+        // per-board key/touch paths shared by the native and embedded cores.
+        if(expressionControls && (!ceres::setParameter(patch,"glide_mode",scene%3) ||
+           !ceres::setParameter(patch,"glide_rate",10+scene*9) ||
+           !ceres::setParameter(patch,"pressure_wah",.3)))return 9;
         ceres::Synth synth(rate,50+scene);synth.setPatch(patch);
         for(unsigned frame=0;frame<12000;++frame) {
             if(frame==0)synth.noteOn(60,.8);
