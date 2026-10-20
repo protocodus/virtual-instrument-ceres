@@ -147,13 +147,19 @@ plateau and fold match the pin sheet. Two things remain:
   waveform phases, wave folding methods"), with no data. The textbook bipolar
   topology, an undegenerated differential pair, has its own minimum-THD drive
   (k = 1.402 for tanh(k*tri): THD 1.36 %, H3 -54 dB, H5 -39 dB, H7 -45 dB).
-  That is a defensible candidate but not evidence, so it is an A/B listening
+  That is a defensible candidate but not evidence, so it was an A/B listening
   test (`/mnt/project-files/ceres/listening/2026-10-20-vco-sine-shaper/`,
-  key in `key.md`) and the ideal shaper ships until the owner chooses.
+  key in `key.md`). **Owner verdict, 2026-10-20: B.** The differential-pair
+  shaper `tanh(k*tri)/tanh(k)`, k = 1.4020, now ships; it is chosen by ear,
+  not measured. Its mean square at unit peak, `(1-tanh(k)/k)/tanh(k)^2` =
+  0.46928 against an ideal sine's 0.5, lowers the four-sine 0 dBm output
+  anchor by 0.275 dB, and the output rails with it.
 - **STI coupling.** The 4.7 uF/22k coupling removes the triangle's mean, which
   the plateau makes `2r^2` of peak (0.2 % at C4, 3 % at C6 on 8', 29 % at the
-  6.33 kHz top). Applying it needs the shaper's behaviour beyond its nominal
-  input range, which is unpublished, so it is omitted and noted in the code.
+  6.33 kHz top). For the ideal shaper that needed a transfer beyond its
+  nominal input range, which is unpublished. The shipping tanh shaper is
+  defined there, but the auditioned candidate omitted the offset, so it is
+  still not applied and is noted in the code.
 
 ## PWM source
 

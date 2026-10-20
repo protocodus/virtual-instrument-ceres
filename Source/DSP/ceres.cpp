@@ -539,6 +539,32 @@ struct FilterChain {
 // Capacitor integration uses physical-RC trapezoids without pole prewarp.
 constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
     4.7e-6*(1e3+4*47e3),33e-6*(4.7e3+560)};
+// WSC sine shaper, IG00158 STI (pin 15) -> pin 2. Its transfer is not
+// published and has not been measured on any CS-50/60/80. The shipping
+// shaper is the textbook bipolar-IC triangle-to-sine converter, an
+// undegenerated differential pair: y = tanh(k*tri)/tanh(k) at unit peak, at
+// that topology's own optimum, the drive k that minimises THD for an ideal
+// triangle (k = 1.40211; 1.4020 is the value auditioned): THD 1.36 %, H3
+// -54.1 dB, H5 -39.0 dB, H7 -45.1 dB. It replaced the ideal sin(pi/2*tri)
+// by ear on 2026-10-20 (owner listening verdict, set
+// 2026-10-20-vco-sine-shaper); it is not a fit to any recording. tanh is
+// not constexpr in C++17, so tanh(k) is written out (std::tanh(1.4020)).
+constexpr double wscSineDrive=1.4020;
+constexpr double wscSineTanhDrive=0.8857831884152492;
+// g'(+/-1) = k*(1-tanh(k)^2)/tanh(k): the slope at both triangle corners.
+constexpr double wscSineCornerSlope=
+    wscSineDrive*(1-wscSineTanhDrive*wscSineTanhDrive)/wscSineTanhDrive;
+// Mean square over a period of the ideal folded triangle (no plateau):
+// (1/2)*integral_{-1}^{1} tanh(k*u)^2 du/tanh(k)^2 = (1-tanh(k)/k)/tanh(k)^2,
+// .4692770 (an ideal sine's .5, so -.275 dB RMS at the same peak).
+constexpr double wscSineMeanSquare=
+    (1-wscSineTanhDrive/wscSineDrive)/(wscSineTanhDrive*wscSineTanhDrive);
+// 2*sqrt(wscSineMeanSquare): RMS of four incoherent unit-peak shaped sines.
+constexpr double wscFourSineRms=1.370075901392172;
+static_assert(wscFourSineRms*wscFourSineRms-4*wscSineMeanSquare<1e-15 &&
+              4*wscSineMeanSquare-wscFourSineRms*wscFourSineRms<1e-15,
+              "Four-sine RMS literal must be 2*sqrt(wscSineMeanSquare)");
+
 // PRA output preamp (SM2 printed p.22 / PDF16; guide printed p.47 / PDF56).
 // VOLUME's wiper (I2) drives IC2-1/2, an HA1452, as an inverting amplifier:
 // 100k+47k in, 150k plus the VR6 B-1M rheostat as feedback, so 1.02 to 7.82,
@@ -558,8 +584,9 @@ constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
 // the sine lever, SUSTAIN and LEVEL at maximum on PANEL and all keys down:
 // a sine-only tone. The PRA board is shared (CS-50 SM2 p.22 note 7: "IC9 is
 // used for CS-60 only"). Each sine sits at CP4 1Vpp (M board VI.1, printed
-// p.38 / PDF 40), engine +/-1, so the CS-50's four voices are sqrt(4/2)
-// RMS, and .18 of that at full VOLUME reads 0 dBm, .775V RMS, at HO.
+// p.38 / PDF 40), engine +/-1 peak. Four of them add incoherently to
+// 2*sqrt(wscSineMeanSquare) RMS (the shaped sine above; sqrt(4/2) for an
+// ideal sine), and .18 of that at full VOLUME reads 0 dBm, .775V RMS, at HO.
 // Cross-check: VI.4 sets each CS-50 voice output O to 0.6V with .8Vpp at
 // CP4, and four 1Vpp sines through 0.75 and the four 1k/47k bus branches
 // are .132V RMS on the bus, so VR6 must give 5.9 of its 1.02..7.82 range.
@@ -569,7 +596,7 @@ constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
 // sits 0.2V below its 10V peak (see ampEnvelopeFloor), so the common VCA
 // passes .98 of each sine while VR6 is trimmed.
 constexpr double outputPreampGain=.18;
-constexpr double outputReferenceRms=outputPreampGain*1.4142135623730951*.98; // sqrt(4/2)
+constexpr double outputReferenceRms=outputPreampGain*wscFourSineRms*.98;
 constexpr double outputReferenceVolts=.7745966692414834; // 0 dBm, sqrt(.6)
 constexpr double outputHaSupplyCurrent=12e-3, outputSwingMargin=2;
 // HO is the inverse of this node, so HO's +8.32V bounds it below.
@@ -897,23 +924,32 @@ struct Oscillator {
         const double fall = std::max(duty, recharge);
         double square = phase < fall ? 1 : -1;
         square += blep(phase,step) - blep(wrap(phase-fall),step);
-        // WSC pin14 -> pin3 folds the SAME conditioned ramp, then pin15 ->
-        // pin2 rounds it. Retain the existing ideal sine transfer, but stop
-        // bypassing the finite reset with an unrelated ideal phase ramp.
-        // The flat plateau is thus 1; the descending branch is cos(2pi*phi).
-        // Sine slice trim/compensation and exact transistor shape are unknown.
-        // Amplitude-domain form: -cos(pi*p) is fold tri=2|p|-1 (TO, 3.2Vpp,
-        // SL pin 4 open; SM2 p.21) through an ideal sin(pi/2*tri). TO reaches
-        // STI through 4.7uF NP with 22k to ground (SM2 p.16), which removes
-        // the triangle's 2r^2 mean; an ideal shaper cannot take that offset
-        // without an out-of-range transfer nobody has published, so it is
-        // omitted (.2% of peak at C4, 3% at C6 on 8').
-        const double resetAngle = 2*pi*recharge;
-        const double resetSine = std::sin(resetAngle);
-        const double resetCosine = std::cos(resetAngle);
-        const double sineBase = phase < recharge ? 1 : std::cos(2*pi*phase);
-        const double sine = sineBase + .5*(resetCosine-1)*blep(resetPhase,step)
-            - pi*resetSine*blamp(resetPhase,step);
+        // WSC pin14 -> pin3 folds the SAME conditioned ramp into the
+        // triangle tri=2|p|-1 (TO, 3.2Vpp, SL pin 4 open; SM2 p.21): 1 on the
+        // plateau, then 1-4*phase down to the fold at phase .5 and 4*phase-3
+        // back up (a plateau longer than .5 covers the fold). pin15 -> pin2
+        // shapes it with the bipolar differential pair tanh(k*tri)/tanh(k)
+        // (wscSineDrive above: textbook topology at its own minimum-THD
+        // drive, not measured, chosen by ear 2026-10-20). Sine slice trim and
+        // the chip's real transistor shape are unpublished. TO reaches STI
+        // through 4.7uF NP with 22k to ground (SM2 p.16), which removes the
+        // triangle's 2r^2 mean (.2% of peak at C4, 3% at C6 on 8'); that
+        // offset is not applied (the auditioned shaper omits it).
+        // Band-limiting, analytic as for the saw: the plateau step at r is a
+        // jump g(tri(r+))-1 and a slope change to -/+4*g'(tri(r+)); the reset
+        // corner (slope 4*g'(1) into the flat plateau) and the fold corner
+        // (-4*g'(1) to +4*g'(1)) are BLAMPs.
+        const bool foldAfterPlateau = recharge < .5;
+        const double plateauEnd = foldAfterPlateau ? 1-4*recharge : 4*recharge-3;
+        const double plateauEndShape = std::tanh(wscSineDrive*plateauEnd);
+        const double plateauEndSlope = (foldAfterPlateau ? -4 : 4)*wscSineDrive
+            *(1-plateauEndShape*plateauEndShape)/wscSineTanhDrive;
+        const double tri = phase < .5 ? 1-4*phase : 4*phase-3;
+        double sine = phase < recharge ? 1 : std::tanh(wscSineDrive*tri)/wscSineTanhDrive;
+        sine += .5*(plateauEndShape/wscSineTanhDrive-1)*blep(resetPhase,step)
+            + .5*plateauEndSlope*blamp(resetPhase,step)
+            - 2*wscSineCornerSlope*blamp(phase,step);
+        if (foldAfterPlateau) sine += 4*wscSineCornerSlope*blamp(wrap(phase-.5),step);
         phase = wrap(phase + step);
         // Empirical audio-polarity calibration: public CS-50 solo/both-on
         // recordings support constructive saw/pulse mixing at equal nominal

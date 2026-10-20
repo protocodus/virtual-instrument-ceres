@@ -11,19 +11,37 @@ namespace {
 constexpr double pi=3.14159265358979323846;
 using C=std::complex<double>;
 void check(bool ok,const std::string& why) { if(!ok)throw std::runtime_error(why); }
-C exponentialIntegral(int k,double a,double b) {
-    if(k==0)return b-a;
-    const C iw(0,2*pi*k);
-    return (std::exp(-iw*a)-std::exp(-iw*b))/iw;
-}
 C rawSawCoefficient(int n,double r) {
     const double w=2*pi*n;
     const C iw(0,w), e=std::exp(-iw*r);
     // Integral of2phi-1 over a full cycle minus2phi on[0,r].
     return -2.0/iw-2.0*(e*(-r/iw+1/(w*w))-1/(w*w));
 }
-C rawSineCoefficient(int n,double r) {
-    return exponentialIntegral(n,0,r)+.5*(exponentialIntegral(n-1,r,1)+exponentialIntegral(n+1,r,1));
+// WSC sine shaper, recomputed here from its definition rather than read from
+// the engine: an undegenerated bipolar differential pair at unit peak,
+// tanh(k*tri)/tanh(k), on the folded conditioned ramp tri=2|p|-1 with
+// p=1 on the one-shot plateau (phase<r) and 1-2*phase after it.
+constexpr double shaperDrive=1.4020;
+double shaped(double tri,double k=shaperDrive) {return std::tanh(k*tri)/std::tanh(k);}
+double shapedSlope(double tri) {
+    const double t=std::tanh(shaperDrive*tri);
+    return shaperDrive*(1-t*t)/std::tanh(shaperDrive);
+}
+double foldedRamp(double phase,double r) {return phase<r ? 1 : 2*std::abs(1-2*phase)-1;}
+template<class F> C simpson(F f,double a,double b,int intervals) {
+    const double h=(b-a)/intervals;
+    C sum=f(a)+f(b);
+    for(int i=1;i<intervals;++i)sum+=(i%2 ? 4.:2.)*f(a+i*h);
+    return sum*(h/3);
+}
+// Continuous Fourier coefficient of the shaped sine with plateau r<.5, by
+// Simpson quadrature on each smooth piece (no closed form exists).
+C shapedCoefficient(int n,double r) {
+    const auto piece=[n,r](double phase){
+        return shaped(foldedRamp(phase,r))*std::polar(1.0,-2*pi*n*phase);
+    };
+    return simpson([n](double phase){return std::polar(1.0,-2*pi*n*phase);},0,r,64)
+        +simpson(piece,r,.5,1<<14)+simpson(piece,.5,1,1<<14);
 }
 C measured(const std::vector<ceres::OscillatorFrame>& data,int harmonic,bool sine) {
     C result=0;
@@ -53,17 +71,26 @@ void conditionedWaveforms() {
             }
             if(phase>r+dt && phase<1-dt) {
                 check(std::abs(wave[i].saw-(2*phase-1))<2e-12,"Descending current-balance slope must not stretch with reset duration");
-                check(std::abs(wave[i].sine-std::cos(2*pi*phase))<2e-12,"Sine must fold the same conditioned branch");
+                if(std::abs(phase-.5)>dt)
+                    check(std::abs(wave[i].sine-shaped(foldedRamp(phase,r)))<2e-12,"Sine must shape the fold of the same conditioned branch");
             }
             check(std::isfinite(wave[i].saw) && std::abs(wave[i].saw)<1.1,"Bounded conditioned saw");
             check(std::isfinite(wave[i].sine) && std::abs(wave[i].sine)<1.1,"Bounded folded sine");
         }
         check(std::abs(measured(wave,0,false).real()+r*r)<2e-6,"Conditioned saw DC must agree with independent piecewise integral");
-        const double slope=-2*pi*std::sin(2*pi*r);
-        const double mean=r-std::sin(2*pi*r)/(2*pi)+slope*dt*dt/12;
-        check(std::abs(measured(wave,0,true).real()-mean)<2e-6,"Folded sine DC including finite BLAMP area");
+        // Shaped sine mean: r on the plateau plus the integral of tanh, whose
+        // antiderivative is log(cosh(k*u))/k; the descending half from 1-4r
+        // to -1 and the rising half (an odd function over [-1,1]) leave
+        // r-(log cosh k-log cosh(k(1-4r)))/(4k tanh k). Each BLAMP leaves
+        // its slope change times dt^2/12: -4g'(1) at the reset corner, +8g'(1)
+        // at the fold and -4g'(1-4r) at the plateau step.
+        const double k=shaperDrive;
+        const double cornerSum=4*shapedSlope(1)-4*shapedSlope(1-4*r);
+        const double mean=r-(std::log(std::cosh(k))-std::log(std::cosh(k*(1-4*r))))/(4*k*std::tanh(k))
+            +cornerSum*dt*dt/12;
+        check(std::abs(measured(wave,0,true).real()-mean)<2e-6,"Shaped sine DC including finite BLAMP areas");
         for(int n=1;n<=16;++n) {
-            C expectedSaw=0,expectedSine=0;
+            C expectedSaw=0;
             // Exact sampling identity: the DFT includes all continuous
             // Fourier coefficients at n+kN. The remaining high-frequency
             // curvature/smoothing tails must not be mistaken for a jump
@@ -72,13 +99,12 @@ void conditionedWaveforms() {
                 const int m=n+alias*int(length);
                 const double sinc=std::sin(pi*m*dt)/(pi*m*dt),t=sinc*sinc;
                 expectedSaw+=rawSawCoefficient(m,r)*t;
-                const double w=2*pi*m,jump=std::cos(2*pi*r)-1;
-                const C edge=std::polar(1.0,-w*r);
-                expectedSine+=rawSineCoefficient(m,r)+edge*(jump*(t-1)/C(0,w)+slope*(1-t)/(w*w));
             }
             check(std::abs(measured(wave,n,false)-expectedSaw)<1e-8,"Saw harmonics must match independent piecewise integral, edge filter and sampling identity");
-            check(std::abs(measured(wave,n,true)-expectedSine)<1e-8,"Folded sine harmonics must match independent integral, jump/slope correction and sampling identity");
         }
+        // The shaped sine has no closed-form spectrum to alias-sum, so its
+        // harmonics are checked against quadrature in wscSineShaper(), at a
+        // period long enough for the BLEP/BLAMP kernels to be negligible.
         auto old=p; old.resetMicroseconds=6;
         const auto shortReset=ceres::oscillatorTrace(fs,f,old,length);
         double sineDifference=0,sawDifference=0;
@@ -137,6 +163,9 @@ void extrapolationAndRate() {
             const double phase=i*dt;
             if(phase>2*dt&&phase<r-2*dt){++plateau;check(wave[i].saw==-1&&wave[i].sine==1,"Plateau lasts the physical one-shot fraction f*tau");}
             if(phase>r+2*dt&&phase<1-2*dt){++ramp;check(std::abs(wave[i].saw-(2*phase-1))<1e-12,"Ramp after the physical one-shot keeps its fixed slope");
+                // At 10kHz (r>.5) the plateau covers the fold: no fold corner.
+                if(std::abs(phase-.5)>2*dt)
+                    check(std::abs(wave[i].sine-shaped(foldedRamp(phase,r)))<1e-12,"Shaped sine follows the folded ramp after the one-shot");
 }
             const double edge=std::max(.5,r);
             if(phase>2*dt&&phase<1-2*dt&&std::abs(phase-edge)>2*dt)
@@ -151,6 +180,54 @@ void extrapolationAndRate() {
                 check(std::isfinite(x.saw)&&std::isfinite(x.sine)&&std::isfinite(x.pulse)&&
                     std::abs(x.saw)<2&&std::abs(x.sine)<2&&std::abs(x.pulse)<2,"Extreme CV and rate guards must remain finite/bounded");
         }
+}
+
+// The shipping WSC sine (owner listening verdict, 2026-10-20): the textbook
+// bipolar differential-pair converter at its own optimum. It is neither a fit
+// nor a measurement; this pins its definition, the derivation of k and the
+// engine's band-limited rendering of it.
+void wscSineShaper() {
+    // Odd sine-series harmonics of tanh(k*tri)/tanh(k) for an ideal triangle
+    // in sine phase, by quarter-wave symmetry b_n=(4/pi)*int_0^{pi/2}
+    // g(2*theta/pi)*sin(n*theta) dtheta (Simpson, 2^14 intervals).
+    const auto harmonics=[](double k) {
+        std::array<double,200> b{};
+        constexpr int intervals=1<<14;
+        const double h=(pi/2)/intervals;
+        for(int i=0;i<=intervals;++i) {
+            const double theta=i*h,weight=(i==0||i==intervals) ? 1 : (i%2 ? 4 : 2);
+            const double x=shaped(2*theta/pi,k);
+            for(int n=1;n<200;n+=2)b[n]+=weight*x*std::sin(n*theta);
+        }
+        for(auto& value:b)value*=(4/pi)*h/3;
+        return b;
+    };
+    const auto thd=[&harmonics](double k) {
+        const auto b=harmonics(k);
+        double energy=0;
+        for(int n=3;n<200;n+=2)energy+=b[n]*b[n];
+        return std::sqrt(energy)/std::abs(b[1]);
+    };
+    const auto b=harmonics(shaperDrive);
+    const auto db=[&b](int n){return 20*std::log10(std::abs(b[n]/b[1]));};
+    std::cout<<"WSC shaper k="<<shaperDrive<<": H3 "<<db(3)<<" dB, H5 "<<db(5)<<" dB, H7 "<<db(7)
+             <<" dB, THD "<<100*thd(shaperDrive)<<"%\n";
+    check(std::abs(db(3)+54.09)<.05&&std::abs(db(5)+39.01)<.05&&std::abs(db(7)+45.13)<.05,
+          "Differential-pair shaper keeps its documented odd harmonics");
+    const double best=thd(shaperDrive);
+    check(std::abs(best-.0135943)<5e-7,"Documented 1.36% THD for the ideal triangle");
+    check(best<thd(shaperDrive-.001)&&best<thd(shaperDrive+.001),"k=1.4020 is the topology's own minimum-THD drive");
+    // Engine rendering, plateau included: over a 20480-sample period the
+    // BLEP/BLAMP kernels and aliasing move harmonics n<=9 by O((n/N)^2) of
+    // each edge term, about 1e-9.
+    ceres::Patch p;p.pwmDepth=0;
+    constexpr double fs=1024000,f=50;
+    const auto length=std::size_t(fs/f);
+    const double r=f*p.resetMicroseconds*1e-6;
+    const auto wave=ceres::oscillatorTrace(fs,f,p,length);
+    for(int n=1;n<=9;++n)
+        check(std::abs(measured(wave,n,true)-shapedCoefficient(n,r))<1e-8,
+              "Rendered shaped sine harmonics must match quadrature of the continuous waveform");
 }
 
 // Public CS-50 oscillator demonstration: AutomaticGainsay, d2u1QrIYvnw.
@@ -225,11 +302,11 @@ void productionMixtureRelationship() {
 }
 }
 int main() {
-    try {nominalTiming();conditionedWaveforms();extrapolationAndRate();
+    try {nominalTiming();conditionedWaveforms();extrapolationAndRate();wscSineShaper();
         bool failed=false;
         for(const auto run:std::array<void(*)(),2>{{recordedMixtureRelationship,productionMixtureRelationship}})
             try {run();}catch(const std::exception& e){std::cerr<<e.what()<<'\n';failed=true;}
         if(failed)return 1;
-        std::cout<<"PASS nominal VCO timing, conditioned current slope, WSC shared fold, Fourier/DC/edge, public mixture relationships and high-CV bounds\n";return 0;
+        std::cout<<"PASS nominal VCO timing, conditioned current slope, WSC shared fold and differential-pair sine, Fourier/DC/edge, public mixture relationships and high-CV bounds\n";return 0;
     }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }
