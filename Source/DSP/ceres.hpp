@@ -137,11 +137,17 @@ struct Patch {
     // siblings below map the PN3 levers onto these. The one IG00150 clock
     // free-runs: note events never reset its phase.
     double lfoRate = 5.0, vibratoCents = 0.0, tremolo = 0.0, filterLfo = 0.0;
-    // Shared SUB source: 0 sine, 1 down saw, 2 up saw, 3 square, 4 noise.
+    // Shared SUB source: 0 sine, 1 down saw, 2 up saw, 3 square, 4 noise,
+    // 5 EXT (the FUNCTION switch's sixth position: Synth::externalInput).
     // Noise uses the sourced22k/.1uF low-pass loaded by SUI's100k on the
     // +/-15V limiter: an estimated .77 RMS (limiter bandwidth and slew rate
     // from datasheet typicals, after the 33.86Hz pick-up coupling), within +/-8.2, independent of rate/audio Noise mix. The free-running PWM sine source is separate and is unaffected.
     double lfoWaveform = 0.0;
+    // Rear-panel EXT LEVEL (PN5 VOLUME, A-50K ahead of the EXT preamp): the
+    // fraction of the EXT IN jack signal its wiper passes on, 0..1. The pot's
+    // audio-taper travel law is not published, so front ends map their own
+    // knob onto this ratio. Only FUNCTION EXT hears it.
+    double extLevel = 1.0;
     // One global balanced ring multiplier after the voice bus. Base carrier
     // Hz, positive frequency-envelope excursion in octaves, initial-to-peak
     // attack seconds and decay T60. These are the quantities at the carrier;
@@ -248,6 +254,11 @@ double subSpeedLeverHz(double travel);
 double subVibratoLeverCents(double travel);
 // VCF lever travel -> filter_lfo (LP octaves per SUB unit).
 double subFilterLeverOctaves(double travel);
+// EXT IN: volts at the jack per unit of Synth::externalInput. The EXT preamp
+// gains 101, so at ext_level 1 one unit swings SUI by the internal SUB's
+// 1.5 V peak (3 Vpp): a full-scale host signal modulates as deeply as the
+// internal waveforms. See ceres.cpp.
+constexpr double subExternalUnitVolts = 1.5 / 101.0;
 // Panel 2 lever laws, for front ends that show the hardware levers. They do
 // not change what `brilliance` and `resonance_offset` mean: both stay loaded
 // bus volts. travel is lever travel, 0 at MIN and 1 at MAX, clamped; a
@@ -288,6 +299,16 @@ public:
     void noteOn(int note, double velocity = 1.0);
     void noteOff(int note);
     void pressure(double value);
+    // EXT IN for FUNCTION EXT (lfo_waveform 5). Feed one host-rate sample
+    // before each process(); it holds until the next call, and is linearly
+    // interpolated across the internal oversampled steps. Units: 1.0 is
+    // subExternalUnitVolts at the jack, so a +/-1 signal at ext_level 1 gives
+    // the internal SUB's depth on every route (vibrato, VCF, VCA, touch).
+    // The EXT preamp clips at 9.33 units and the SUI buffer at 8.67 (19.4 and
+    // 18.8 dB above). Nonfinite values read as 0. reset() clears the jack and
+    // its coupling capacitor; allSoundOff() keeps them, like the SUB clock.
+    // Realtime-safe and allocation-free, in the embedded target too.
+    void externalInput(double sample) noexcept;
     void pitchBend(double semitones);
     // MIDI damper adaptation: holds envelope gates until pedal-up. Distinct
     // from globalRelease and the CS-50 SUSTAIN I/II key-CV modes.

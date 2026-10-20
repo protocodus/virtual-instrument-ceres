@@ -322,6 +322,10 @@ if(BUILD_TESTING)
   target_link_libraries(ceres_native_configuration_parity PRIVATE ceres)
   add_executable(ceres_embedded_configuration_parity Tests/ConfigurationParityDriver.cpp)
   target_link_libraries(ceres_embedded_configuration_parity PRIVATE ceres_embedded)
+  add_executable(ceres_native_external_parity Tests/ExternalParityDriver.cpp)
+  target_link_libraries(ceres_native_external_parity PRIVATE ceres)
+  add_executable(ceres_embedded_external_parity Tests/ExternalParityDriver.cpp)
+  target_link_libraries(ceres_embedded_external_parity PRIVATE ceres_embedded)
   find_package(Python3 COMPONENTS Interpreter)
   if(Python3_Interpreter_FOUND)
     if(CERES_BUILD_TOOLS)
@@ -348,12 +352,16 @@ if(BUILD_TESTING)
     add_test(NAME Ceres.capacitor_native_embedded_parity COMMAND "${Python3_EXECUTABLE}"
       "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_capacitor_parity.py" "$<TARGET_FILE_DIR:ceres_native_parity>"
       --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
+    add_test(NAME Ceres.external_input_audio_parity COMMAND "${Python3_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_external_parity.py" "$<TARGET_FILE_DIR:ceres_native_external_parity>"
+      --native "$<TARGET_FILE:ceres_native_external_parity>" --embedded "$<TARGET_FILE:ceres_embedded_external_parity>")
   endif()
 
   foreach(target IN ITEMS ceres_configuration_tests ceres_noise_quality_tests ceres_oscillator_circuit_tests ceres_tests ceres_sound_path_tests
       ceres_capacitor_tests ceres_ring_depth_tests ceres_ring_carrier_tests ceres_ring_switching_tests ceres_expression_tests ceres_note_reuse_tests ceres_fast_note_envelope_tests
       ceres_embedded_contract ceres_native_parity ceres_embedded_parity
-      ceres_native_configuration_parity ceres_embedded_configuration_parity)
+      ceres_native_configuration_parity ceres_embedded_configuration_parity
+      ceres_native_external_parity ceres_embedded_external_parity)
     set_target_properties(${target} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
   endforeach()
     add_executable(CeresDSPTests Tests/test_dsp.cpp)

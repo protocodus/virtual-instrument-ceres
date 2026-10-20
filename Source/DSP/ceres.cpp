@@ -201,7 +201,8 @@ const Parameter parameters[] = {
     {"board_pitch_tolerance", &Patch::boardPitchTolerance, 0, 1},
     {"board_filter_tolerance", &Patch::boardFilterTolerance, 0, 1},
     {"board_envelope_tolerance", &Patch::boardEnvelopeTolerance, 0, 1},
-    {"lfo_waveform", &Patch::lfoWaveform, 0, 4},
+    {"lfo_waveform", &Patch::lfoWaveform, 0, 5},
+    {"ext_level", &Patch::extLevel, 0, 1},
     {"ring_mix", &Patch::ringMix, 0, 1}, {"ring_rate", &Patch::ringRate, .2, 220},
     {"ring_depth", &Patch::ringDepth, 0, 8},
     {"ring_attack", &Patch::ringAttack, .001, 10},
@@ -815,6 +816,27 @@ constexpr double pickupCouplingTau=100e3*.047e-6;
 // SUI waveforms, 1.5V peak): the +/-15V swing times the 100/122 divider.
 constexpr double subNoiseResistance=22e3*100e3/122e3;
 constexpr double subNoiseRail=15*(100./122.)/1.5;
+// SUB-EXT. The rear EXT IN jack's tip goes to the top of the A-50K LEVEL pot
+// (PN5 VOLUME, sleeve to its foot; SM2 printed p.27), whose wiper is PRA
+// EX(53). The EXT preamp, IC3-1/2 (NJM4558D), is non-inverting with 100k
+// feedback over 1k to ground, gain 101 (SM2 printed p.22; guide printed p.56 /
+// PDF 65 draws the same stage). Its output reaches EXO(56) through a 10uF
+// non-polar capacitor with 100k to ground, and FUNCTION EXT (PN3 SSW M6)
+// joins EXO to SUI, where the SUB board's 100k to ground and the IC1-1
+// follower (SM2 printed p.8) take it to SUO like every other source. So the
+// coupling sees 100k||100k, a .318 Hz high-pass, while EXT is selected, and
+// EXO's own 100k (.159 Hz) otherwise; the capacitor charge carries across a
+// switch. In units of the 1.5 V SUB peak, the stage gain is 1 by definition of
+// subExternalUnitVolts (1.5 V / 101). Swings, NJM4558 datasheet typicals
+// (VOM, +/-15 V; ESTIMATE): the preamp drives 101k||50k, so +/-14 V (RL>=10k);
+// IC1-1 drives the three B-10k PN3 levers, about 3k, so +/-13 V (RL>=2k). The
+// square's 15k/1.8k divider assumes the same 14 V (14*1.8/16.8 = 1.5 V).
+// The preamp's 3 MHz typical gain-bandwidth (29.7 kHz closed-loop) and 1 V/us
+// slew rate act only at the top of the audio band or in hard overload, and
+// are not modelled.
+constexpr double externalPreampRail=14/1.5, externalBufferRail=13/1.5;
+constexpr double externalCouplingTauSelected=10e-6*(100e3*100e3/200e3);
+constexpr double externalCouplingTauOpen=10e-6*100e3;
 
 // Acklam's rational inverse normal CDF, relative error below 1.2e-9: one
 // uniform draw per Gaussian sample keeps the shared random sequence intact.
@@ -994,16 +1016,20 @@ struct OutputRate {
 
 // SUB-OSCILLATOR lever laws. Guide printed p.55 / PDF 64: the SUB is VCO II,
 // an IG00150; SPEED (PN3 SVR1, B-10k between 0 and +10V; SM2 p.27) drives VC2,
-// which reaches pin 1 through 180k, with 330k from pin 1 to the +15V pin 4.
-// Pin 1 is a current input: the PWM oscillator, the same IG00150, takes VC1
-// through 110k (guide printed p.49) and spans log2(222/.2)=10.12 octaves over
-// 10V, the SUB log2(50/.8)=5.97; 110k/180k predicts the ratio 1.636 and the
-// table gives 1.695 (3.5%), while a voltage-input divider (330k to +15 V here,
-// to -15 V there) predicts 1.16. So the rate is exponential in VC2 and the
-// lever works into 180k. Calibration (VR7 trim) is .8+/-.16, 6.7+/-1.3 and
-// 50+/-10 Hz at 0/5/10 V. As for the PWM clock in preset() below, the law runs
-// exponentially through the end points; it gives 6.325 Hz at 5 V, 5.6% under
-// the printed nominal and inside its tolerance.
+// which the guide draws reaching pin 1 through 180k, with 330k from pin 1 to a
+// rail. The CS-50 SUB board (SM2 printed p.8) has 120k plus VR13 (B-100K
+// trim) in series, 120k..220k, and the 330k to -15 V; VR9 (B-500K) on Iadj
+// sets the frequency. Pin 1 is a current input: the guide's PWM oscillator,
+// the same IG00150, takes VC1 through 110k (printed p.49) and spans
+// log2(222/.2)=10.12 octaves over 10V, the SUB log2(50/.8)=5.97; 110k/180k
+// predicts the ratio 1.636 and the tables give 1.695 (3.5%), while a
+// voltage-input divider against the 330k predicts 1.16. So the rate is
+// exponential in VC2, and the lever works into the guide's 180k, inside the
+// board's trim range. With a scale trim and a frequency trim, both
+// table ends can be set: .8+/-.16, 6.7+/-1.3 and 50+/-10 Hz at 0/5/10 V (no
+// CS-50 trim procedure for them is printed). As for the PWM clock in preset()
+// below, the law runs exponentially through the end points; it gives 6.325 Hz
+// at 5 V, 5.6% under the printed nominal and inside its tolerance.
 double subSpeedHz(double vc2Volts) {
     return .8*std::pow(50/.8,clamp(vc2Volts,0.,10.)/10);
 }
@@ -1159,6 +1185,11 @@ struct Synth::Impl {
     // the FUNCTION switch puts N on SUI, a buffer with100k to ground, so the
     // RC sees22k||100k (pole88.26Hz) and a100/122 divider.
     double subNoiseMemory = 0, subNoiseG = 0;
+    // SUB-EXT: the host input (held between calls), the previous host value
+    // and the interpolated value for this internal step; the coupling
+    // capacitor between the EXT preamp and EXO/SUI.
+    double externalTarget = 0, externalPrevious = 0, externalNow = 0;
+    OutputCoupling externalCoupling;
     Envelope ringEnvelope;
     std::array<double,4> ringCoefficients{};
     double ringPhase = 0, ringCarrier = 0, ringFrequency = 30;
@@ -1283,6 +1314,7 @@ struct Synth::Impl {
         physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
         physicalKeyPresses=0; lastAssignedKey=60;
         subNoiseMemory=limiterInput=limiterOutput=0; pickupCoupling={};
+        externalTarget=externalPrevious=externalNow=0; externalCoupling={};
         limiterRandom=Random(seed^0xd1b54a32d192ed03ULL); ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={}; ringSignalCoupling={};
         ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
@@ -1373,7 +1405,15 @@ struct Synth::Impl {
         const double noise=limiterSum/limiterSteps;
         const double subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
         subNoiseMemory=2*subNoise-subNoiseMemory;
-        const double lfo = subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
+        // SUB-EXT (see externalPreampRail): LEVEL, the preamp's swing, the
+        // switch-loaded coupling capacitor, then the IC1-1 follower's swing.
+        // The preamp and capacitor run whatever FUNCTION selects.
+        const bool external=patch.lfoWaveform==5;
+        const double externalSub=clamp(externalCoupling.process(
+            clamp(patch.extLevel*externalNow,-externalPreampRail,externalPreampRail),
+            external ? externalCouplingTauSelected : externalCouplingTauOpen,internalFs),
+            -externalBufferRail,externalBufferRail);
+        const double lfo = external ? externalSub : subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
             patch.lfoWaveform==4 ? subNoise*subNoiseRail:0.);
         lastSub=lfo;
         // Exact zero-order-held RC update. Never bypass while offset returns
@@ -1715,9 +1755,23 @@ std::size_t Synth::activeVoices() const {
         [](const auto& v) { return v.amp.stage != Envelope::Idle; }));
 }
 double Synth::sampleRate() const { return impl_->fs; }
+void Synth::externalInput(double sample) noexcept {
+    // Numerical guard only: 1e9 units overdrives the preamp at any LEVEL
+    // above 1e-8, and keeps the interpolation below overflow.
+    impl_->externalTarget=std::isfinite(sample) ? clamp(sample,-1e9,1e9) : 0.;
+}
 float Synth::process() {
     ++impl_->hostSamples;
-    for (unsigned i = 0; i < impl_->rateFactor; ++i) impl_->decimator.push(impl_->sample(),impl_->rateFactor);
+    // SUB-EXT arrives at the host rate: step linearly from the previous host
+    // value, landing on the new one at the last internal step (exact at 1x).
+    // A digital adaptation of the continuous jack, not a hardware stage.
+    auto& state=*impl_;
+    const double from=state.externalPrevious, to=state.externalTarget;
+    for (unsigned i = 0; i < state.rateFactor; ++i) {
+        state.externalNow=i+1==state.rateFactor ? to : from+(to-from)*(i+1)/state.rateFactor;
+        state.decimator.push(state.sample(),state.rateFactor);
+    }
+    state.externalPrevious=to;
     const double output=impl_->decimator.output(impl_->rateFactor);
     // Post-circuit/post-FIR utility gain: no change to analog state, timing,
     // nonlinear operating level or default sound. No output limiter is added.

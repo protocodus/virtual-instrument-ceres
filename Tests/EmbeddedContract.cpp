@@ -39,7 +39,7 @@ int main() {
         "pressure_filter","pressure_vibrato","velocity_sensitivity","drive","reset_microseconds",
         "ring_mix","ring_rate","ring_depth","ring_attack","ring_decay","lfo_waveform","sustain_mode",
         "brilliance","resonance_offset","amp_level","output_trim_db","expression_source",
-        "pressure_wah","glide_mode","glide_rate"};
+        "pressure_wah","glide_mode","glide_rate","expression","ext_level"};
     synth.setPatch(patch);
     watch=true;
     require(!ceres::setParameter(patch,nullptr,1),"null key rejected");
@@ -97,10 +97,32 @@ int main() {
             for(unsigned frame=0;frame<64;++frame)require(std::isfinite(synth.process()),"configured render finite");
         }
     }
+    // SUB-EXT: FUNCTION EXT with every SUB route open, fed every frame with
+    // audio-rate, overdriven, DC and invalid jack samples, at each quality.
+    for(unsigned factor:{1u,2u,4u}) {
+        synth.reset();require(synth.configure(4,factor),"EXT configuration");
+        patch=ceres::Patch{};
+        require(ceres::setParameter(patch,"lfo_waveform",5) && ceres::setParameter(patch,"ext_level",.8),
+                "EXT keys accepted");
+        patch.vibratoCents=25;patch.filterLfo=.8;patch.tremolo=.7;patch.pressureVibrato=20;patch.pressureWah=.5;
+        synth.setPatch(patch);synth.pressure(.6);synth.noteOn(57,.8);synth.noteOn(64,.5);
+        for(unsigned frame=0;frame<4096;++frame) {
+            const double jack[]={std::sin(frame*.05),40.,-1e300,std::numeric_limits<double>::quiet_NaN(),
+                                 std::numeric_limits<double>::infinity(),.5};
+            synth.externalInput(jack[(frame/97)%6]*(frame%3 ? 1:.5));
+            if(frame==1024){patch.lfoWaveform=1;synth.setPatch(patch);}
+            if(frame==1536){patch.lfoWaveform=5;synth.setPatch(patch);}
+            if(frame==2048)synth.allSoundOff();
+            if(frame==3072){synth.reset();synth.noteOn(60,.7);}
+            require(std::isfinite(synth.process()),"finite EXT IN render");
+        }
+    }
     require(allocations==0,"no allocations after construction across edits/render/reset/configure");
     watch=false;
     for(double rate:{0.,std::numeric_limits<double>::quiet_NaN(),400000.}) {
         ceres::Synth invalid(rate,1);require(invalid.sampleRate()==48000,"invalid target rate safely defaults");
     }
-    std::printf("PASS embedded: no exceptions, numeric Patch, active expression and9 render configurations, 60 control keys, zero post-construction new/new[] allocations\n");
+    std::printf("PASS embedded: no exceptions, numeric Patch, active expression, 9 render configurations, "
+                "EXT IN at 3 qualities, %u control keys, zero post-construction new/new[] allocations\n",
+                static_cast<unsigned>(sizeof(keys)/sizeof(keys[0])));
 }

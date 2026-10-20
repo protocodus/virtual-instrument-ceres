@@ -146,7 +146,7 @@ Additional voices are a virtual extension of the four-board model. The calibrate
 
 Audio noise is the hard-limited "white noise of constant amplitude" the guide describes (printed p.32), trimmed to the same 3 Vpp as the waveforms. It is the limiter's band-limited input driven into the ±15 V rails, with the bandwidth estimated at 14 kHz from the pick-up op-amp's datasheet gain-bandwidth and the limiter's slew rate at the datasheet's 1 V/µs, simulated at 768 kHz or more so its density is the same at every quality and host sample rate. SUB noise filters the same signal. Different quality settings can still differ through filter discretization, nonlinear processing and alias rejection; this is not hardware gain calibration. See [noise-quality validation](Docs/validation/noise-quality/README.md).
 
-The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults `4` and `4`. Host adapters may choose and save different defaults independently of the 60 hardware/engineering patch keys.
+The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults `4` and `4`. Host adapters may choose and save different defaults independently of the 65 hardware/engineering patch keys.
 
 ### Ring, SUB and SUSTAIN controls
 
@@ -157,14 +157,17 @@ The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults
 | `ring_depth` | 0..8 octaves | 0 | Positive carrier-frequency envelope excursion |
 | `ring_attack` | 0.001..10 s | 0.01 | Frequency-envelope time to peak |
 | `ring_decay` | 0.01..10 s T60 | 0.35 | Frequency-envelope decay toward the base rate |
-| `lfo_waveform` | 0..4 | 0 | Sine, Down, Up, Square, Noise |
+| `lfo_waveform` | 0..5 | 0 | Sine, Down, Up, Square, Noise, EXT |
+| `ext_level` | 0..1 | 1 | Rear EXT LEVEL: the share of the EXT IN signal that reaches the EXT preamp |
 | `sustain_mode` | 1..2 | 1 | I holds released key voltage; II follows the last assigned key |
 
 Live `ring_depth` changes interpolate over 20 ms in the digital control domain. This dezipper preserves the existing exponential frequency law and 220 Hz cap; it is not a newly inferred analog time constant. Startup/reset use the saved depth immediately. Repeated notifications at the same target do not prolong the transition, and a reversal starts from the current interpolated value. The change removes the immediate frequency-control step in a synthetic test; it does not prove the exact cause of a reported host crackle.
 
 The ring envelope triggers when the first physical key is pressed after all keys have been released. Additional held keys do not retrigger it, including a key that finds no free voice. Final key-up returns its frequency envelope toward zero through a fixed nominal release; the carrier phase keeps running. The total carrier is bounded at 220 Hz, so SPEED and DEPTH interact near that limit. This is a circuit-informed balanced-multiplier model with provisional envelope and wet-gain calibration.
 
-The selected SUB waveform drives VCO, VCF, VCA and pressure vibrato. Noise uses the documented 22k/0.1µF low-pass and a fixed engineering level; it is independent of SUB rate and audio Noise mix. PWM retains its separate sine oscillator. No external modulation input is implemented.
+The selected SUB waveform drives VCO, VCF, VCA and pressure vibrato. Noise uses the documented 22k/0.1µF low-pass and a fixed engineering level; it is independent of SUB rate and audio Noise mix. PWM retains its separate sine oscillator.
+
+FUNCTION EXT (`lfo_waveform` 5) takes the SUB signal from the rear EXT IN jack instead, through the same routes. A front end feeds one sample per host frame with `Synth::externalInput()` before each `process()`. One unit is 1.5 V/101, about 14.9 mV at the jack: the ×101 EXT preamp lifts it to the internal waveforms' 1.5 V peak, so a ±1 signal at `ext_level` 1 modulates as deeply as the internal SUB. The preamp's 10 µF output capacitor high-passes the signal at 0.32 Hz while EXT is selected and keeps its charge when FUNCTION moves away (0.16 Hz there). The preamp and the SUI buffer clip at their datasheet-typical swings, 9.33 and 8.67 units, an estimate. The LEVEL pot's taper is not published, so `ext_level` is its wiper ratio rather than its travel. The internal waveforms ignore the jack, and EXT with nothing fed is a silent SUB. See [the SUB research note](Docs/research/sub-authenticity-2026-10-20.md).
 
 In Sustain II, released/free boards follow the last assigned key in both oscillator pitch and filter tracking. Their envelope charge, gates, oscillator phase and filter state remain continuous. Entering II applies this immediately; returning to I captures the current key voltage. MIDI-damper-held boards remain protected until pedal-up, an explicit software adaptation rather than recovered Yamaha allocation behavior. This selector is distinct from `global_release` and MIDI damper gating.
 
@@ -213,7 +216,7 @@ Touch LEVEL adds to the common VCA gain: `amp_level + 1.08*pressure_volume*expre
 - The plug-in still has no preset bank. The audio tier checks the separately identified circuit research presets; passing it does not establish audible JUCE plug-in functionality.
 - Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
-- No external modulation input is implemented. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
+- No front end feeds EXT IN yet. Its host-rate signal is interpolated linearly inside the oversampled engine; the op-amp swings are datasheet typicals, and the EXT preamp's bandwidth and slew rate are not modelled. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
 - The portamento/glissando clock rate and the noise limiter's bandwidth and slew rate are not calibrated.
 
 ## Build
@@ -230,7 +233,7 @@ ctest --test-dir build-dsp -L '^unit$' --output-on-failure
 
 `ceres` and `ceres_embedded` are the circuit libraries. `ceres_render` writes mono float32 WAV without normalization; sorted event rows are `frame type note value`. It supports note-on/off, bend, pressure, pedal, all-notes-off, panic and reset. `--patch path` reads key=value overrides and `--build-info` reports the exact compiled sources including the merged CMake file. The native research preset API is excluded from the embedded ABI.
 
-The 12 circuit checks cover oscillator/filter/envelope/ring contracts, expression, all 60 keys with zero post-construction allocations, and native/embedded parity. They are named `Ceres.<Suite>` and labelled `unit` alongside the existing scaffold unit tests. Test executables are resolved by CMake target paths for single- and multi-configuration generators. The `audio`, `render` and `fuzz` tiers remain separate; the unchanged audio contract now renders the actual circuit preset list twice.
+The 12 circuit checks cover oscillator/filter/envelope/ring contracts, expression, all 65 keys and the EXT IN feed with zero post-construction allocations, and native/embedded parity. They are named `Ceres.<Suite>` and labelled `unit` alongside the existing scaffold unit tests. Test executables are resolved by CMake target paths for single- and multi-configuration generators. The `audio`, `render` and `fuzz` tiers remain separate; the unchanged audio contract now renders the actual circuit preset list twice.
 
 ```sh
 ctest --test-dir build-dsp -L '^audio$' --output-on-failure
