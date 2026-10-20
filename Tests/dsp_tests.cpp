@@ -869,12 +869,19 @@ void subOscillatorRoutes() {
     for(unsigned n=0;n<20000;++n) {
         noise.process();other.process();const double x=noise.modulationState().sub;
         require(x==other.modulationState().sub,"SUB noise independent of Rate/audio NO mix");
-        require(std::abs(x)<=1,"SUB noise control remains bounded");
+        require(std::abs(x)<=15*(100./122)/1.5,"SUB noise stays within the loaded +/-15V limiter rails");
         if(n>2000){sum+=x;sum2+=x*x;cross+=x*previous;}
         previous=x;
     }
-    require(sum2>100 && sum2<2500 && std::abs(sum/17999)<.05,"Noise has a bounded nonzero engineering level");
-    require(cross/sum2>.90 && cross/sum2<.99,"Sourced2.2ms noise RC must smooth white noise at8kHz");
+    // +/-15V limiter, estimated 3MHz/(1+1M/4.7k) bandwidth: arcsine-law
+    // density 2*tc*ln2, through 22k||100k with .1uF and the 100/122 divider,
+    // in 1.5V SUB units.
+    const double tc=1/(2*pi*3e6/(1+1e6/4.7e3)),fc=1/(2*pi*(22e3*100/122)*.1e-6);
+    const double expectedRms=10*(100./122)*std::sqrt(2*tc*std::log(2.)*pi*fc);
+    const double rms=std::sqrt(sum2/17999);
+    require(std::abs(rms/expectedRms-1)<.1 && std::abs(sum/17999)<.1*expectedRms,"SUB noise has the limiter's loaded RC level");
+    // Loaded pole 88.26Hz: lag-one correlation exp(-2pi*88.26/8000)=.933.
+    require(cross/sum2>.90 && cross/sum2<.96,"Loaded1.8ms noise RC must smooth white noise at8kHz");
     // Selecting SUB alone must not change either the VCO waveform/PWM clock
     // or random draws when the three SUB destinations and touch vibrato are0.
     p=sinePatch();p.sine=0;p.pulse=1;p.pwmDepth=.2;p.pwmRate=7;p.lfoRate=29;

@@ -34,6 +34,7 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 ### Unreleased — 0.4.0 — circuit details
 
 - The noise source is now hard-limited, as the CS-50's limiter amplifier makes it: a binary ±1 signal at the waveforms' peak level instead of uniform random values. Audio NOISE is 4.8 dB louder at the same lever setting; its spectrum is unchanged and SUB-N keeps its level. Patches using NOISE change sound.
+- SUB-N, the noise SUB waveform, now has the hardware's level: the ±15 V limiter through its 22k/0.1µF filter and the 100k load of the SUB buffer. It is about 6.7 dB deeper than before and a little brighter (corner 88 Hz, was 72 Hz). The level rests on an estimated limiter bandwidth from the op-amp's datasheet.
 
 ### Unreleased — 0.3.0 — hardware realism
 

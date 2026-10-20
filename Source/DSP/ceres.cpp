@@ -439,9 +439,25 @@ double blamp(double phase, double step) {
     return 0;
 }
 
+// SUB-N level in SUB units (the 3Vpp SUI waveforms, 1.5V peak). The limiter
+// output N swings +/-15V (guide printed p.32: 30Vpp). Its bandwidth is NOT
+// documented: ESTIMATE it as the pick-up amplifier IC11-1's closed-loop pole,
+// NJM4558 typical GBW 3MHz / (1+1M/4.7k) = 14.03kHz (datasheet typical, not a
+// measured unit), ahead of the limiting stage. The sign of a one-pole
+// Gaussian process has R(t)=(2/pi)asin(exp(-|t|/tc)), so its low-frequency
+// two-sided density is 2*tc*ln2 per peak^2. Through the loaded RC (fc
+// 88.26Hz, DC gain 100/122) the variance is that density times pi*fc.
+constexpr double subNoiseResistance=22e3*100e3/122e3;
+constexpr double subNoiseRail=15*(100./122.)/1.5;
+double subNoiseRms() {
+    const double tc=1/(2*pi*(3e6/(1+1e6/4.7e3)));
+    const double fc=1/(2*pi*subNoiseResistance*.1e-6);
+    return subNoiseRail*std::sqrt(2*tc*std::log(2.0)*pi*fc);
+}
+
 // One shared SUB source. Discontinuities use the same short analytic BLEP
-// correction as the VCO pulse, without tables. Noise comes from the existing
-// shared transistor-noise approximation through its dedicated RC path.
+// correction as the VCO pulse, without tables. Noise comes from the shared
+// limiter sample through its dedicated RC path.
 double subWaveform(double phase,double step,double waveform,double noise) {
     if (waveform==1) return 1-2*phase+blep(phase,step);
     if (waveform==2) return -(1-2*phase+blep(phase,step));
@@ -630,10 +646,12 @@ struct Synth::Impl {
     bool hasProcessed=false;
     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
     double outputTrimGain=1, audioNoiseGain=1;
-    // Guide printed32: SUB-N uses22k/.1uF, independent of audio NO level.
-    // This is the documented single low-pass (called pink in the prose),
-    // not an invented ideal1/f filter. Normalize its unknown limiter level
-    // to an engineering RMS across rates, then softly bound the control.
+    // Guide printed32: SUB-N is the limiter output N through22k/.1uF,
+    // independent of audio NO level: the documented single low-pass (called
+    // pink in the prose), not an invented ideal1/f filter. SM2 p.8 (PN3):
+    // the FUNCTION switch puts N on SUI, a buffer with100k to ground, so the
+    // RC sees22k||100k (pole88.26Hz) and a100/122 divider. Its RMS is
+    // normalized across rates to subNoiseRms and bounded by the +/-15V rails.
     double subNoiseMemory = 0, subNoiseG = 0, subNoiseGain = 0;
     Envelope ringEnvelope;
     std::array<double,4> ringCoefficients{};
@@ -678,9 +696,9 @@ struct Synth::Impl {
         pressureCoefficient = 1-std::exp(-1/(internalFs*.005));
         driftCoefficient = 1-std::exp(-1/(internalFs*.3));
         qControlCoefficient=-std::expm1(-1/(internalFs*qControlTau));
-        subNoiseG=1/(2*internalFs*22e3*.1e-6);
+        subNoiseG=1/(2*internalFs*subNoiseResistance*.1e-6);
         // Unit-variance binary source through the trapezoidal RC.
-        subNoiseGain=.25*std::sqrt((1+subNoiseG)/subNoiseG);
+        subNoiseGain=subNoiseRms()*std::sqrt((1+subNoiseG)/subNoiseG);
         ringCarrierCoupling.configure(internalFs);
         updateCoefficients();
     }
@@ -813,7 +831,7 @@ struct Synth::Impl {
         const double subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
         subNoiseMemory=2*subNoise-subNoiseMemory;
         const double lfo = subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
-            patch.lfoWaveform==4 ? std::tanh(subNoise*subNoiseGain):0.);
+            patch.lfoWaveform==4 ? clamp(subNoise*subNoiseGain,-subNoiseRail,subNoiseRail):0.);
         lastSub=lfo;
         // Exact zero-order-held RC update. Never bypass while offset returns
         // to zero: capacitor charge survives note allocation, patch edits,
