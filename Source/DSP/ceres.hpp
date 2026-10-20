@@ -114,7 +114,9 @@ struct Patch {
     double voiceSpreadCents = 0.0, driftCents = 0.0;
     // filterLfo is LP octave depth. HP gets .3374358974 times that depth:
     // (.7/.65)*(47k/150k), independent of user-editable EG coupling scales.
-    // tremolo is the SUB VCA lever, 0..1: R7 adds .3375*tremolo*SUB to LEVEL.
+    // tremolo is SUB VCA lever travel, 0..1: R7 adds .3375 of the wiper's
+    // share of SUB to LEVEL, and the B-10k lever into its 30k load delivers
+    // x/(1+x(1-x)/3) of it, 7.7% low at mid-travel with exact endpoints.
     double lfoRate = 5.0, vibratoCents = 0.0, tremolo = 0.0, filterLfo = 0.0;
     // Shared SUB source: 0 sine, 1 down saw, 2 up saw, 3 square, 4 noise.
     // Noise uses the sourced22k/.1uF low-pass loaded by SUI's100k on the
@@ -129,6 +131,10 @@ struct Patch {
     // key-up uses a fixed nominal .46781044s T60 return, independent of MIDI
     // pedal/globalRelease. Retrigger retains capacitor charge, not phase reset.
     // mix=0 preserves the previous signal path exactly; carrier phase is free.
+    // mix is MODULATION lever travel: the B-10k crossfades dry against wet and
+    // its own track loads the 8.04k it works into, so the whole mix sits
+    // 2.35dB low at mid-lever. Both ends stay exact. The load assumes the
+    // expression pedal open; closing it straightens the taper (not modelled).
     // Live digital Depth edits interpolate over20ms without restarting the EG
     // or carrier. Startup/reset precharge the saved value. This dezipper is a
     // DAW-control policy, not a measured component or physical timing law.

@@ -1019,8 +1019,11 @@ void ringAudioAndFreeCarrier() {
     wet.noteOn(69);dry.noteOn(69);middle.noteOn(69);render(wet,16000);render(dry,16000);render(middle,16000);
     const auto w=render(wet,8000),d=render(dry,8000),m=render(middle,8000);
     require(m!=w && m!=d,"Partial ring blend differs from both endpoints");
+    // The B-10k MODULATION lever's own track loads the 8.04k at MI, so a
+    // mid-lever blend is the average divided by 1+.25*10k/8.04k.
+    const double sag=1+.25*10e3/(1/(1/(68e3/2+2.2e3)+1/(10e3+330)));
     for(std::size_t i=0;i<m.size();++i)
-        require(std::abs(m[i]-.5*(w[i]+d[i]))<1e-7,"Ring blend is linear before the common output rail");
+        require(std::abs(m[i]-.5*(w[i]+d[i])/sag)<1e-7,"Ring blend is the loaded lever's crossfade before the common rail");
     const double low=toneMagnitude(w,393,fs),high=toneMagnitude(w,487,fs);
     require(low>1 && high>1 && std::abs(low/high-1)<.02,"Balanced product produces both sum/difference sidebands");
     // Physical upper-pair steering has a nominal DC offset and therefore

@@ -211,7 +211,9 @@ void sharedSubPolarity() {
             const auto v=active.voiceState()[0];
             const double hpOct=std::log2((v.hpFrequency-floorHz)/(p.hpCutoff-floorHz));
             const double lpOct=std::log2((v.lpFrequency-floorHz)/(p.lpCutoff-floorHz));
-            near(gain,.8+.4*(1.5/120e3)/(10/270e3)*source,2e-16,"Common gain swings around LEVEL by the R7 120k/270k ratio");
+            // The .4 lever delivers .4/(1+.4*.6/3) of SUO into its 30k load.
+            const double wiper=.4/(1+.4*.6*(10e3/30e3));
+            near(gain,.8+wiper*(1.5/120e3)/(10/270e3)*source,2e-16,"Common gain swings around LEVEL by the loaded R7 120k/270k ratio");
             near(lpOct,.4*source,2e-14,"Selected SUB feeds actual LP variable-gm control");
             near(hpOct,.4*source*(.7/.65)*(47./150.),2e-14,"Selected SUB feeds actual HP variable-gm control");
             if(source>.05) {

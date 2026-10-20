@@ -31,10 +31,23 @@ constexpr double touchLevelScale=(6/150e3)/(10/270e3);
 // The same LC node takes the SUB VCA lever (PN3 SVR4, B-10k between SUO and
 // ground; SM2 p.27) through 120k: the 3Vpp SUB at full lever adds +/-1.5V/120k
 // against LEVEL's 10V/270k, so +/-.3375 of full LEVEL. The wiper feeds all
-// four boards' 120k (R7 L1), 30k in all, so lever travel x gives the loaded
-// fraction x/(1+x(1-x)/3), at most 7.7% low at mid-lever. tremolo is that
-// loaded fraction; the endpoints are exact.
+// four boards' 120k (R7 L1), 30k in all, so tremolo is lever travel and the
+// wiper delivers leverFraction(x,10e3/30e3) of SUO, 7.7% low at mid-lever.
 constexpr double tremoloScale=(1.5/120e3)/(10/270e3);
+constexpr double tremoloLeverRatio=10e3/30e3;
+// A linear pot between a source and ground, or between two sources, sags in
+// the middle by what its own track draws through the load: travel x delivers
+// x/(1+x(1-x)*Rtrack/Rload) of the source, and the endpoints stay exact.
+double leverFraction(double x,double ratio) { return x/(1+x*(1-x)*ratio); }
+// MODULATION TVR5 (PN2, B-10k) is the dry/wet crossfader itself: RMO on one
+// end, the dry buffer O1 on the other, and its wiper is MI, the expression
+// network's input (SM2 p.26 wiring; p.22 for what MI drives). With the pedal
+// open the cell ties MI to MO, so the wiper works into the A-10k VOLUME track
+// with its 330 ohm foot in parallel with the 68k leg's 34k+2.2k: 8.04k, and
+// the whole mix sits 2.35dB low at mid-lever. A closed pedal raises that load
+// and straightens the taper; that coupling is not modelled.
+constexpr double ringMixLoad=1/(1/(68e3/2+2.2e3)+1/(10e3+330));
+constexpr double ringMixLeverRatio=10e3/ringMixLoad;
 constexpr double qControlTau=10e-6*(220e3/2);
 // KAS gate/integrator, one per channel (SM2 p.3; guide printed p.24). The D-A
 // output reaches the channel's .033uF hold capacitor through a permanent 3.3M
@@ -994,7 +1007,8 @@ struct Synth::Impl {
         // so positive SUB must raise both cutoff and common gain. SUB swings
         // LC around LEVEL; the summed current, touch included, cannot drive
         // the VCA below zero gain.
-        const double levelControl=patch.ampLevel+tremoloScale*patch.tremolo*lfo;
+        const double levelControl=patch.ampLevel
+            +tremoloScale*leverFraction(patch.tremolo,tremoloLeverRatio)*lfo;
         commonVcaGain=std::max(0.0,levelControl);
         const double pwm = std::sin(2*pi*(pwmPhase+patch.pwmPhase));
         lfoPhase = wrap(lfoPhase + patch.lfoRate*dt);
@@ -1107,7 +1121,8 @@ struct Synth::Impl {
         ringSwitchGain=ringSteering(ringDifferentialDc+ringSourcePeakVolts*ringCoupledCarrier);
         const double wet=ringWetCoupling.process(bus*ringSwitchGain,.1,internalFs);
         // Explicit bypass avoids even a rounding change for old patches.
-        const double ringed=patch.ringMix==0 ? bus : bus+patch.ringMix*(wet-bus);
+        const double ringed=patch.ringMix==0 ? bus
+            : (bus+patch.ringMix*(wet-bus))/(1+patch.ringMix*(1-patch.ringMix)*ringMixLeverRatio);
         // MI to MO. A fully open pedal is the fully conducting cell, which is
         // the path this engine was calibrated on, so it stays a bare wire.
         const double expressed=patch.expression>=1 ? ringed : expression.process(ringed);
