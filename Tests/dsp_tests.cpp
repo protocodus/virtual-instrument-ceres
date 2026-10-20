@@ -39,6 +39,14 @@ std::complex<double> response(const std::vector<double>& impulse,double f,double
         result+=impulse[i]*std::polar(1.0,-2*pi*f*static_cast<double>(i)/fs);
     return result;
 }
+// Reference damping at the printed IG00156 endpoints, Q 5 at VQ 0V and Q .5
+// at VQ 10V (SM1 printed p.19), interpolated geometrically in VQ: the
+// exponential Q law chosen by ear on 2026-10-20 (vcf-q-law). Until then these
+// fixtures used the linear d=2-1.8r. Resonance r is 1-VQ/10.
+double printedQDamping(double resonance) {
+    const double vq=10*(1-resonance);
+    return (1/5.)*std::pow((1/.5)/(1/5.),vq/10);
+}
 std::complex<double> physicalFilter(double f,double rate,double omega,double damping,
     double sourceConductance,double referenceConductance,bool highPass) {
     // Physical source and feedback branch currents, independent of the DSP's
@@ -78,7 +86,7 @@ void circuitResponse() {
             const double referenceGs=(highPass ? 3:1)/150e3;
             const auto impulse=ceres::filterImpulse(fs,fc,resonance,highPass,262144,amplitude,gs,referenceGs);
             for (double f : {.3,1.0,5.0,50.0,250.0,1000.0,4000.0,12000.0}) {
-                const auto expected=physicalFilter(f,fs,omega,2-1.8*resonance,gs,referenceGs,highPass);
+                const auto expected=physicalFilter(f,fs,omega,printedQDamping(resonance),gs,referenceGs,highPass);
                 const auto observed=response(impulse,f,fs)/amplitude;
                 require(std::abs(observed-expected)<2e-6,
                         "Coupled source/Q capacitor response differs from physical branch-current equations");
@@ -129,8 +137,8 @@ void physicalCascade() {
         const auto impulse=ceres::filterCascadeImpulse(fs,hp,lp,resonance,.5,
             branches,262144,amplitude,1);
         for (double f : {20.0,100.0,300.0,1000.0,4000.0,8000.0}) {
-            const auto expected=physicalFilter(f,fs,wh,2-1.8*resonance,branches/150e3,3/150e3,true)
-                *physicalFilter(f,fs,wl,1.1,1/150e3,1/150e3,false)*calibration/double(branches);
+            const auto expected=physicalFilter(f,fs,wh,printedQDamping(resonance),branches/150e3,3/150e3,true)
+                *physicalFilter(f,fs,wl,printedQDamping(.5),1/150e3,1/150e3,false)*calibration/double(branches);
             require(std::abs(response(impulse,f,fs)/amplitude-expected)<3e-6,
                 "Production cascade must preserve physical mixer gain, fixed Q current and interstage units");
         }

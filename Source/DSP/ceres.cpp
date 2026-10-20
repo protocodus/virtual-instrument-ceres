@@ -431,8 +431,8 @@ struct BoardTolerance {
 // actual signal-voltage scaling remain unidentified.
 // Trapezoidal capacitor integration makes the nonlinear feedback implicit.
 // Eliminating l leaves one monotone equation, solved with analytic Newton
-// derivatives at every sample. Vs and the VQ -> damping map remain calibration
-// parameters: Yamaha does not specify the internal transistor geometry.
+// derivatives at every sample. Vs remains a calibration parameter: Yamaha
+// does not specify the internal transistor geometry.
 // CS-50 M-board schematic: C=1.5nF; each 4.7Mohm resistor bypasses its
 // variable-gm block, feeding the next integrator INPUT. It is not a capacitor
 // bleed resistor. This linear input-current path sets a 22.58 Hz integrator-rate floor.
@@ -442,14 +442,16 @@ struct BoardTolerance {
 // specifies Q=.5 at VQ=10V and Q=5 at VQ=0V (SM1 printed p.19; pin 6 sets
 // the standing Q current that gives Q=5 at 0V). Guide printed p.33 draws the
 // Q path as a variable-gm block (gm=K*Icont) between BP and FB, so damping is
-// proportional to its control current; damping LINEAR in VQ is the law for a
-// linear VQ-to-Icont converter. The sheet does not say whether that converter
-// is linear or exponential; an exponential one through the same endpoints is
-// the open alternative (listening test 2026-10-20-vcf-q-law; Docs/research/
-// vcf-authenticity-2026-10-20.md). Yamaha's own variable-gm cell of the
-// period (JP S59-49726 B2, priority 1976-01-12, figs. 5-6) drives its tail
-// current from a linear V-to-I amplifier, gm ~ Ic ~ Vc: sibling practice
-// that favours the linear law, not a measurement of the IG00156.
+// proportional to its control current. The sheet does not say whether the
+// VQ-to-Icont converter is linear or exponential. Damping is EXPONENTIAL in
+// VQ through the printed endpoints, d=.2*10^(VQ/10): chosen by ear
+// 2026-10-20 (listening test 2026-10-20-vcf-q-law, B), the converter law the
+// cutoff input has, against the linear d=.2+.18*VQ shipped before. The
+// endpoints are printed; the path between them is that choice, not a
+// measurement. Yamaha's own variable-gm cell of the period (JP S59-49726 B2,
+// priority 1976-01-12, figs. 5-6) used a linear V-to-I amplifier instead,
+// sibling practice that does not identify the IG00156's converter. See
+// Docs/research/vcf-authenticity-2026-10-20.md.
 // HP and LP have independent Q trims: the nominal endpoints are anchored at
 // their usual source loads (HP three mixer branches, LP one). Changing a
 // waveform gate changes the source load, not the Q transistor conductance.
@@ -463,7 +465,8 @@ struct OtaSvf {
         constexpr double feedbackCapacitance=180e-12, sourceCapacitance=1e-6;
         const double conductance=sourceConductance+1/33e3+1/1.2e6;
         const double referenceConductance=referenceSourceConductance+1/33e3+1/1.2e6;
-        const double damping=(2.0-1.8*clamp(resonance,0,1))*referenceConductance/conductance;
+        // resonance r is 1-VQ/10, so d=.2*10^(VQ/10)=2*10^-r.
+        const double damping=2*std::pow(10.0,-clamp(resonance,0,1))*referenceConductance/conductance;
         const double ratio=sourceConductance/conductance;
         // X is the physical Thevenin source voltage, in the SAME OTA voltage
         // unit at both stages. Canonical u=2*Gs*X/D0 is a local algebraic
@@ -1394,8 +1397,8 @@ struct Synth::Impl {
         qVoltageOffset+=(patch.resonanceOffset*.5-qVoltageOffset)*qControlCoefficient;
         hpResonanceAnchor+=(patch.hpResonance-hpResonanceAnchor)*qControlCoefficient;
         lpResonanceAnchor+=(patch.lpResonance-lpResonanceAnchor)*qControlCoefficient;
-        // Direct chip endpoints Vq0:Q5,Vq10:Q.5 only. The intermediate
-        // d=2-1.8*r law is provisional; delta d=.18*deltaVq retains that law.
+        // Direct chip endpoints Vq0:Q5,Vq10:Q.5. deltaVq moves the pin
+        // voltage itself; OtaSvf applies the exponential law to the sum.
         effectiveHpResonance=clamp(hpResonanceAnchor-qVoltageOffset*.1,0,1);
         effectiveLpResonance=clamp(lpResonanceAnchor-qVoltageOffset*.1,0,1);
         // R7 LC sums LEVEL(270k) and SUB(120k) currents before common VCA2.

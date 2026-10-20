@@ -346,6 +346,28 @@ EG scales (`dsp_tests`). `VcfKeyVoltageTests` adds a contract that every
 factory cutoff equals the printed law at its independently solved pin volts,
 and the pin sheet's 1 kHz check point through key tracking.
 
+### The Q law (`vcf-q-law` B)
+
+Damping is now exponential in the pin-7 voltage through the printed
+endpoints, `d = 0.2 · 10^(VQ/10)` (Q 5 at 0 V, Q 0.5 at 10 V; SM1 p.19 /
+PDF 9), in place of the linear `d = 0.2 + 0.18 · VQ`. In the engine's
+coordinate r = 1 − VQ/10 that is `d = 2 · 10^(−r)`, applied in `OtaSvf`
+before the source-loading correction, so the RESONANCE offset moves VQ
+itself. At VQ 5 V Q is 1.58 (was 0.91); at 2.5 V, 2.81 (was 1.54).
+
+- **Printed:** the endpoints, and the variable-gm Q block (Guide p.33 /
+  PDF 42).
+- **Chosen by ear:** the converter law between them. The JP S59-49726 B2
+  cell uses a linear converter; that remains sibling practice and does not
+  identify the IG00156's.
+- **Fixtures:** `dsp_tests`' physical-branch transfer functions took the
+  linear damping at r = 0.5. They now take the printed endpoints'
+  geometric interpolation, written independently of the engine's form.
+  The r = 0 and r = 1 cases are unchanged. Adding a
+  `std::pow` per stage per sample cost about 3 % in a paired run of
+  `Tools/native_performance.cpp` (4 voices, 4× oversampling, noisy shared
+  machine).
+
 ## What would close the gap
 
 1. A measured CS-50 (or CS-60/CS-80 IG00156) cutoff against lever voltage at
@@ -355,7 +377,7 @@ and the pin sheet's 1 kHz check point through key tracking.
 2. Pin-4 input characteristic of the IG00156 (voltage/current at the pin
    against cutoff), or any chip-level datasheet. The test circuit behind
    the pin sheet's "Vf 5 V gives 1 kHz" would settle the printed-law reading.
-3. Q against VQ at three or more voltages on one chip, to choose the Q
-   converter law.
+3. Q against VQ at three or more voltages on one chip, to confirm or
+   correct the exponential converter law chosen by ear.
 4. Signal amplitude at IG00156 pin 15/10 for a known WSC input, or the onset
    of audible OTA compression at a known input level, for the input scale.
