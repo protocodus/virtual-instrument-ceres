@@ -18,9 +18,9 @@ struct Patch {
 #if !defined(CERES_EMBEDDED_TARGET)
     std::string name = "init";
 #endif
-    // Audio noise keeps the legacy4x in-band density at a fixed host rate:
-    // its source amplitude scales sqrt(internalFactor/4). SUB noise uses
-    // its separate RC/RMS convention and the unchanged raw random sample.
+    // Audio noise is the binary limiter source (guide p.32) at the 4x in-band
+    // density for a fixed host rate: its amplitude scales sqrt(internalFactor/4).
+    // SUB noise uses its separate RC/RMS convention on the same raw sample.
     double saw = 1.0, pulse = 0.0, sine = 0.0, noise = 0.0;
     // PW is the comparator's logical timing window (50..90%), modulated by
     // PWM with its fixed cycle edge retained. The completed audio pulse has

@@ -31,6 +31,10 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 
 ## Version history
 
+### Unreleased — 0.4.0 — circuit details
+
+- The noise source is now hard-limited, as the CS-50's limiter amplifier makes it: a binary ±1 signal at the waveforms' peak level instead of uniform random values. Audio NOISE is 4.8 dB louder at the same lever setting; its spectrum is unchanged and SUB-N keeps its level. Patches using NOISE change sound.
+
 ### Unreleased — 0.3.0 — hardware realism
 
 - Adds the CS-50's PORTAMENTO/GLISSANDO (`glide_mode`, `glide_rate`): a semitone counter, plus an Hz-domain integrator for portamento, on the key voltage shared by the oscillator and both filters. In Sustain II a released note keeps gliding. Off by default; existing patches are unchanged.
@@ -117,7 +121,7 @@ The 4× path retains its original 249-tap FIR. The 2× path has a 125-tap FIR wi
 
 Additional voices are a virtual extension of the four-board model. The calibrated common bus and per-voice gain remain unchanged; no voice-count normalization or limiter is added. Larger chords can increase rail saturation and output level. Extra voices use a separate initialization stream; at the default four-voice setting the original shared noise/drift stream remains exact. See [configuration validation](Docs/validation/poly-quality/README.md).
 
-Audio noise scales by `sqrt(factor/4)` before the waveform mixer. This corrects the increased in-band noise density that unscaled random samples would produce at lower internal rates. The 4× source is unchanged, and SUB noise retains its own RC normalization. Different quality settings can still differ through filter discretization, nonlinear processing and alias rejection; this is not hardware gain calibration. See [noise-quality validation](Docs/validation/noise-quality/README.md).
+Audio noise is a binary ±1 source, the hard-limited "white noise of constant amplitude" the guide describes (printed p.32), trimmed to the same 3 Vpp as the waveforms. It scales by `sqrt(factor/4)` before the waveform mixer. This corrects the increased in-band noise density that unscaled random samples would produce at lower internal rates. The 4× density is the reference, and SUB noise retains its own RC normalization. Different quality settings can still differ through filter discretization, nonlinear processing and alias rejection; this is not hardware gain calibration. See [noise-quality validation](Docs/validation/noise-quality/README.md).
 
 The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults `4` and `4`. Host adapters may choose and save different defaults independently of the 60 hardware/engineering patch keys.
 
@@ -187,7 +191,7 @@ Touch LEVEL adds to the common VCA gain: `amp_level + 1.08*pressure_volume*expre
 - Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
 - No external modulation input is implemented. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
-- The portamento/glissando clock rate, the KAS note-ladder intonation and the limited noise source's amplitude statistics are not calibrated.
+- The portamento/glissando clock rate, the KAS note-ladder intonation and the noise limiter's bandwidth are not calibrated.
 
 ## Build
 

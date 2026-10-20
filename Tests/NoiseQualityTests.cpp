@@ -82,8 +82,8 @@ int main(){
                 std::printf("NOISE_POWER,%.0f,%u,%u,%.17g\n",fs,factor,band,levels[index][band]);
             }
         }
-        // White variance1/3 at4fs means two-sided density1/(12fs).
-        // At lower factors variance must be factor/12 for the same density.
+        // Binary +/-1 (variance 1) at4fs means two-sided density1/(4fs).
+        // At lower factors variance must be factor/4 for the same density.
         // Different sequences/filter discretizations are not byte-identical;
         // .6dB allows finite-sample scatter and small-signal response error,
         // while decisively rejecting the original +3/+6dB variance defect.

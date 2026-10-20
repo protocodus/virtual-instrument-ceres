@@ -670,8 +670,8 @@ struct Synth::Impl {
     }
     void configureRate() {
         internalFs=fs*rateFactor;
-        // Discrete white-noise PSD is variance/internalFs. Preserve the
-        // legacy4x density at this host rate: variance scales by factor/4.
+        // Discrete white-noise PSD is variance/internalFs. Keep the 4x
+        // density at this host rate: variance scales by factor/4.
         // Audio NO only; SUB-N has its own RC/RMS convention below and
         // must continue to receive the original shared random sample.
         audioNoiseGain=std::sqrt(rateFactor/4.0);
@@ -679,7 +679,8 @@ struct Synth::Impl {
         driftCoefficient = 1-std::exp(-1/(internalFs*.3));
         qControlCoefficient=-std::expm1(-1/(internalFs*qControlTau));
         subNoiseG=1/(2*internalFs*22e3*.1e-6);
-        subNoiseGain=.25*std::sqrt(3*(1+subNoiseG)/subNoiseG);
+        // Unit-variance binary source through the trapezoidal RC.
+        subNoiseGain=.25*std::sqrt((1+subNoiseG)/subNoiseG);
         ringCarrierCoupling.configure(internalFs);
         updateCoefficients();
     }
@@ -802,7 +803,12 @@ struct Synth::Impl {
         hasProcessed=true;
         const double dt = 1 / internalFs;
         pressureValue += (pressureTarget-pressureValue) * pressureCoefficient;
-        const double noise = random.bipolar(); // one shared physical noise source
+        // Guide printed p.32: the limiter amplifier drives the zener noise to
+        // saturation (30Vpp), "white noise of constant amplitude", and VR10
+        // trims it to 3Vpp, the WSC waveforms' 3Vpp. So the one shared source
+        // is binary +/-1, not uniform: same peak as the saw, 4.77dB more RMS.
+        // The limiter's bandwidth is not documented; the sample stays white.
+        const double noise = random.unit()<.5 ? -1.0 : 1.0;
         const double audioNoise=rateFactor==4 ? noise : noise*audioNoiseGain;
         const double subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
         subNoiseMemory=2*subNoise-subNoiseMemory;
