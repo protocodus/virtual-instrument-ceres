@@ -1572,7 +1572,16 @@ Patch preset(const std::string& name) {
         p.hpEnvelopeScale=.7*39/220;
         p.lpEnvelopeScale=.65*39/47;
         p.hpResonance=(10-cv[7])*.1; p.lpResonance=(10-cv[9])*.1;
-        p.filterInitial=-cv[10]*.5; p.filterPeak=cv[11]*.5;
+        // VCF-EG levels at TP1 (EG OUT). The IG00152 pin sheet (SM1 p.20)
+        // gives AL 0..10V -> LC up to +5V and IL 0..10V -> 0..-5V, but the
+        // alignment of the same M board (Yamaha CS-60 Service Manual p.37,
+        // EG-VCF item 1; the CS-50 M sheet, SM2 p.16, is drawn for "CS-60,50"
+        // with the same IG00152/IG00151, 82k+VR19, 560k and .22uF) checks
+        // +5V +/-.5V at AL=10V and -4V +/-.5V at IL=10V after VR18 has
+        // nulled the held level to 0 +/-.01V. Its -4V window excludes -5V,
+        // so IL takes the alignment value, AL the agreeing .5V/V. Sibling
+        // service evidence for a shared board, not a CS-50 measurement.
+        p.filterInitial=-cv[10]*.4; p.filterPeak=cv[11]*.5;
         // Service-manual endpoints: attack 1ms..1s; decay/release 10ms..10s.
         // The related CS-20M/CS-40M explanation of this IG00159 circuit
         // defines durations as 5*RC. Convert D/R to the engineering API's

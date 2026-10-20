@@ -71,10 +71,39 @@ void releaseFollowerDrop() {
     const double ratio=law(follower(pin(6.41)))/law(pin(6.41));
     require(ratio>1.6&&ratio<1.75,"Release is about 1.7x the same CV's decay");
 }
+
+// Levels and attack law against the alignment of the shared M board (Yamaha
+// CS-60 Service Manual p.37 EG-VCF and p.38 EG-VCA; SM2 p.16 draws the M
+// board for "CS-60,50"): TP1 reads +5V at AL=10V and -4V at IL=10V; both
+// EGs are trimmed to a 4ms attack at 8V and 125ms at 3V on the A pin.
+struct Levels {const char* name; double il, al, filterAttack, ampAttack;};
+const std::array<Levels,13> levels{{
+    {"string1",3.85,6.80,2.50,1.52},{"string2",0,5.49,5,4.35},{"brass1",1.89,3.57,1.39,5.24},
+    {"brass2",2.70,8.70,4,5.49},{"flute",5.24,.63,3.57,3.13},{"electric_piano",0,4.76,7.52,10},
+    {"clavichord",0,4.55,10,10},{"harpsichord",0,0,0,10},{"guitar1",.43,2.94,10,7.52},
+    {"guitar2",0,7.52,10,10},{"funky1",10,6.80,10,10},{"funky2",9.09,9.59,6.41,10},
+    {"funky3",0,9.47,6.17,7.19}}};
+double attackLaw(double volts) {return std::pow(10,-.3*volts);}
+
+void alignedLevelsAndAttack() {
+    // The pin law meets both trim points of the alignment to under 1%.
+    require(std::abs(attackLaw(8)/.004-1)<.01,"Attack law meets the 4ms-at-8V trim point");
+    require(std::abs(attackLaw(3)/.125-1)<.01,"Attack law meets the 125ms-at-3V trim point");
+    for(const auto& row:levels) {
+        const auto p=ceres::preset(row.name);
+        near(p.filterInitial,-.4*pin(row.il),1e-12,"Factory IL uses the aligned -4V at 10V");
+        near(p.filterPeak,.5*pin(row.al),1e-12,"Factory AL uses the aligned +5V at 10V");
+        near(p.filterAttack,attackLaw(pin(row.filterAttack)),1e-12*attackLaw(pin(row.filterAttack)),
+             "Factory VCF attack follows the aligned pin law");
+        near(p.ampAttack,attackLaw(pin(row.ampAttack)),1e-12*attackLaw(pin(row.ampAttack)),
+             "Factory VCA attack follows the aligned pin law");
+    }
+}
 }
 
 int main() {
     try {
         releaseFollowerDrop();std::puts("PASS factory release CVs through the sustain-control follower");
+        alignedLevelsAndAttack();std::puts("PASS factory IL/AL levels and attack law against the M-board alignment");
     } catch(const std::exception& e) {std::fprintf(stderr,"FAIL %s\n",e.what());return 1;}
 }
