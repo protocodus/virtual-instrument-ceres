@@ -114,7 +114,19 @@ struct Patch {
     // this master offset is independent of the engineering keyTrack slope.
     double tuneCents = 0.0;
     // These modeled oscillator variations, like vibrato below, are VCO-only.
-    double voiceSpreadCents = 0.0, driftCents = 0.0;
+    // voiceSpreadCents is a fixed engineering spread, not a tolerance (see
+    // the board tolerances below). driftCents is the peak excursion of each
+    // board's free-running wander about its tuned pitch: a new random target
+    // every 0.2-0.7s, followed with a .3s time constant (.41 cents RMS per
+    // cent). Default 1: an OWNER-REQUESTED ENGINEERING VALUE, not a
+    // measurement. It is the most the tuning tolerance leaves room for: each
+    // warmed-up board is set and checked within +/-1 cent (Guide printed p.65
+    // after 10 minutes' warm-up; CS-80 procedure printed pp.3-5 after 30), so
+    // its wander must stay inside that band. No source gives a time course
+    // for it. The documented instability is thermal (Service News E-46; see
+    // boardTemperatureRise) and settles over those 10-30 minute warm-ups, far
+    // slower than this wander, whose time constants have no source.
+    double voiceSpreadCents = 0.0, driftCents = 1.0;
     // Board-to-board tolerance of the four M boards, each 0..1 of the
     // documented spread; 0 keeps the boards identical. Pitch, filter and
     // envelope ship at 1 (owner's listening verdict B, 2026-10-20, set

@@ -18,6 +18,10 @@
 //  - Sibling CS-80 Adjustment Procedure printed pp.7, 13, 15: EG attacks
 //    trimmed to 4ms and 125ms "(+/-5%)"; VR11 sine 1.00 +/-.02Vpp and VR12
 //    filtered 800 +/-20mVpp at CP4.
+//  - The +/-1 cent of the tuning method again, after the warm-up it asks for
+//    (Guide p.65: 10 minutes; CS-80 printed pp.3, 5: 30 minutes): the
+//    shipping drift_cents (an owner-requested engineering value) keeps each
+//    board's free-running wander inside it.
 #include "ceres.hpp"
 #include <algorithm>
 #include <array>
@@ -509,11 +513,46 @@ void boardsAreFixedUnits() {
     const auto other=play(6,p,0,60),mine=play(5,p,0,60);
     require(other.oscillatorFrequency!=mine.oscillatorFrequency,"another seed is another instrument");
 }
+
+// drift_cents ships at 1, an owner-requested engineering value: the wander
+// of each board peaks at the +/-1 cent the tuning method holds a warmed-up
+// board to. Its time course has no source and is not checked here.
+void driftStaysInTheTuningBand() {
+    const ceres::Patch defaults;
+    require(defaults.driftCents==1 && ceres::preset("brass1").driftCents==1,
+            "drift ships at the tuning tolerance, factory presets included");
+    auto p=plain();p.driftCents=defaults.driftCents;p.vibratoCents=0;
+    auto twice=p;twice.driftCents=2;
+    ceres::Synth s(8000,50),d(8000,50);
+    require(s.configure(4,1) && d.configure(4,1),"configure");
+    s.setPatch(p);d.setPatch(twice);
+    for(unsigned board=0;board<4;++board){s.noteOn(60);d.noteOn(60);}
+    std::array<double,4> peak{},power{};
+    double apart=0;unsigned samples=0;
+    for(unsigned n=0;n<30*8000;++n) {
+        s.process();d.process();
+        if(n%80)continue;
+        const auto a=s.voiceState(),b=d.voiceState();
+        for(unsigned k=0;k<4;++k) {
+            require(a[k].note==60 && a[k].held,"four boards hold one key");
+            const double c=cents(a[k].oscillatorFrequency,keyHz(60));
+            near(cents(b[k].oscillatorFrequency,keyHz(60)),2*c,1e-9,"drift_cents is the wander's peak depth");
+            peak[k]=std::max(peak[k],std::abs(c));power[k]+=c*c;
+        }
+        apart+=std::pow(cents(a[0].oscillatorFrequency,a[1].oscillatorFrequency),2);++samples;
+    }
+    for(unsigned k=0;k<4;++k) {
+        require(peak[k]<=1,"each board's wander stays within +/-1 cent");
+        require(peak[k]>.5 && std::sqrt(power[k]/samples)>.2,"each board wanders");
+    }
+    require(std::sqrt(apart/samples)>.2,"the boards wander independently");
+}
 }
 
 int main() {
     try {
         defaultsShipTheVerdict();
+        driftStaysInTheTuningBand();
         trimPointsHoldTheirBand();
         linearVcoBetweenTrimPoints();
         thermalDriftWithinTheRanks();

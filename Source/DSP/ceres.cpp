@@ -1560,6 +1560,8 @@ struct Synth::Impl {
             // noteOn. This digital adaptation does not slew the keyboard CV.
             v.velocityValue+=(v.velocity-v.velocityValue)*velocityCoefficient;
             const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
+            // Free-running wander, driftCents peak (see ceres.hpp): its 0.2-0.7s
+            // hold and .3s smoothing are engineering choices with no source.
             if (v.driftCountdown-- == 0) {
                 v.driftTarget = random.bipolar();
                 v.driftCountdown = static_cast<unsigned>(internalFs * (.2 + random.unit()*.5));

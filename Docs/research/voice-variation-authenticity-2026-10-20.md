@@ -4,7 +4,8 @@ The CS-50 has four separate M voice boards (SM2 printed pp.17-18, PDF 13-14,
 "M1~M4"). Before this pass Ceres ran four bit-identical boards; the only
 differences were the engineering controls `voice_spread_cents` (a fixed
 symmetric spread) and `drift_cents` (a random walk), both VCO-only and
-default 0. Neither is a tolerance model.
+default 0. Neither is a tolerance model. (`drift_cents` now ships at 1: see
+[Free-running drift](#free-running-drift-drift_cents).)
 
 This pass adds the per-board variation the service documents bound, as
 amounts from 0 (four identical boards) to 1 (the documented spread). The
@@ -129,6 +130,53 @@ Conventions, labelled in the code: uniform in the window; linear in the
 temperature change (E-46 gives only the 25 -> 50 C step); the same at every
 transposition (the IC is ranked, not the Rn resistors). 0 K is the
 temperature the boards were tuned at.
+
+## Free-running drift (`drift_cents`)
+
+`drift_cents` predates this pass. Each board's pitch moves toward a new
+random target, uniform within +/-`drift_cents`, every 0.2-0.7 s (0.1-0.6 s
+for the first), followed with a 0.3 s time constant. Measured at 1 cent
+(seed 50, four boards holding middle C for 600 s): 0.40-0.41 cents RMS per
+board, peaks 0.91-0.99 cents, 0.59 cents RMS between two boards, the
+autocorrelation down to 1/e in 0.51-0.56 s, about 1 cent per second of
+average slew.
+
+**Default 1 cent: an owner-requested engineering value, not a
+measurement.** The owner asked for a non-zero default. The bound comes from
+the tuning method: each warmed-up board is set and checked within +/-1 cent
+at every trim point (Guide printed p.65, after "10 minutes or longer";
+CS-80 procedure printed p.3, "Unit should be allowed to warm up at least 30
+minutes before any final tuning adjustments are performed", and +/-1 cent
+on printed p.5). A board whose wander left that band could not be set and
+verified to it, so 1 cent peak is the most the tolerance leaves room for,
+and the model never exceeds it. Where inside the band a real board's wander
+lies is unknown: no measurement of IG00153 or CS-50/60/80 pitch against
+time was found. E-46 gives temperature coefficients only, the service
+documents warm-up times and tolerances; owner and dealer accounts online
+describe temperature-sensitive tuning and long warm-ups without numbers.
+
+**Time behaviour: it does not match the documented mechanism, and is not
+changed.** The documented instability is thermal. E-46 is titled
+"Countermeasures for stabilizing the pitch", and both its remedies are
+thermal: rank each IC by its temperature coefficient, and grease the
+compensating diode onto the IC so the two share one temperature. The
+instrument settles over the 10-30 minute warm-ups the procedures ask for,
+so its drift moves on a scale of minutes, set by the interior temperature
+and that IC/diode coupling. The engine's wander decorrelates in half a
+second, about three orders of magnitude faster, and no source describes
+pitch movement on that scale. A slower model would need a temperature
+course (amplitude and time constants) for a warmed-up instrument, which no
+source gives, so the wander keeps its engineering time constants, labelled
+as such in the code.
+
+What would match: each board's pitch following E-46's coefficients times
+its own temperature excursion, `board_temperature_rise` driven by a slowly
+varying temperature, the shared part included (E-46's absolute figures put
+up to 30 cents at C6 and 45 at C1 per 25 K on every board). The missing
+data is the temperature, or directly the pitch, of a warmed-up CS-50 over
+an hour: a frequency-counter log of one or more boards with the room
+temperature alongside would give the amplitude and the time constants, and
+would show whether anything moves on the sub-second scale at all.
 
 ## VCF: sensitivity binned by chip rank; cutoff and Q trimmed by ear
 
@@ -272,7 +320,12 @@ plays it as its A.
     tolerance at full spread (measured -0.005..+0.003 dB for seeds 3, 8, 21,
     against -0.011..+0.003 dB with identical boards);
   - the shared noise stream and start phases unchanged; boards fixed across
-    polyphony, reset and seed.
+    polyphony, reset and seed;
+  - `drift_cents` ships at 1, factory presets included; over 30 s each of
+    four boards on one key stays within +/-1 cent and moves (peak over 0.5,
+    RMS over 0.2 cents), two boards wander independently, and 2 cents
+    doubles every excursion exactly. The time course is not checked: it has
+    no source.
 - `Ceres.board_tolerance_audio_parity`: native and embedded produce identical
   audio with every tolerance at full spread, and the tolerances change it
   (against the driver's `identical-boards` mode, the same panel controls
@@ -288,13 +341,15 @@ plays it as its A.
 - Contracts that read a nominal design law back from the engine (the VCO
   key law and clock, the printed filter node ratios and SUB depth, EG
   octaves per volt, touch and vibrato depths) set the three shipping
-  amounts to 0, each with a comment; the board contracts above own the
-  tolerance itself. The idle VCA-EG floor contract checks each shipping
+  amounts to 0, and those that read a pitch `drift_cents` too, each with a
+  comment; the board contracts above own the tolerance and the drift
+  bound. The idle VCA-EG floor contract checks each shipping
   board's own floor (-200 +/-20 mV) and the exact -200 mV of identical
   boards.
-- With every amount at 0, the native parity driver (all seven modes), the
-  configuration parity driver and `ceres_render` of all 14 presets are
-  byte-identical to 0.5.0 (`0f1d00f`).
+- With every board amount and `drift_cents` at 0, the native parity driver
+  (all seven modes; it sets its own `drift_cents`), the configuration parity
+  driver and `ceres_render` of all 14 presets are byte-identical to 0.5.0
+  (`0f1d00f`), checked again after the default changes.
 
 ## What would close the gap
 
@@ -307,3 +362,6 @@ plays it as its A.
 - Measured per-board pitch error of a calibrated unit across the keyboard,
   to replace the uniform-in-band assumption, and the temperature course of
   a board between the 25 and 50 C points E-46 gives.
+- A pitch-against-time log of a warmed-up CS-50 (frequency counter on one
+  or more boards for an hour, room temperature alongside), to give
+  `drift_cents` a measured depth and time course.

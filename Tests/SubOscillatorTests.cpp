@@ -70,8 +70,10 @@ void depthLevers() {
 ceres::Patch quiet() {
     ceres::Patch p;p.saw=1;p.ampAttack=.001;p.ampSustain=1;p.ampRelease=5;
     p.filterInitial=p.filterPeak=0;p.lfoRate=3;
-    // Nominal boards: the vibrato depth is read against A440 itself.
+    // Nominal boards, no drift: the vibrato depth is read against A440
+    // itself.
     p.boardPitchTolerance=p.boardFilterTolerance=p.boardEnvelopeTolerance=0;
+    p.driftCents=0;
     return p;
 }
 

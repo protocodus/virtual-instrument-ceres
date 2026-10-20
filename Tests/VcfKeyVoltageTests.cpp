@@ -23,8 +23,10 @@ void near(double a,double b,double tolerance,const char* why) {
 ceres::Patch plain() {
     ceres::Patch p;p.saw=1;p.ampAttack=.001;p.ampSustain=1;p.ampRelease=5;
     p.filterInitial=p.filterPeak=0;p.hpCutoff=80;p.lpCutoff=900;
-    // Nominal boards: Kv is read back through the design's VCO law.
+    // Nominal boards, no drift: Kv is read back through the design's VCO
+    // law.
     p.boardPitchTolerance=p.boardFilterTolerance=p.boardEnvelopeTolerance=0;
+    p.driftCents=0;
     return p;
 }
 // Variable-gm part of each stage relative to its middle-C reference, in

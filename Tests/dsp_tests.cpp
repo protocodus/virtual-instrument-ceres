@@ -31,9 +31,11 @@ ceres::Patch sinePatch() {
     auto p=ceres::preset("init");
     p.saw=p.pulse=p.noise=0; p.sine=1;
     p.ampAttack=.001; p.ampSustain=1; p.ampRelease=.03;
-    // Nominal boards: these contracts check the design laws; the shipping
-    // board tolerances have their own (BoardToleranceTests.cpp).
+    // Nominal boards without free-running drift: these contracts check the
+    // design laws; the shipping board tolerances and drift have their own
+    // (BoardToleranceTests.cpp).
     p.boardPitchTolerance=p.boardFilterTolerance=p.boardEnvelopeTolerance=0;
+    p.driftCents=0;
     return p;
 }
 std::complex<double> response(const std::vector<double>& impulse,double f,double fs) {

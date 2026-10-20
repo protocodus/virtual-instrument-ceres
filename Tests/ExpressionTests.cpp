@@ -22,8 +22,10 @@ ceres::Patch patch() {
     ceres::Patch p;p.expressionSource=1;p.pressureFilter=1.3;p.pressureVibrato=80;
     p.pressureVolume=.8;p.filterInitial=p.filterPeak=0;p.hpCutoff=90;p.lpCutoff=900;
     p.ampAttack=.001;p.ampSustain=1;p.ampRelease=10;p.lfoRate=7;
-    // Nominal boards: the expected pitch and cutoffs are the design laws.
+    // Nominal boards, no drift: the expected pitch and cutoffs are the
+    // design laws.
     p.boardPitchTolerance=p.boardFilterTolerance=p.boardEnvelopeTolerance=0;
+    p.driftCents=0;
     return p;
 }
 void advance(ceres::Synth& s,unsigned n=16) {
