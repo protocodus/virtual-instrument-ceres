@@ -36,6 +36,29 @@ constexpr double touchLevelScale=(6/150e3)/(10/270e3);
 // loaded fraction; the endpoints are exact.
 constexpr double tremoloScale=(1.5/120e3)/(10/270e3);
 constexpr double qControlTau=10e-6*(220e3/2);
+// KAS gate/integrator, one per channel (SM2 p.3; guide printed p.24). The D-A
+// output reaches the channel's .033uF hold capacitor through a permanent 3.3M
+// and two TC4016 gates in parallel with it: one direct, one through 470k.
+// Comparators b and c switch those gates on the PORTAMENTO lever voltage PS,
+// giving the three regimes of the guide's p.25 table:
+//   PS -6.5..-1.72  both gates off   3.3M       * .033uF = 108.9ms, clock slow
+//   PS -1.72..3.81  470k gate on     470k||3.3M * .033uF =  13.6ms, clock mid
+//   PS  3.81..7.14  direct gate on   switch Ron * .033uF ~  10us, clock fast
+// Above 7.14V comparator a stops the counter altogether, so the key code is
+// applied whole. The guide's prose quotes "470k 1uF" for the medium leg; the
+// schematic's .033uF is what the board carries and the only value that gives a
+// portamento-length glide, so the schematic is followed here.
+constexpr double glideHoldCap=.033e-6;
+constexpr double glideTauLarge=3.3e6*glideHoldCap;
+constexpr double glideTauMedium=(470e3*3.3e6/(470e3+3.3e6))*glideHoldCap;
+// Mapping a glide rate back to a PS voltage needs the lever's clock law, which
+// is not printed. ESTIMATE: the counter clock period runs log-linearly in PS
+// across the lever, from the printed 11s at -6.5V to 1.4ms at +8.5V (SM1 p.5,
+// YM26700 pin 4 "the frequency is variable by changing the portamento VR").
+// That places the two comparator thresholds at these step rates;
+// Ceres.HardwareRealism recomputes both from the printed endpoints.
+constexpr double glideMediumAbove=1.584522156984606;
+constexpr double glideDirectAbove=43.24665787480699;
 // Fairchild uA796 upper carrier pairs have no emitter degeneration. In the
 // matched, forward-active/infinite-beta limit their current steering is
 // tanh(V7minus8/(2VT)). Guide p49 gives the carrier sine as nominal3Vpp.
@@ -863,8 +886,13 @@ struct Synth::Impl {
         const double stepped=std::exp2((v.glideCode-60)/12.0);
         // Hz-linear key voltage: the integrator's RC glide is exponential in
         // Hz, so a wide glide covers its last semitones more slowly in pitch.
-        v.glideVoltage=patch.glideMode==2 ? stepped
-            : v.glideVoltage+(stepped-v.glideVoltage)*-std::expm1(-patch.glideRate*dt);
+        // The gate the lever selects fixes the time constant; in the fast
+        // regime the direct gate passes the counter's steps as they are, so
+        // portamento and glissando meet at the short end of the lever.
+        const double tau=patch.glideRate<glideMediumAbove ? glideTauLarge
+            : patch.glideRate<glideDirectAbove ? glideTauMedium : 0;
+        v.glideVoltage=patch.glideMode==2 || tau==0 ? stepped
+            : v.glideVoltage+(stepped-v.glideVoltage)*-std::expm1(-dt/tau);
         if (v.held || v.pedalHeld || patch.sustainMode==2)
             v.keyPitch=60+12*std::log2(v.glideVoltage);
         return v.keyPitch;

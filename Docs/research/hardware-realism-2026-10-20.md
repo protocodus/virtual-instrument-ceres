@@ -71,7 +71,7 @@ Sources as above, read for circuitry still between the documented parts and the 
 
 ### Checked and not changed (third pass)
 
-- **Portamento clock and integrator.** SM1 p.5 gives the YM26700 PC clock period as 11 s to 1.4 ms. The KAS integrator capacitor is 0.033 µF on SM2 p.3 (3.3M: 109 ms; 470k‖3.3M: 13.6 ms; direct gate: under 1 ms), while the guide's prose says 1 µF. The BA617 clock law is not documented, so neither the lever law nor the regime boundaries map onto `glide_rate`.
+- **Portamento clock and integrator.** Implemented in the fourth pass (row 20).
 - **Vibrato depth.** The VCO VIB input is exponential at 50 cents per 1.5 V (guide p.27); R7 feeds it V1/V2 through 100k per board. `vibrato_cents` is already in engineering units, so the lever taper belongs to an adapter.
 - **Oscillator pitch.** A probe reads 0.00 cents from equal temperament through C7 at the top octave, matching the guide's ±1 cent tuning at C3 and C7.
 - **Expression with no pedal.** −15 V reaches EI through 27k (TP1 −3.83 V) and the PS88 LED draws about 4.7 mA. The CdS on-resistance is not documented, so the network stays ideal-conducting.
@@ -83,3 +83,14 @@ Sources as above, read for circuitry still between the documented parts and the 
 - **Envelope attack.** Gate 1 applies about 10 V (+15 V through 30k/60k) and the sequencer switches to decay at VA = VB (guide p.43): an RC aimed at the attack level, as the 1 % headroom model has it. The VCF-EG's SL pin is grounded on the M board, so its decay ends at 0 V, as modelled.
 - **KAS sample-hold.** Each channel samples the D/A line through 2.2k and a TC4016 into 0.033 µF; the strobed time constant is below a millisecond, so there is no audible slew. The buffer's 560 Ω and 0.01 µF add 5.6 µs.
 - **WSC sine.** The IG00158 rounds its triangle into a sine with an undocumented transfer, so the ideal sine stays.
+
+## Fourth pass (0.4.0)
+
+The owner asked for the four items the third pass had ruled out, each of which
+needs at least one value the documents do not print. They are implemented here
+with those values named as estimates, in the code beside what uses them and in
+the rows below. Each row is one commit on `main`.
+
+| # | Hardware behaviour | Source | Change | Estimated? |
+|---|---|---|---|---|
+| 20 | **Portamento integrator regimes.** Every KAS channel reaches its 0.033 µF hold capacitor through a permanent 3.3M and two TC4016 gates in parallel with it, one direct and one through 470k. Comparators b and c switch those gates on the PORTAMENTO lever voltage PS, so the integrator has three time constants: 108.9 ms (3.3M alone), 13.6 ms (470k‖3.3M) and the direct gate, whose switch resistance into 0.033 µF is about 10 µs. Above PS 7.14 V comparator a stops the counter and the key code is applied whole. | Guide p.24 / PDF 33 (gate and integrator block); p.25 / PDF 34 (comparator table and the three step shapes); SM2 p.3 (IC9/IC10 gates, 470k, 3.3M, 0.033 µF); SM1 p.5 (YM26700 pin 4, clock period 11 s to 1.4 ms) | `advanceGlide` takes τ from the regime instead of `1/glide_rate`. At the default rate of 24 steps/s τ falls from 41.7 ms to 13.6 ms, so the glide trails its staircase by a third of a semitone instead of a whole one; above 43.2 steps/s portamento passes the counter's steps unsmoothed, meeting glissando at the short end of the lever. | **Yes**, for the two thresholds only: the BA617 clock's PS-voltage law is not printed, so the engine assumes the clock period is log-linear in PS between the printed 11 s at −6.5 V and 1.4 ms at +8.5 V, putting the comparators' −1.72 V and 3.81 V at 1.58 and 43.2 steps/s. The three time constants themselves are read off the schematic. The guide's prose quotes “470 kΩ 1 µF” for the medium leg against the schematic's 0.033 µF; the schematic is followed, since 1 µF would make even the medium leg a 0.47 s lag. |

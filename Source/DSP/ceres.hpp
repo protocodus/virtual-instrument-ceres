@@ -143,10 +143,11 @@ struct Patch {
     // 0 off, 1 portamento, 2 glissando. A per-board counter steps the key code
     // one semitone at a time toward its assigner key at glideRate semitones/s.
     // Glissando sends the steps to the sample-hold; portamento integrates the
-    // stepped key voltage, which is linear in Hz, with tau equal to one step
-    // period (the guide's "adjust the integrating rate to the rate of
-    // controlling the key code data"). The counter clock's PS-voltage law is
-    // not printed, so glideRate is an engineering rate, not lever calibration.
+    // stepped key voltage, which is linear in Hz, through the gate the lever's
+    // comparators select: 108.9ms below 1.58 steps/s, 13.6ms below 43.2, and
+    // the direct gate above that, where portamento steps like glissando. Those
+    // two thresholds assume a log-linear counter clock, since the lever's
+    // PS-voltage law is not printed; glideRate is an engineering rate.
     double glideMode = 0.0, glideRate = 24.0;
     // Modern optional expression routing: 0=channel aftertouch (default),
     // through the touch pre-amplifier's 10ms RC, 1=each board's latched

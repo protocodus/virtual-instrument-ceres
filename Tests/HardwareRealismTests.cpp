@@ -55,15 +55,44 @@ void glissandoSteps() {
     }
 }
 
-// Portamento integrates the stepped key voltage, linear in Hz, with tau equal
-// to one counter step.
+// The lever's three integrator regimes (guide printed pp.24-25, SM2 p.3): the
+// 3.3M alone, 470k||3.3M, and the direct gate, each into the .033uF hold cap.
+// The thresholds follow from the printed 11s..1.4ms clock range over the
+// lever's -6.5..+8.5V, the log-linear clock law the engine assumes.
+void glideIntegratorRegimes() {
+    const double slow=1/11., fast=1/1.4e-3;
+    auto rateAtPs=[&](double ps){return slow*std::pow(fast/slow,(ps+6.5)/15);};
+    near(rateAtPs(-1.72),1.584522156984606,1e-12,"Medium-gate threshold rate");
+    near(rateAtPs(3.81),43.24665787480699,1e-12,"Direct-gate threshold rate");
+    constexpr double fs=8000;
+    // One rate inside each regime, against an explicit counter and integrator.
+    for(auto band:{std::make_pair(1.5,3.3e6*.033e-6),
+                   std::make_pair(12.,(470e3*3.3e6/(470e3+3.3e6))*.033e-6),
+                   std::make_pair(100.,0.)}) {
+        const double rate=band.first,tau=band.second;
+        ceres::Synth s(fs,3);require(s.configure(1,1),"Configure regime witness");
+        auto p=plain();p.glideMode=1;p.glideRate=rate;s.setPatch(p);
+        s.noteOn(67);
+        double code=60,steps=0,voltage=1;
+        const double c=tau==0 ? 1 : -std::expm1(-1/(fs*tau));
+        for(unsigned n=0;n<unsigned(fs*2);++n) {
+            if(code!=67){steps+=rate/fs;while(steps>=1&&code!=67){code+=1;steps-=1;}}else steps=0;
+            voltage+=(std::exp2((code-60)/12)-voltage)*c;
+            s.process();
+            near(key(s,0),60+12*std::log2(voltage),1e-9,"The lever's gate sets the integrator time constant");
+        }
+    }
+}
+
+// Portamento integrates the stepped key voltage, linear in Hz, with the time
+// constant the lever's comparators select.
 void portamentoIntegratesHz() {
     constexpr double fs=8000,rate=12;
     ceres::Synth s(fs,3);require(s.configure(1,1),"Configure portamento witness");
     auto p=plain();p.glideMode=1;p.glideRate=rate;s.setPatch(p);
     s.noteOn(48);
     double code=60,steps=0,voltage=1;
-    const double c=-std::expm1(-rate/fs);
+    const double c=-std::expm1(-1/(fs*(470e3*3.3e6/(470e3+3.3e6))*.033e-6));
     double previous=-1;
     for(unsigned n=0;n<unsigned(fs*3);++n) {
         if(code!=48){steps+=rate/fs;while(steps>=1&&code!=48){code-=1;steps-=1;}}else steps=0;
@@ -172,7 +201,8 @@ void keys() {
 
 int main() {
     try {
-        keys();offIsUnchanged();glissandoSteps();portamentoIntegratesHz();sustainModesAtRelease();
+        keys();offIsUnchanged();glissandoSteps();glideIntegratorRegimes();
+        portamentoIntegratesHz();sustainModesAtRelease();
         freeBoardGlidesFromLastKey();sameKeyReuse();simultaneousKeysKeepHighest();touchRoutes();
     } catch(const std::exception& e) {std::fprintf(stderr,"FAIL %s\n",e.what());return 1;}
     std::puts("PASS glide, same-key reuse and touch-route contracts");
