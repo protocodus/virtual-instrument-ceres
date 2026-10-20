@@ -75,18 +75,86 @@ constexpr double glideTauMedium=(470e3*3.3e6/(470e3+3.3e6))*glideHoldCap;
 // Ceres.HardwareRealism recomputes both from the printed endpoints.
 constexpr double glideMediumAbove=1.584522156984606;
 constexpr double glideDirectAbove=43.24665787480699;
-// Fairchild uA796 upper carrier pairs have no emitter degeneration. In the
-// matched, forward-active/infinite-beta limit their current steering is
-// tanh(V7minus8/(2VT)). Guide p49 gives the carrier sine as nominal3Vpp.
+// PRA ring modulator, IC8 Fairchild uA796HC (SM2 printed p.22 / PDF16; guide
+// printed p.52 / PDF61; overall circuit diagram). Pin roles are the uA796
+// sheet's (Fairchild 1973 Linear IC catalog pp.7-74..7-77): 1/4 signal
+// inputs, 2-3 gain (emitter) resistor, 5 bias, 6/9 outputs, 7/8 carrier
+// inputs, 10 V- (grounded here: the chip runs from one +15V rail).
+// The upper carrier pairs have no emitter degeneration, so a matched pair
+// steers tanh(V7minus8/(2VT)) of each signal-side current.
 constexpr double ringThermalVoltage=1.380649e-23*298.15/1.602176634e-19;
-constexpr double ringSourcePeakVolts=1.5;
-// Nominal zero-IC-current DC circuit, balance VR5 at center. Unlike the
-// reduced AC network, include both470+(100k+25k) signal-input returns.
+// Carrier: IG00150 pin 6 (SIO) sine, 3.20Vpp on its own pin sheet (SM2
+// printed p.9 / PDF7). Guide p.49's 3Vpp is the PWM level-control output, a
+// different node. Pin 6 reaches pin 7 through 100uF in SERIES with 33k; all
+// three drawings agree no 33k end is grounded. Pin 8 sits on the 100uF-bypassed
+// bias node and pin 7 hangs off it through 100 ohm, so the carrier at pins
+// 7-8 is the 33k/100 divider: 4.7mV peak, deep inside the 25mV-peak linear
+// region the uA796 sheet gives (p.7-77, Fig.3). The modulator multiplies by a
+// sine; it does not switch.
+constexpr double ringSourcePeakVolts=1.6;
+// DC operating point, VR5 at centre. Pin 5 takes 10k from the 390-fed local
+// rail S; with V- grounded the bias current is I5=(VS-phi)/(10k+500), the
+// MC1496 second-source formula with phi=.75V at 25C (the uA796 sheet shows
+// the same 500 ohm in its equivalent circuit). S feeds pin 6's and pin 9's
+// 2.7k (I5 each, the quad's 2*I5 split evenly), pin 5, and the 1.2k into the
+// carrier-bias divider (820 to the audio bias node: 1k and both 470+(100k+25k)
+// signal-input returns to ground). IC base currents are neglected here
+// (they move the rail by under .1%).
+constexpr double ringPhi=.75;
 constexpr double ringBiasGround=1/(1/1000.+2/(470.+125000.));
-constexpr double ringBiasLoad=1/(1/33100.+1/(820.+ringBiasGround));
-constexpr double ringPin8Dc=15*ringBiasLoad/(390+1200+ringBiasLoad);
-constexpr double ringDifferentialDc=-ringPin8Dc*100/33100.;
+constexpr double ringBiasLoad=820.+ringBiasGround;
+constexpr double ringRail=(15+390*3*ringPhi/10500.)
+    /(1+390*3/10500.+390/(1200+ringBiasLoad));          // 12.15V
+constexpr double ringBiasCurrent=(ringRail-ringPhi)/10500.; // 1.086mA
+// uA796 sheet p.7-75: carrier-port bias current (I7+I8)/2 = 12uA typical
+// (30uA max) in its Fig.1 circuit, I5=(8V-phi)/(6.8k+500)=.993mA. Scaled to
+// this I5 that is beta=82.8. Pin 7's base current can only arrive through the
+// 100 ohm (the 33k path is capacitor-coupled), so V7-V8=-1.31mV DC: a
+// typical-part estimate of the carrier-port offset, which passes some of the
+// dry signal through the modulator. VR5 trims carrier leakage on the signal
+// side (guide p.52, <3mVp-p), not this offset.
+constexpr double ringFigure1Bias=(8-ringPhi)/(6800+500.);
+constexpr double ringBeta=ringFigure1Bias/12e-6;
+constexpr double ringDifferentialDc=-100*ringBiasCurrent/ringBeta;
+// Small-signal carrier port: each upper pair is 2*rpi differential at
+// Ic=I5/2, the two pairs in parallel, i.e. rpi=3.92k across the 100 ohm.
+constexpr double ringCarrierPortShunt=1/(1/100.+1/(ringBeta*ringThermalVoltage/(ringBiasCurrent/2)));
+// Signal side: the buffer O1 feeds pin 1 through 10uF and 330 ohm. SM2 draws
+// 330K; the guide p.52 outline and the overall circuit diagram both print 330,
+// and 330K would leave the wet path 44dB down at the wet buffer's full gain,
+// so 330 ohm is used. Pin 1 sees 470 to the AC-grounded bias node, 100k+25k
+// (VR5 centre) to ground and the degenerated pair, beta*(470+2re). Pin 4 is
+// AC-grounded the same way. The emitter-degenerated signal pair converts
+// V1-V4 to a differential current over 470+2re, re=VT/I5.
+constexpr double ringSignalDegeneration=470+2*ringThermalVoltage/ringBiasCurrent;
+constexpr double ringSignalNode=1/(1/470.+1/125000.+1/(ringBeta*ringSignalDegeneration));
+constexpr double ringSignalDivider=ringSignalNode/(330+ringSignalNode);
+constexpr double ringSignalCouplingTau=10e-6*(330+ringSignalNode); // 20.1Hz
+// Pin 6 (output +, Fig.1 of the sheet) works into 2.7k to the bypassed rail,
+// the chip's own 40k single-ended output resistance (sheet p.7-75, typical)
+// and, through 10uF, the wet buffer's 10k. Midband single-ended gain is
+// RL/(470+2re); the coupling corner sees the 2.7k||40k source, 1.27Hz.
+constexpr double ringCollectorSource=1/(1/2700.+1/40e3);
+constexpr double ringCollectorLoad=1/(1/ringCollectorSource+1/10e3);
+constexpr double ringWetCouplingTau=10e-6*(ringCollectorSource+10e3);
+constexpr double ringModulatorGain=ringSignalDivider*ringCollectorLoad/ringSignalDegeneration;
 double ringSteering(double volts) { return std::tanh(volts/(2*ringThermalVoltage)); }
+} // namespace
+double ringSpeedHz(double vc1Volts) {
+    return ringSpeedReferenceHz*std::exp2(ringSpeedOctavesPerVolt*(vc1Volts-5));
+}
+namespace {
+// The wet buffer IC1-2 is non-inverting with VR4 (B-100K trimmer) over 10k:
+// gain 1+VR4/10k, 1..11. Its factory setting is not printed anywhere in the
+// service documentation. ASSUMPTION: VR4 is trimmed so that the MODULATION
+// lever is level-neutral, the wet path's RMS equal to the dry signal's for a
+// steady midband carrier. That needs VR4=57.8k, inside its range, and keeps
+// this engine's earlier wet level. Matching peaks instead (VR4=38.0k) is the
+// other defensible trim; it was rendered as a listening candidate.
+double ringWetBufferGain() {
+    const double carrierPeak=ringSourcePeakVolts*ringCarrierPortShunt/(33000+ringCarrierPortShunt);
+    return std::sqrt(2.)/(ringModulatorGain*std::tanh(carrierPeak/(2*ringThermalVoltage)));
+}
 // The patch specifies TOTAL integrator Hz at middle C. Only variable gm
 // responds to exponential control; the parallel 4.7Mohm path stays fixed.
 double modulatedFilterFrequency(double referenceHz, double factor) {
@@ -484,9 +552,12 @@ struct ExpressionNetwork {
 };
 
 // Direct CS-50 PRA: four 100uF capacitors around the uA796 carrier input.
-// Nodes x=pin7, b=pin8, a=audio-bias, s=bypassed local supply. This passive
-// limit assumes an ideal sine source and zero incremental IC input currents.
-// It does not identify the multiplier's transistor law or wet-gain trim.
+// Nodes m=coupling-capacitor/33k junction, b=pin8, a=audio-bias, s=bypassed
+// local supply. The 33k runs in series from m to pin 7, and pin 7 reaches
+// pin 8 through 100 ohm in parallel with the carrier port's small-signal rpi,
+// so m-b is one 33k+97.5 ohm branch and pins 7-8 carry its 97.5/33097.5 share.
+// Ideal sine source; the IG00150's output impedance and the .047uF on its
+// pin 6 are not modelled (the source impedance is unpublished).
 struct RingCarrierCoupling {
     std::array<std::array<double,4>,4> inverse{};
     std::array<double,4> memory{};
@@ -496,7 +567,7 @@ struct RingCarrierCoupling {
         auto edge=[&](unsigned i,unsigned j,double r){
             const double y=1/r;g[i][i]+=y;g[j][j]+=y;g[i][j]-=y;g[j][i]-=y;
         };
-        ground(0,33000);edge(0,1,100);edge(1,2,820);edge(1,3,1200);
+        edge(0,1,33000+ringCarrierPortShunt);edge(1,2,820);edge(1,3,1200);
         ground(2,1000);ground(3,390);
         // TPT capacitor coordinates w=(x-source,b,a,s):
         // (I+G/(2fsC))*v=memory+(source,0,0,0), memory'=2w-memory.
@@ -527,7 +598,8 @@ struct RingCarrierCoupling {
         std::array<double,4> nodes{};
         for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j)nodes[i]+=inverse[i][j]*rhs[j];
         for(unsigned i=0;i<4;++i)memory[i]=2*(nodes[i]-(i==0?source:0.))-memory[i];
-        return nodes[0]-nodes[1]; // actual differential carrier; no gain normalization
+        // Actual pin7-pin8 carrier per volt of source; no gain normalization.
+        return (nodes[0]-nodes[1])*ringCarrierPortShunt/(33000+ringCarrierPortShunt);
     }
 };
 
@@ -1000,7 +1072,8 @@ struct Synth::Impl {
     double ringCoupledCarrier=0;
     double ringSwitchGain=ringSteering(ringDifferentialDc);
     RingCarrierCoupling ringCarrierCoupling;
-    OutputCoupling ringWetCoupling;
+    OutputCoupling ringSignalCoupling, ringWetCoupling;
+    double ringWetGain=ringModulatorGain*ringWetBufferGain();
     int lastAssignedKey = 60;
     bool pedal = false;
     // Physical-key ledger is independent of four-board allocation/stealing
@@ -1104,7 +1177,7 @@ struct Synth::Impl {
         physicalKeyPresses=0; lastAssignedKey=60;
         subNoiseMemory=limiterInput=limiterOutput=0; pickupCoupling={};
         limiterRandom=Random(seed^0xd1b54a32d192ed03ULL); ringEnvelope={}; ringPhase=ringCarrier=0;
-        ringFrequency=patch.ringRate; ringWetCoupling={};
+        ringFrequency=patch.ringRate; ringWetCoupling={}; ringSignalCoupling={};
         ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
         ringCarrierCoupling.clear();ringCoupledCarrier=0;
         ringSwitchGain=ringSteering(ringDifferentialDc);
@@ -1315,9 +1388,13 @@ struct Synth::Impl {
         const double bus=busCoupling.process(mixed,outputCouplingTau[2],internalFs);
         // One global processor, after the voice bus and before expression/
         // output. The carrier uses the physical matched upper-BJT steering
-        // law; signal-pair nonlinearity/loading, mismatch and wet gain remain
-        // unidentified. Direct PRA/Overall wet output uses
-        // 10uF into10k (Guide differs): retain that physical RC at tau=.1s.
+        // law at the pins 7-8 carrier; the signal pair is kept linear. Its
+        // 470 ohm degeneration limits at .56V peak on pin 1; the CS-50 voice
+        // output aligns to .6V (CS-60 manual p.39, VI-4, "CS-50 is 0.6V"),
+        // which reaches pin 1 as at most .35V: 1.5% peak compression, third
+        // harmonic -48dB, and -62dB at half that. The engine's bus is not a
+        // calibrated voltage, so that bound is not applied. Wet gain is the
+        // derived modulator gain times the wet buffer's VR4 trim (see above).
         const double ringControl=ringEnvelope.advance(0,1,0,.01,0,
             ringCoefficients[0],0,ringCoefficients[1],ringCoefficients[2]);
         // Digital control dezippering only: retain the physical EG trajectory,
@@ -1332,12 +1409,15 @@ struct Synth::Impl {
         ringPhase=wrap(ringPhase+ringFrequency*dt);
         // Keep this free-running passive network connected even at mix0.
         ringCoupledCarrier=ringCarrierCoupling.process(ringCarrier);
-        // No mean removal or gain normalization: the nominal DC mismatch
-        // permits signal feedthrough and even carrier harmonics. This is a
-        // 25C ideal-source/zero-IC-DC-load and zero-incremental-input-current
-        // limit, not fitted hardware gain (collector/bias loads also omitted).
+        // No mean removal or gain normalization: the typical-part carrier-
+        // port offset passes dry signal (about 5dB under each sideband) and
+        // gives even carrier products. 25C, matched transistors, ideal source.
         ringSwitchGain=ringSteering(ringDifferentialDc+ringSourcePeakVolts*ringCoupledCarrier);
-        const double wet=ringWetCoupling.process(bus*ringSwitchGain,.1,internalFs);
+        // Pin 1 sees the bus through 10uF into 330+463 ohm (20Hz); pin 6 and
+        // the wet buffer are coupled through 10uF into 2.5k+10k (1.27Hz).
+        // Both run even at mix 0, like the carrier network.
+        const double signal=ringSignalCoupling.process(bus,ringSignalCouplingTau,internalFs);
+        const double wet=ringWetGain*ringWetCoupling.process(signal*ringSwitchGain,ringWetCouplingTau,internalFs);
         // Explicit bypass avoids even a rounding change for old patches.
         const double ringed=patch.ringMix==0 ? bus
             : (bus+patch.ringMix*(wet-bus))/(1+patch.ringMix*(1-patch.ringMix)*ringMixLeverRatio);
@@ -1482,7 +1562,7 @@ void Synth::allNotesOff() {
     impl_->followFreeKeys();
 }
 void Synth::allSoundOff() {
-    impl_->keysOff(); impl_->ringEnvelope={}; impl_->ringWetCoupling={};
+    impl_->keysOff(); impl_->ringEnvelope={}; impl_->ringWetCoupling={}; impl_->ringSignalCoupling={};
     impl_->ringCarrierCoupling.clear();impl_->ringCoupledCarrier=0;
     impl_->ringSwitchGain=ringSteering(ringDifferentialDc);
     for (auto& voice : impl_->voices) {

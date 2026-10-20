@@ -1052,7 +1052,9 @@ void ringAudioAndFreeCarrier() {
     auto p=sinePatch();p.ringMix=1;p.ringRate=47;p.ringDepth=0;p.volume=.01;
     ceres::Synth wet(fs,71),dry(fs,71),middle(fs,71);wet.setPatch(p);p.ringMix=0;dry.setPatch(p);
     p.ringMix=.5;middle.setPatch(p);
-    wet.noteOn(69);dry.noteOn(69);middle.noteOn(69);render(wet,16000);render(dry,16000);render(middle,16000);
+    // 15s of settling: the carrier's 100uF works into 33k (a 3.3s pole), and
+    // its start-up charge would otherwise bias the offset feedthrough.
+    wet.noteOn(69);dry.noteOn(69);middle.noteOn(69);render(wet,120000);render(dry,120000);render(middle,120000);
     const auto w=render(wet,8000),d=render(dry,8000),m=render(middle,8000);
     require(m!=w && m!=d,"Partial ring blend differs from both endpoints");
     // The B-10k MODULATION lever's own track loads the 8.04k at MI, so a
@@ -1062,20 +1064,24 @@ void ringAudioAndFreeCarrier() {
         require(std::abs(m[i]-.5*(w[i]+d[i])/sag)<1e-7,"Ring blend is the loaded lever's crossfade before the common rail");
     const double low=toneMagnitude(w,393,fs),high=toneMagnitude(w,487,fs);
     require(low>1 && high>1 && std::abs(low/high-1)<.02,"Balanced product produces both sum/difference sidebands");
-    // Physical upper-pair steering has a nominal DC offset and therefore
+    // Physical upper-pair steering has a typical-part DC offset and therefore
     // permits signal feedthrough/even sidebands. Independently derive the
-    // carrier amplitude from the passive Schur network, then integrate the
-    // matched-BJT current ratio rather than relaxing a suppression limit.
+    // carrier at pins 7-8 (100uF, then 33k in series to pin 7, which meets
+    // pin 8 through 100 ohm || rpi; pin 8 on its bypassed bias network), then
+    // integrate the matched-BJT current ratio rather than relaxing a limit.
+    const double vt=1.380649e-23*298.15/1.602176634e-19;
+    const double beta=((8-.75)/7300.)/12e-6;            // uA796 sheet, 12uA at Fig.1's I5
+    const double ra=1/(1/1000.+2/125470.);
+    const double rail=(15/390.+3*.75/10500.)/(1/390.+3/10500.+1/(2020.+ra));
+    const double i5=(rail-.75)/10500.,rpi=beta*vt/(i5/2),shunt=100*rpi/(100+rpi);
     const std::complex<double> sc(0,2*(4*fs)*std::tan(pi*47/(4*fs)));
     const auto ya=1/1000.+sc*100e-6,ys=1/390.+sc*100e-6;
     const auto zb=1./(sc*100e-6+ya/(1.+820.*ya)+ys/(1.+1200.*ys));
-    const auto hc=(sc*100e-6)/(sc*100e-6+1/33000.+1./(100.+zb))*100./(100.+zb);
-    const double ra=1/(1/1000.+2/(470.+125000.)),rb=1/(1/33100.+1/(820.+ra));
-    const double dc=-(15*rb/(390+1200+rb))*100/33100.;
-    const double vt=1.380649e-23*298.15/1.602176634e-19;
+    const auto hc=shunt/(1./(sc*100e-6)+33000.+shunt+zb);
+    const double dc=-100*i5/beta;
     std::array<std::complex<double>,4> coefficients{};
     for(unsigned i=0;i<65536;++i) {
-        const double phase=2*pi*i/65536.,volts=dc+1.5*std::abs(hc)*std::sin(phase);
+        const double phase=2*pi*i/65536.,volts=dc+1.6*std::abs(hc)*std::sin(phase);
         const double ratio=std::exp(volts/vt),steering=(ratio-1)/(ratio+1);
         for(unsigned h=0;h<4;++h)coefficients[h]+=steering*std::polar(1.,-static_cast<double>(h)*phase)/65536.;
     }
@@ -1084,6 +1090,25 @@ void ringAudioAndFreeCarrier() {
     for(unsigned h=2;h<=3;++h)
         require(std::abs(toneMagnitude(w,440-47*h,fs)/low-std::abs(coefficients[h]/coefficients[1]))<2e-4,
             "Even/odd carrier sidebands match physical BJT current-ratio oracle");
+    // Absolute wet level. VR4 is assumed trimmed level-neutral: wet RMS equal
+    // to dry RMS for a steady midband carrier, so each sideband sits at
+    // (sqrt2/2)*|c1|/(s_peak/2) of the dry tone, with s_peak the steering of
+    // the midband 4.71mV carrier. The pin-1 coupling (10uF into 330+463 ohm)
+    // and the pin-6 coupling (10uF into 2.53k+10k) act at 440 and 393Hz.
+    {
+        const double node=1/(1/470.+1/125000.+1/(beta*(470+2*vt/i5)));
+        const double peak=std::tanh(1.6*shunt/(33000+shunt)/(2*vt));
+        const auto hp=[&](double f,double tau){
+            const std::complex<double> s(0,2*(4*fs)*std::tan(pi*f/(4*fs)));
+            return std::abs(s*tau/(1.+s*tau));
+        };
+        const double expected=std::sqrt(2.)*std::abs(coefficients[1])/peak
+            *hp(440,10e-6*(330+node))*hp(393,10e-6*(1/(1/2700.+1/40e3)+10e3));
+        const double measured=low/toneMagnitude(d,440,fs);
+        if(std::abs(measured/expected-1)>2e-3)
+            std::cerr<<"wet sideband/dry "<<measured<<" expected "<<expected<<'\n';
+        require(std::abs(measured/expected-1)<2e-3,"Wet level follows the derived chain and level-neutral VR4 trim");
+    }
     require(toneMagnitude(d,440,fs)>low && toneMagnitude(d,393,fs)<.002*low,"Dry bypass retains fundamental without ring sidebands");
     // Carrier phase is independent of note gates, allocation and mix bypass.
     ceres::Synth a(fs,5),b(fs,5);p.ringRate=37;p.ringDepth=0;p.ringMix=0;a.setPatch(p);p.ringMix=1;b.setPatch(p);
