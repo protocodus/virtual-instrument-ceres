@@ -125,8 +125,13 @@ struct Patch {
     double lfoWaveform = 0.0;
     // One global balanced ring multiplier after the voice bus. Base carrier
     // Hz, positive frequency-envelope excursion in octaves, initial-to-peak
-    // attack seconds and decay T60. Engineering mapping, not panel calibration.
-    // Total carrier is bounded .2..220Hz, so rate/depth interact at the top.
+    // attack seconds and decay T60. These are the quantities at the carrier;
+    // the panel levers map onto them through the laws below the struct
+    // (ringSpeedHz, ringDepthOctavesPerLever). Attack/decay stay seconds:
+    // the PRA envelope is the M-board VCA-EG chip pair, so its lever law is
+    // that EG's, offset by the PRA's own trim (31ms attack at AT=10V, CS-60
+    // PRA alignment). Total carrier is bounded .2..220Hz (guide p.53's
+    // printed range), so rate/depth interact at the top.
     // Trigger once per physical all-keys-up -> any-key-down transition; final
     // key-up uses a fixed nominal .46781044s T60 return, independent of MIDI
     // pedal/globalRelease. Retrigger retains capacitor charge, not phase reset.
@@ -185,6 +190,29 @@ struct Patch {
     // Actual chip current and trim tolerances remain unmeasured.
     double resetMicroseconds = 1e6 / (523.2 * 40e3 * 800e-6);
 };
+
+// PRA ring lever laws (header-only, both targets). SPEED is TVR4, B-10k from
+// +10V to ground, wiper to VC1; the CS-60 PRA alignment, the same board
+// (SM2 p.22 notes the CS-60 differences on it), trims the IG00150 to a
+// 150+/-10ms period at VC1=5V and 5+/-1ms at 10V (CS-60 service manual
+// p.39, section VI PRA II), i.e. 6.667Hz and 200Hz; the IG00150 pin sheet
+// (SM2 p.9) also states 200Hz at VC1=10V, VC2=0. Exponential through those:
+// .9814 oct/V, .222Hz at 0V (the guide's p.53 range says .2Hz).
+constexpr double ringSpeedReferenceHz = 1000.0 / 150.0;
+constexpr double ringSpeedOctavesPerVolt = 0.98137811912170374; // log2(30)/5
+// DEPTH is TVR3, B-10k from the envelope output EO to ground, wiper to VC2.
+// VC1 enters the VCO's pin-1 node through 100k and VC2 through 180k, so VC2
+// moves the carrier 100/180 as far per volt as VC1, whatever that node's
+// trimmed impedance. EO peaks at 10+/-2V (CS-60 PRA alignment I; the same
+// IG00159/IG00151 pair as the M-board VCA EG, whose peak aligns to 10+/-.2V).
+// Full lever at the envelope peak therefore lifts the carrier 5.45 octaves;
+// ring_depth in octaves = travel*ringDepthOctavesPerLever, the lever's own
+// sag into 180k (at most 1.3% mid-travel) aside.
+constexpr double ringDepthOctavesPerVolt = ringSpeedOctavesPerVolt * 100.0 / 180.0;
+constexpr double ringEnvelopePeakVolts = 10.0;
+constexpr double ringDepthOctavesPerLever = ringDepthOctavesPerVolt * ringEnvelopePeakVolts;
+// Carrier Hz for a VC1 voltage (0..10V is the SPEED lever's travel times 10).
+double ringSpeedHz(double vc1Volts);
 
 // Keys use snake_case (e.g. lp_cutoff, filter_initial, amp_attack). Finite values
 // are range-limited; false means an unknown key or a nonfinite input.
