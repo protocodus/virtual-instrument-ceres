@@ -136,17 +136,19 @@ void commonVcaPlacement() {
     require(advance(muted,2000)==0,"Common LEVEL closes both filtered and sine paths");
     // Additive LC control, including its zero-gain boundary, differs from a
     // LEVEL*tremolo product. Square SUB makes the two halves unambiguous.
-    p.ampLevel=.4;p.tremolo=.8;p.lfoWaveform=3;p.lfoRate=2;
+    // R7 LC: SUB lever through 120k against LEVEL's 10V through 270k.
+    const double subScale=(1.5/120e3)/(10/270e3);
+    p.ampLevel=.2;p.tremolo=1;p.lfoWaveform=3;p.lfoRate=2;
     ceres::Synth additive(8000,21);additive.setPatch(p);additive.noteOn(60);
     require(advance(additive,1800)>1e-5,"Positive square SUB opens the additive common VCA");
-    near(additive.soundPathState().commonVcaGain,.4,1e-15,"Inherited AM scale, additive LEVEL value");
+    near(additive.soundPathState().commonVcaGain,.2+subScale,1e-15,"R7 SUB current adds to LEVEL");
     require(advance(additive,400)>0,"Closing the common VCA retains downstream capacitor tails");
     require(additive.soundPathState().commonVcaGain==0,"Negative square half closes LC gain");
     additive.allSoundOff();
     require(advance(additive,1200)==0,"Panic clears audio tails while SUB stays in its closed half");
     additive.noteOn(60);
     require(advance(additive,1000)>1e-5,"Next positive half reopens common VCA without restarting SUB");
-    near(additive.soundPathState().commonVcaGain,.4,1e-15,"Positive SUB returns to the same open level");
+    near(additive.soundPathState().commonVcaGain,.2+subScale,1e-15,"Positive SUB returns to the same open level");
     // Dynamic LEVEL is upstream of the bus and global ring. Changing master
     // volume at the same instant is not the same circuit state trajectory.
     p.ampLevel=1;p.tremolo=0;p.ringMix=1;p.ringRate=47;
@@ -195,14 +197,14 @@ void sharedSubPolarity() {
             const auto v=active.voiceState()[0];
             const double hpOct=std::log2((v.hpFrequency-floorHz)/(p.hpCutoff-floorHz));
             const double lpOct=std::log2((v.lpFrequency-floorHz)/(p.lpCutoff-floorHz));
-            near(gain,.6+.2*source,2e-16,"Common gain has declared unchanged mean/depth with positive SUB slope");
+            near(gain,.8+.4*(1.5/120e3)/(10/270e3)*source,2e-16,"Common gain swings around LEVEL by the R7 120k/270k ratio");
             near(lpOct,.4*source,2e-14,"Selected SUB feeds actual LP variable-gm control");
             near(hpOct,.4*source*(.7/.65)*(47./150.),2e-14,"Selected SUB feeds actual HP variable-gm control");
             if(source>.05) {
-                ++positive;require(gain>.6 && hpOct>0 && lpOct>0,"Positive shared SUB raises gain and both cutoffs");
+                ++positive;require(gain>.8 && hpOct>0 && lpOct>0,"Positive shared SUB raises gain and both cutoffs");
             }
             if(source<-.05) {
-                ++negative;require(gain<.6 && hpOct<0 && lpOct<0,"Negative shared SUB lowers gain and both cutoffs");
+                ++negative;require(gain<.8 && hpOct<0 && lpOct<0,"Negative shared SUB lowers gain and both cutoffs");
             }
         }
         require(positive>100 && negative>100,"Both SUB polarities were exercised for every waveform");

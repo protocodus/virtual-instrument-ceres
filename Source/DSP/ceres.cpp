@@ -28,6 +28,11 @@ constexpr double touchVibratoBias=.5/1.5;
 // printed p.55 calibration) into common VCA2: full touch adds 1.08 times the
 // full-LEVEL current (SM1 printed p.14).
 constexpr double touchLevelScale=(6/150e3)/(10/270e3);
+// The same LC node takes the SUB VCA lever (PN3 SVR4, B-10k between SUO and
+// ground; SM2 p.27) through 120k: the 3Vpp SUB at full lever adds +/-1.5V/120k
+// against LEVEL's 10V/270k, so +/-.3375 of full LEVEL. The lever's <=2.5k
+// source resistance (2% of 120k) is neglected.
+constexpr double tremoloScale=(1.5/120e3)/(10/270e3);
 constexpr double qControlTau=10e-6*(220e3/2);
 // Fairchild uA796 upper carrier pairs have no emitter degeneration. In the
 // matched, forward-active/infinite-beta limit their current steering is
@@ -850,10 +855,11 @@ struct Synth::Impl {
         // R7 LC sums LEVEL(270k) and SUB(120k) currents before common VCA2.
         // PN3 VCF/VCA depth pots share SUO and ground; their passive R7
         // paths do not invert. Positive LI raises VCA gain (Guide pp.40–41),
-        // so positive SUB must raise both cutoff and common gain. Retain the
-        // existing tremolo mean/depth and closure normalization; those are
-        // still engineering choices, not a recovered pot-to-current law.
-        commonVcaGain=std::max(0.0,patch.ampLevel-patch.tremolo*(.5-.5*lfo));
+        // so positive SUB must raise both cutoff and common gain. SUB swings
+        // LC around LEVEL; the summed current, touch included, cannot drive
+        // the VCA below zero gain.
+        const double levelControl=patch.ampLevel+tremoloScale*patch.tremolo*lfo;
+        commonVcaGain=std::max(0.0,levelControl);
         const double pwm = std::sin(2*pi*(pwmPhase+patch.pwmPhase));
         lfoPhase = wrap(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrap(pwmPhase + patch.pwmRate*dt);
@@ -928,7 +934,7 @@ struct Synth::Impl {
             // optional velocity term is zero in factory-derived presets.
             const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocityValue);
             const double touchLevel=patch.pressureVolume*expression*touchLevelScale;
-            mixed += beforeVca * ampEnvelope * velocityGain * (commonVcaGain+touchLevel);
+            mixed += beforeVca * ampEnvelope * velocityGain * std::max(0.0,levelControl+touchLevel);
         }
         // Output rail saturation is a deliberately mild, uncalibrated op-amp
         // approximation; no hidden peak normalization or dynamics processor.

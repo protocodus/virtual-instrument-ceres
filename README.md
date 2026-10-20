@@ -35,6 +35,7 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 
 - The noise source is now hard-limited, as the CS-50's limiter amplifier makes it: a binary ±1 signal at the waveforms' peak level instead of uniform random values. Audio NOISE is 4.8 dB louder at the same lever setting; its spectrum is unchanged and SUB-N keeps its level. Patches using NOISE change sound.
 - SUB-N, the noise SUB waveform, now has the hardware's level: the ±15 V limiter through its 22k/0.1µF filter and the 100k load of the SUB buffer. It is about 6.7 dB deeper than before and a little brighter (corner 88 Hz, was 72 Hz). The level rests on an estimated limiter bandwidth from the op-amp's datasheet.
+- Tremolo (`tremolo`, the SUB VCA lever) now swings the common VCA around LEVEL by the R7 resistor ratio, ±0.34 of full LEVEL at full lever, instead of dipping up to the whole LEVEL below it. Tremolo patches become shallower and no longer lose average loudness.
 - Channel pressure now follows the touch pre-amplifier's 10 ms RC (100k and 0.1 µF), twice the previous 5 ms, so touch swells are slightly softer. Velocity smoothing is unchanged.
 
 ### Unreleased — 0.3.0 — hardware realism

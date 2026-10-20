@@ -106,6 +106,7 @@ struct Patch {
     double voiceSpreadCents = 0.0, driftCents = 0.0;
     // filterLfo is LP octave depth. HP gets .3374358974 times that depth:
     // (.7/.65)*(47k/150k), independent of user-editable EG coupling scales.
+    // tremolo is the SUB VCA lever, 0..1: R7 adds .3375*tremolo*SUB to LEVEL.
     double lfoRate = 5.0, vibratoCents = 0.0, tremolo = 0.0, filterLfo = 0.0;
     // Shared SUB source: 0 sine, 1 down saw, 2 up saw, 3 square, 4 noise.
     // Noise uses the sourced22k/.1uF low-pass loaded by SUI's100k, at an
