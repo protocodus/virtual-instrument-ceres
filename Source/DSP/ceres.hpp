@@ -370,6 +370,10 @@ public:
         double ringCoupledCarrier;
         double ringSwitchGain; // matched upper-pair steering, includes nominal DC bias
         double ringDepth; // actual interpolated digital Depth coordinate
+        // Last processed sample at pin 1, in bus units: the coupled bus, and
+        // the linear-pair equivalent of the signal pair's current split
+        // (equal for small signals; the pair limits near .56V at pin 1).
+        double ringSignalInput, ringSignalOutput;
     };
     struct SoundPathState {
         double resonanceVoltageOffset, hpResonance, lpResonance;

@@ -1155,6 +1155,68 @@ void ringAudioAndFreeCarrier() {
     require(first==render(b,1000),"Reset restores ring phase/envelope/noise and deterministic audio");
 }
 
+void ringSignalPairLaw() {
+    // Independent pin-1 scale. One bus unit is .5V at CP4 (M-board VI.1: the
+    // sine at 1Vpp is the engine's +/-1); VI.4 gives .6Vpp at O for .8Vpp at
+    // CP4 with the VCA EG at full SUSTAIN, .98 of its peak; one O drives I1
+    // through 1k against the other three 1k branches and 47k; O1 follows I1;
+    // 330 ohm then feeds the pin-1 node.
+    const double vt=1.380649e-23*298.15/1.602176634e-19;
+    const double beta=((8-.75)/7300.)/12e-6;
+    const double ra=1/(1/1000.+2/125470.);
+    const double rail=(15/390.+3*.75/10500.)/(1/390.+3/10500.+1/(2020.+ra));
+    const double i5=(rail-.75)/10500.,re=vt/i5;
+    const double node=1/(1/470.+1/125000.+1/(beta*(470+2*re)));
+    const double others=1/(3/1e3+1/47e3);
+    const double pinOne=.5*(.6/.8)/.98*others/(1e3+others)*node/(330+node);
+    require(std::abs(pinOne-.05557)<1e-5,"Pin 1 sees 55.6mV per bus unit");
+    // The pair's current split x by bisection (production runs Halley in
+    // atanh(x)): V1-V4 = 2VT*atanh(x) + x*I5*470 (uA796 equivalent circuit,
+    // each emitter on its own I5 sink, 470 ohm between them).
+    const auto split=[&](double volts){
+        double lo=-1,hi=1;
+        for(int i=0;i<200;++i){
+            const double mid=.5*(lo+hi);
+            if(mid<=-1 || mid>=1)break;
+            (2*vt*std::atanh(mid)+mid*i5*470>volts ? hi : lo)=mid;
+        }
+        return .5*(lo+hi);
+    };
+    const double full=i5*(470+2*re)/pinOne; // bus units a linear pair needs for x=1
+    require(std::abs(full*pinOne-.5618)<1e-4,"Signal pair limits at I5*(470+2re), .56V on pin 1");
+    const auto equivalent=[&](double signal){return split(pinOne*signal)*full;};
+    // Sixteen virtual voices of sine and saw with full touch LEVEL drive pin
+    // 1 well past the limit; a quiet single sine stays linear. Every sample
+    // must follow the law at the derived scale.
+    for(const bool loud:{true,false}) {
+        auto p=sinePatch();p.ringMix=1;p.ringRate=47;p.ringDepth=0;
+        if(loud){p.saw=1;p.filterLevel=1;p.ampLevel=1;p.pressureVolume=1;}
+        else p.ampLevel=.05;
+        ceres::Synth s(8000,23);
+        require(s.configure(loud ? 16:1,4),"Virtual voice configuration");
+        s.setPatch(p);if(loud)s.pressure(1);
+        for(int note=0;note<(loud ? 16:1);++note)s.noteOn(40+2*note);
+        double peakVolts=0,leastRatio=1,worstLinear=0;
+        for(unsigned n=0;n<6000;++n) {
+            require(std::isfinite(s.process()),"Finite ring audio");
+            const auto m=s.modulationState();
+            const double expected=equivalent(m.ringSignalInput);
+            if(std::abs(m.ringSignalOutput-expected)>1e-12*std::max(1.,std::abs(m.ringSignalInput)))
+                std::cerr<<"pair "<<m.ringSignalInput<<" -> "<<m.ringSignalOutput<<" expected "<<expected<<'\n';
+            require(std::abs(m.ringSignalOutput-expected)<=1e-12*std::max(1.,std::abs(m.ringSignalInput)),
+                "Production signal pair follows the degenerated-pair law at the aligned bus scale");
+            require(std::abs(m.ringSignalOutput)<full,"Pair current never exceeds I5");
+            peakVolts=std::max(peakVolts,std::abs(m.ringSignalInput)*pinOne);
+            if(std::abs(m.ringSignalInput)>1e-9) {
+                leastRatio=std::min(leastRatio,m.ringSignalOutput/m.ringSignalInput);
+                worstLinear=std::max(worstLinear,std::abs(m.ringSignalOutput/m.ringSignalInput-1));
+            }
+        }
+        if(loud) require(peakVolts>.8 && leastRatio<.75,"Loud render reaches the pair's limiting");
+        else require(peakVolts<.005 && worstLinear<1e-5,"Quiet signals stay linear");
+    }
+}
+
 void sustainKeyCvModes() {
     auto p=sinePatch();p.ampRelease=2;p.filterRelease=2;p.filterInitial=-1;p.filterPeak=2;
     p.hpCutoff=100;p.lpCutoff=1000;p.hpEnvelopeScale=.2;p.lpEnvelopeScale=.5;
@@ -1193,6 +1255,7 @@ int main() {
         subOscillatorRoutes(); std::cout<<"PASS SUB shapes, sourced noise pole, destinations and separate PWM\n";
         ringEnvelopeAndKeyLedger(); std::cout<<"PASS ring RC timing, key ledger, legato/retrigger, bounds and panic\n";
         ringAudioAndFreeCarrier(); std::cout<<"PASS global ring sidebands, dry bypass, free carrier and reset\n";
+        ringSignalPairLaw(); std::cout<<"PASS ring signal pair large-signal law at the aligned bus scale\n";
         sustainKeyCvModes(); std::cout<<"PASS Sustain I/II live key CV, shared VCO/filters, state continuity and MIDI pedal adaptation\n";
         parametersAndConstruction(); std::cout<<"PASS parameter ranges and constructor validation\n";
         circuitResponse(); std::cout<<"PASS physical source/Q capacitor transfer, four source loads, DC rejection, Q and slope\n";
