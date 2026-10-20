@@ -99,11 +99,30 @@ void alignedLevelsAndAttack() {
              "Factory VCA attack follows the aligned pin law");
     }
 }
+
+// VCA-EG floor: VR17 is aligned so TP2 reads -200mV with SL=0 against a 10V
+// peak (CS-60 Service Manual p.38), so a decay to S=0 crosses zero, where
+// the VCA closes, after ln(1.02/.02) time constants.
+void vcaFloorEndsDecay() {
+    constexpr double fs=48000, decay=.5;
+    ceres::Patch p; p.ampAttack=.001; p.ampSustain=0; p.ampDecay=decay;
+    const auto trace=ceres::envelopeTrace(fs,p,false,60000,{{0,true}});
+    std::size_t peakFrame=0; while(trace[peakFrame]<1) ++peakFrame;
+    // Decay T60 = decay: tau = decay/ln(1000); zero at tau*ln(1.02/.02).
+    const double crossing=decay/std::log(1000.)*std::log(1.02/.02)*fs;
+    const auto zero=peakFrame+static_cast<std::size_t>(std::ceil(crossing));
+    require(trace[zero-1]>0 && trace[zero]<=0,"Decay to S=0 reaches zero at ln(51) time constants");
+    require(trace.back()>-.02-1e-9 && trace.back()<-.019,"Held S=0 settles at the -.2V floor");
+    ceres::Synth synth(48000,3);
+    for(const auto& v:synth.allVoiceState())
+        near(v.ampEnvelope,-.02,0,"Idle VCA-EG capacitors start at the floor");
+}
 }
 
 int main() {
     try {
         releaseFollowerDrop();std::puts("PASS factory release CVs through the sustain-control follower");
         alignedLevelsAndAttack();std::puts("PASS factory IL/AL levels and attack law against the M-board alignment");
+        vcaFloorEndsDecay();std::puts("PASS VCA-EG -.2V floor closes the VCA in finite time");
     } catch(const std::exception& e) {std::fprintf(stderr,"FAIL %s\n",e.what());return 1;}
 }

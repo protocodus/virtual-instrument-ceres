@@ -44,7 +44,9 @@ void shortEnvelopeLaws() {
             const double fs=hostFs*factor;
             auto p=base();p.ampAttack=p.filterAttack=attack;
             p.ampDecay=p.filterDecay=.01;p.ampRelease=p.filterRelease=.01;
-            const double initial=filter?p.filterInitial:0, peak=filter?p.filterPeak:1;
+            // The VCA-EG's IL target carries the aligned -.2V VR17 floor
+            // (CS-60 Service Manual p.38): -.02 of the 10V peak.
+            const double initial=filter?p.filterInitial:-.02, peak=filter?p.filterPeak:1;
             const double headroom=.01,target=peak+headroom*(peak-initial);
             const double a=std::exp(-std::log1p(1/headroom)/(fs*attack));
             const auto first=ceres::envelopeTrace(fs,p,filter,2,{{0,true}});
@@ -126,7 +128,9 @@ void burstMatrix() {
                 const auto sounding=synth.allVoiceState();
                 for(unsigned i=0;i<voices;++i) {
                     const auto& v=sounding[i];
-                    require(std::isfinite(v.ampEnvelope)&&v.ampEnvelope>=0&&v.ampEnvelope<=1,
+                    // Physical VCA-EG endpoints: the aligned -.2V VR17 floor
+                    // (CS-60 p.38, -.02 of peak) up to the peak.
+                    require(std::isfinite(v.ampEnvelope)&&v.ampEnvelope>=-.02&&v.ampEnvelope<=1,
                             "Fast amplitude charge stays inside physical endpoints");
                     require(std::isfinite(v.filterEnvelope)&&v.filterEnvelope>=p.filterInitial&&v.filterEnvelope<=p.filterPeak,
                             "Fast filter charge stays inside physical endpoints");

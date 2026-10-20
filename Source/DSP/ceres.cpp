@@ -493,6 +493,19 @@ struct RingCarrierCoupling {
 // Decay/release durations denote 60 dB settling (not hardware calibration).
 // Both M-board integrating capacitors are .22uF. The parameter durations set
 // equivalent resistance; e.g. R_decay = duration/(.22uF*ln(1000)).
+// VCA-EG held floor. The CS-60 alignment of the shared M board (Yamaha CS-60
+// Service Manual p.38, EG-VCA item 1; SM2 p.16 draws the board for
+// "CS-60,50", with the same VR17 B50K/470k into IG00151 +I against the 100k
+// LC and OUT feeds) sets VR17 so that TP2 reads -200 +/-20mV with SL = 0V
+// and the key held, against its 10 +/-.2V peak (item 2). VR17's current is
+// constant, so every VCA-EG target (SL while held, IL = 0V after release)
+// sits .2V below its nominal level: -.02 of the 10V peak. The VCA gain is
+// linear in the positive envelope (guide pp.40-41) and closed below zero,
+// so a decay to SL = 0 and every release reach true silence in finite time
+// (ln((v+.02)/.02) RC from v) instead of approaching it exponentially.
+// Sibling alignment evidence for a shared board, not a CS-50 measurement.
+// The VCF-EG is nulled to 0 +/-.01V (VR18, p.37) and keeps no floor.
+constexpr double ampEnvelopeFloor=-.2/10;
 struct Envelope {
     enum Stage { Idle, Attack, Decay, Sustain, Release } stage = Idle;
     double voltage = 0;
@@ -942,6 +955,7 @@ struct Synth::Impl {
             auto& initialRandom=i<Synth::voiceCount ? random : extra;
             voice.osc.phase = initialRandom.unit();
             voice.filter.voltage = patch.filterInitial;
+            voice.amp.voltage = ampEnvelopeFloor;
             voice.driftTarget = initialRandom.bipolar();
             voice.driftCountdown = static_cast<unsigned>(internalFs * (.1 + initialRandom.unit()*.5));
         }
@@ -1059,9 +1073,10 @@ struct Synth::Impl {
             const double filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
                 patch.filterAttackHeadroom,patch.filterAttackSaturation,filterCoefficients[0],
                 filterCoefficients[3],filterCoefficients[1],filterCoefficients[2]);
-            const double ampEnvelope = v.amp.advance(0,1,patch.ampSustain,
+            const double ampEnvelope = std::max(0.0,v.amp.advance(ampEnvelopeFloor,1,
+                patch.ampSustain+ampEnvelopeFloor,
                 patch.ampAttackHeadroom,patch.ampAttackSaturation,ampCoefficients[0],
-                ampCoefficients[3],ampCoefficients[1],ampCoefficients[2]);
+                ampCoefficients[3],ampCoefficients[1],ampCoefficients[2]));
             // Guide p.34 fc=125*Kv*2^Vfc; octave-linear key CV. The measured
             // panel-to-Vfc offset is currently replaced by cutoff-at-middle-C.
             // This law controls the OTA gm contribution. The independent
@@ -1227,7 +1242,7 @@ void Synth::noteOn(int note, double velocity) {
     // it does not re-gate their VCF/VCA or reset any oscillator/filter state.
     state.followFreeKeys();
     const bool silent=replacing ? selected->assignedSilent
-        : selected->amp.stage==Envelope::Idle || selected->amp.voltage==0;
+        : selected->amp.stage==Envelope::Idle || selected->amp.voltage<=0;
     selected->assignedAt=state.hostSamples+1; selected->assignedSilent=silent;
     selected->note = selected->keyNote = note;
     selected->velocity = clamp(velocity,0,1);
@@ -1287,6 +1302,7 @@ void Synth::allSoundOff() {
     for (auto& voice : impl_->voices) {
         voice.held = voice.pedalHeld = false;
         voice.amp = {};
+        voice.amp.voltage = ampEnvelopeFloor;
         voice.filter = {};
         voice.filter.voltage = impl_->patch.filterInitial;
         voice.filters = {}; voice.filteredCoupling={}; voice.commonCoupling={};
@@ -1422,9 +1438,9 @@ std::vector<double> envelopeTrace(double fs,const Patch& supplied,bool filter,
         if (gates[i].frame>=frames || (i && gates[i].frame<gates[i-1].frame))
             throw std::invalid_argument("Envelope gates must be ordered and inside the trace");
     const Patch patch=validatePatch(supplied);
-    const double initial=filter ? patch.filterInitial : 0;
+    const double initial=filter ? patch.filterInitial : ampEnvelopeFloor;
     const double peak=filter ? patch.filterPeak : 1;
-    const double sustained=filter ? 0 : patch.ampSustain;
+    const double sustained=filter ? 0 : patch.ampSustain+ampEnvelopeFloor;
     const double headroom=filter ? patch.filterAttackHeadroom : patch.ampAttackHeadroom;
     const double saturation=filter ? patch.filterAttackSaturation : patch.ampAttackSaturation;
     const auto coefficients=filter
