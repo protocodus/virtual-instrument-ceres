@@ -273,7 +273,7 @@ void expressionNetwork() {
                 if(k>=unsigned(fs*.3)) {sum+=y*std::exp(std::complex<double>(0,-2*pi*hz*k/fs)); n+=1;}
             }
             // Against the open pedal at the same pitch, so only the network
-            // is measured; the shared soft rail leaves about 0.2% of level.
+            // is measured; the output preamp is linear at this level.
             ceres::Synth o(fs,7); require(o.configure(4,4),"Configure open witness");
             auto q=ceres::preset("flute"); o.setPatch(q); o.noteOn(note);
             std::complex<double> reference=0;

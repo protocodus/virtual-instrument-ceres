@@ -22,7 +22,7 @@ endif()
 
 # C is required in addition to C++: JUCE's macOS plug-in wrappers (AU and
 # Standalone) compile C/Objective-C sources with non-Xcode generators too.
-project(Ceres VERSION 0.4.0 LANGUAGES C CXX)
+project(Ceres VERSION 0.5.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -265,6 +265,9 @@ if(BUILD_TESTING)
   add_executable(ceres_sound_path_tests Tests/SoundPathTests.cpp)
   target_link_libraries(ceres_sound_path_tests PRIVATE ceres)
   add_test(NAME Ceres.sound_path_circuit_contracts COMMAND ceres_sound_path_tests)
+  add_executable(ceres_panel_lever_tests Tests/PanelLeverTests.cpp)
+  target_link_libraries(ceres_panel_lever_tests PRIVATE ceres)
+  add_test(NAME Ceres.panel_lever_contracts COMMAND ceres_panel_lever_tests)
   add_executable(ceres_capacitor_tests Tests/CapacitorContinuityTests.cpp)
   target_link_libraries(ceres_capacitor_tests PRIVATE ceres)
   add_test(NAME Ceres.capacitor_continuity_contracts COMMAND ceres_capacitor_tests)
@@ -289,6 +292,22 @@ if(BUILD_TESTING)
   add_executable(ceres_hardware_realism_tests Tests/HardwareRealismTests.cpp)
   target_link_libraries(ceres_hardware_realism_tests PRIVATE ceres)
   add_test(NAME Ceres.hardware_realism_contracts COMMAND ceres_hardware_realism_tests)
+  add_executable(ceres_sub_oscillator_tests Tests/SubOscillatorTests.cpp)
+  target_link_libraries(ceres_sub_oscillator_tests PRIVATE ceres)
+  add_test(NAME Ceres.sub_oscillator_contracts COMMAND ceres_sub_oscillator_tests)
+  add_executable(ceres_output_stage_tests Tests/OutputStageTests.cpp)
+  target_link_libraries(ceres_output_stage_tests PRIVATE ceres)
+  add_test(NAME Ceres.output_stage_contracts COMMAND ceres_output_stage_tests)
+  add_executable(ceres_vcf_key_voltage_tests Tests/VcfKeyVoltageTests.cpp)
+  target_link_libraries(ceres_vcf_key_voltage_tests PRIVATE ceres)
+  add_test(NAME Ceres.vcf_key_voltage_contracts COMMAND ceres_vcf_key_voltage_tests)
+  add_executable(ceres_envelope_circuit_tests Tests/EnvelopeCircuitTests.cpp)
+  target_link_libraries(ceres_envelope_circuit_tests PRIVATE ceres)
+  set_target_properties(ceres_envelope_circuit_tests PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+  add_test(NAME Ceres.envelope_circuit_contracts COMMAND ceres_envelope_circuit_tests)
+  add_executable(ceres_board_tolerance_tests Tests/BoardToleranceTests.cpp)
+  target_link_libraries(ceres_board_tolerance_tests PRIVATE ceres)
+  add_test(NAME Ceres.board_tolerance_contracts COMMAND ceres_board_tolerance_tests)
   add_executable(ceres_embedded_contract Tests/EmbeddedContract.cpp)
   target_link_libraries(ceres_embedded_contract PRIVATE ceres_embedded)
   if(NOT MSVC)
@@ -322,6 +341,9 @@ if(BUILD_TESTING)
       --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
     add_test(NAME Ceres.expression_audio_parity COMMAND "${Python3_EXECUTABLE}"
       "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_expression_parity.py" "$<TARGET_FILE_DIR:ceres_native_parity>"
+      --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
+    add_test(NAME Ceres.board_tolerance_audio_parity COMMAND "${Python3_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_board_tolerance_parity.py" "$<TARGET_FILE_DIR:ceres_native_parity>"
       --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
     add_test(NAME Ceres.capacitor_native_embedded_parity COMMAND "${Python3_EXECUTABLE}"
       "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_capacitor_parity.py" "$<TARGET_FILE_DIR:ceres_native_parity>"

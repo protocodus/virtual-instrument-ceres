@@ -11,6 +11,7 @@ int main(int argc,char** argv) {
     const bool panelControls=argc==3;
     const bool capacitorControls=argc==3 && std::strcmp(argv[2],"capacitors")==0;
     const bool expressionControls=argc==3 && std::strcmp(argv[2],"expression")==0;
+    const bool boardControls=argc==3 && std::strcmp(argv[2],"boards")==0;
     const bool soundPathControls=argc==3 && (std::strcmp(argv[2],"soundpath")==0 || expressionControls);
     std::ofstream output(argv[1],std::ios::binary);
     if(!output)return 3;
@@ -60,6 +61,10 @@ int main(int argc,char** argv) {
                !ceres::setParameter(patch,"output_trim_db",-24+scene*48./7))return 7;
         }
         if(expressionControls && !ceres::setParameter(patch,"expression_source",1))return 8;
+        // Board tolerances at full documented spread, on every board.
+        if(boardControls && (!ceres::setParameter(patch,"board_pitch_tolerance",1) ||
+           !ceres::setParameter(patch,"board_filter_tolerance",1) ||
+           !ceres::setParameter(patch,"board_envelope_tolerance",1)))return 10;
         // Glide and touch-wah ride with the expression scenes: both are
         // per-board key/touch paths shared by the native and embedded cores.
         if(expressionControls && (!ceres::setParameter(patch,"glide_mode",scene%3) ||

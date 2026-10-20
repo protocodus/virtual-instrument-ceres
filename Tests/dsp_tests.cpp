@@ -341,11 +341,28 @@ void outputLifecycleAndPolarity() {
         for (int i=0;i<4;++i) synth->noteOff(60);
         render(*synth,12000);
     }
-    // Re-key the oldest pedal-held board (key up) to the SAME note, with its
-    // amp already at sustain=peak and VCF EG fixed at zero. Only allocation changes.
+    // Re-key the oldest pedal-held board (key up) to the SAME note, VCF EG
+    // fixed at zero. Until 2026-10-20 a full-sustain board sat exactly at the
+    // peak, so this re-key was a no-op and the audio could be compared
+    // whole. The VCA-EG's aligned VR17 floor (CS-60 p.38) holds S=10V .2V
+    // below the 10V peak, so the G1 edge now starts a real attack from the
+    // retained charge. Check the histories directly instead: every board's
+    // oscillator phase and VCF EG are untouched, and exactly one board's amp
+    // capacitor moves up from its held charge rather than restarting.
     stolen.noteOn(60);
-    require(render(held,1024)==render(stolen,1024),
-            "Voice stealing must preserve physical filter and output capacitor histories");
+    render(held,1); render(stolen,1);
+    const auto kept=held.allVoiceState(), moved=stolen.allVoiceState();
+    unsigned retriggered=0;
+    for (std::size_t i=0;i<kept.size();++i) {
+        require(kept[i].oscillatorPhase==moved[i].oscillatorPhase &&
+                kept[i].filterEnvelope==moved[i].filterEnvelope,
+                "Voice stealing must preserve oscillator and VCF EG histories");
+        if (kept[i].ampEnvelope==moved[i].ampEnvelope) continue;
+        ++retriggered;
+        require(std::abs(kept[i].ampEnvelope-.98)<1e-4 && moved[i].ampEnvelope>kept[i].ampEnvelope &&
+                moved[i].ampEnvelope<=1,"Re-keyed board attacks from its retained held charge");
+    }
+    require(retriggered==1,"Voice stealing re-keys exactly one board");
 
     p=sinePatch();
     ceres::Synth warm(48000,1),cleared(48000,1);
@@ -444,7 +461,8 @@ void globalReleaseEnvelope() {
             auto p=base; p.globalRelease=global;
             const double selected=filter ? p.filterRelease : p.ampRelease;
             const double expectedTime=global>selected ? global : selected;
-            const double target=filter ? p.filterInitial : 0;
+            // VCA IL carries the aligned -.2V VR17 floor (CS-60 p.38): -.02.
+            const double target=filter ? p.filterInitial : -.02;
             const auto off=static_cast<std::size_t>(std::lround(.03*fs));
             const auto n=static_cast<std::size_t>(std::lround(.15*expectedTime*fs));
             const std::vector<ceres::EnvelopeGate> gates={{0,true},{off,false}};
@@ -575,7 +593,7 @@ void envelopeAttackShape() {
         p.ampSustain=.3; p.filterInitial=-2.5; p.filterPeak=3;
         for (bool filter : {false,true}) {
             const auto trace=ceres::envelopeTrace(fs,p,filter,attackFrames+8,{{0,true}});
-            const double initial=filter ? p.filterInitial : 0;
+            const double initial=filter ? p.filterInitial : -.02; // VCA-EG VR17 floor, CS-60 p.38
             const double peak=filter ? p.filterPeak : 1;
             // Closed-form circuit solution at elapsed attack fractions,
             // independent of the sample-by-sample implementation.
@@ -602,7 +620,8 @@ void envelopeAttackShape() {
     require(heldCharge>.05,"Retrigger test must retain nontrivial capacitor charge");
     require(retriggered[retriggerFrame]>heldCharge && retriggered[retriggerFrame]-heldCharge<.001,
             "Retrigger must continue from capacitor charge without resetting it");
-    const double target=1+p.ampAttackHeadroom;
+    // Headroom is relative to the IL-to-peak span, now from the -.02 floor.
+    const double target=1+p.ampAttackHeadroom*1.02;
     const double rate=std::log1p(1/p.ampAttackHeadroom)/p.ampAttack;
     const double expected=target-(target-heldCharge)*std::exp(-rate/fs);
     require(std::abs(retriggered[retriggerFrame]-expected)<1e-12,"Retrigger follows same RC target from stored voltage");
@@ -621,7 +640,7 @@ void envelopeCurrentLimit() {
         p.ampAttackSaturation=p.filterAttackSaturation=saturation;
         for (bool filter : {false,true}) {
             const auto trace=ceres::envelopeTrace(fs,p,filter,attackFrames+8,{{0,true}});
-            const double initial=filter ? p.filterInitial : 0;
+            const double initial=filter ? p.filterInitial : -.02; // VCA-EG VR17 floor, CS-60 p.38
             const double peak=filter ? p.filterPeak : 1;
             const double span=peak-initial,vs=saturation*span,target=peak+headroom*span;
             require(trace[attackFrames-2]<peak,"Current-limited attack must not finish early");
@@ -658,14 +677,17 @@ void envelopeCurrentLimit() {
     constexpr std::size_t retriggerFrame=2880;
     const auto retrigger=ceres::envelopeTrace(fs,p,false,9000,{{0,true},{1440,false},{retriggerFrame,true}});
     const double charge=retrigger[retriggerFrame-1];
-    const double target=1+headroom,vs=.4;
-    const double k=std::log(std::sinh(target/vs)/std::sinh(headroom/vs))/attack;
+    // Span 1.02 from the VCA-EG's -.02 VR17 floor (CS-60 p.38); k is in
+    // span-normalized units and does not change.
+    const double target=1+headroom*1.02,vs=.4*1.02;
+    const double k=std::log(std::sinh((1+headroom)/.4)/std::sinh(headroom/.4))/attack;
     const double expected=target-vs*std::asinh(std::sinh((target-charge)/vs)*std::exp(-k/fs));
     require(charge>.05 && std::abs(retrigger[retriggerFrame]-expected)<1e-12,
             "Current-limited retrigger must retain capacitor charge");
     p.ampAttackHeadroom=100000; p.ampAttackSaturation=.001;
     const auto extreme=ceres::envelopeTrace(fs,p,false,attackFrames,{{0,true}});
-    require(std::abs(extreme[attackFrames/2-1]-.5)<2e-9 && std::abs(extreme.back()-1)<2e-9,
+    // Linear ramp from the -.02 VCA-EG floor to the peak: midpoint .49.
+    require(std::abs(extreme[attackFrames/2-1]-.49)<2e-9 && std::abs(extreme.back()-1)<2e-9,
             "Large target and strong current limit must avoid cancellation");
     require(ceres::setParameter(p,"amp_attack_saturation",.000001) && p.ampAttackSaturation==.001,
             "Positive saturation must clamp to supported minimum");
@@ -687,14 +709,26 @@ void factoryEnvelopeTiming() {
         }
         return (low+high)/2;
     };
+    // Release CVs then pass the SUB-board sustain-control follower (SM2 p.8:
+    // 10k+1k into a 2SC458, 10k to -15V; VBE .67V at 2mA, hFE 283), solved
+    // by bisection. Before 2026-10-20 this fixture fed the bare lever CV to
+    // the pin law, which omitted that follower.
+    const auto follower=[](double lever) {
+        double low=lever-2,high=lever;
+        for (int i=0;i<200;++i) {
+            const double mid=(low+high)/2, emitter=(mid+15)/10e3;
+            (mid>lever-emitter/284*11e3-(.67+25.85e-3*std::log(emitter/2e-3)) ? high : low)=mid;
+        }
+        return (low+high)/2;
+    };
     const auto p=ceres::preset("flute");
     for (bool filter : {false,true}) {
         const double nominalA=std::pow(10,-.3*pin(filter ? 3.57 : 3.13));
         const double nominalD=10*std::pow(10,-.3*pin(filter ? 1.64 : 0.0));
-        const double nominalR=10*std::pow(10,-.3*pin(filter ? 7.35 : 7.19));
-        const double initial=filter ? p.filterInitial : 0;
+        const double nominalR=10*std::pow(10,-.3*follower(pin(filter ? 7.35 : 7.19)));
+        const double initial=filter ? p.filterInitial : -.02; // VCA-EG VR17 floor, CS-60 p.38
         const double peak=filter ? p.filterPeak : 1;
-        const double sustained=filter ? 0 : p.ampSustain;
+        const double sustained=filter ? 0 : p.ampSustain-.02;
         const auto attackFrames=static_cast<std::size_t>(std::ceil(nominalA*fs));
         const auto decayFrames=static_cast<std::size_t>(std::lround(nominalD*fs));
         const auto off=attackFrames+decayFrames;
@@ -718,7 +752,9 @@ void factoryEnvelopeTiming() {
     require(manual.ampAttackHeadroom==.01 && manual.filterAttackHeadroom==.01,
             "Engineering attack defaults must remain unchanged");
     const auto manualTrace=ceres::envelopeTrace(fs,manual,false,5760,{{0,true},{960,false}});
-    require(std::abs(manualTrace.back()/manualTrace[959]-.001)<1e-12,
+    // T60 is the capacitor's settling toward its target, which carries the
+    // VCA-EG's -.02 VR17 floor (CS-60 p.38); the gain closes below zero.
+    require(std::abs((manualTrace.back()+.02)/(manualTrace[959]+.02)-.001)<1e-12,
             "Explicit engineering release must retain its T60 contract");
 }
 void filterEnvelopeCoupling() {
@@ -1016,7 +1052,9 @@ void ringAudioAndFreeCarrier() {
     auto p=sinePatch();p.ringMix=1;p.ringRate=47;p.ringDepth=0;p.volume=.01;
     ceres::Synth wet(fs,71),dry(fs,71),middle(fs,71);wet.setPatch(p);p.ringMix=0;dry.setPatch(p);
     p.ringMix=.5;middle.setPatch(p);
-    wet.noteOn(69);dry.noteOn(69);middle.noteOn(69);render(wet,16000);render(dry,16000);render(middle,16000);
+    // 15s of settling: the carrier's 100uF works into 33k (a 3.3s pole), and
+    // its start-up charge would otherwise bias the offset feedthrough.
+    wet.noteOn(69);dry.noteOn(69);middle.noteOn(69);render(wet,120000);render(dry,120000);render(middle,120000);
     const auto w=render(wet,8000),d=render(dry,8000),m=render(middle,8000);
     require(m!=w && m!=d,"Partial ring blend differs from both endpoints");
     // The B-10k MODULATION lever's own track loads the 8.04k at MI, so a
@@ -1026,20 +1064,24 @@ void ringAudioAndFreeCarrier() {
         require(std::abs(m[i]-.5*(w[i]+d[i])/sag)<1e-7,"Ring blend is the loaded lever's crossfade before the common rail");
     const double low=toneMagnitude(w,393,fs),high=toneMagnitude(w,487,fs);
     require(low>1 && high>1 && std::abs(low/high-1)<.02,"Balanced product produces both sum/difference sidebands");
-    // Physical upper-pair steering has a nominal DC offset and therefore
+    // Physical upper-pair steering has a typical-part DC offset and therefore
     // permits signal feedthrough/even sidebands. Independently derive the
-    // carrier amplitude from the passive Schur network, then integrate the
-    // matched-BJT current ratio rather than relaxing a suppression limit.
+    // carrier at pins 7-8 (100uF, then 33k in series to pin 7, which meets
+    // pin 8 through 100 ohm || rpi; pin 8 on its bypassed bias network), then
+    // integrate the matched-BJT current ratio rather than relaxing a limit.
+    const double vt=1.380649e-23*298.15/1.602176634e-19;
+    const double beta=((8-.75)/7300.)/12e-6;            // uA796 sheet, 12uA at Fig.1's I5
+    const double ra=1/(1/1000.+2/125470.);
+    const double rail=(15/390.+3*.75/10500.)/(1/390.+3/10500.+1/(2020.+ra));
+    const double i5=(rail-.75)/10500.,rpi=beta*vt/(i5/2),shunt=100*rpi/(100+rpi);
     const std::complex<double> sc(0,2*(4*fs)*std::tan(pi*47/(4*fs)));
     const auto ya=1/1000.+sc*100e-6,ys=1/390.+sc*100e-6;
     const auto zb=1./(sc*100e-6+ya/(1.+820.*ya)+ys/(1.+1200.*ys));
-    const auto hc=(sc*100e-6)/(sc*100e-6+1/33000.+1./(100.+zb))*100./(100.+zb);
-    const double ra=1/(1/1000.+2/(470.+125000.)),rb=1/(1/33100.+1/(820.+ra));
-    const double dc=-(15*rb/(390+1200+rb))*100/33100.;
-    const double vt=1.380649e-23*298.15/1.602176634e-19;
+    const auto hc=shunt/(1./(sc*100e-6)+33000.+shunt+zb);
+    const double dc=-100*i5/beta;
     std::array<std::complex<double>,4> coefficients{};
     for(unsigned i=0;i<65536;++i) {
-        const double phase=2*pi*i/65536.,volts=dc+1.5*std::abs(hc)*std::sin(phase);
+        const double phase=2*pi*i/65536.,volts=dc+1.6*std::abs(hc)*std::sin(phase);
         const double ratio=std::exp(volts/vt),steering=(ratio-1)/(ratio+1);
         for(unsigned h=0;h<4;++h)coefficients[h]+=steering*std::polar(1.,-static_cast<double>(h)*phase)/65536.;
     }
@@ -1048,6 +1090,25 @@ void ringAudioAndFreeCarrier() {
     for(unsigned h=2;h<=3;++h)
         require(std::abs(toneMagnitude(w,440-47*h,fs)/low-std::abs(coefficients[h]/coefficients[1]))<2e-4,
             "Even/odd carrier sidebands match physical BJT current-ratio oracle");
+    // Absolute wet level. VR4 is assumed trimmed level-neutral: wet RMS equal
+    // to dry RMS for a steady midband carrier, so each sideband sits at
+    // (sqrt2/2)*|c1|/(s_peak/2) of the dry tone, with s_peak the steering of
+    // the midband 4.71mV carrier. The pin-1 coupling (10uF into 330+463 ohm)
+    // and the pin-6 coupling (10uF into 2.53k+10k) act at 440 and 393Hz.
+    {
+        const double node=1/(1/470.+1/125000.+1/(beta*(470+2*vt/i5)));
+        const double peak=std::tanh(1.6*shunt/(33000+shunt)/(2*vt));
+        const auto hp=[&](double f,double tau){
+            const std::complex<double> s(0,2*(4*fs)*std::tan(pi*f/(4*fs)));
+            return std::abs(s*tau/(1.+s*tau));
+        };
+        const double expected=std::sqrt(2.)*std::abs(coefficients[1])/peak
+            *hp(440,10e-6*(330+node))*hp(393,10e-6*(1/(1/2700.+1/40e3)+10e3));
+        const double measured=low/toneMagnitude(d,440,fs);
+        if(std::abs(measured/expected-1)>2e-3)
+            std::cerr<<"wet sideband/dry "<<measured<<" expected "<<expected<<'\n';
+        require(std::abs(measured/expected-1)<2e-3,"Wet level follows the derived chain and level-neutral VR4 trim");
+    }
     require(toneMagnitude(d,440,fs)>low && toneMagnitude(d,393,fs)<.002*low,"Dry bypass retains fundamental without ring sidebands");
     // Carrier phase is independent of note gates, allocation and mix bypass.
     ceres::Synth a(fs,5),b(fs,5);p.ringRate=37;p.ringDepth=0;p.ringMix=0;a.setPatch(p);p.ringMix=1;b.setPatch(p);
