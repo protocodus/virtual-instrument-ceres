@@ -192,7 +192,16 @@ double effectiveRelease(double selected, double global) {
     // SUB selects min(selected release CV, global SUS) for both RA and RF
     // (CS-50 service2 PDF6/printed8; Guide PDF70/printed61). Under a common
     // decreasing time-vs-CV law this becomes max(selected time, global time).
-    // This ideal selector omits diode/VBE offsets and source/chip loading.
+    // The SUB board (SM2 p.8) builds it from two 1S1555s whose cathodes meet
+    // at SUS, each lever reaching its node through 10k, and a 2SC458
+    // follower (1k base, 10k to -15V) per output: RF/RA = min(lever,
+    // SUS + Vd) - VBE. Selected and global times here are both defined at
+    // the EG pin, so the lever path's VBE is applied where a lever voltage
+    // becomes a time (preset()); on the SUS path Vd and VBE nearly cancel
+    // (1S1555, as a 1N4148-class estimate, ~.55V at .5mA against the
+    // 2SC458's .67V), a residual ~.1V (~7% in time) not modelled. The
+    // diode's soft knee near the crossover is not modelled. SVR5, the
+    // SUSTAIN lever, is a C-10K taper (SM2 p.27) whose curve is unpublished.
     // A zero engineering time is a bypass, not literal electrical SUS=10V.
     return std::max(selected,global);
 }
@@ -522,15 +531,36 @@ struct RingCarrierCoupling {
     }
 };
 
+// Retrigger: G1 takes the key-on edge of G2 through a 1000pF ceramic ("K",
+// SM2 p.16/17 notes), so each new key-on starts an attack from whatever
+// charge the .22uF capacitor holds; on() therefore never resets voltage.
 // IG00159 VCA-EG and IG00152 VCF-EG (CS-50 service manual, pp.20–21):
 // a sequencer switches a variable
 // resistance into an integrating capacitor. Each segment below is the exact
 // RC solution v(t+dt)=target+(v(t)-target)*exp(-dt/RC). The attack target has
 // configurable target headroom (1% default, not a hardware calibration);
 // attack duration reaches the nominal peak from IL for every headroom value.
+// The chip's ideal headroom is zero: IG00159's sequencer compares the buffer
+// against the same 30k/60k node that G1-1 puts on LC (Yamaha IC Guide p.2-7;
+// Guide p.43), so where an attack ends is set by unpublished comparator,
+// buffer and IG00151 offsets and by the VR17 trim (470k into +I against the
+// 100k LC/OUT feeds), whose procedure is not printed.
 // Decay/release durations denote 60 dB settling (not hardware calibration).
 // Both M-board integrating capacitors are .22uF. The parameter durations set
 // equivalent resistance; e.g. R_decay = duration/(.22uF*ln(1000)).
+// VCA-EG held floor. The CS-60 alignment of the shared M board (Yamaha CS-60
+// Service Manual p.38, EG-VCA item 1; SM2 p.16 draws the board for
+// "CS-60,50", with the same VR17 B50K/470k into IG00151 +I against the 100k
+// LC and OUT feeds) sets VR17 so that TP2 reads -200 +/-20mV with SL = 0V
+// and the key held, against its 10 +/-.2V peak (item 2). VR17's current is
+// constant, so every VCA-EG target (SL while held, IL = 0V after release)
+// sits .2V below its nominal level: -.02 of the 10V peak. The VCA gain is
+// linear in the positive envelope (guide pp.40-41) and closed below zero,
+// so a decay to SL = 0 and every release reach true silence in finite time
+// (ln((v+.02)/.02) RC from v) instead of approaching it exponentially.
+// Sibling alignment evidence for a shared board, not a CS-50 measurement.
+// The VCF-EG is nulled to 0 +/-.01V (VR18, p.37) and keeps no floor.
+constexpr double ampEnvelopeFloor=-.2/10;
 struct Envelope {
     enum Stage { Idle, Attack, Decay, Sustain, Release } stage = Idle;
     double voltage = 0;
@@ -1093,6 +1123,7 @@ struct Synth::Impl {
             auto& initialRandom=i<Synth::voiceCount ? random : extra;
             voice.osc.phase = initialRandom.unit();
             voice.filter.voltage = patch.filterInitial;
+            voice.amp.voltage = ampEnvelopeFloor;
             voice.driftTarget = initialRandom.bipolar();
             voice.driftCountdown = static_cast<unsigned>(internalFs * (.1 + initialRandom.unit()*.5));
         }
@@ -1210,9 +1241,10 @@ struct Synth::Impl {
             const double filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
                 patch.filterAttackHeadroom,patch.filterAttackSaturation,filterCoefficients[0],
                 filterCoefficients[3],filterCoefficients[1],filterCoefficients[2]);
-            const double ampEnvelope = v.amp.advance(0,1,patch.ampSustain,
+            const double ampEnvelope = std::max(0.0,v.amp.advance(ampEnvelopeFloor,1,
+                patch.ampSustain+ampEnvelopeFloor,
                 patch.ampAttackHeadroom,patch.ampAttackSaturation,ampCoefficients[0],
-                ampCoefficients[3],ampCoefficients[1],ampCoefficients[2]);
+                ampCoefficients[3],ampCoefficients[1],ampCoefficients[2]));
             // Guide printed p.34: fc=125*Kv*2^Vfc. Kv is LINEAR in key Hz: the
             // M board feeds IG00156 pin 2 from the same K terminal as VCO III
             // pin 2 (SM2 p.16), 0.25V at 130.8Hz to 4V at 2093Hz (Yamaha's
@@ -1396,7 +1428,7 @@ void Synth::noteOn(int note, double velocity) {
     // it does not re-gate their VCF/VCA or reset any oscillator/filter state.
     state.followFreeKeys();
     const bool silent=replacing ? selected->assignedSilent
-        : selected->amp.stage==Envelope::Idle || selected->amp.voltage==0;
+        : selected->amp.stage==Envelope::Idle || selected->amp.voltage<=0;
     selected->assignedAt=state.hostSamples+1; selected->assignedSilent=silent;
     selected->note = selected->keyNote = note;
     selected->velocity = clamp(velocity,0,1);
@@ -1456,6 +1488,7 @@ void Synth::allSoundOff() {
     for (auto& voice : impl_->voices) {
         voice.held = voice.pedalHeld = false;
         voice.amp = {};
+        voice.amp.voltage = ampEnvelopeFloor;
         voice.filter = {};
         voice.filter.voltage = impl_->patch.filterInitial;
         voice.filters = {}; voice.filteredCoupling={}; voice.commonCoupling={};
@@ -1595,9 +1628,9 @@ std::vector<double> envelopeTrace(double fs,const Patch& supplied,bool filter,
         if (gates[i].frame>=frames || (i && gates[i].frame<gates[i-1].frame))
             throw std::invalid_argument("Envelope gates must be ordered and inside the trace");
     const Patch patch=validatePatch(supplied);
-    const double initial=filter ? patch.filterInitial : 0;
+    const double initial=filter ? patch.filterInitial : ampEnvelopeFloor;
     const double peak=filter ? patch.filterPeak : 1;
-    const double sustained=filter ? 0 : patch.ampSustain;
+    const double sustained=filter ? 0 : patch.ampSustain+ampEnvelopeFloor;
     const double headroom=filter ? patch.filterAttackHeadroom : patch.ampAttackHeadroom;
     const double saturation=filter ? patch.filterAttackSaturation : patch.ampAttackSaturation;
     const auto coefficients=filter
@@ -1759,22 +1792,63 @@ Patch preset(const std::string& name) {
         // straight to the pin, which matches it only at R=P; the lever
         // position the factory voicing assumed is unknown (A-Z test pending).
         p.hpResonance=(10-cv[7])*.1; p.lpResonance=(10-cv[9])*.1;
-        p.filterInitial=-cv[10]*.5; p.filterPeak=cv[11]*.5;
+        // VCF-EG levels at TP1 (EG OUT). The IG00152 pin sheet (SM1 p.20)
+        // gives AL 0..10V -> LC up to +5V and IL 0..10V -> 0..-5V, but the
+        // alignment of the same M board (Yamaha CS-60 Service Manual p.37,
+        // EG-VCF item 1; the CS-50 M sheet, SM2 p.16, is drawn for "CS-60,50"
+        // with the same IG00152/IG00151, 82k+VR19, 560k and .22uF) checks
+        // +5V +/-.5V at AL=10V and -4V +/-.5V at IL=10V after VR18 has
+        // nulled the held level to 0 +/-.01V. Its -4V window excludes -5V,
+        // so IL takes the alignment value, AL the agreeing .5V/V. Sibling
+        // service evidence for a shared board, not a CS-50 measurement.
+        p.filterInitial=-cv[10]*.4; p.filterPeak=cv[11]*.5;
         // Service-manual endpoints: attack 1ms..1s; decay/release 10ms..10s.
         // The related CS-20M/CS-40M explanation of this IG00159 circuit
         // defines durations as 5*RC. Convert D/R to the engineering API's
         // T60, and set attack's target to reach the nominal peak after 5*RC.
         // This is a related-model inference, not a CS-50 timing calibration:
         // the published A versus D/R decade and shared TC remain unresolved.
+        // Pin sheets (SM2 p.21 IG00159 AT/1DT/2DT; SM1 p.20 IG00152): each
+        // law is stated at the chip pin, 0..10V. The decade between A and D/R
+        // is the chip's own: Yamaha IC Guide pp.2-3/2-7 show AT/DT/RT switched
+        // straight to TC, which drives one IG00151 EI pin through 82k+VR19
+        // (VR20) into one .22uF capacitor, but the attack aims at the same
+        // 30k/60k node the sequencer compares against (VA = VB, Guide p.43),
+        // so an attack spans several RC; a ten-times-shorter attack range
+        // therefore needs a ten-times-shorter RC per pin volt. Those block
+        // diagrams also omit IL's printed 0..10V -> 0..-5V scaling, so they
+        // do not rule out internal AT scaling. See
+        // Docs/research/envelopes-authenticity-2026-10-20.md.
         const auto attackTime = [](double v) { return std::pow(10,-.3*v); };
         const auto decayTime = [](double v) { return 10*std::pow(10,-.3*v)*std::log(1000.0)/5; };
+        // RF/RA are not the release lever: SUB-board sustain control (SM2
+        // p.8; Guide p.61) takes each lever through 10k to a diode-OR node
+        // with SUS and then 1k into a 2SC458 emitter follower with 10k to
+        // -15V. The decay levers reach DF/DA directly, and D and R share the
+        // EG's one TC/EI trim, so the follower's drop cannot be trimmed out of
+        // R alone: release sits below the same CV's decay on the pin law.
+        // Hitachi 2SC458 datasheet: VBE typ .67V at IC 2mA, VCE 12V (this
+        // follower runs at (Vout+15)/10k = 1.5..2.5mA, VCE 5..15V); hFE ranks
+        // C 160-320 and D 250-500 (the M/SUB notes allow C or D), taken at
+        // their geometric centre, 283. ESTIMATE: typical datasheet values for
+        // the fitted part, not a measured unit; 0.1V of drop is 7% of time.
+        // With the factory presets' zero global release, SUS never clamps.
+        const auto releaseFollower = [](double lever) {
+            constexpr double vbe=.67, ic=2e-3, vt=25.85e-3, beta=283;
+            double out=lever-vbe;
+            for (int i=0;i<8;++i) {
+                const double emitter=(out+15)/10e3;
+                out=lever-emitter/(beta+1)*11e3-(vbe+vt*std::log(emitter/ic));
+            }
+            return out;
+        };
         p.filterAttackHeadroom=p.ampAttackHeadroom=1/std::expm1(5.0);
-        p.filterAttack=attackTime(cv[12]); p.filterDecay=decayTime(cv[13]); p.filterRelease=decayTime(cv[14]);
+        p.filterAttack=attackTime(cv[12]); p.filterDecay=decayTime(cv[13]); p.filterRelease=decayTime(releaseFollower(cv[14]));
         p.filterLevel=cv[15]/10; p.sine=cv[16]/10;
         p.ampAttack=attackTime(cv[17]); p.ampDecay=decayTime(cv[18]); p.ampSustain=cv[19]/10;
         // The final preset column drives common M-board VCA LEVEL, before
         // the amp EG/bus/ring. PN2 master VOLUME is a separate later control.
-        p.ampRelease=decayTime(cv[20]); p.ampLevel=cv[21]/10; p.volume=.55;
+        p.ampRelease=decayTime(releaseFollower(cv[20])); p.ampLevel=cv[21]/10; p.volume=.55;
         return p;
     }
     throw std::invalid_argument("Unknown Ceres preset: " + name);
