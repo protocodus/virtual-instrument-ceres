@@ -4,7 +4,8 @@
 // PITCH master offset. TRANSPOSITION enters VCO III pin 1 (FT) only. So the
 // variable-gm cutoff follows the sounding key exactly, octave for octave,
 // except that transposition moves the oscillator and not the filters. The
-// factory presets convert their cutoff columns with the same printed law.
+// factory presets convert their cutoff columns with the same printed law,
+// and their Q columns through the pin-7 divider.
 // Expected values come from those laws, not from the engine's own formulas.
 #include "ceres.hpp"
 #include <cmath>
@@ -142,12 +143,26 @@ void factoryCutoffsFollowPrintedLaw() {
     near(v.lpFrequency-floorHz,1000,1e-9,"VK .25V, Vf 5V gives 1kHz (LP)");
     near(v.hpFrequency-floorHz,1000,1e-9,"VK .25V, Vf 5V gives 1kHz (HP)");
 }
+
+void factoryQThroughDivider() {
+    // Each pin 7 takes its preset Q bus and the RES bus through 220k each
+    // (SM1 printed p.14; SM2 printed p.16), so it settles at their mean. The
+    // presets assume RESONANCE at MIN, RES = +10V (chosen by ear 2026-10-20,
+    // brilliance-resonance-preset-q-divider). The engine coordinate r is
+    // 1 - VQ/10 (r = 1 is VQ 0V, Q 5). Until then presets put the bus
+    // straight on the pin, r = 1 - P/10.
+    for(const auto& row:factoryFilterColumns) {
+        const auto p=ceres::preset(row.name);
+        near(p.hpResonance,1-(presetPin(row.h)+10)/2/10,1e-13,"Factory HP Q pin at (P + RES MIN)/2");
+        near(p.lpResonance,1-(presetPin(row.j)+10)/2/10,1e-13,"Factory LP Q pin at (P + RES MIN)/2");
+    }
+}
 }
 
 int main() {
     try {
         tracksKeyVoltage();transpositionLeavesFilters();pitchMovesFilters();glideMovesFilters();
-        factoryCutoffsFollowPrintedLaw();
+        factoryCutoffsFollowPrintedLaw();factoryQThroughDivider();
         std::puts("VCF key-voltage contracts passed");
         return 0;
     } catch(const std::exception& e) {std::fprintf(stderr,"%s\n",e.what());return 1;}

@@ -47,9 +47,10 @@ struct Patch {
     // law (ceres.cpp); it is not the position/taper of the passive panel pot.
     double brilliance = 0.0; // [-15,15]
     // Change of loaded RES-bus voltage around the existing effective Q
-    // calibration, V. Positive lowers Q. The signed [-10,10] engineering
-    // offset does not imply every value is reachable from an unknown real
-    // 0..10V wiper baseline. Stiff preset/source, zero chip input-current
+    // calibration, V. Positive lowers Q. Factory presets assume the
+    // RESONANCE lever at MIN (+10V), so from them the real 0..10V wiper
+    // reaches 0 to -10V; positive values have no lever position. Stiff
+    // preset/source, zero chip input-current
     // limit: each pin7 has 220k to each source and 10uF to ground, giving
     // deltaVq -> offset/2 with tau1.1s. This incremental control is
     // smoothed together with the independent hp/lp_resonance anchor terms;
@@ -267,7 +268,10 @@ double brillianceLeverVolts(double travel);
 // pin-7 networks (220k to the preset Q bus, 220k to RES, 10 uF) load the
 // wiper with 55k returning to the mean of the HP and LP preset Q buses,
 // presetMeanVolts. Returns the loaded RES bus voltage, from which a front end
-// takes its own neutral to form `resonance_offset`.
+// takes its own neutral to form `resonance_offset`. Factory presets assume
+// MIN, so from them resonance_offset = resonanceLeverVolts(t, mean bus) - 10
+// reproduces the hardware, each preset bus being 10 - 20*hp/lp_resonance
+// (ceres.cpp preset()).
 double resonanceLeverVolts(double travel, double presetMeanVolts);
 #if !defined(CERES_EMBEDDED_TARGET)
 bool setParameter(Patch&, const std::string& key, double value);

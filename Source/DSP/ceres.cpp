@@ -2009,11 +2009,18 @@ Patch preset(const std::string& name) {
         // unresolved.
         p.hpEnvelopeScale=leverOctavesPerVolt*39/220;
         p.lpEnvelopeScale=leverOctavesPerVolt*39/47;
-        // The pin takes (Q bus + RES)/2 through the 220k pair, so the hardware
-        // is r=1-(P+R)/20 for RESONANCE lever volts R. This maps the bus
-        // straight to the pin, which matches it only at R=P; the lever
-        // position the factory voicing assumed is unknown (A-Z test pending).
-        p.hpResonance=(10-cv[7])*.1; p.lpResonance=(10-cv[9])*.1;
+        // Q columns h (HP) and j (LP): each pin 7 takes its preset Q bus P
+        // and the RES bus R through 220k each, with 10uF to ground (SM1
+        // printed p.14 R7; SM2 printed p.16), so it settles at (P+R)/2 and
+        // r=1-(P+R)/20. Factory presets put the RESONANCE lever at MIN, where
+        // TVR6 sits on the +10V bus (SM2 p.26 PN2 sheet): r=(10-P)/20. The
+        // divider is printed; which lever position Yamaha voiced the presets
+        // at is not, and MIN was chosen by ear 2026-10-20 (listening test
+        // 2026-10-20-brilliance-resonance-preset-q-divider, B). Before, the
+        // bus went straight to the pin, r=(10-P)/10, which no single lever
+        // position gives for every preset. resonance_offset is then the RES
+        // change from MIN: 0 to -10V.
+        p.hpResonance=(10-cv[7])/20; p.lpResonance=(10-cv[9])/20;
         // VCF-EG levels at TP1 (EG OUT). The IG00152 pin sheet (SM1 p.20)
         // gives AL 0..10V -> LC up to +5V and IL 0..10V -> 0..-5V, but the
         // alignment of the same M board (Yamaha CS-60 Service Manual p.37,

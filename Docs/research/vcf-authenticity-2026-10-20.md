@@ -368,6 +368,53 @@ itself. At VQ 5 V Q is 1.58 (was 0.91); at 2.5 V, 2.81 (was 1.54).
   `Tools/native_performance.cpp` (4 voices, 4× oversampling, noisy shared
   machine).
 
+### The preset Q divider (`brilliance-resonance-preset-q-divider` B)
+
+This set belongs to the BRILLIANCE/RESONANCE pass, but its change sits in
+the same `preset()` block, so it is implemented here. Each pin 7 takes its
+preset Q bus P and the RES bus through 220k each with 10 µF to ground
+(SM1 p.14 / PDF 8; SM2 p.16 / PDF 12), so it settles at their mean. Factory
+presets now assume the RESONANCE lever at MIN, where TVR6 sits on the +10 V
+bus (SM2 p.26 PN2 sheet): `r = (10 − P)/20`, in place of the bus going
+straight to the pin, `r = (10 − P)/10`, which no single lever position
+gives for every preset.
+
+- **Printed:** the divider and the lever wiring.
+- **Chosen by ear:** the lever position the factory voicing assumed.
+- **Consequences:** every factory pin 7 now sits between 5 V (Q column 0)
+  and 9.71 V (a 10 V column, 9.42 V after its diode). With the exponential
+  law the two changes nearly cancel for high columns, while a 0 V column
+  goes from Q 5 to Q 1.58 (guitar2 both stages, funky1 LP, funky2 both).
+  `resonance_offset` is now the RES change from MIN: the lever reaches 0 to
+  −10 V, and positive values have no lever position. A front end that shows the lever sets it to
+  `resonanceLeverVolts(t, mean bus) − 10`, with each preset bus at
+  `10 − 20 · r`. The BRILLIANCE/RESONANCE note's inverse `P = 10 · (1 − r)`
+  belongs to the old mapping.
+- **Fixture:** `VcfKeyVoltageTests` checks every factory Q anchor against the
+  divider at independently solved pin volts. No existing fixture encoded the
+  old mapping.
+
+Factory Q (HP / LP), before both Q changes and after them (linear law with
+the bus on the pin, against the exponential law through the divider):
+
+| Preset | HP was | HP now | LP was | LP now |
+| --- | --- | --- | --- | --- |
+| string1 | 0.80 | 0.81 | 0.53 | 0.53 |
+| string2 | 0.53 | 0.53 | 0.53 | 0.53 |
+| brass1 | 0.53 | 0.53 | 0.85 | 0.85 |
+| brass2 | 1.17 | 1.04 | 0.65 | 0.67 |
+| flute | 1.24 | 1.07 | 1.67 | 1.23 |
+| electric_piano | 0.78 | 0.79 | 1.30 | 1.10 |
+| clavichord | 0.83 | 0.83 | 1.03 | 0.96 |
+| harpsichord | 0.53 | 0.53 | 0.61 | 0.63 |
+| guitar1 | 0.88 | 0.87 | 1.60 | 1.20 |
+| guitar2 | 5.00 | 1.58 | 5.00 | 1.58 |
+| funky1 | 0.80 | 0.81 | 5.00 | 1.58 |
+| funky2 | 5.00 | 1.58 | 5.00 | 1.58 |
+| funky3 | 1.60 | 1.20 | 1.36 | 1.12 |
+
+These are nominal chip Q at the pin, before the source-loading correction.
+
 ## What would close the gap
 
 1. A measured CS-50 (or CS-60/CS-80 IG00156) cutoff against lever voltage at
