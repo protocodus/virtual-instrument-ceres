@@ -565,9 +565,11 @@ constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
 // are .132V RMS on the bus, so VR6 must give 5.9 of its 1.02..7.82 range.
 // What is assumed: the meter reads RMS at an unloaded HO terminal (into
 // 600 ohm both rails would sit 5.7dB lower) and the four notes add
-// incoherently.
+// incoherently. The keys are held at full SUSTAIN, where the aligned VCA EG
+// sits 0.2V below its 10V peak (see ampEnvelopeFloor), so the common VCA
+// passes .98 of each sine while VR6 is trimmed.
 constexpr double outputPreampGain=.18;
-constexpr double outputReferenceRms=outputPreampGain*1.4142135623730951; // sqrt(4/2)
+constexpr double outputReferenceRms=outputPreampGain*1.4142135623730951*.98; // sqrt(4/2)
 constexpr double outputReferenceVolts=.7745966692414834; // 0 dBm, sqrt(.6)
 constexpr double outputHaSupplyCurrent=12e-3, outputSwingMargin=2;
 // HO is the inverse of this node, so HO's +8.32V bounds it below.

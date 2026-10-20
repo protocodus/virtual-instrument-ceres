@@ -73,16 +73,17 @@ only nonlinearity is its output swing:
   full and four keys down; the shared-PRA CS-60 procedure says which tone:
   the sine lever, SUSTAIN and LEVEL at maximum on PANEL, all keys. Each sine
   is 1 Vpp at CP4 (VI.1), engine ±1, so four incoherent sines are √2 RMS and
-  0.18·√2 = 0.2546 at full VOLUME reads 0.775 V RMS at HO. The engine's own
-  render of that condition measures 0.2542 RMS (`Ceres.output_stage_contracts`
-  holds it within 0.1 dB).
+  0.18·√2 = 0.2546 at full VOLUME reads 0.775 V RMS at HO. With the
+  envelope work merged, full SUSTAIN holds the aligned VCA EG at 9.8 V of its
+  10 V peak (TP2 floor −0.2 V), so the reference is 0.98 of that, 0.2495;
+  `Ceres.output_stage_contracts` holds the engine's render within 0.1 dB.
 - **Cross-check.** VI.4 sets a CS-50 voice output O to 0.6 V for 0.8 Vpp at
   CP4, a CP4-to-O gain of 0.75. Four reference sines then put 0.132 V RMS on
   the 47 kΩ bus through their 1 kΩ branches, so VR6 must set the preamp to
   5.9, inside its printed 1.02–7.82 range. The parts and the two procedures
   agree.
-- **Result.** In the engine node (HO inverted) the rails are **+3.40 and
-  −2.73**: linear `.18·volume·x` below them, clamped above. That is about
+- **Result.** In the engine node (HO inverted) the rails are **+3.34 and
+  −2.68**: linear `.18·volume·x` below them, clamped above. That is about
   12 dB above the reference's own peak.
 
 Assumptions, stated rather than estimated away: the service meter reads RMS
