@@ -85,7 +85,7 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 ## Downloads
 
 <!-- build-download-begin -->
-**[Download main build 17](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/39416929692/artifacts/12263020472)**, built from [`e6e13258f3a7`](https://github.com/protocodus/virtual-instrument-ceres/commit/e6e13258f3a78674c3b0229fe15c1ae48056874a). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
+**[Download main build 18](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/39434788725/artifacts/12272280579)**, built from [`1683c62a3f05`](https://github.com/protocodus/virtual-instrument-ceres/commit/1683c62a3f052cfafea01bca40c7f0c62de9e683). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
 <!-- build-download-end -->
 
 ---
