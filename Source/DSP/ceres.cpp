@@ -324,9 +324,15 @@ struct OtaSvf {
 
 // The shared M-board service procedure (CS-60 manual p.38, section VI)
 // trims sine-only CP4 to 1Vpp and filtered pulse-only CP4 to .8Vpp, using
-// separate VCA controls. Exact test key/HP setting and CS-50 calibration
-// remain unresolved. This broad-pass estimate is a PROVISIONAL downstream
-// VCA gain, not an inverse gain inserted between the nonlinear filters.
+// separate VCA controls (IC3 VR11, IC4 VR12; printed p.38 / PDF 40, VI.1-2:
+// sine at 2 OCT-DOWN, pulse at NORMAL with RESH/RESL low, LPF high). It is
+// the CS-50's own: VI.4 gives the CS-50's O level beside the CS-60's, and the
+// CS-50 M board is the same part (SM1 parts list p.2, M #21233, "Common
+// Models CS-60"; SM2 p.16 tabulates only CS-80 differences, all in the
+// pitch section). Neither the CS-50 guide nor SM1/SM2 prints a VCA level
+// procedure of its own. The test key and HPF lever are unprinted, so this
+// broad-pass estimate stays a downstream VCA gain, not an inverse gain
+// inserted between the nonlinear filters.
 constexpr double hpNominalConductance=3/150e3+1/33e3+1/1.2e6;
 constexpr double lpNominalConductance=1/150e3+1/33e3+1/1.2e6;
 constexpr double hpSingleWaveGain=2/(150e3*hpNominalConductance);
@@ -358,6 +364,46 @@ struct FilterChain {
 // Capacitor integration uses physical-RC trapezoids without pole prewarp.
 constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
     4.7e-6*(1e3+4*47e3),33e-6*(4.7e3+560)};
+// PRA output preamp (SM2 printed p.22 / PDF16; guide printed p.47 / PDF56).
+// VOLUME's wiper (I2) drives IC2-1/2, an HA1452, as an inverting amplifier:
+// 100k+47k in, 150k plus the VR6 B-1M rheostat as feedback, so 1.02 to 7.82,
+// then 33uF to HO. It never sees a nonlinearity of its own at playing
+// levels. The guide's VR6 procedure trims the HO terminal to 0 dBm at the
+// maximum output level, and its panel description (printed p.7 / PDF16)
+// defines that as all volume controls fully clockwise with four keys down.
+// The chip's rails are +/-15V through its own 390 ohm (+) and 220 ohm (-)
+// droppers. The HA1452 is a 25V-rated two-channel audio preamplifier, Icc
+// 12mA (radiomuseum.org HA1452 data); 12mA through the droppers leaves the
+// chip +10.32/-12.36V. Its output swing is not published: the NJM4558 that
+// shares the PRA board (IC3,4,9) is the documented sibling, typical +/-13V
+// on +/-15V into 2k or more, so 2V short of each rail. HO therefore clips at
+// +8.32V and -10.36V, a hard op-amp limit with the loop opened.
+// Engine reference: the sibling CS-60 procedure (CS-60 service manual
+// printed p.39 / PDF 41, PRA III) trims VR6 for 0 dBm at the OUT jack with
+// the sine lever, SUSTAIN and LEVEL at maximum on PANEL and all keys down:
+// a sine-only tone. The PRA board is shared (CS-50 SM2 p.22 note 7: "IC9 is
+// used for CS-60 only"). Each sine sits at CP4 1Vpp (M board VI.1, printed
+// p.38 / PDF 40), engine +/-1, so the CS-50's four voices are sqrt(4/2)
+// RMS, and .18 of that at full VOLUME reads 0 dBm, .775V RMS, at HO.
+// Cross-check: VI.4 sets each CS-50 voice output O to 0.6V with .8Vpp at
+// CP4, and four 1Vpp sines through 0.75 and the four 1k/47k bus branches
+// are .132V RMS on the bus, so VR6 must give 5.9 of its 1.02..7.82 range.
+// What is assumed: the meter reads RMS at an unloaded HO terminal (into
+// 600 ohm both rails would sit 5.7dB lower) and the four notes add
+// incoherently.
+constexpr double outputPreampGain=.18;
+constexpr double outputReferenceRms=outputPreampGain*1.4142135623730951; // sqrt(4/2)
+constexpr double outputReferenceVolts=.7745966692414834; // 0 dBm, sqrt(.6)
+constexpr double outputHaSupplyCurrent=12e-3, outputSwingMargin=2;
+// HO is the inverse of this node, so HO's +8.32V bounds it below.
+constexpr double outputRailHigh=(15-outputHaSupplyCurrent*220-outputSwingMargin)
+    *outputReferenceRms/outputReferenceVolts;
+constexpr double outputRailLow=-(15-outputHaSupplyCurrent*390-outputSwingMargin)
+    *outputReferenceRms/outputReferenceVolts;
+double outputPreamp(double volts,double volume) {
+    return clamp(volts*outputPreampGain*volume,outputRailLow,outputRailHigh);
+}
+
 struct OutputCoupling {
     double memory=0;
     double process(double x,double tau,double fs) {
@@ -1198,12 +1244,22 @@ struct Synth::Impl {
             const double beforeVca=v.commonCoupling.process(summed,outputCouplingTau[1],internalFs);
             // IG00151 gain is LINEAR in envelope CV (guide pp.40–41). The
             // optional velocity term is zero in factory-derived presets.
+            // Each chip's EI trim sets zero output at 0V LI (guide p.41), so
+            // gain closes at zero. IC6's VR21 (B-100k across +/-15V, 10M into
+            // +I; SM2 p.16) is trimmed with LEVEL at 0 and a key down for the
+            // minimum level at O (CS-60 manual printed p.39 / PDF 41, VI.5),
+            // nulling what the envelope would gate through: control
+            // feedthrough is zero here. What remains at that minimum, and
+            // IC5's own tremolo feedthrough, is unpublished. The IG00151's transfer above 10V LI (touch adds
+            // up to 1.08 of full LEVEL, tremolo .3375) is unpublished too, so
+            // it stays linear. The LEVEL levers' 100k/.01uF at LI (1ms with a
+            // high-impedance pin) is not modelled: LI's impedance is unknown.
             const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocityValue);
             const double touchLevel=patch.pressureVolume*expression*touchLevelScale;
             mixed += beforeVca * ampEnvelope * velocityGain * std::max(0.0,levelControl+touchLevel);
         }
-        // Output rail saturation is a deliberately mild, uncalibrated op-amp
-        // approximation; no hidden peak normalization or dynamics processor.
+        // The PRA output preamp (outputPreamp) is linear up to its derived
+        // op-amp rails; no hidden peak normalization or dynamics processor.
         // Four equal4.7uF/1k branches into47k define this calibrated bus.
         // Extra voices are a virtual extension: retain the same bus/gain,
         // rather than inventing a new physical load or dividing by voice count.
@@ -1242,7 +1298,7 @@ struct Synth::Impl {
         // MI to MO. A fully open pedal is the fully conducting cell, which is
         // the path this engine was calibrated on, so it stays a bare wire.
         const double expressed=patch.expression>=1 ? ringed : expression.process(ringed);
-        const double rail=.9*std::tanh(expressed*.18*patch.volume/.9);
+        const double rail=outputPreamp(expressed,patch.volume);
         // Unloaded HIGH output 33uF/5260ohm and documented inverting preamp.
         // No recording EQ.
         return -lineCoupling.process(rail,outputCouplingTau[3],internalFs);
@@ -1471,6 +1527,10 @@ std::vector<double> ringCarrierResponse(double fs,const std::vector<double>& inp
 double ringSwitchingResponse(double differentialVolts) {
     if(!std::isfinite(differentialVolts))throw std::invalid_argument("Nonfinite carrier differential voltage");
     return ringSteering(differentialVolts);
+}
+double outputPreampResponse(double volts,double volume) {
+    if(!std::isfinite(volts)||!std::isfinite(volume))throw std::invalid_argument("Nonfinite output preamp probe");
+    return outputPreamp(volts,volume);
 }
 // Individual normalized section, using the same RC class/constants as voices.
 std::vector<double> outputCouplingImpulse(unsigned stage,double fs,std::size_t frames) {
