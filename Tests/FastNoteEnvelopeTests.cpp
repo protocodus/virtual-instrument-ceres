@@ -76,12 +76,11 @@ void rapidVelocityAndGates() {
             for(unsigned n=0;n<32;++n) {
                 const int note=same?60:48+int(n%25);
                 const double target=n%2?.9:.1;
+                // The only board is released, then re-keyed at once.
+                synth.noteOff(n==0?60:(same?60:48+int((n-1)%25)));
                 const auto before=synth.allVoiceState()[0];synth.noteOn(note,target);
                 sameCharge(before,synth.allVoiceState()[0]);
-                // Old physical presses remain outstanding after stealing.
-                // Consuming one must not key-off the newest replacement.
-                synth.noteOff(n==0?60:(same?60:48+int((n-1)%25)));
-                require(synth.allVoiceState()[0].held,"Stale note-off cannot release fast replacement");
+                require(synth.allVoiceState()[0].held,"Fast re-press re-keys the released board");
                 for(unsigned f=0;f<13;++f) {
                     expected=target+(expected-target)*std::exp(-1/(fs*.005));
                     require(std::isfinite(synth.process()),"Finite rapid CV sample");
@@ -121,8 +120,8 @@ void burstMatrix() {
                     for(unsigned i=0;i<voices;++i)sameCharge(before[i],after[i]);
                     previous[k]=note;
                 }
-                // Includes free boards, audible released-board reuse and held
-                // stealing for rapid chords that exceed the selected polyphony.
+                // Includes free boards, audible released-board reuse and
+                // unstored presses for rapid chords beyond the selected polyphony.
                 clock(synth,shape==2?8:96);
                 const auto sounding=synth.allVoiceState();
                 for(unsigned i=0;i<voices;++i) {

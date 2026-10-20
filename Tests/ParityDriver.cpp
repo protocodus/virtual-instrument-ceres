@@ -71,7 +71,7 @@ int main(int argc,char** argv) {
             if(frame==73)synth.noteOn(64,.5);
             if(frame==149)synth.noteOn(67,1);
             if(frame==997)synth.noteOn(72,.7);
-            if(frame==1499)synth.noteOn(60,.3); // Four-voice steal/repeated pitch.
+            if(frame==1499)synth.noteOn(60,.3); // Repeated pitch beyond four held voices.
             if(frame==1500)synth.sustain(true);
             if(frame==1777){synth.noteOff(60);synth.noteOff(64);}
             if(frame==2048){ceres::setParameter(patch,"lp_cutoff",870.);synth.setPatch(patch);}

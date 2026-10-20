@@ -336,10 +336,12 @@ void outputLifecycleAndPolarity() {
     for (auto* synth : {&held,&stolen}) {
         synth->setPatch(p);
         for (int i=0;i<4;++i) synth->noteOn(60);
+        synth->sustain(true);
+        for (int i=0;i<4;++i) synth->noteOff(60);
         render(*synth,12000);
     }
-    // Retask the oldest physical board to the SAME note, with its amp already
-    // at sustain=peak and VCF EG fixed at zero. Only allocation changes.
+    // Re-key the oldest pedal-held board (key up) to the SAME note, with its
+    // amp already at sustain=peak and VCF EG fixed at zero. Only allocation changes.
     stolen.noteOn(60);
     require(render(held,1024)==render(stolen,1024),
             "Voice stealing must preserve physical filter and output capacitor histories");
@@ -379,9 +381,9 @@ void allocationAndTails() {
     auto p=sinePatch(); s.setPatch(p);
     for (int n : {48,52,55,60,64}) { s.noteOn(n); render(s,64); }
     require(s.activeVoices()==4,"Exactly four voices after fifth note");
-    s.noteOff(48); render(s,2000);
-    require(s.activeVoices()==4,"Note-off for stolen voice must not release other pitch");
-    for (int n : {52,55,60,64}) s.noteOff(n);
+    s.noteOff(64); render(s,2000);
+    require(s.activeVoices()==4,"Note-off for the unstored fifth key must not release another pitch");
+    for (int n : {48,52,55,60}) s.noteOff(n);
     const auto beginning=render(s,1000);
     const auto early=render(s,15000);
     require(rms(beginning)>1e-4,"Release has an audible tail");
@@ -923,21 +925,21 @@ void ringEnvelopeAndKeyLedger() {
         }
     }
     require(maxValue>.999,"Ring attack must reach its normalized peak");
-    // A stolen voice does not erase a still-physically-held key from the trigger bus.
+    // An unstored fifth key still counts on the trigger bus.
     ceres::Synth many(fs,5),one(fs,5);many.setPatch(p);one.setPatch(p);
     many.noteOn(60);one.noteOn(60);render(many,100);render(one,100);
     for(int note:{61,62,63,64})many.noteOn(note);
-    require(many.modulationState().physicalKeyPresses==5,"Physical ledger survives fifth-note voice stealing");
+    require(many.modulationState().physicalKeyPresses==5,"Physical ledger counts an unstored fifth key");
     for(unsigned n=0;n<100;++n) {
         many.process();one.process();
         require(many.modulationState().ringEnvelope==one.modulationState().ringEnvelope,
                 "Legato note-ons must not retrigger aggregate ring attack");
     }
     for(int note:{61,62,63,64})many.noteOff(note);
-    require(many.modulationState().physicalKeyPresses==1,"Stolen original key remains physically held");
+    require(many.modulationState().physicalKeyPresses==1,"Original key remains physically held");
     many.noteOn(65);many.process();one.process();
     require(many.modulationState().ringEnvelope==one.modulationState().ringEnvelope,
-            "Another note while stolen key remains down is still legato");
+            "Another note while the original key remains down is still legato");
     many.sustain(true);many.noteOff(60);many.noteOff(65);
     require(many.modulationState().physicalKeyPresses==0,"Damper must not prevent physical all-keys-up rearm");
     render(many,50);const auto before=many.modulationState();many.noteOn(67);

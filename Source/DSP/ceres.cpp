@@ -981,13 +981,15 @@ void Synth::noteOn(int note, double velocity) {
     auto& state = *impl_;
     std::uint32_t ticket=0;
     if (!state.keyOn(note,ticket)) return;
-    state.lastAssignedKey=note;
     Impl::Voice* selected = nullptr;
     // KAS gate control (guide printed pp.17-18) writes a new key only into a
     // channel whose code differs and whose key is up; a released channel that
     // still holds this key is re-keyed. Reuse that board first. Otherwise use
-    // an idle voice, then the quietest released voice, then the oldest held
-    // voice. Overlapping presses of a still-held note occupy separate voices.
+    // an idle voice, then the quietest released voice, then the oldest
+    // pedal-held one (its key is up). A key pressed while every board's key is
+    // down is not stored (guide printed p.19 timing chart): it sounds neither
+    // now nor when a board frees, though its press still counts for the ring
+    // trigger. Overlapping presses of a still-held note occupy separate voices.
     for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it)
         if (it->note==note && !it->held && !it->pedalHeld) {
             selected=&*it; break;
@@ -1003,8 +1005,10 @@ void Synth::noteOn(int note, double velocity) {
             if (!voice.held && !voice.pedalHeld && (!selected || voice.amp.voltage < selected->amp.voltage)) selected = &voice;
         }
     if (!selected)
-        selected = &*std::min_element(state.voices.begin(),state.voices.begin()+state.voiceLimit,
-            [](const auto& a,const auto& b) { return a.age < b.age; });
+        for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it)
+            if (!it->held && (!selected || it->age < selected->age)) selected = &*it;
+    if (!selected) return;
+    state.lastAssignedKey=note;
     // I/II changes the held keyboard voltage of released physical boards;
     // it does not re-gate their VCF/VCA or reset any oscillator/filter state.
     state.followFreeKeys();

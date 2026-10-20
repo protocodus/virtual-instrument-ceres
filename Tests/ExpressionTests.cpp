@@ -87,15 +87,17 @@ void lifecycle() {
     require(s.voiceState()[1].keyNote==72,"Pedal-up changes key CV without copying new key velocity");
     s.noteOn(72,0);advance(s);checkVoice(s,2,.45,p);
     require(!s.voiceState()[2].held,"Zero-velocity noteOn is noteOff, not replacement velocity");
-    // Fully held allocation must steal the oldest board and retarget only
-    // its velocity. The consumed CV follows the5ms digital controller RC;
-    // its oscillator/envelope capacitors are not restarted.
+    // A fifth key while all four are held is not stored. Re-keying an
+    // audible released board retargets only its velocity. The consumed CV
+    // follows the 5ms digital controller RC; capacitors are not restarted.
     s.reset();s.setPatch(p);
     for(unsigned i=0;i<4;++i)s.noteOn(48+int(i)*4,.2+.15*i);
-    advance(s);const auto old=s.voiceState();s.noteOn(80,.95);
+    advance(s);s.noteOn(80,.95);
+    for(unsigned i=0;i<4;++i)require(s.voiceState()[i].note==48+int(i)*4,"Fifth held key is not stored");
+    s.noteOff(80);s.noteOff(48);const auto old=s.voiceState();s.noteOn(80,.95);
     const auto assigned=s.voiceState();
     require(assigned[0].note==80 && assigned[0].oscillatorPhase==old[0].oscillatorPhase &&
-            assigned[0].ampEnvelope==old[0].ampEnvelope,"Steal assigns velocity without clearing capacitor/phase state");
+            assigned[0].ampEnvelope==old[0].ampEnvelope,"Reuse assigns velocity without clearing capacitor/phase state");
     advance(s);checkVoice(s,0,.95+(.2-.95)*std::exp(-16/(8000.*.005)),p);
     for(unsigned i=1;i<4;++i)checkVoice(s,i,.2+.15*i,p);
     s.allNotesOff();advance(s);checkVoice(s,0,.95+(.2-.95)*std::exp(-32/(8000.*.005)),p);

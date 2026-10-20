@@ -38,10 +38,12 @@ void voices(){
         auto state=s.allVoiceState();
         for(unsigned i=0;i<n;++i)require(state[i].held&&state[i].note==40+int(i),"distinct initial allocation");
         for(unsigned i=n;i<16;++i)require(!state[i].held&&state[i].oscillatorPhase==before[i].oscillatorPhase,"unconfigured slots unclocked");
-        s.noteOn(90,.8);state=s.allVoiceState();require(state[0].note==90,"oldest held voice stolen");
-        s.sustain(true);s.noteOff(90);state=s.allVoiceState();require(state[0].pedalHeld&&!state[0].held,"pedal gate preserved");
+        s.noteOn(90,.8);state=s.allVoiceState();
+        for(unsigned i=0;i<n;++i)require(state[i].held&&state[i].note==40+int(i),"key beyond held polyphony is not stored");
+        s.noteOff(90);
+        s.sustain(true);s.noteOff(40);state=s.allVoiceState();require(state[0].pedalHeld&&!state[0].held,"pedal gate preserved");
         const double phase=state[0].oscillatorPhase;s.noteOn(91,.5);state=s.allVoiceState();
-        require(state[0].oscillatorPhase==phase,"allocation never resets oscillator phase");
+        require(state[0].note==91&&state[0].oscillatorPhase==phase,"pedal-held board is re-keyed without a phase reset");
         s.allNotesOff();advance(s,200);require(s.activeVoices()==n,"all-notes-off honors pedal");
         s.sustain(false);advance(s,3000);require(s.activeVoices()==0,"pedal-up releases all configured boards");
         s.allSoundOff();for(unsigned i=0;i<100;++i)near(s.process(),0,0,"panic exact silence");

@@ -37,28 +37,30 @@ void continuousVelocity() {
         ceres::Synth s(fs,50);require(s.configure(1,factor),"Configure reuse quality");
         auto p=patch();s.setPatch(p);s.noteOn(60,.2);advance(s,unsigned(fs*.02));
         near(velocity(s),.2,1e-13,"Fresh note precharges its velocity");
-        const auto before=s.allVoiceState()[0];s.noteOn(60,.9);
+        // One board: a held key takes no second board, so each re-press
+        // follows its release and re-keys the board that held that key.
+        s.noteOff(60);const auto before=s.allVoiceState()[0];s.noteOn(60,.9);
         const auto assigned=s.allVoiceState()[0];
         require(assigned.oscillatorPhase==before.oscillatorPhase &&
                 assigned.ampEnvelope==before.ampEnvelope &&
                 assigned.filterEnvelope==before.filterEnvelope,"Reuse preserves oscillator and envelope capacitors");
         s.process();double expected=.9+(.2-.9)*std::exp(-1/(fs*.005));
-        near(velocity(s),expected,2e-13,"Audible stolen velocity follows five-ms RC without a step");
+        near(velocity(s),expected,2e-13,"Audible reused velocity follows five-ms RC without a step");
         const unsigned frames=unsigned(fs*.003);advance(s,frames);
         expected=.9+(.2-.9)*std::exp(-double(frames+1)/(fs*.005));
         near(velocity(s),expected,2e-12,"Five-ms velocity timing is independent of sample rate and quality");
         // Retarget the actual in-flight value rather than the previous target.
-        s.noteOn(60,.4);s.process();expected=.4+(expected-.4)*std::exp(-1/(fs*.005));
-        near(velocity(s),expected,2e-12,"Repeated steals retarget the current velocity value");
-        // Consume all three physical presses. Only the newest surviving press
-        // releases this board; its still audible tail must also reuse smoothly.
-        s.noteOff(60);s.noteOff(60);s.noteOff(60);advance(s,unsigned(fs*.002));
-        const double previous=velocity(s);require(!s.allVoiceState()[0].held,"Newest FIFO note released");
+        s.noteOff(60);s.noteOn(60,.4);s.process();expected=.4+(expected-.4)*std::exp(-1/(fs*.005));
+        near(velocity(s),expected,2e-12,"Repeated reuse retargets the current velocity value");
+        // An extra press while the only board is held is not stored; its
+        // note-off is consumed after the owner's. The audible tail reuses smoothly.
+        s.noteOn(60,.95);s.noteOff(60);s.noteOff(60);advance(s,unsigned(fs*.002));
+        const double previous=velocity(s);require(!s.allVoiceState()[0].held,"Owner press released");
         require(s.allVoiceState()[0].ampEnvelope>0,"Released reuse witness is audible");
         s.noteOn(60,.1);s.process();expected=.1+(previous-.1)*std::exp(-1/(fs*.005));
         near(velocity(s),expected,2e-12,"Audible released-board reuse also keeps velocity continuous");
         // A silent gate assigned twice before its first sample must not ramp.
-        s.reset();s.noteOn(60,.2);s.noteOn(60,.8);s.process();
+        s.reset();s.noteOn(60,.2);s.noteOff(60);s.noteOn(60,.8);s.process();
         near(velocity(s),.8,1e-13,"Zero-amplitude assignment precharges immediately");
         s.allSoundOff();s.noteOn(60,.3);s.process();
         near(velocity(s),.3,1e-13,"Panic's silent board starts at new velocity");
@@ -76,6 +78,7 @@ void legacyGainAndReset() {
         const double c=(6/150e3)/(10/270e3)*p.pressureVolume;
         p.expressionSource=0;p.ampLevel=.2+c;p.velocitySensitivity=c/p.ampLevel;p.pressureVolume=0;legacy.setPatch(p);
         for(unsigned f=0;f<5000;++f) {
+            if(f==2000 || f==2100)for(auto* s:{&selected,&legacy})s->noteOff(60);
             if(f==0 || f==2000 || f==2100)for(auto* s:{&selected,&legacy})s->noteOn(60,f==0?.2:(f==2000?.9:.4));
             near(selected.process(),legacy.process(),1e-12,"Legacy velocity gain uses the same continuous coordinate");
         }
@@ -87,22 +90,24 @@ void legacyGainAndReset() {
 void stolenPressFifo() {
     for(unsigned voices:{1u,4u,16u})for(unsigned factor:{1u,2u,4u}) {
         ceres::Synth s(48000,52);s.configure(voices,factor);s.setPatch(patch());
+        // Presses beyond held polyphony are not stored (guide printed p.19).
         for(unsigned n=0;n<voices+2;++n)s.noteOn(60,.2+.5*n/(voices+2));
-        require(held(s)==voices,"Repeated presses fill and steal configured voices");
-        for(unsigned n=0;n<2;++n) {
-            s.noteOff(60);
-            require(held(s)==voices,"Off for a stolen oldest press cannot release its newer replacement");
-        }
+        require(held(s)==voices,"Repeated presses fill configured voices and no more");
         for(unsigned n=0;n<voices;++n) {
-            s.noteOff(60);require(held(s)==voices-n-1,"Surviving same-pitch presses release in FIFO order");
+            s.noteOff(60);require(held(s)==voices-n-1,"Owning same-pitch presses release in FIFO order");
         }
-        require(s.modulationState().physicalKeyPresses==0,"Every stolen and surviving physical press is consumed");
+        for(unsigned n=0;n<2;++n) {
+            const auto before=s.allVoiceState();s.noteOff(60);
+            for(unsigned i=0;i<voices;++i)require(s.allVoiceState()[i].ampEnvelope==before[i].ampEnvelope &&
+                !s.allVoiceState()[i].held,"Off for an unstored press has no owner");
+        }
+        require(s.modulationState().physicalKeyPresses==0,"Every stored and unstored physical press is consumed");
         s.noteOff(60);require(held(s)==0,"Unmatched note-off has no owner");
         s.reset();s.noteOn(60,.2);s.noteOn(60,.8);s.sustain(true);
         if(voices==1) {
-            s.noteOff(60);require(held(s)==1&&!s.allVoiceState()[0].pedalHeld,"Stolen press off cannot pedal-latch its replacement");
-            s.noteOff(60);require(held(s)==0&&s.allVoiceState()[0].pedalHeld,"Matching press off still honors pedal");
-            s.sustain(false);require(!s.allVoiceState()[0].pedalHeld,"Pedal-up releases the correct replacement");
+            s.noteOff(60);require(held(s)==0&&s.allVoiceState()[0].pedalHeld,"Owner press off honors pedal");
+            s.noteOff(60);require(s.allVoiceState()[0].pedalHeld,"Unstored press off cannot touch the latched board");
+            s.sustain(false);require(!s.allVoiceState()[0].pedalHeld,"Pedal-up releases the board");
         }
         s.allNotesOff();s.noteOn(64,.6);s.noteOff(64);require(held(s)==0,"All Notes Off clears FIFO generations");
         s.allSoundOff();s.noteOn(65,.4);s.noteOff(65);require(held(s)==0,"Panic clears FIFO generations");
@@ -114,6 +119,6 @@ int main() {
     try {
         continuousVelocity();std::puts("PASS audible held/released velocity reuse, retarget, fresh/zero/idle gates and all quality clocks");
         legacyGainAndReset();std::puts("PASS legacy/selected velocity audio equivalence and reset");
-        stolenPressFifo();std::puts("PASS repeated-note ownership after stealing, FIFO/pedal/panic/reset across 1/4/16 voices");
+        stolenPressFifo();std::puts("PASS repeated-note ownership beyond polyphony, FIFO/pedal/panic/reset across 1/4/16 voices");
     } catch(const std::exception& e) {std::fprintf(stderr,"FAIL %s\n",e.what());return 1;}
 }
