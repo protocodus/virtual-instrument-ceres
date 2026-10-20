@@ -114,18 +114,45 @@ struct Patch {
     // this master offset is independent of the engineering keyTrack slope.
     double tuneCents = 0.0;
     // These modeled oscillator variations, like vibrato below, are VCO-only.
-    double voiceSpreadCents = 0.0, driftCents = 0.0;
+    // voiceSpreadCents is a fixed engineering spread, not a tolerance (see
+    // the board tolerances below). driftCents is the peak excursion of each
+    // board's free-running wander about its tuned pitch: a new random target
+    // every 0.2-0.7s, followed with a .3s time constant (.41 cents RMS per
+    // cent). Default 1: an OWNER-REQUESTED ENGINEERING VALUE, not a
+    // measurement. It is the most the tuning tolerance leaves room for: each
+    // warmed-up board is set and checked within +/-1 cent (Guide printed p.65
+    // after 10 minutes' warm-up; CS-80 procedure printed pp.3-5 after 30), so
+    // its wander must stay inside that band. No source gives a time course
+    // for it. The documented instability is thermal (Service News E-46; see
+    // boardTemperatureRise) and settles over those 10-30 minute warm-ups, far
+    // slower than this wander, whose time constants have no source.
+    double voiceSpreadCents = 0.0, driftCents = 1.0;
     // Board-to-board tolerance of the four M boards, each 0..1 of the
-    // documented spread; 0 (default) keeps the boards identical. Each seed is
-    // one fixed instrument: its offsets never move while it plays.
+    // documented spread; 0 keeps the boards identical. Pitch, filter and
+    // envelope ship at 1 (owner's listening verdict B, 2026-10-20, set
+    // 2026-10-20-voice-variation-board-tolerance); envelope time, VCA and
+    // temperature stay 0 until a verdict. Each seed is one fixed instrument:
+    // its offsets never move while it plays.
     // Pitch: the residual the service tuning trims leave (+/-1 cent at each
     // trim point, Guide printed p.65). Filter: the IG00156 rank-bin residual
     // of each filter's control sensitivity (+/-.146 oct per octave of Vfc
     // input, SM2 printed pp.17-18 rank table; the static cutoff and Q are
-    // trimmed by ear and stay identical). Envelope: the VCF EG (+/-10%) and
-    // VCA EG (+/-2%) output-level check bands of the sibling CS-60 alignment
-    // (CS-60 SM printed pp.37-38). See ceres.cpp.
-    double boardPitchTolerance = 0.0, boardFilterTolerance = 0.0, boardEnvelopeTolerance = 0.0;
+    // trimmed by ear and stay identical). Envelope: the EG level checks of
+    // the sibling CS-60/CS-80 alignments of the same board: VCF EG level
+    // (+/-10%), VCA EG peak (+/-2%) and floor (-200 +/-20mV); the output trim
+    // after them keeps each board's full-sustain level. Envelope time: both
+    // EGs' time trims (+/-5% at the 4ms and 125ms attack trims). VCA: the
+    // CP4 sine and filtered-path trims (+/-2%, +/-2.5%); the output trims
+    // after them keep the filtered path's level and the 0 dBm reference.
+    // See ceres.cpp.
+    double boardPitchTolerance = 1.0, boardFilterTolerance = 1.0, boardEnvelopeTolerance = 1.0;
+    double boardEnvelopeTimeTolerance = 0.0, boardVcaTolerance = 0.0;
+    // Ambient temperature change since the boards were tuned, in kelvin
+    // (-25..25; 0 is as tuned). Each board's VCO drifts by its own amount
+    // within the IG00153 temperature ranks one instrument may mix (Yamaha
+    // Service News E-46, 1978: 25 -> 50 C moves C6 within one 5-cent rank and
+    // C1 within two neighbouring ranks); the drift they share is left out.
+    double boardTemperatureRise = 0.0;
     // filterLfo is LP octave depth. HP gets .3374358974 times that depth:
     // (.7/.65)*(47k/150k), independent of user-editable EG coupling scales.
     // tremolo is SUB VCA lever travel, 0..1: R7 adds .3375 of the wiper's

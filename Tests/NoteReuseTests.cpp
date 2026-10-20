@@ -21,6 +21,8 @@ ceres::Patch patch() {
     ceres::Patch p;p.saw=0;p.sine=1;p.keyTrack=0;p.hpCutoff=100;p.lpCutoff=1000;
     p.filterInitial=p.filterPeak=0;p.ampAttack=.001;p.ampSustain=1;p.ampRelease=10;
     p.expressionSource=1;p.pressureVolume=.7;p.pressureFilter=1;p.volume=.3;
+    // Nominal boards: the LP readout below is the design's touch depth.
+    p.boardPitchTolerance=p.boardFilterTolerance=p.boardEnvelopeTolerance=0;
     return p;
 }
 double velocity(const ceres::Synth& s) {

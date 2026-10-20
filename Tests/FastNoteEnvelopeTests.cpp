@@ -32,6 +32,8 @@ ceres::Patch base() {
     p.ringRate=1.26;p.ringDepth=8;p.ringAttack=.0087;p.ringDecay=.05;
     p.pwmRate=1.48;p.pwmDepth=.31;p.lfoRate=.22;p.filterLfo=.18;
     p.expressionSource=1;p.pressureVolume=.45;p.pressureFilter=1;
+    // Nominal boards: the closed-form EG and touch readouts are design laws.
+    p.boardPitchTolerance=p.boardFilterTolerance=p.boardEnvelopeTolerance=0;
     return p;
 }
 

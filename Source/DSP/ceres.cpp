@@ -201,6 +201,9 @@ const Parameter parameters[] = {
     {"board_pitch_tolerance", &Patch::boardPitchTolerance, 0, 1},
     {"board_filter_tolerance", &Patch::boardFilterTolerance, 0, 1},
     {"board_envelope_tolerance", &Patch::boardEnvelopeTolerance, 0, 1},
+    {"board_envelope_time_tolerance", &Patch::boardEnvelopeTimeTolerance, 0, 1},
+    {"board_vca_tolerance", &Patch::boardVcaTolerance, 0, 1},
+    {"board_temperature_rise", &Patch::boardTemperatureRise, -25, 25},
     {"lfo_waveform", &Patch::lfoWaveform, 0, 5},
     {"ext_level", &Patch::extLevel, 0, 1},
     {"ring_mix", &Patch::ringMix, 0, 1}, {"ring_rate", &Patch::ringRate, .2, 220},
@@ -333,12 +336,37 @@ struct Random {
 // ASSUMPTION: each residual is uniform over its band (a technician stops
 // anywhere inside it); the service guide prints only the band.
 //
+// Thermal drift (temperature, in kelvin). Yamaha Service News E-46 (January
+// 1978, CS-50/CS-60/CS-80, "Countermeasures for stabilizing the pitch") ranks
+// the IG00153 of every M board by how far the pitch of C1 and of C6 moves
+// when the ambient temperature goes from 25 to 50C: one figure per 5 cents
+// (C1 0..45, C6 0..30 cents; "32" is 10-15 cents at C1 and 5-10 at C6). One
+// instrument may use one C6 figure only and two neighbouring C1 figures, so
+// over that 25K step its boards differ by less than 5 cents at C6 and 10 at
+// C1. It covers CS-50 #1546 on (November 1977) and the earlier serials it
+// lists, which also had the 1S1555 compensation diode greased onto IC8. C1
+// and C6 are Kv 125mV and 4V: the CS-80 adjustment procedure sets the C1
+// key's Kv to 125.0mV against a 4.000V reference (TUNING 1-3, printed p.3)
+// and the CS-50's C6 key is 4V (Guide p.29), so C1 is x = 1/32. Model: each
+// board sits uniformly in its window about the window's centre (C6 +/-2.5,
+// C1 +/-5 cents), between them in the trims' gain-and-offset form (ratio 32
+// in place of 16), all scaled by the temperature change over 25K. The drift
+// the boards share (the windows' centres) moves the instrument, not a board:
+// it is left out. CONVENTIONS: uniform in the window; linear in temperature
+// (E-46 gives the 25 -> 50C step only); the same at every transposition (the
+// ranking is of the IC, not of the Rn resistors).
+//
 // The VCF, EG and VCA trims are not in the CS-50 guide. The CS-60 service
 // manual's section VI (printed pp.37-39 / PDF 39-41) aligns the same M board:
 // SM1's parts list gives the M board (NA04485) "Common Models: CS-60", the
 // CS-60 M schematic (printed p.15 / PDF 17) is drawn for "CS-60,50" with the
 // CS-50's transposition values, and the procedure itself gives the CS-50's
 // different output level (".24V (CS-50 is 0.6V)"). SIBLING EVIDENCE, below.
+// Yamaha's CS-80 "Adjustment Procedure" aligns the same board as well. SM2
+// p.16 prints the CS-80's M-board differences: the transposition circuit
+// (R1-R5, VR4-VR6) and the rank resistor R7, none in the EGs or VCAs. Where
+// it trims the same trimmer to the CS-60's target, it prints the tolerance
+// the CS-60 leaves out. SIBLING EVIDENCE as well.
 //
 // VCF sensitivity (filter amount). On that schematic the IG00156 rank
 // resistor is NOT on the fadj pin (220k, fixed): R6/R7 load each filter's Vfc
@@ -354,50 +382,133 @@ struct Random {
 // circuit boards" (CS-60 p.38): matched by ear, no numeric residual, so the
 // static cutoff and Q stay identical here and only the Vfc-driven octaves
 // (EG, SUB, touch, BRILLIANCE) carry the sensitivity residual. INFERENCE:
-// chips uniform within contiguous one-step bins.
+// chips uniform within contiguous one-step bins. The CS-80's numbers do not
+// carry over: its complete VCF alignment (printed p.11) holds FH/FL at
+// 4.0/3.3V, turns VR7/VR9 for maximum amplitude at the C1 key and sets
+// VR8/VR10 to 4.3 and 2.2 +/-1Vpp at CP3, a procedure the CS-60/50 does not
+// use, on a CS-80 R7 and bus.
 //
-// EG output levels (envelope amount). The VCF EG check (CS-60 p.37): AL, IL
-// at 10V give TP1 +5V +/-.5V and -4V +/-.5V; only the offset is trimmed (VR18,
-// 0 +/-.01V). One buffer gain must meet both bands, so the VCF EG reaches HP
-// and LP within +/-10%. The VCA EG check (p.38): peak 10V +/-.2V at TP2, so
-// the amplitude EG is within +/-2%. Uniform within the band, as for pitch.
-// Attack trims (VR19, VR20: 125ms at 3V) and the VCA level trims (VR11,
-// VR12, VR3, VR14) carry no printed tolerance and are not modelled.
+// EG levels (envelope amount). The VCF EG check (CS-60 p.37): AL, IL at 10V
+// give TP1 +5V +/-.5V and -4V +/-.5V; only the offset is trimmed (VR18, 0
+// +/-.01V, a constant offset the static VCF trims then absorb). One buffer
+// gain must meet both bands, so the VCF EG reaches HP and LP within +/-10%.
+// The VCA EG's attack ends where the sequencer's 30k/60k node trips its
+// comparator: TP2 10V +/-.2V (p.38, EG-VCA 2), a peak of each board's own.
+// Its held and released targets are the panel's SL and IL plus VR17's offset,
+// trimmed to -200 +/-20mV (EG-VCA 1; CS-80 printed p.13, the same). VR14 is
+// trimmed after both, with A, D, R short and S at 10 ("CS-50 is 0.6V", CS-60
+// p.39, VI.4), so every board's full-sustain output is the nominal one: the
+// peak and floor residuals stay, a level offset at full sustain does not.
 //
-// Not modelled, no printed tolerance: Q and static cutoff (ear-matched), EG
-// times, VCA trims, WSC level (no per-board procedure), 1.5nF/4.7M parts.
+// EG times (envelope time amount). Each EG is one exponential converter: TC
+// reaches the IG00151's EI through 82k + VR19 (VCF) or VR20 (VCA), with the
+// VR15/VR16 offsets through 100k (SM2 p.16), trimmed to an attack of 4ms at
+// 8V and 125ms at 3V (CS-60 pp.37-38). The CS-80 trims the same VR15/VR19 and
+// VR16/VR20 to the same two times and prints "(+/-5%)" for each (printed
+// pp.7 and 13). Each trim point is uniform in +/-5%; an exponential
+// converter's log-time error is linear in its control voltage, so between
+// and beyond the points it is linear in log time. D and R drive the same
+// converter (Docs/research/envelopes-authenticity-2026-10-20.md), placed on
+// it by preset()'s convention: an attack ends after 5 RC and a D/R time is a
+// T60 of ln(1000) RC, so a T60 shares the RC of an attack of 5*T60/ln(1000).
+//
+// VCA levels (VCA amount). VR11 trims the sine to 1Vpp and VR12 the filtered
+// pulse to .8Vpp at CP4 (CS-60 p.38, VI.1-2); the CS-80 trims the same VR11
+// and VR12 to 1.00 +/-.02Vpp and 800 +/-20mVpp (printed p.15). VR13 and VR14
+// act after CP4 and are trimmed on the filtered pulse (VI.3-4), restoring its
+// level, so the sine keeps its ratio to it: (1+e11)/(1+e12). The PRA's VR6
+// is trimmed last, in the finished instrument, for 0 dBm from the sine alone
+// with all keys down (CS-60 p.39, PRA III; see outputPreamp): it takes the
+// four boards' sine error out of the common gain. With the reference's
+// assumptions (RMS meter, notes adding incoherently) that is
+// sqrt(4/sum g^2) over the four physical boards' sine gains g.
+//
+// Not modelled, no printed tolerance: Q and static cutoff (ear-matched),
+// VR14's own residual (0.6V, no band for the CS-50), WSC level (no per-board
+// procedure), the 1.5nF/180pF/.22uF capacitors and 4.7M resistors (neither
+// parts list gives a tolerance), the KAS sample-holds.
 constexpr double boardTrimCents=1;          // Guide printed p.65, every trim
 constexpr double boardScaleKeyRatio=16;     // C6 key Kv / C2 key Kv, p.29
 constexpr double boardTrimKeyNormalHz=2093; // C6 key at NORMAL, p.29/p.65
+constexpr double boardThermalStepKelvin=25; // E-46: ambient 25 -> 50C
+constexpr double boardThermalKeyRatio=32;   // E-46 C6 / C1: Kv 4V / 125mV
+constexpr double boardThermalHighCents=5./2; // E-46: one 5-cent C6 figure
+constexpr double boardThermalLowCents=10./2; // E-46: two neighbouring C1 figures
 constexpr double boardFilterRankOctaves=.14624062518028906; // log2(1.5)/4
 constexpr double boardFilterEnvelopeBand=.5/5; // CS-60 p.37, TP1 +5V +/-.5V
-constexpr double boardAmpEnvelopeBand=.2/10;   // CS-60 p.38, TP2 10V +/-.2V
+constexpr double boardAmpPeakBand=.2/10;       // CS-60 p.38, TP2 10V +/-.2V
+constexpr double boardAmpFloorBand=.02/10;     // CS-60 p.38, TP2 -200 +/-20mV
+constexpr double boardEnvelopeTimeBand=.05;    // CS-80 printed pp.7, 13: +/-5%
+constexpr double boardEnvelopeFastSeconds=.004;  // attack trim at 8V
+constexpr double boardEnvelopeSlowSeconds=.125;  // attack trim at 3V
+constexpr double boardAttackTimeConstants=5;     // preset(): attack = 5 RC
+constexpr double boardSineBand=.02/1;          // CS-80 p.15: VR11 1.00 +/-.02Vpp
+constexpr double boardFilteredBand=.02/.8;     // CS-80 p.15: VR12 800 +/-20mVpp
 struct BoardTolerance {
     // C6-key residual at transposition 2-down, 1-down, NORMAL, 1-up.
     std::array<double,4> transposeCents{};
     double offsetRatio=0, hpOctaves=0, lpOctaves=0;
-    double filterEnvelopeError=0, ampEnvelopeError=0;
-    // Cached at the patch's amounts; exactly 1 when an amount is 0.
-    double hpScale=1, lpScale=1, hpEnvelopeGain=1, lpEnvelopeGain=1, ampEnvelopeGain=1;
-    void draw(Random& random) {
-        const double low=boardTrimCents*random.bipolar();
-        for (auto& cents : transposeCents) cents=boardTrimCents*random.bipolar();
+    double filterEnvelopeError=0, ampPeakError=0;
+    // Thermal drift over 25K at the C6 key, and its Kv offset ratio.
+    double thermalHighCents=0, thermalOffsetRatio=0;
+    // Log-time error at the 4ms and 125ms attack trims: VCF EG, VCA EG.
+    std::array<double,2> filterTimeLog{}, ampTimeLog{};
+    double ampFloorError=0, sineError=0, filteredError=0;
+    // Cached at the patch's amounts; the identical-board values when off.
+    double hpScale=1, lpScale=1, hpEnvelopeGain=1, lpEnvelopeGain=1;
+    double ampPeak=1, ampFloor=0, ampEnvelopeGain=1, sineGain=1;
+    std::array<double,4> filterCoefficients{}, ampCoefficients{};
+    // trims keeps the first stream's order, so a seed keeps the boards it
+    // had; everything added since draws from more, in this order.
+    void draw(Random& trims, Random& more) {
+        const double low=boardTrimCents*trims.bipolar();
+        for (auto& cents : transposeCents) cents=boardTrimCents*trims.bipolar();
         const double r=std::exp2((low-transposeCents[3])/1200);
         offsetRatio=(r-1)/(boardScaleKeyRatio-r);
-        hpOctaves=boardFilterRankOctaves*random.bipolar();
-        lpOctaves=boardFilterRankOctaves*random.bipolar();
-        filterEnvelopeError=boardFilterEnvelopeBand*random.bipolar();
-        ampEnvelopeError=boardAmpEnvelopeBand*random.bipolar();
+        hpOctaves=boardFilterRankOctaves*trims.bipolar();
+        lpOctaves=boardFilterRankOctaves*trims.bipolar();
+        filterEnvelopeError=boardFilterEnvelopeBand*trims.bipolar();
+        ampPeakError=boardAmpPeakBand*trims.bipolar();
+        const double thermalLow=boardThermalLowCents*more.bipolar();
+        thermalHighCents=boardThermalHighCents*more.bipolar();
+        const double q=std::exp2((thermalLow-thermalHighCents)/1200);
+        thermalOffsetRatio=(q-1)/(boardThermalKeyRatio-q);
+        for (auto& error : filterTimeLog) error=std::log1p(boardEnvelopeTimeBand*more.bipolar());
+        for (auto& error : ampTimeLog) error=std::log1p(boardEnvelopeTimeBand*more.bipolar());
+        ampFloorError=boardAmpFloorBand*more.bipolar();
+        sineError=boardSineBand*more.bipolar();
+        filteredError=boardFilteredBand*more.bipolar();
     }
     // octave: TRANSPOSE (-2..1); normalHz: the board's ideal NORMAL-position
     // frequency for its key voltage (key, PITCH and bend; not vibrato).
-    double pitchCents(double octave, double normalHz) const {
+    double trimCents(double octave, double normalHz) const {
         const double position=std::max(0.0,std::min(octave+2,3.0));
         const auto index=static_cast<std::size_t>(position<3 ? position : 2);
         const double gain=transposeCents[index]
             +(transposeCents[index+1]-transposeCents[index])*(position-index);
         const double x=normalHz/boardTrimKeyNormalHz;
         return gain+1200*std::log2(std::max(1e-9,1+offsetRatio/x)/(1+offsetRatio));
+    }
+    // Drift over the 25K step, the same at every transposition.
+    double thermalCents(double normalHz) const {
+        const double x=normalHz/boardTrimKeyNormalHz;
+        return thermalHighCents
+            +1200*std::log2(std::max(1e-9,1+thermalOffsetRatio/x)/(1+thermalOffsetRatio));
+    }
+    double pitchCents(const Patch& patch, double normalHz) const {
+        double cents=0;
+        if (patch.boardPitchTolerance>0)
+            cents=patch.boardPitchTolerance*trimCents(patch.octave,normalHz);
+        if (patch.boardTemperatureRise!=0)
+            cents+=patch.boardTemperatureRise/boardThermalStepKelvin*thermalCents(normalHz);
+        return cents;
+    }
+    // Duration factor of one EG at the attack time sharing the segment's RC
+    // (the duration itself for an attack, 5*T60/ln(1000) for decay/release).
+    static double timeFactor(const std::array<double,2>& trim, double attack, double amount) {
+        const double span=std::log(attack/boardEnvelopeFastSeconds)
+            /std::log(boardEnvelopeSlowSeconds/boardEnvelopeFastSeconds);
+        return std::exp(amount*(trim[0]+(trim[1]-trim[0])*span));
     }
 };
 
@@ -1322,14 +1433,49 @@ struct Synth::Impl {
         updateBoardScales();
     }
     void updateBoardScales() {
+        const double envelope=patch.boardEnvelopeTolerance, time=patch.boardEnvelopeTimeTolerance;
+        const double vca=patch.boardVcaTolerance;
+        const double filterRelease=effectiveRelease(patch.filterRelease,patch.globalRelease);
+        const double ampRelease=effectiveRelease(patch.ampRelease,patch.globalRelease);
+        // The attack time sharing a T60's RC (see BoardTolerance).
+        const auto attack=[](double t60) { return boardAttackTimeConstants*t60/std::log(1000.0); };
         for (auto& voice : voices) {
             auto& board=voice.board;
             board.hpScale=std::exp2(patch.boardFilterTolerance*board.hpOctaves);
             board.lpScale=std::exp2(patch.boardFilterTolerance*board.lpOctaves);
-            const double envelope=1+patch.boardEnvelopeTolerance*board.filterEnvelopeError;
-            board.hpEnvelopeGain=envelope*board.hpScale;
-            board.lpEnvelopeGain=envelope*board.lpScale;
-            board.ampEnvelopeGain=1+patch.boardEnvelopeTolerance*board.ampEnvelopeError;
+            const double level=1+envelope*board.filterEnvelopeError;
+            board.hpEnvelopeGain=level*board.hpScale;
+            board.lpEnvelopeGain=level*board.lpScale;
+            board.ampPeak=1+envelope*board.ampPeakError;
+            board.ampFloor=ampEnvelopeFloor+envelope*board.ampFloorError;
+            // VR14 is trimmed at full sustain (CS-60 VI.4): there each board
+            // gives the nominal output, whatever its own floor.
+            board.ampEnvelopeGain=(1+ampEnvelopeFloor)/(1+board.ampFloor);
+            board.sineGain=(1+vca*board.sineError)/(1+vca*board.filteredError);
+            board.filterCoefficients=filterCoefficients;
+            board.ampCoefficients=ampCoefficients;
+            if (time>0) {
+                const auto& f=board.filterTimeLog;
+                board.filterCoefficients=envelopeCoefficients(internalFs,
+                    patch.filterAttack*BoardTolerance::timeFactor(f,patch.filterAttack,time),
+                    patch.filterDecay*BoardTolerance::timeFactor(f,attack(patch.filterDecay),time),
+                    filterRelease*BoardTolerance::timeFactor(f,attack(filterRelease),time),
+                    patch.filterAttackHeadroom,patch.filterAttackSaturation);
+                const auto& a=board.ampTimeLog;
+                board.ampCoefficients=envelopeCoefficients(internalFs,
+                    patch.ampAttack*BoardTolerance::timeFactor(a,patch.ampAttack,time),
+                    patch.ampDecay*BoardTolerance::timeFactor(a,attack(patch.ampDecay),time),
+                    ampRelease*BoardTolerance::timeFactor(a,attack(ampRelease),time),
+                    patch.ampAttackHeadroom,patch.ampAttackSaturation);
+            }
+        }
+        // VR6, trimmed with the four physical boards in place (see
+        // BoardTolerance): one common gain, exactly 1 when the VCA amount is 0.
+        if (vca>0) {
+            double power=0;
+            for (unsigned i=0;i<Synth::voiceCount;++i) power+=voices[i].board.sineGain*voices[i].board.sineGain;
+            const double vr6=std::sqrt(Synth::voiceCount/power);
+            for (auto& voice : voices) voice.board.ampEnvelopeGain*=vr6;
         }
     }
     void followFreeKeys() {
@@ -1396,12 +1542,14 @@ struct Synth::Impl {
             voice.driftTarget = initialRandom.bipolar();
             voice.driftCountdown = static_cast<unsigned>(internalFs * (.1 + initialRandom.unit()*.5));
         }
-        // Board tolerances come from their own seeded stream, drawn for every
+        // Board tolerances come from their own seeded streams, drawn for every
         // physical slot in a fixed order, so the shared audio/drift stream is
         // untouched and board i is the same unit at every polyphony/quality.
-        Random boards(seed^0x5851f42d4c957f2dULL);
-        for (auto& voice : voices) voice.board.draw(boards);
+        Random boards(seed^0x5851f42d4c957f2dULL), moreBoards(seed^0x2545f4914f6cdd1dULL);
+        for (auto& voice : voices) voice.board.draw(boards,moreBoards);
         updateBoardScales();
+        // An idle board rests at its own VCA-EG floor (VR17).
+        for (auto& voice : voices) voice.amp.voltage=voice.board.ampFloor;
     }
     // KAS key voltage path (guide printed pp.22-25): assigner code -> glissando
     // counter -> integrating gate -> sample-hold -> VCO and filter key CV.
@@ -1509,6 +1657,8 @@ struct Synth::Impl {
             // noteOn. This digital adaptation does not slew the keyboard CV.
             v.velocityValue+=(v.velocity-v.velocityValue)*velocityCoefficient;
             const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
+            // Free-running wander, driftCents peak (see ceres.hpp): its 0.2-0.7s
+            // hold and .3s smoothing are engineering choices with no source.
             if (v.driftCountdown-- == 0) {
                 v.driftTarget = random.bipolar();
                 v.driftCountdown = static_cast<unsigned>(internalFs * (.2 + random.unit()*.5));
@@ -1518,21 +1668,24 @@ struct Synth::Impl {
                 + v.drift*patch.driftCents + lfo*(patch.vibratoCents + expression*patch.pressureVibrato)
                 + expression*patch.pressureVibrato*touchVibratoBias;
             const double key=advanceGlide(v,dt);
-            // Trim residual of this board's linear VCO (see BoardTolerance):
-            // its key voltage is the NORMAL frequency of key, bend and PITCH.
-            if (patch.boardPitchTolerance>0)
-                cents+=patch.boardPitchTolerance*v.board.pitchCents(patch.octave,
+            // Trim residual and thermal drift of this board's linear VCO (see
+            // BoardTolerance): its key voltage is the NORMAL frequency of key,
+            // bend and PITCH.
+            if (patch.boardPitchTolerance>0 || patch.boardTemperatureRise!=0)
+                cents+=v.board.pitchCents(patch,
                     440*std::exp2((key-69+bend+patch.tuneCents*.01)/12));
             const double frequency = 440 * std::exp2((key-69 + bend + 12*patch.octave + cents*.01)/12);
             const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
                                             patch.resetMicroseconds*1e-6,internalFs);
+            // Each board's EG times, VCA-EG peak and floor (see BoardTolerance;
+            // the shared values when the envelope tolerance is off).
+            const auto& egf=v.board.filterCoefficients;
+            const auto& ega=v.board.ampCoefficients;
             const double filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
-                patch.filterAttackHeadroom,patch.filterAttackSaturation,filterCoefficients[0],
-                filterCoefficients[3],filterCoefficients[1],filterCoefficients[2]);
-            const double ampEnvelope = std::max(0.0,v.amp.advance(ampEnvelopeFloor,1,
-                patch.ampSustain+ampEnvelopeFloor,
-                patch.ampAttackHeadroom,patch.ampAttackSaturation,ampCoefficients[0],
-                ampCoefficients[3],ampCoefficients[1],ampCoefficients[2]));
+                patch.filterAttackHeadroom,patch.filterAttackSaturation,egf[0],egf[3],egf[1],egf[2]);
+            const double ampEnvelope = std::max(0.0,v.amp.advance(v.board.ampFloor,v.board.ampPeak,
+                patch.ampSustain+v.board.ampFloor,
+                patch.ampAttackHeadroom,patch.ampAttackSaturation,ega[0],ega[3],ega[1],ega[2]));
             // Guide printed p.34: fc=125*Kv*2^Vfc. Kv is LINEAR in key Hz: the
             // M board feeds IG00156 pin 2 from the same K terminal as VCO III
             // pin 2 (SM2 p.16), 0.25V at 130.8Hz to 4V at 2093Hz (Yamaha's
@@ -1579,7 +1732,9 @@ struct Synth::Impl {
             // CP3 coupling precedes filtered level; CP4 coupling acts on
             // the filtered/sine sum before common level and envelope VCAs.
             const double filtered=v.filteredCoupling.process(low,outputCouplingTau[0],internalFs);
-            const double summed=filtered*patch.filterLevel + waves.sine*patch.sine;
+            // The sine's VR11/VR12 balance against the filtered path (VCA
+            // amount); exactly 1 when off.
+            const double summed=filtered*patch.filterLevel + waves.sine*patch.sine*board.sineGain;
             const double beforeVca=v.commonCoupling.process(summed,outputCouplingTau[1],internalFs);
             // IG00151 gain is LINEAR in envelope CV (guide pp.40–41). The
             // optional velocity term is zero in factory-derived presets.
@@ -1672,8 +1827,11 @@ void Synth::setPatch(const Patch& patch) {
         impl_->lpResonanceAnchor=validated.lpResonance;
         impl_->effectiveHpResonance=validated.hpResonance;
         impl_->effectiveLpResonance=validated.lpResonance;
-        for (auto& voice : impl_->voices)
+        for (auto& voice : impl_->voices) {
             if (voice.filter.stage == Envelope::Idle) voice.filter.voltage = validated.filterInitial;
+            // ... and an idle VCA EG at its board's floor (VR17).
+            if (voice.amp.stage == Envelope::Idle) voice.amp.voltage = voice.board.ampFloor;
+        }
     } else if (changingRingDepth) {
         // Retarget from the actual interpolated value. Repeated patch writes
         // with the same target do not prolong the finite20ms transition.
@@ -1788,7 +1946,7 @@ void Synth::allSoundOff() {
     for (auto& voice : impl_->voices) {
         voice.held = voice.pedalHeld = false;
         voice.amp = {};
-        voice.amp.voltage = ampEnvelopeFloor;
+        voice.amp.voltage = voice.board.ampFloor;
         voice.filter = {};
         voice.filter.voltage = impl_->patch.filterInitial;
         voice.filters = {}; voice.filteredCoupling={}; voice.commonCoupling={};

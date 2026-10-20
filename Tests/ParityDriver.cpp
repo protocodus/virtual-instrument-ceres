@@ -12,6 +12,7 @@ int main(int argc,char** argv) {
     const bool capacitorControls=argc==3 && std::strcmp(argv[2],"capacitors")==0;
     const bool expressionControls=argc==3 && std::strcmp(argv[2],"expression")==0;
     const bool boardControls=argc==3 && std::strcmp(argv[2],"boards")==0;
+    const bool identicalBoards=argc==3 && std::strcmp(argv[2],"identical-boards")==0;
     const bool soundPathControls=argc==3 && (std::strcmp(argv[2],"soundpath")==0 || expressionControls);
     std::ofstream output(argv[1],std::ios::binary);
     if(!output)return 3;
@@ -64,7 +65,15 @@ int main(int argc,char** argv) {
         // Board tolerances at full documented spread, on every board.
         if(boardControls && (!ceres::setParameter(patch,"board_pitch_tolerance",1) ||
            !ceres::setParameter(patch,"board_filter_tolerance",1) ||
-           !ceres::setParameter(patch,"board_envelope_tolerance",1)))return 10;
+           !ceres::setParameter(patch,"board_envelope_tolerance",1) ||
+           !ceres::setParameter(patch,"board_envelope_time_tolerance",1) ||
+           !ceres::setParameter(patch,"board_vca_tolerance",1) ||
+           !ceres::setParameter(patch,"board_temperature_rise",25)))return 10;
+        // The shipping tolerances off: the same panel controls on four
+        // identical boards, the reference the board parity check contrasts.
+        if(identicalBoards && (!ceres::setParameter(patch,"board_pitch_tolerance",0) ||
+           !ceres::setParameter(patch,"board_filter_tolerance",0) ||
+           !ceres::setParameter(patch,"board_envelope_tolerance",0)))return 11;
         // Glide and touch-wah ride with the expression scenes: both are
         // per-board key/touch paths shared by the native and embedded cores.
         if(expressionControls && (!ceres::setParameter(patch,"glide_mode",scene%3) ||
