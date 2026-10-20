@@ -989,9 +989,22 @@ void ringEnvelopeAndKeyLedger() {
         require(std::abs(state.ringEnvelope-expected)<2e-13,"Ring RC attack must follow independent exponential solution");
         require(std::abs(state.ringFrequency-10*std::exp2(2*expected))<2e-11,"Ring depth controls frequency, not mix amplitude");
     }
-    // Last key-up interrupts attack through the separately sourced fixed RT.
+    // Last key-up interrupts attack through the separately sourced fixed 2DT.
+    // This fixture held the untrimmed pin-sheet law (.4678s T60); the
+    // PRA-aligned law was chosen by ear on 2026-10-20. Derived here without
+    // the engine's helpers: 2DT is the 6.8k/3.3k divider of +15V; the pin
+    // sheet's decay runs exponentially from 10s at 0V to 10ms at 10V, as
+    // five-RC durations (T60 = duration*ln1000/5); the CS-60 PRA alignment
+    // puts the attack at AT=10V at 31ms, where the pin sheet's 1s-to-1ms
+    // attack gives 1ms.
     const double initial=s.modulationState().ringEnvelope;s.noteOff(60);
-    constexpr double release=.4678104397473947;
+    const double twoDt=15*3300./(6800+3300);
+    const double trim=.031/(1*std::pow(.001/1,10/10.));
+    const double release=trim*10*std::pow(.010/10,twoDt/10)*std::log(1000.)/5;
+    require(std::abs(release-14.5021)<1e-4 && std::abs(.4678104397473947*trim/release-1)<1e-12,
+            "Ring release is the 2DT divider on the 31x PRA-aligned law, 14.50s T60");
+    require(std::abs(ceres::ringDecaySeconds(ceres::ringReleaseVolts)/release-1)<1e-14,
+            "Header DECAY TIME law at the fixed 2DT gives the derived release");
     for(unsigned n=1;n<=800;++n) {
         s.process();require(std::abs(s.modulationState().ringEnvelope-
             initial*std::exp(-std::log(1000.)*(n/fs)/release))<2e-13,"Ring fixed release toward0, independent of A/D");

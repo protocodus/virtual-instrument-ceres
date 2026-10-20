@@ -143,6 +143,15 @@ double ringSteering(double volts) { return std::tanh(volts/(2*ringThermalVoltage
 double ringSpeedHz(double vc1Volts) {
     return ringSpeedReferenceHz*std::exp2(ringSpeedOctavesPerVolt*(vc1Volts-5));
 }
+// PRA envelope lever laws: the IG00159 pin-sheet times scaled by the PRA's
+// 31ms alignment (sources, the slope assumption and the by-ear choice are
+// beside the declarations in ceres.hpp).
+double ringAttackSeconds(double atVolts) {
+    return ringEnvelopeTrim*std::pow(10.,-.3*atVolts);
+}
+double ringDecaySeconds(double dtVolts) {
+    return ringEnvelopeTrim*10*std::pow(10.,-.3*dtVolts)*std::log(1000.)/5;
+}
 namespace {
 // The wet buffer IC1-2 is non-inverting with VR4 (B-100K trimmer) over 10k:
 // gain 1+VR4/10k, 1..11. Its factory setting is not printed anywhere in the
@@ -1226,13 +1235,13 @@ struct Synth::Impl {
         filterCoefficients = envelopeCoefficients(internalFs,patch.filterAttack,
             patch.filterDecay,effectiveRelease(patch.filterRelease,patch.globalRelease),
             patch.filterAttackHeadroom,patch.filterAttackSaturation);
-        // Direct CS-50 PRA RT divider: +15V through6.8k,3.3k toground.
-        // Its unloaded4.901V mapped by the existing nominal five-RC law
-        // implies .46781044s T60. External timing gain is not calibrated;
-        // this fixed key-off return is separate from the M-board global SUS.
-        constexpr double ringRelease=.4678104397473947;
+        // Direct CS-50 PRA 2DT divider: +15V through 6.8k, 3.3k to ground.
+        // Its unloaded 4.901V on the PRA-aligned DECAY TIME law gives 14.50s
+        // T60 (CS-60 sibling trim, fixed-100k slope assumption; chosen by ear
+        // 2026-10-20 over the untrimmed .4678s; see ceres.hpp). This fixed
+        // key-off return is separate from the M-board global SUS.
         ringCoefficients=envelopeCoefficients(internalFs,patch.ringAttack,
-            patch.ringDecay,ringRelease,.01,0);
+            patch.ringDecay,ringDecaySeconds(ringReleaseVolts),.01,0);
         updateBoardScales();
     }
     void updateBoardScales() {
