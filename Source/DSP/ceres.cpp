@@ -609,9 +609,21 @@ struct Oscillator {
         // A flat reset plateau followed by a 2r step is a reduced clamp model
         // of the published sketch, not a recovered hidden-chip transfer.
         const double step = clamp(frequency / fs, 1e-8, .18);
-        const double recharge = clamp(frequency * resetSeconds, 1e-7, .35);
-        // The .35 guard is a defensive extrapolation outside the calibrated
-        // Normal keyboard range; no high-CV/pulse overlap behavior is claimed.
+        // Charge balance (guide printed p.28): C2*Vpp=(Iref-I)*tau=I*t, so
+        // f=I/(Iref*tau) and the one-shot fills r=f*tau of every period at
+        // every pitch, exactly, until I reaches Iref (r=1, f=1/tau=16.7kHz),
+        // where the discharge interval vanishes. The CS-50 itself stops near
+        // r=.38: top C6 on 4' (4186Hz), PITCH at its 6V end (TU 6V/4V, guide
+        // printed p.23, x1.5) and +14 cent fine tune (p.5) give 6.33kHz. The .9
+        // guard only bounds MIDI notes and engineering tuning beyond that.
+        // tau itself is a trim, not a part value: the CS-50 pitch procedure
+        // (CS-60 service manual printed p.17, which lists the CS-50 values)
+        // sets VR3 so the C6 key gives 4186Hz +/-1 cent at 4', where RFT is
+        // the untrimmed 20k 0.1% resistor (SM2 p.16 table), and VR2 so C2
+        // gives 261.6Hz. So Iref*tau=1/(1046.4Hz/V*20k), i.e. the shipped
+        // 59.73us at the guide's nominal 800uA; only Iref's own tolerance
+        // (unpublished) moves r.
+        const double recharge = clamp(frequency * resetSeconds, 1e-7, .9);
         const double resetPhase = wrap(phase-recharge);
         // WSC pin5 inverts the conditioned downward ramp. Correct both
         // voltage jumps and both slope changes analytically, without tables.
@@ -624,16 +636,30 @@ struct Oscillator {
         // edge. Its rising edge stays locked to the VCO period. Applying a
         // comparator to BOTH slopes of the internal recharge capacitor would
         // incorrectly move both edges; WSC uses the conditioned VCO output.
-        // This is the comparator's logical timing coordinate. At
-        // deep PWM where duty<recharge, this fixed-edge rule is an independent
-        // WSC approximation; hidden reset/comparator compensation is unknown.
-        double square = phase < duty ? 1 : -1;
-        square += blep(phase,step) - blep(wrap(phase-duty),step);
+        // This is the comparator's logical timing coordinate. PI (pin 9) is
+        // wired to the same T1 node as SI and TL (SM2 p.16, 22k to ground),
+        // and the IG00158 pin sheet (SM2 p.21, pins 9-11) draws PO as that
+        // ramp compared with the PW/PWM level: high from the reset jump until
+        // the descending ramp crosses the level. The threshold sits at p=1-2d
+        // on the conditioned ramp p (bottom fixed, slope fixed per period), so
+        // it is crossed at phase d; while the one-shot holds p on its top
+        // plateau no crossing exists, and a level above the ramp's start
+        // 1-2r (d<r, deep PWM at upper notes) is crossed at the plateau's
+        // step instead. The falling edge is therefore at max(d,r).
+        const double fall = std::max(duty, recharge);
+        double square = phase < fall ? 1 : -1;
+        square += blep(phase,step) - blep(wrap(phase-fall),step);
         // WSC pin14 -> pin3 folds the SAME conditioned ramp, then pin15 ->
         // pin2 rounds it. Retain the existing ideal sine transfer, but stop
         // bypassing the finite reset with an unrelated ideal phase ramp.
         // The flat plateau is thus 1; the descending branch is cos(2pi*phi).
         // Sine slice trim/compensation and exact transistor shape are unknown.
+        // Amplitude-domain form: -cos(pi*p) is fold tri=2|p|-1 (TO, 3.2Vpp,
+        // SL pin 4 open; SM2 p.21) through an ideal sin(pi/2*tri). TO reaches
+        // STI through 4.7uF NP with 22k to ground (SM2 p.16), which removes
+        // the triangle's 2r^2 mean; an ideal shaper cannot take that offset
+        // without an out-of-range transfer nobody has published, so it is
+        // omitted (.2% of peak at C4, 3% at C6 on 8').
         const double resetAngle = 2*pi*recharge;
         const double resetSine = std::sin(resetAngle);
         const double resetCosine = std::cos(resetAngle);
@@ -648,6 +674,13 @@ struct Oscillator {
         // introducing another oscillator. The guide's small waveform sketches
         // do not establish an unambiguous common timing reference; this is not
         // proof of an active-low chip output or an extra hardware inverter.
+        // Yamaha's two drawings point the other way: the guide's WSC block
+        // (p.31) labels SI->SO an inverter, and the SM2 p.21 pin sheet draws
+        // PO high from the reset jump; read literally, SO falls as PO rises
+        // and equal-level mixing partly cancels. The M board gives both the
+        // same FET gate and 150k into one node (SM2 p.16), so no board stage
+        // reconciles them. The measured recording is kept over the sketches;
+        // see Docs/research/vco-authenticity-2026-10-20.md.
         return {saw, -square, sine};
     }
 };
