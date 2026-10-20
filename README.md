@@ -13,19 +13,19 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 | # | Preset | Demo | Length | Peak |
 | --- | --- | --- | --- | --- |
 | 1 | init | [01-init.mp3](Docs/audio/01-init.mp3) | 12.0 s | -9.8 dBFS |
-| 2 | string1 | [02-string1.mp3](Docs/audio/02-string1.mp3) | 12.0 s | -7.6 dBFS |
-| 3 | string2 | [03-string2.mp3](Docs/audio/03-string2.mp3) | 12.0 s | -11.5 dBFS |
-| 4 | brass1 | [04-brass1.mp3](Docs/audio/04-brass1.mp3) | 12.0 s | -10.6 dBFS |
-| 5 | brass2 | [05-brass2.mp3](Docs/audio/05-brass2.mp3) | 12.0 s | -12.3 dBFS |
-| 6 | flute | [06-flute.mp3](Docs/audio/06-flute.mp3) | 12.0 s | -7.8 dBFS |
-| 7 | electric_piano | [07-electric-piano.mp3](Docs/audio/07-electric-piano.mp3) | 12.0 s | -6.3 dBFS |
-| 8 | clavichord | [08-clavichord.mp3](Docs/audio/08-clavichord.mp3) | 12.0 s | -6.8 dBFS |
-| 9 | harpsichord | [09-harpsichord.mp3](Docs/audio/09-harpsichord.mp3) | 12.0 s | -8.6 dBFS |
-| 10 | guitar1 | [10-guitar1.mp3](Docs/audio/10-guitar1.mp3) | 12.0 s | -8.6 dBFS |
-| 11 | guitar2 | [11-guitar2.mp3](Docs/audio/11-guitar2.mp3) | 12.0 s | -11.6 dBFS |
-| 12 | funky1 | [12-funky1.mp3](Docs/audio/12-funky1.mp3) | 12.0 s | -7.3 dBFS |
-| 13 | funky2 | [13-funky2.mp3](Docs/audio/13-funky2.mp3) | 12.0 s | -5.8 dBFS |
-| 14 | funky3 | [14-funky3.mp3](Docs/audio/14-funky3.mp3) | 12.0 s | -9.9 dBFS |
+| 2 | string1 | [02-string1.mp3](Docs/audio/02-string1.mp3) | 12.0 s | -9.1 dBFS |
+| 3 | string2 | [03-string2.mp3](Docs/audio/03-string2.mp3) | 12.0 s | -13.6 dBFS |
+| 4 | brass1 | [04-brass1.mp3](Docs/audio/04-brass1.mp3) | 12.0 s | -12.0 dBFS |
+| 5 | brass2 | [05-brass2.mp3](Docs/audio/05-brass2.mp3) | 12.0 s | -13.9 dBFS |
+| 6 | flute | [06-flute.mp3](Docs/audio/06-flute.mp3) | 12.0 s | -8.9 dBFS |
+| 7 | electric_piano | [07-electric-piano.mp3](Docs/audio/07-electric-piano.mp3) | 12.0 s | -7.5 dBFS |
+| 8 | clavichord | [08-clavichord.mp3](Docs/audio/08-clavichord.mp3) | 12.0 s | -8.0 dBFS |
+| 9 | harpsichord | [09-harpsichord.mp3](Docs/audio/09-harpsichord.mp3) | 12.0 s | -9.7 dBFS |
+| 10 | guitar1 | [10-guitar1.mp3](Docs/audio/10-guitar1.mp3) | 12.0 s | -9.5 dBFS |
+| 11 | guitar2 | [11-guitar2.mp3](Docs/audio/11-guitar2.mp3) | 12.0 s | -12.8 dBFS |
+| 12 | funky1 | [12-funky1.mp3](Docs/audio/12-funky1.mp3) | 12.0 s | -9.3 dBFS |
+| 13 | funky2 | [13-funky2.mp3](Docs/audio/13-funky2.mp3) | 12.0 s | -7.3 dBFS |
+| 14 | funky3 | [14-funky3.mp3](Docs/audio/14-funky3.mp3) | 12.0 s | -11.4 dBFS |
 
 <!-- audio-demos-end -->
 
@@ -86,7 +86,7 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 ## Downloads
 
 <!-- build-download-begin -->
-**[Download main build 18](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/39434788725/artifacts/12272280579)**, built from [`1683c62a3f05`](https://github.com/protocodus/virtual-instrument-ceres/commit/1683c62a3f052cfafea01bca40c7f0c62de9e683). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
+**[Download main build 19](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/39436302937/artifacts/12272717312)**, built from [`7e6cd068e866`](https://github.com/protocodus/virtual-instrument-ceres/commit/7e6cd068e866d6a1f7d243f7227f85ff4ab01789). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
 <!-- build-download-end -->
 
 ---
