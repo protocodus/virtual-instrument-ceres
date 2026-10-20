@@ -30,8 +30,10 @@ constexpr double touchVibratoBias=.5/1.5;
 constexpr double touchLevelScale=(6/150e3)/(10/270e3);
 // The same LC node takes the SUB VCA lever (PN3 SVR4, B-10k between SUO and
 // ground; SM2 p.27) through 120k: the 3Vpp SUB at full lever adds +/-1.5V/120k
-// against LEVEL's 10V/270k, so +/-.3375 of full LEVEL. The lever's <=2.5k
-// source resistance (2% of 120k) is neglected.
+// against LEVEL's 10V/270k, so +/-.3375 of full LEVEL. The wiper feeds all
+// four boards' 120k (R7 L1), 30k in all, so lever travel x gives the loaded
+// fraction x/(1+x(1-x)/3), at most 7.7% low at mid-lever. tremolo is that
+// loaded fraction; the endpoints are exact.
 constexpr double tremoloScale=(1.5/120e3)/(10/270e3);
 constexpr double qControlTau=10e-6*(220e3/2);
 // Fairchild uA796 upper carrier pairs have no emitter degeneration. In the

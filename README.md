@@ -198,7 +198,7 @@ Touch LEVEL adds to the common VCA gain: `amp_level + 1.08*pressure_volume*expre
 - Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
 - No external modulation input is implemented. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
-- The portamento/glissando clock rate, the KAS note-ladder intonation and the noise limiter's bandwidth and slew rate are not calibrated.
+- The portamento/glissando clock rate and the noise limiter's bandwidth and slew rate are not calibrated.
 
 ## Build
 
