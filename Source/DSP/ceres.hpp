@@ -130,7 +130,10 @@ struct Patch {
     // vibrato cents per unit touch; level amplifier I is trimmed to centre the
     // 3Vpp SUB on +.5V, so touch vibrato rises by a third of its depth.
     // pressureWah is touch-scaled SUB filter depth (level amplifier II -> R7
-    // VCF pin70), LP octaves with the same .3374 HP ratio. Uncalibrated depths.
+    // VCF pin70), LP octaves with the same .3374 HP ratio. pressureVolume is
+    // touch LEVEL: R7 adds its current to LEVEL's at common VCA2, so full depth
+    // and full touch add 1.08 times full amp_level; zero touch leaves amp_level.
+    // Uncalibrated filter and vibrato depths.
     double pressureVolume = 0.0, pressureFilter = 0.0, pressureVibrato = 0.0;
     double pressureWah = 0.0;
     // PORTAMENTO/GLISSANDO (panel 3; guide printed pp.23-25, KAS YM26700):
@@ -155,8 +158,7 @@ struct Patch {
     // without regating/resetting circuit state. This is not a CS-50 circuit.
     double expressionSource = 0.0;
     // Independent legacy velocity-to-gain depth, multiplicative with the
-    // selected expression gain. Leave zero when using pressureVolume alone
-    // for velocity response; otherwise both gains intentionally apply.
+    // common VCA gain including touch LEVEL; both apply when both are set.
     double velocitySensitivity = 0.0;
     // Effective differential-pair input scaling, uncalibrated. 1 is restrained.
     double drive = 1.0;

@@ -24,6 +24,10 @@ constexpr double hpSubRelativeScale=(.7/.65)*(47./150.);
 // Guide printed p.56: touch level amplifier I is trimmed so a 0V-centred SUB
 // input leaves centred on +.5V; the SUB source is fixed at 3Vpp (p.55).
 constexpr double touchVibratoBias=.5/1.5;
+// R7 LC sums LEVEL (10V full, 270k) and touch LEVEL (6.0V full, 150k; guide
+// printed p.55 calibration) into common VCA2: full touch adds 1.08 times the
+// full-LEVEL current (SM1 printed p.14).
+constexpr double touchLevelScale=(6/150e3)/(10/270e3);
 constexpr double qControlTau=10e-6*(220e3/2);
 // Fairchild uA796 upper carrier pairs have no emitter degeneration. In the
 // matched, forward-active/infinite-beta limit their current steering is
@@ -895,8 +899,8 @@ struct Synth::Impl {
             // IG00151 gain is LINEAR in envelope CV (guide pp.40–41). The
             // optional velocity term is zero in factory-derived presets.
             const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocityValue);
-            const double pressureGain = 1-patch.pressureVolume*(1-expression);
-            mixed += beforeVca * ampEnvelope * velocityGain * pressureGain * commonVcaGain;
+            const double touchLevel=patch.pressureVolume*expression*touchLevelScale;
+            mixed += beforeVca * ampEnvelope * velocityGain * (commonVcaGain+touchLevel);
         }
         // Output rail saturation is a deliberately mild, uncalibrated op-amp
         // approximation; no hidden peak normalization or dynamics processor.

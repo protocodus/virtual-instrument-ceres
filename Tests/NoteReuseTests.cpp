@@ -71,15 +71,17 @@ void legacyGainAndReset() {
     for(unsigned factor:{1u,2u,4u}) {
         ceres::Synth selected(48000,51),legacy(48000,51);
         selected.configure(1,factor);legacy.configure(1,factor);
-        auto p=patch();p.pressureFilter=0;selected.setPatch(p);
-        p.expressionSource=0;p.velocitySensitivity=p.pressureVolume;p.pressureVolume=0;legacy.setPatch(p);
+        // Touch LEVEL a+c*e equals legacy (a+c)*(1-s*(1-e)) with s=c/(a+c).
+        auto p=patch();p.pressureFilter=0;p.ampLevel=.2;selected.setPatch(p);
+        const double c=(6/150e3)/(10/270e3)*p.pressureVolume;
+        p.expressionSource=0;p.ampLevel=.2+c;p.velocitySensitivity=c/p.ampLevel;p.pressureVolume=0;legacy.setPatch(p);
         for(unsigned f=0;f<5000;++f) {
             if(f==0 || f==2000 || f==2100)for(auto* s:{&selected,&legacy})s->noteOn(60,f==0?.2:(f==2000?.9:.4));
-            require(selected.process()==legacy.process(),"Legacy velocity gain uses the same continuous coordinate");
+            near(selected.process(),legacy.process(),1e-12,"Legacy velocity gain uses the same continuous coordinate");
         }
         selected.reset();legacy.reset();
         for(auto* s:{&selected,&legacy})s->noteOn(67,.65);
-        for(unsigned f=0;f<1000;++f)require(selected.process()==legacy.process(),"Reset precharges both velocity routes identically");
+        for(unsigned f=0;f<1000;++f)near(selected.process(),legacy.process(),1e-12,"Reset precharges both velocity routes identically");
     }
 }
 void stolenPressFifo() {

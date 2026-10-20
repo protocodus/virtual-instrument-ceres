@@ -132,11 +132,12 @@ void audioLawsAndZeroDepth() {
     for(unsigned route=0;route<3;++route) {
         auto p=patch();p.pressureFilter=p.pressureVibrato=p.pressureVolume=0;
         p.sine=.15;constexpr double v=.37;
-        if(route==0)p.pressureVolume=.8;
+        if(route==0){p.pressureVolume=.8;p.ampLevel=.5;}
         if(route==1)p.pressureFilter=1.3;
         if(route==2)p.pressureVibrato=80;
         auto equivalent=p;equivalent.expressionSource=0;
-        if(route==0){equivalent.velocitySensitivity=p.pressureVolume;equivalent.pressureVolume=0;}
+        // Touch LEVEL adds 1.08 x depth x touch to LEVEL at common VCA2 (R7 LC).
+        if(route==0){equivalent.ampLevel=p.ampLevel+(6/150e3)/(10/270e3)*v*p.pressureVolume;equivalent.pressureVolume=0;}
         if(route==1) {
             equivalent.hpCutoff=floorHz+(p.hpCutoff-floorHz)*std::exp2(v*p.pressureFilter*hpTouch);
             equivalent.lpCutoff=floorHz+(p.lpCutoff-floorHz)*std::exp2(v*p.pressureFilter);
@@ -163,11 +164,11 @@ void audioLawsAndZeroDepth() {
         a.pressure(n/1500.);b.pressure(1-n/1500.);
         require(a.process()==b.process(),"Zero expression depths are byte-exact with independent legacy velocity sensitivity");
     }
-    // At one shared velocity, both independent gain laws multiply; the
-    // equivalent combined depth follows 1-d*(1-v)=g1*g2, not replacement.
-    p=patch();p.pressureFilter=p.pressureVibrato=0;p.pressureVolume=.3;p.velocitySensitivity=.4;
+    // At one shared velocity, velocity sensitivity multiplies the common VCA
+    // gain that touch LEVEL adds to; it does not replace it.
+    p=patch();p.pressureFilter=p.pressureVibrato=0;p.pressureVolume=.3;p.velocitySensitivity=.4;p.ampLevel=.5;
     constexpr double v=.4;auto both=p;both.pressureVolume=0;
-    both.velocitySensitivity=(1-(1-.3*(1-v))*(1-.4*(1-v)))/(1-v);
+    both.ampLevel=p.ampLevel+(6/150e3)/(10/270e3)*.3*v;
     ceres::Synth c(8000,8),d(8000,8);c.setPatch(p);d.setPatch(both);c.noteOn(60,v);d.noteOn(60,v);
     for(unsigned n=0;n<500;++n)near(c.process(),d.process(),2e-8,"Velocity sensitivity remains an independent multiplicative gain");
 }
