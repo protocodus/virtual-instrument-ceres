@@ -19,17 +19,36 @@ void near(double a,double b,double tolerance,const char* why) {
 // HA1452 Icc 12mA through the 390/220 ohm droppers from +/-15V, less the
 // NJM4558 sibling's typical 2V swing margin into 2k: HO +8.32V, -10.36V.
 constexpr double hoPositive=15-.012*390-2, hoNegative=-(15-.012*220-2);
-// Four sine-only voices (CP4 1Vpp, engine +/-1) at full LEVEL, .18 at full
-// VOLUME, read 0 dBm (sqrt(.6) V RMS) at HO. Full SUSTAIN holds the aligned
-// VCA EG at 9.8V of its 10V peak (TP2 floor -0.2V), so .98 of each sine.
-const double referenceRms=.18*std::sqrt(4*.5)*.98;
+// Four sine-only voices (CP4 1Vpp, engine +/-1 peak) at full LEVEL, .18 at
+// full VOLUME, read 0 dBm (sqrt(.6) V RMS) at HO. Full SUSTAIN holds the
+// aligned VCA EG at 9.8V of its 10V peak (TP2 floor -0.2V), so .98 of each
+// sine. The WSC sine is the differential-pair shaper tanh(k*tri)/tanh(k),
+// k=1.4020, whose mean square over a period is (1/2)*int_{-1}^{1} of its
+// square: (1-tanh(k)/k)/tanh(k)^2 in closed form (an ideal sine's is .5).
+// shapedMeanSquare() integrates the shaped waveform itself to check that.
+constexpr double shaperDrive=1.4020;
+double shapedMeanSquare() {
+    // Simpson over one period of the folded triangle, 2^16 intervals.
+    constexpr int intervals=1<<16;
+    const auto square=[](double phase){
+        const double tri=2*std::abs(1-2*phase)-1;
+        const double y=std::tanh(shaperDrive*tri)/std::tanh(shaperDrive);
+        return y*y;
+    };
+    double sum=square(0)+square(1);
+    for(int i=1;i<intervals;++i)sum+=(i%2 ? 4:2)*square(double(i)/intervals);
+    return sum/(3.0*intervals);
+}
+const double closedMeanSquare=(1-std::tanh(shaperDrive)/shaperDrive)/std::pow(std::tanh(shaperDrive),2);
+const double referenceRms=.18*std::sqrt(4*closedMeanSquare)*.98;
 const double perVolt=referenceRms/std::sqrt(.6);
 
 void preampTransfer() {
+    near(shapedMeanSquare(),closedMeanSquare,1e-13,"Shaped sine mean square: quadrature agrees with the closed form");
     // The engine node is HO inverted, so HO's positive limit bounds it below.
     const double high=-hoNegative*perVolt, low=-hoPositive*perVolt;
-    near(high,3.3365505491030696,1e-12,"Upper rail from the printed droppers");
-    near(low,-2.679546386924473,1e-12,"Lower rail from the printed droppers");
+    near(high,3.2324166750544396,1e-12,"Upper rail from the printed droppers");
+    near(low,-2.5959176386537592,1e-12,"Lower rail from the printed droppers");
     for(double volume:{0.,.1,.55,1.})
         for(double x:{-20.,-3.,-.7,0.,.3,2.,9.}) {
             const double linear=x*.18*volume;

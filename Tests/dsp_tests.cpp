@@ -377,10 +377,16 @@ void outputLifecycleAndPolarity() {
     require(rms(render(warm,1024))==0,"Panic must clear every output coupling and FIR history exactly");
 
     // Independent absolute phase reference: first SplitMix64 unit value for
-    // seed 1, a cosine WSC sine, and the symmetric FIR's 124-sample delay.
-    // The final-of-four output phase is 3, hence 121 internal samples delay.
-    // Physical RC phase at 440Hz is small; an omitted line inversion changes
-    // this correlation's sign. No old renderer is needed by this native test.
+    // seed 1, the WSC sine on that phase, and the symmetric FIR's 124-sample
+    // delay. The final-of-four output phase is 3, hence 121 internal samples
+    // delay. Physical RC phase at 440Hz is small; an omitted line inversion
+    // changes this correlation's sign. No old renderer is needed by this
+    // native test. Since 2026-10-20 the WSC sine is the differential-pair
+    // shaper tanh(k*tri)/tanh(k), k=1.4020, on the folded ramp: its 1.36%
+    // THD alone caps the correlation with a pure cosine at .99991, and with
+    // the RC phase it measures .99987, under the bound; against the shaped
+    // waveform it is .99997 (an ideal sine is cos(2*pi*phase), which the
+    // previous engine met at .99999). The reference follows the waveform.
     ceres::Synth sign(48000,1); p.volume=.01; sign.setPatch(p); sign.noteOn(69);
     constexpr std::size_t start=96000;
     render(sign,start);
@@ -388,7 +394,8 @@ void outputLifecycleAndPolarity() {
     double cross=0,energy=0,referenceEnergy=0;
     for (std::size_t i=0;i<audio.size();++i) {
         const double phase=.5665615751722809+440*(double(start+i)-121.0/4)/48000;
-        const double reference=std::cos(2*pi*phase);
+        const double tri=2*std::abs(1-2*(phase-std::floor(phase)))-1;
+        const double reference=std::tanh(1.4020*tri)/std::tanh(1.4020);
         cross+=audio[i]*reference; energy+=audio[i]*audio[i]; referenceEnergy+=reference*reference;
     }
     require(cross/std::sqrt(energy*referenceEnergy)<-.9999,
