@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace {
 constexpr double pi=3.14159265358979323846;
@@ -266,6 +267,48 @@ void recordedMixtureRelationship() {
     check(rmsRatio>2.5&&rmsRatio<2.8,"Both-on RMS must increase with constructive equal-level mixing");
 }
 
+// Public CS-80 sample set (Freesound "mogigrumbles"; same M board #21233, so
+// the same IG00158; Tools/measure_cs80_wsc_recordings.py): under PWM the
+// falling audio pulse edge is fixed and the rising one moves (all 12 PWM
+// notes), and the saw rises and drops at its reset (all 11 SAW notes). The
+// comparator's fixed edge is the reset, so pulse and saw fall together. This
+// checks that relationship on the rendered edges themselves, not through the
+// comparator formula, and assumes as the recording does that both takes share
+// one chain polarity.
+std::vector<double> zeroCrossings(const std::vector<ceres::OscillatorFrame>& trace,bool pulse,bool rising) {
+    std::vector<double> times;
+    for(std::size_t i=1;i<trace.size();++i) {
+        const double a=pulse ? trace[i-1].pulse:trace[i-1].saw,b=pulse ? trace[i].pulse:trace[i].saw;
+        if(rising ? (a<0&&b>=0) : (a>0&&b<=0))times.push_back(double(i-1)+a/(a-b));
+    }
+    return times;
+}
+double intervalSpread(const std::vector<double>& times) {
+    double sum=0,squares=0;
+    for(std::size_t i=1;i<times.size();++i) {const double d=times[i]-times[i-1];sum+=d;squares+=d*d;}
+    const double n=double(times.size()-1);
+    return std::sqrt(std::max(0.,squares/n-std::pow(sum/n,2)));
+}
+void recordedEdgeRelationship() {
+    // An 800-sample period puts every reset at the same sub-sample position
+    // (mid-sample), so linear interpolation of the band-limited edges has the
+    // same small bias each period and the spreads measure the engine alone.
+    constexpr double fs=192000,frequency=240;
+    ceres::Patch p;p.pulseWidth=.5;p.pwmDepth=.35;p.pwmRate=3;
+    const auto trace=ceres::oscillatorTrace(fs,frequency,p,64000,.25+.5/800);
+    const auto drops=zeroCrossings(trace,false,false);
+    const auto falls=zeroCrossings(trace,true,false),rises=zeroCrossings(trace,true,true);
+    check(drops.size()>70&&falls.size()==drops.size()&&rises.size()+1>=falls.size()&&rises.size()<=falls.size()+1,
+          "One audio pulse fall and rise per saw reset");
+    double worst=0;
+    for(std::size_t i=0;i<falls.size();++i)worst=std::max(worst,std::abs(falls[i]-drops[i]));
+    const double fixedSpread=intervalSpread(falls),movingSpread=intervalSpread(rises);
+    std::cout<<"CS-80 edge relationship: fall-to-reset "<<worst<<" samples, fall spread "<<fixedSpread
+             <<", rise spread "<<movingSpread<<'\n';
+    check(worst<.05,"The audio pulse falls with the saw's reset drop, as in the CS-80 PWM and SAW takes");
+    check(fixedSpread<.05&&movingSpread>5,"PWM moves only the rising audio pulse edge, as in the CS-80 PWM takes");
+}
+
 double productionRms(bool saw,bool pulse) {
     ceres::Synth synth(48000,321);
     ceres::Patch p;p.saw=saw;p.pulse=pulse;p.sine=p.noise=0;
@@ -304,9 +347,9 @@ void productionMixtureRelationship() {
 int main() {
     try {nominalTiming();conditionedWaveforms();extrapolationAndRate();wscSineShaper();
         bool failed=false;
-        for(const auto run:std::array<void(*)(),2>{{recordedMixtureRelationship,productionMixtureRelationship}})
+        for(const auto run:std::array<void(*)(),3>{{recordedMixtureRelationship,recordedEdgeRelationship,productionMixtureRelationship}})
             try {run();}catch(const std::exception& e){std::cerr<<e.what()<<'\n';failed=true;}
         if(failed)return 1;
-        std::cout<<"PASS nominal VCO timing, conditioned current slope, WSC shared fold and differential-pair sine, Fourier/DC/edge, public mixture relationships and high-CV bounds\n";return 0;
+        std::cout<<"PASS nominal VCO timing, conditioned current slope, WSC shared fold and differential-pair sine, Fourier/DC/edge, public mixture and CS-80 edge relationships and high-CV bounds\n";return 0;
     }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }

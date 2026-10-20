@@ -540,15 +540,25 @@ struct FilterChain {
 constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
     4.7e-6*(1e3+4*47e3),33e-6*(4.7e3+560)};
 // WSC sine shaper, IG00158 STI (pin 15) -> pin 2. Its transfer is not
-// published and has not been measured on any CS-50/60/80. The shipping
-// shaper is the textbook bipolar-IC triangle-to-sine converter, an
-// undegenerated differential pair: y = tanh(k*tri)/tanh(k) at unit peak, at
-// that topology's own optimum, the drive k that minimises THD for an ideal
+// published and no measurement isolates it. The shipping shaper is the
+// textbook bipolar-IC triangle-to-sine converter, an undegenerated
+// differential pair: y = tanh(k*tri)/tanh(k) at unit peak, at that
+// topology's own optimum, the drive k that minimises THD for an ideal
 // triangle (k = 1.40211; 1.4020 is the value auditioned): THD 1.36 %, H3
 // -54.1 dB, H5 -39.0 dB, H7 -45.1 dB. It replaced the ideal sin(pi/2*tri)
 // by ear on 2026-10-20 (owner listening verdict, set
-// 2026-10-20-vco-sine-shaper); it is not a fit to any recording. tanh is
-// not constexpr in C++17, so tanh(k) is written out (std::tanh(1.4020)).
+// 2026-10-20-vco-sine-shaper); it is not a fit to any recording.
+// The one whole-path measurement found since fits neither shaper: a public
+// CS-80 sample set (same M board, so the same IG00158;
+// Tools/measure_cs80_wsc_recordings.py) reads H3 -22.5..-30.3, H5
+// -40.4..-46.9 and H7 -59.4..-71.2 dB re H1 over 11 sine-only notes, with
+// flattened peaks. That path adds three IG00151 OTAs, the output stage and
+// an unknown capture. With one or two differential-pair (tanh) stages after
+// the shaper, driven to match each note's H3, this shaper's H5 is 3.5-7.9 dB
+// high at every note and its H7 11-20 dB high at 9 of 11, while an ideal
+// sine's H5 is 0.9-11 dB low at every note (the tool's `chains` command;
+// Docs/research/vco-authenticity-2026-10-20.md).
+// tanh is not constexpr in C++17, so tanh(k) is written out (std::tanh(1.4020)).
 constexpr double wscSineDrive=1.4020;
 constexpr double wscSineTanhDrive=0.8857831884152492;
 // g'(+/-1) = k*(1-tanh(k)^2)/tanh(k): the slope at both triangle corners.
@@ -930,7 +940,8 @@ struct Oscillator {
         // back up (a plateau longer than .5 covers the fold). pin15 -> pin2
         // shapes it with the bipolar differential pair tanh(k*tri)/tanh(k)
         // (wscSineDrive above: textbook topology at its own minimum-THD
-        // drive, not measured, chosen by ear 2026-10-20). Sine slice trim and
+        // drive, not measured, chosen by ear 2026-10-20; the CS-80 recording
+        // that questions it is noted there). Sine slice trim and
         // the chip's real transistor shape are unpublished. TO reaches STI
         // through 4.7uF NP with 22k to ground (SM2 p.16), which removes the
         // triangle's 2r^2 mean (.2% of peak at C4, 3% at C6 on 8'); that
@@ -951,20 +962,30 @@ struct Oscillator {
             - 2*wscSineCornerSlope*blamp(phase,step);
         if (foldAfterPlateau) sine += 4*wscSineCornerSlope*blamp(wrap(phase-.5),step);
         phase = wrap(phase + step);
-        // Empirical audio-polarity calibration: public CS-50 solo/both-on
-        // recordings support constructive saw/pulse mixing at equal nominal
-        // source levels. Negate the completed pulse, including its BLEP,
+        // Audio polarity: the completed pulse is negated, including its BLEP,
         // without moving either comparator edge, changing PW/PWM timing or
-        // introducing another oscillator. The guide's small waveform sketches
-        // do not establish an unambiguous common timing reference; this is not
-        // proof of an active-low chip output or an extra hardware inverter.
+        // introducing another oscillator, so saw and pulse fall together at
+        // the reset and equal levels mix constructively. Recordings of two
+        // instruments support that. Public CS-50 solo/both-on recordings mix
+        // constructively at equal nominal source levels. A public CS-80 sample
+        // set (same M board #21233, so the same IG00158;
+        // Tools/measure_cs80_wsc_recordings.py) holds the falling audio pulse
+        // edge fixed under PWM while the rising one moves (period-to-period
+        // spread .04-.23 against .24-12 samples, all 12 PWM notes), and its
+        // saw rises and drops at the reset (all 11 SAW notes); the fixed edge
+        // is the reset, so pulse and saw fall together. Both assume one chain
+        // polarity across the takes; neither is a transistor-level proof.
         // Yamaha's two drawings point the other way: the guide's WSC block
         // (p.31) labels SI->SO an inverter, and the SM2 p.21 pin sheet draws
         // PO high from the reset jump; read literally, SO falls as PO rises
-        // and equal-level mixing partly cancels. The M board gives both the
-        // same FET gate and 150k into one node (SM2 p.16), so no board stage
-        // reconciles them. The measured recording is kept over the sketches;
-        // see Docs/research/vco-authenticity-2026-10-20.md.
+        // and equal-level mixing partly cancels. Nippon Gakki's own 1974
+        // discrete converter (US 4,012,981, FIG. 2: NPN switch, PNP buffer)
+        // is a non-inverting comparator like that PO. The M board gives both
+        // the same FET gate and 150k into one node (SM2 p.16), so no board
+        // stage reconciles them: the inversion the recordings need would sit
+        // inside the IG00158, which no document shows. The recordings are
+        // kept over the sketches; see
+        // Docs/research/vco-authenticity-2026-10-20.md.
         return {saw, -square, sine};
     }
 };
