@@ -35,7 +35,7 @@ int main() {
         "filter_initial","filter_peak","filter_attack","filter_attack_headroom","filter_attack_saturation",
         "filter_decay","filter_release","amp_attack","amp_attack_headroom","amp_attack_saturation","amp_decay",
         "amp_sustain","amp_release","global_release","filter_level","volume","octave","tune_cents",
-        "voice_spread_cents","drift_cents","lfo_rate","vibrato_cents","tremolo","filter_lfo","pressure_volume",
+        "voice_spread_cents","drift_cents","board_pitch_tolerance","board_filter_tolerance","lfo_rate","vibrato_cents","tremolo","filter_lfo","pressure_volume",
         "pressure_filter","pressure_vibrato","velocity_sensitivity","drive","reset_microseconds",
         "ring_mix","ring_rate","ring_depth","ring_attack","ring_decay","lfo_waveform","sustain_mode",
         "brilliance","resonance_offset","amp_level","output_trim_db","expression_source",

@@ -112,6 +112,13 @@ struct Patch {
     double tuneCents = 0.0;
     // These modeled oscillator variations, like vibrato below, are VCO-only.
     double voiceSpreadCents = 0.0, driftCents = 0.0;
+    // Board-to-board tolerance of the four M boards, 0..1 of the documented
+    // spread; 0 (default) keeps the boards identical. Each seed is one fixed
+    // instrument: its offsets never move while it plays. Pitch is the residual
+    // the service tuning trims leave (+/-1 cent at each trim point, Guide
+    // printed p.65); filter is the IG00156 rank-bin residual (+/-.146 oct,
+    // SM2 printed p.17-18 rank table) on the HP and LP cutoffs. See ceres.cpp.
+    double boardPitchTolerance = 0.0, boardFilterTolerance = 0.0;
     // filterLfo is LP octave depth. HP gets .3374358974 times that depth:
     // (.7/.65)*(47k/150k), independent of user-editable EG coupling scales.
     // tremolo is SUB VCA lever travel, 0..1: R7 adds .3375 of the wiper's

@@ -127,6 +127,8 @@ const Parameter parameters[] = {
     {"octave", &Patch::octave, -2, 1}, {"tune_cents", &Patch::tuneCents, -500, 700},
     {"voice_spread_cents", &Patch::voiceSpreadCents, 0, 30},
     {"drift_cents", &Patch::driftCents, 0, 20},
+    {"board_pitch_tolerance", &Patch::boardPitchTolerance, 0, 1},
+    {"board_filter_tolerance", &Patch::boardFilterTolerance, 0, 1},
     {"lfo_waveform", &Patch::lfoWaveform, 0, 4},
     {"ring_mix", &Patch::ringMix, 0, 1}, {"ring_rate", &Patch::ringRate, .2, 220},
     {"ring_depth", &Patch::ringDepth, 0, 8},
@@ -226,6 +228,71 @@ struct Random {
     }
     double unit() { return static_cast<double>(next() >> 11) * 0x1.0p-53; }
     double bipolar() { return 2 * unit() - 1; }
+};
+
+// Board-to-board tolerance: what the four M boards keep after Yamaha's own
+// calibration, and nothing the service documents do not bound.
+//
+// Pitch. IG00153 (VCO III) is LINEAR in the key voltage Kv (Guide printed
+// pp.28-29: f = I/(Iref*tau), I = Kv/Rn; NORMAL Kv 250mV..4V gives
+// 130.8..2093Hz, so Kv is proportional to the NORMAL frequency). A board's
+// error is therefore a gain error per transposition resistor Rn plus one
+// input-offset voltage, f = G_t*(Kv+Voff). The tuning method (Guide printed
+// p.65) trims each board at OCT-UP until C6 key gives C7 and C2 key gives C3,
+// each "+/-1 cent" (VR2/VR3, offset and scale, Guide p.29), then trims the
+// NORMAL, 1-down and 2-down Rn at the C6 key to +/-1 cent (VR4, VR5, VR6).
+// The residual is five numbers per board, each inside its printed +/-1 cent
+// band: eLow (C2 key, OCT-UP), and the C6-key error at each transposition.
+// The C2/C6 pair fixes d = Voff/Kv(C6 key): with r = 2^((eLow-eUp)/1200),
+// (1+16d)/(1+d) = r, so d = (r-1)/(16-r) (the C2 key is Kv/16, Guide p.29).
+// Error at any key, transposition t: e_t + 1200*log2((1+d/x)/(1+d)), with x =
+// Kv/Kv(C6 key). The 0.1% B-mark Rn resistors and 2% G-mark timing parts
+// (SM2 printed pp.17-18, note 7) are inside this trim, so they add nothing.
+// ASSUMPTION: each residual is uniform over its band (a technician stops
+// anywhere inside it); the service guide prints only the band.
+//
+// Filter. The IG00156 cutoffs have no trimmer in the tuning method. Instead
+// the chips are sorted into ranks A/B/C and each rank gets its own fc-pin
+// resistor (SM2 printed pp.17-18, note 9: R6 2.7k/2.2k/1.8k for IC10, R7
+// 3.3k/2.7k/2.2k for IC11, board NA03574); pin 3 "sets the control current
+// of the cut off frequency" (SM1 printed p.19), i.e. scales the variable gm.
+// Successive rank resistors step by sqrt(2.7/1.8) = sqrt(3.3/2.2) = 1.2247,
+// so a chip anywhere in its bin is corrected to within half a step:
+// +/-log2(1.2247)/2 = +/-.14624 octave of variable gm, HP and LP independent.
+// INFERENCE: fc proportional to the pin-3 current (1/R), bins contiguous and
+// one step wide, chip uniform within its bin. The 4.7M feed path is not part
+// of the chip and keeps its nominal 22.58Hz floor.
+//
+// Not modelled, because no tolerance is printed: Q (Qo trimmer, target Q=5
+// at Vq=0V, SM1 p.19), EG timing (.22uF caps, TR trimmers), VCA gain
+// (IG00151 pin-1 trim, Guide p.41), WSC levels, 1.5nF/4.7M part tolerance.
+constexpr double boardTrimCents=1;          // Guide printed p.65, every trim
+constexpr double boardScaleKeyRatio=16;     // C6 key Kv / C2 key Kv, p.29
+constexpr double boardTrimKeyNormalHz=2093; // C6 key at NORMAL, p.29/p.65
+constexpr double boardFilterRankOctaves=.14624062518028906; // log2(1.5)/4
+struct BoardTolerance {
+    // C6-key residual at transposition 2-down, 1-down, NORMAL, 1-up.
+    std::array<double,4> transposeCents{};
+    double offsetRatio=0, hpOctaves=0, lpOctaves=0;
+    double hpScale=1, lpScale=1; // cached 2^(amount*octaves)
+    void draw(Random& random) {
+        const double low=boardTrimCents*random.bipolar();
+        for (auto& cents : transposeCents) cents=boardTrimCents*random.bipolar();
+        const double r=std::exp2((low-transposeCents[3])/1200);
+        offsetRatio=(r-1)/(boardScaleKeyRatio-r);
+        hpOctaves=boardFilterRankOctaves*random.bipolar();
+        lpOctaves=boardFilterRankOctaves*random.bipolar();
+    }
+    // octave: TRANSPOSE (-2..1); normalHz: the board's ideal NORMAL-position
+    // frequency for its key voltage (key, PITCH and bend; not vibrato).
+    double pitchCents(double octave, double normalHz) const {
+        const double position=std::max(0.0,std::min(octave+2,3.0));
+        const auto index=static_cast<std::size_t>(position<3 ? position : 2);
+        const double gain=transposeCents[index]
+            +(transposeCents[index+1]-transposeCents[index])*(position-index);
+        const double x=normalHz/boardTrimKeyNormalHz;
+        return gain+1200*std::log2(std::max(1e-9,1+offsetRatio/x)/(1+offsetRatio));
+    }
 };
 
 // Yamaha CS Series Servicing Guide, printed pp. 33–34: IG00156 is a
@@ -754,6 +821,7 @@ struct Synth::Impl {
         // Physical board capacitor histories persist across allocation and Idle.
         OutputCoupling filteredCoupling, commonCoupling;
         Envelope amp, filter;
+        BoardTolerance board;
 #if !defined(CERES_EMBEDDED_TARGET)
         double oscillatorFrequency=0, hpFrequency=0, lpFrequency=0;
 #endif
@@ -865,6 +933,13 @@ struct Synth::Impl {
         constexpr double ringRelease=.4678104397473947;
         ringCoefficients=envelopeCoefficients(internalFs,patch.ringAttack,
             patch.ringDecay,ringRelease,.01,0);
+        updateBoardScales();
+    }
+    void updateBoardScales() {
+        for (auto& voice : voices) {
+            voice.board.hpScale=std::exp2(patch.boardFilterTolerance*voice.board.hpOctaves);
+            voice.board.lpScale=std::exp2(patch.boardFilterTolerance*voice.board.lpOctaves);
+        }
     }
     void followFreeKeys() {
         if (patch.sustainMode==2)
@@ -928,6 +1003,12 @@ struct Synth::Impl {
             voice.driftTarget = initialRandom.bipolar();
             voice.driftCountdown = static_cast<unsigned>(internalFs * (.1 + initialRandom.unit()*.5));
         }
+        // Board tolerances come from their own seeded stream, drawn for every
+        // physical slot in a fixed order, so the shared audio/drift stream is
+        // untouched and board i is the same unit at every polyphony/quality.
+        Random boards(seed^0x5851f42d4c957f2dULL);
+        for (auto& voice : voices) voice.board.draw(boards);
+        updateBoardScales();
     }
     // KAS key voltage path (guide printed pp.22-25): assigner code -> glissando
     // counter -> integrating gate -> sample-hold -> VCO and filter key CV.
@@ -1032,10 +1113,15 @@ struct Synth::Impl {
                 v.driftCountdown = static_cast<unsigned>(internalFs * (.2 + random.unit()*.5));
             }
             v.drift += (v.driftTarget-v.drift) * driftCoefficient;
-            const double cents = patch.tuneCents + (static_cast<double>(i)-1.5)*patch.voiceSpreadCents
+            double cents = patch.tuneCents + (static_cast<double>(i)-1.5)*patch.voiceSpreadCents
                 + v.drift*patch.driftCents + lfo*(patch.vibratoCents + expression*patch.pressureVibrato)
                 + expression*patch.pressureVibrato*touchVibratoBias;
             const double key=advanceGlide(v,dt);
+            // Trim residual of this board's linear VCO (see BoardTolerance):
+            // its key voltage is the NORMAL frequency of key, bend and PITCH.
+            if (patch.boardPitchTolerance>0)
+                cents+=patch.boardPitchTolerance*v.board.pitchCents(patch.octave,
+                    440*std::exp2((key-69+bend+patch.tuneCents*.01)/12));
             const double frequency = 440 * std::exp2((key-69 + bend + 12*patch.octave + cents*.01)/12);
             const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
                                             patch.resetMicroseconds*1e-6,internalFs);
@@ -1068,8 +1154,9 @@ struct Synth::Impl {
                     + touchOctaves+lfo*patch.filterLfo
                     + patch.brilliance*lpBrillianceScale);
             const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*noise;
-            const double hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor);
-            const double lpFrequency=modulatedFilterFrequency(patch.lpCutoff,lpFactor);
+            // IG00156 rank residual scales this board's variable gm only.
+            const double hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor*v.board.hpScale);
+            const double lpFrequency=modulatedFilterFrequency(patch.lpCutoff,lpFactor*v.board.lpScale);
 #if !defined(CERES_EMBEDDED_TARGET)
             v.oscillatorFrequency=frequency; v.hpFrequency=hpFrequency; v.lpFrequency=lpFrequency;
 #endif
