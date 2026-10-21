@@ -188,12 +188,12 @@ struct Patch {
     // the panel levers map onto them through the laws below the struct
     // (ringSpeedHz, ringDepthOctavesPerLever, ringAttackSeconds,
     // ringDecaySeconds). Attack/decay stay seconds: the PRA envelope is the
-    // M-board VCA-EG chip pair, so its lever law is that EG's, offset by the
-    // PRA's own trim (31ms attack at AT=10V, CS-60 PRA alignment). Total
-    // carrier is bounded .2..220Hz (guide p.53's printed range), so rate/depth
-    // interact at the top.
+    // M-board VCA-EG chip pair, so its lever law is that EG's, set by the
+    // PRA's own trim (31ms attack at AT=5V, the CS-80 procedure for the same
+    // circuit). Total carrier is bounded .2..220Hz (guide p.53's printed
+    // range), so rate/depth interact at the top.
     // Trigger once per physical all-keys-up -> any-key-down transition; final
-    // key-up uses the fixed 2DT's 14.50s T60 return (ringReleaseVolts),
+    // key-up uses the fixed 2DT's .459s T60 return (ringReleaseVolts),
     // independent of MIDI pedal/globalRelease. Retrigger retains capacitor
     // charge, not phase reset.
     // mix=0 preserves the previous signal path exactly; carrier phase is free.
@@ -280,24 +280,30 @@ double ringSpeedHz(double vc1Volts);
 // VCA-EG pair (SM2 p.16), whose pin sheets give attack 10^(-.3V)s to the peak
 // and decay 10*10^(-.3V)s as five-RC durations (SM2 p.21); the CS-60 M-board
 // alignment confirms .3 decade/V (4ms at 8V, 125ms at 3V, manual p.38).
-// The PRA EG is aligned 31 times slower: CS-60 PRA alignment I (sibling
-// evidence, the same board; manual p.39) puts the EO peak 31ms after key-on
-// at AT=DT=10V, where the pin sheet gives 1ms. Every segment drives the one
-// TC->EI exponential converter, so the factor applies to all of them.
-// ASSUMPTION: the PRA's fixed 100k span into EI gives the M board's trimmed
-// .3 decade/V (the M board's span is 82k+VR20, B-50K, so .246...396 decade/V
-// is possible). The fixed release follows this law: CHOSEN BY EAR over the
-// untrimmed pin-sheet law (owner listening test ring-release, 2026-10-20).
-// Over 10..0V attack runs 31ms..31s and decay .428..428s T60; ring_attack and
-// ring_decay stop at 10s (AT below 1.64V, DT below 5.44V) and also allow
-// times shorter than the hardware's 31ms and .428s.
-constexpr double ringEnvelopeTrim = 0.031 / 0.001;
+// The PRA's TC reaches EI through a fixed 100k, with VR2 (B-100K across
+// +/-15V) as an offset trim through 100k (SM2 p.22). The CS-80 PRA is the
+// same circuit (TC 100k, VR10 B100K through 100k, .22uF), and its procedure
+// trims VR10 for 31ms +/-5% from key-on to the EO peak with ATTACK TIME at
+// +5.0V on the A terminal (CS-80 Adjustment Procedure printed p.19; sibling
+// evidence). The CS-60 sheet for this board draws the same "Alignment by
+// 31mS" beside its EO zeroing at AT=DT=10V but gives the 31ms neither a
+// lever voltage nor a trimmer (manual p.39); 0.6.0 read it at 10V, a law 31
+// times slower. Every segment drives the one TC->EI converter, so the trim
+// applies to all of them. At 5V the PRA law is the pin-sheet law within 2%
+// (31.6ms there), inside the M board's +/-5% attack trims at 8V and 3V.
+// ASSUMPTION: the PRA's fixed 100k gives the M board's trimmed .3 decade/V
+// (the M board's span is 82k+VR20, B-50K, so .246...396 decade/V is
+// possible); the fixed 2DT sits .1V from the 5V trim point, so the slope
+// moves the release by 2.2% at most. Over 10..0V attack runs .98ms..0.98s
+// and decay 13.5ms..13.5s T60; ring_attack stops at 1ms (AT above 9.97V)
+// and ring_decay at 10s (DT below .44V).
+constexpr double ringEnvelopeTrim = 0.031 / 0.03162277660168379; // 10^-1.5s
 // Attack seconds, key-on to peak, for an AT pin voltage (0..10V).
 double ringAttackSeconds(double atVolts);
 // Decay T60 seconds toward the grounded SL for a DT pin voltage (0..10V).
 double ringDecaySeconds(double dtVolts);
 // 2DT (release) is fixed by 6.8k from +15V and 3.3k to ground (SM2 p.22):
-// every final key-up returns over ringDecaySeconds(4.901V) = 14.50s T60.
+// every final key-up returns over ringDecaySeconds(4.901V) = .459s T60.
 constexpr double ringReleaseVolts = 15.0 * 3.3 / (6.8 + 3.3);
 
 // Keys use snake_case (e.g. lp_cutoff, filter_initial, amp_attack). Finite values
@@ -475,8 +481,8 @@ double ringSwitchingResponse(double differentialVolts);
 // Normalized output-coupling sections at their actual processing rate
 // (4*hostRate in production), without the final line inversion or rail.
 // Stages: 0=CP3 filtered branch, 1=CP4 common voice, 2=four-voice bus,
-// 3=unloaded HIGH line output. These expose the conditional component model,
-// not measured VCA input impedances or external recording-chain loading.
+// 3=HIGH line output into the 10k bench load. These expose the conditional
+// component model, not measured VCA input impedances or a recording chain.
 std::vector<double> outputCouplingImpulse(unsigned stage,double sampleRate,std::size_t frames);
 
 // Exact PRA output preamp as the engine applies it: the summed, expressed

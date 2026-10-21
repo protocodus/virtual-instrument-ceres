@@ -179,7 +179,8 @@ under 2 % (`Ceres.ring_switching_circuit_contracts`).
   assumption: a fixed 100k against the M board's trimmed 82k–132k span
   could put the slope anywhere from 0.246 to 0.396 decade/V, which at the
   fixed 2DT means 7.7–45 s T60.
-- **Release, chosen by ear.** The 0.5.0 engine used the untrimmed pin-sheet
+- **Release, chosen by ear** (superseded 2026-10-21, see the addendum). The
+  0.5.0 engine used the untrimmed pin-sheet
   law at 2DT: 0.468 s T60. The PRA-aligned law gives 31 × 0.468 =
   **14.50 s T60**. The owner chose the aligned law by ear (listening test
   ring-release, 2026-10-20), so after the last key-up the DEPTH excursion
@@ -187,7 +188,8 @@ under 2 % (`Ceres.ring_switching_circuit_contracts`).
   0.3 decade/V slope is still an assumption, not a measurement. The
   listening render took 2DT as the rounded 4.901 V (14.50202 s against the
   engine's 14.50212 s, 7 ppm apart).
-- **Lever laws.** TVR1 (ATTACK TIME) and TVR2 (DECAY TIME) are B-10K from
+- **Lever laws** (times superseded 2026-10-21, see the addendum). TVR1
+  (ATTACK TIME) and TVR2 (DECAY TIME) are B-10K from
   +10 V to ground, wipers to AT and DT (SM2 p.26). 10 V is the SHORT end
   (CS-60 SM p.39). On the aligned law the attack runs 31 ms–31 s and the
   decay 0.428–428 s T60 over 10–0 V. `ringAttackSeconds` and
@@ -225,6 +227,9 @@ release now follow the owner's choices (§3, §5).
 2. **One ring EG time on a real unit away from the 10 V alignment point**:
    the EO trace of an attack at any AT below 10 V, or of the release. One
    trace settles the slope assumption in §5 and with it the release.
+   **Settled 2026-10-21** from the CS-80 procedure, which states the
+   alignment voltage (addendum). What remains is the slope, which now moves
+   the release by 2.2 % at most.
 3. **IG00150 output impedance and sine purity.** The 0.047 µF on its pin 6
    and any shaper distortion are not modelled.
 4. **A measured CS-50 voice-output level** (O or O1, any known patch). The
@@ -233,3 +238,35 @@ release now follow the owner's choices (§3, §5).
 5. **Part-to-part spread.** Carrier-port offset (12 µA typ, 30 µA max bias
    current) and V_BE mismatch move the dry leakage by several dB between
    units.
+
+## Addendum, 2026-10-21: the alignment voltage
+
+The owner allowed sibling evidence where the CS-50's own documents are silent.
+The CS-80 Adjustment Procedure (printed p.19, RING MODULATOR) trims the same
+envelope and prints the voltage the CS-60 sheet leaves out:
+
+- Step 1, envelope zeroing: ATTACK TIME and DECAY TIME at min, EO
+  0 ± 0.01 V (VR9). This is the CS-60's AT = DT = 10 V step.
+- Step 2, attack time: ATTACK TIME set for +5.0 V on the A terminal, VR10
+  trimmed so EO peaks 31 ms ±5 % after key-on.
+- Step 3, speed: 150 ms ±5 % period at VC1 = +5.0 V (VR5) and 5 ms ±5 % at
+  SPEED max (VR4), the CS-60's PRA II values, so §4's law is corroborated.
+
+The CS-80 ring envelope is the same circuit (CS-80 Service Manual p.53, PRA
+circuit diagram): IG00159 with an IG00151 integrating into 0.22 µF, TC into
+EI through 100k, VR10 (B-100K across ±15 V) through 100k, and 2DT on
+6.8k/3.3k. So the 31 ms belongs at AT = 5 V. The M-board pin-sheet law gives
+31.6 ms there, and the PRA envelope sits on that law within 2 %:
+`ringEnvelopeTrim` = 0.031/10^−1.5 = 0.980 (was 31).
+
+- **Release:** 0.468 × 0.980 = **0.459 s T60**, was 14.50 s. The 0.6.0
+  reading, chosen by ear, is rejected by this source (`Docs/decisions.md`).
+- **Levers:** over 10–0 V the attack runs 0.98 ms–0.98 s and the decay
+  13.5 ms–13.5 s T60. `ring_attack`'s 1 ms floor sits at AT = 9.97 V and
+  `ring_decay`'s 10 s ceiling at DT = 0.44 V.
+- **Slope:** 2DT (4.901 V) sits 0.099 V from the trim point, so the
+  0.246–0.396 decade/V span the fixed 100k allows moves the release by
+  −1.2 % to +2.2 %. The slope stays an assumption; it no longer matters.
+
+`Ceres.ring_carrier_circuit_contracts` holds the law to 31 ms at 5 V and to
+the M-board points (4 ms at 8 V, 125 ms at 3 V) within their ±5 %.

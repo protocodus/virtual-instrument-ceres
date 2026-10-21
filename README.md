@@ -31,6 +31,11 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 
 ## Version history
 
+### Unreleased — 0.6.2 — two readings from the CS-80 procedure
+
+- After the last key-up, the ring modulator's DEPTH sweep returns to the SPEED rate over 0.46 s instead of 14.5 s. The CS-80's service procedure aligns the same ring envelope circuit at ATTACK TIME 5 V, which rules out 0.6.0's reading at 10 V; this reverses a choice made by ear in 0.6.0. The panel lever laws for ring ATTACK TIME and DECAY TIME (`ringAttackSeconds`, `ringDecaySeconds`) are 31.6 times faster at every position (attack about 1 ms to 1 s, decay 13.5 ms to 13.5 s T60). The `ring_attack` and `ring_decay` controls are unchanged.
+- The output stage clips 0.47 dB lower, and the final 33 µF coupling's corner moves from 0.9 Hz to 1.4 Hz: the HIGH output now drives the 10 kΩ load the CS-80 procedure trims its 0 dBm into, instead of an open terminal. Below the rails the level is unchanged.
+
 ### Unreleased — 0.6.1 — every board trim on by default
 
 - The four voices now also differ slightly in envelope timing and VCA balance, by default: each board's attacks, decays and releases sit within its ±5 % EG time trims, and its sine-to-filtered balance within its level trims (`board_envelope_time_tolerance` and `board_vca_tolerance` now 1, were 0). Set both to 0 for the 0.6.0 voices. The owner took both candidates without a listening test, so neither is chosen by ear nor measured.
@@ -187,7 +192,7 @@ The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults
 
 Live `ring_depth` changes interpolate over 20 ms in the digital control domain. This dezipper preserves the existing exponential frequency law and 220 Hz cap; it is not a newly inferred analog time constant. Startup/reset use the saved depth immediately. Repeated notifications at the same target do not prolong the transition, and a reversal starts from the current interpolated value. The change removes the immediate frequency-control step in a synthetic test; it does not prove the exact cause of a reported host crackle.
 
-The ring envelope triggers when the first physical key is pressed after all keys have been released. Additional held keys do not retrigger it, including a key that finds no free voice. Final key-up returns its frequency envelope toward zero through a fixed release of 14.5 s T60, the PRA's fixed release voltage on its aligned envelope law (chosen by ear); the carrier phase keeps running. The total carrier is bounded at 220 Hz, so SPEED and DEPTH interact near that limit. The multiplier's input pair limits as the µA796's does, on a bus scale taken from the voice-board alignment: four-note chords compress it by at most about 1 %, while touch LEVEL and extra virtual voices push it into its limit. This is a circuit-informed balanced-multiplier model with provisional envelope and wet-gain calibration.
+The ring envelope triggers when the first physical key is pressed after all keys have been released. Additional held keys do not retrigger it, including a key that finds no free voice. Final key-up returns its frequency envelope toward zero through a fixed release of 0.46 s T60: the PRA holds the release voltage fixed, on an envelope law Yamaha aligns to a 31 ms attack at ATTACK TIME 5 V (the CS-80 procedure for the same circuit); the carrier phase keeps running. The total carrier is bounded at 220 Hz, so SPEED and DEPTH interact near that limit. The multiplier's input pair limits as the µA796's does, on a bus scale taken from the voice-board alignment: four-note chords compress it by at most about 1 %, while touch LEVEL and extra virtual voices push it into its limit. This is a circuit-informed balanced-multiplier model with an envelope alignment taken from the CS-80 and a provisional wet gain.
 
 The selected SUB waveform drives VCO, VCF, VCA and pressure vibrato. Noise uses the documented 22k/0.1µF low-pass and a fixed engineering level; it is independent of SUB rate and audio Noise mix. PWM retains its separate sine oscillator.
 
@@ -252,7 +257,7 @@ The editor (1080×750) is laid out like the CS-50 panel: the tone-selector table
 
 - No host has yet exercised the plug-in's EXT IN as a sidechain input, and the AU's handling of it is untested. The factory programs are research presets from the circuit study, not calibrated Yamaha voices.
 - Every plug-in instance is the same unit, with one fixed seed; there is no per-instance board variation. Sixteen voices at 4× can need more than a whole CPU core at 48 kHz; `voice_count` and `oversampling` trade CPU for polyphony and alias rejection.
-- Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
+- Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. The ring envelope's alignment voltage and the output level meter's load come from the CS-80's procedure for the same circuits; no CS-50 document states them. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
 - EXT IN's host-rate signal is interpolated linearly inside the oversampled engine; the op-amp swings are datasheet typicals, and the EXT preamp's bandwidth and slew rate are not modelled. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
 - The portamento/glissando clock rate and the noise limiter's bandwidth and slew rate are not calibrated.
