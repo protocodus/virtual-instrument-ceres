@@ -1,7 +1,9 @@
 # Ceres — decision log
 
-Directions chosen by ear, recorded per the A–Z listening-test convention in
-the repository's `CLAUDE.md`. A choice made by ear is recorded as made by ear.
+Directions chosen by ear, or taken on the owner's word without a listen,
+recorded per the A–Z listening-test convention in the repository's
+`CLAUDE.md`. Each entry says which: a choice made by ear is recorded as made
+by ear, and an unheard one as unheard.
 
 ## 2026-10-20: the owner chose B in every open set
 
@@ -128,3 +130,36 @@ not committed, and each `key.md` held the rendering details summarised here.
   600 Ω, rails 5.7 dB lower.
 - **Chosen:** B.
 - **Licensed:** the unloaded reading, which Ceres already shipped in 0.5.0.
+
+## 2026-10-21: the owner took every pending candidate, unheard
+
+The owner had not listened to the open set and asked for all of its
+candidates ("take all candidate changes from the listening test", then
+"listening test was not performed … so pick all proposals"). Neither the ear
+nor a measurement chose what follows; each candidate stands only on its own
+sources.
+
+### Board EG times and VCA balance (`2026-10-20-voice-variation-eg-time-vca`)
+
+- **Decided:** whether the EG-time and VCA board amounts become default,
+  together or alone.
+- **A:** the shipping engine: pitch, filter and envelope tolerances at 1 and
+  `drift_cents` 1. **B:** A plus each board's EG time-trim residual, both
+  EGs' attack trims within ±5 % at 4 ms and 125 ms (CS-80 procedure), decay
+  and release on the converter's log-time line through them. **C:** A plus
+  each board's CP4 level-trim residual, VR11 sine ±2 % and VR12 filtered
+  ±2.5 % (CS-80 procedure), with VR13/VR14 restoring the filtered path and VR6
+  the four-sine 0 dBm reference (CS-60 procedure). **D:** both.
+- **Chosen:** D, unheard.
+- **Licensed:** `board_envelope_time_tolerance` and `board_vca_tolerance`
+  default to 1, factory presets included (Ceres 0.6.1). `board_temperature_rise`
+  was not a candidate and stays 0: a default would need an invented
+  temperature.
+
+### VCO sine shaper, kept
+
+- After a public CS-80 sample set was found to fit neither letter of
+  `2026-10-20-vco-sine-shaper` (B's 5th and 7th harmonics 3.5–20 dB too
+  strong, A's 5th 1–11 dB too weak), the proposal was to keep B. The owner
+  took it with the same instruction, without a new listen. The shaper stays
+  as recorded above: chosen by ear, unmeasured.

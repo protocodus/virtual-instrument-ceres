@@ -96,6 +96,9 @@ void idleIlAndRetrigger() {
     for(double fs:{8000.,48000.,192000.}) {
         ceres::Patch p;p.filterInitial=-1.25;p.filterPeak=2;p.filterAttack=.2;
         p.filterAttackHeadroom=.01;p.filterRelease=.2;p.globalRelease=.7;
+        // Nominal EG times on every board: this checks the RC law itself.
+        // Each board's trimmed times are BoardToleranceTests' contract.
+        p.boardEnvelopeTimeTolerance=0;
         ceres::Synth s(fs,4);s.setPatch(p);
         for(const auto& v:s.voiceState())near(v.filterEnvelope,-1.25,0,"Setup precharges IL");
         advance(s,1);p.filterInitial=-4;s.setPatch(p);
@@ -126,6 +129,7 @@ void idleIlAndRetrigger() {
 void releasedIdleReturn() {
     ceres::Patch p;p.filterInitial=-1;p.filterPeak=2;p.filterAttack=.001;
     p.filterRelease=.005;p.ampRelease=.005;p.ampAttack=.001;p.globalRelease=0;
+    p.boardEnvelopeTimeTolerance=0; // nominal times, as in idleIlAndRetrigger
     ceres::Synth s(8000,7);s.setPatch(p);s.noteOn(60);advance(s,80);s.noteOff(60);advance(s,200);
     require(s.activeVoices()==0,"Amplitude release retired before edit");
     for(const auto& v:s.voiceState())near(v.filterEnvelope,-1,0,"Filter release reached existing snap endpoint");

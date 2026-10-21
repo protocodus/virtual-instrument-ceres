@@ -129,17 +129,19 @@ Gain gainOf(const std::vector<double>& x,const std::vector<double>& y,std::size_
 }
 
 void defaultsShipTheVerdict() {
-    // Listening verdict B (2026-10-20): the trimmed residuals ship; the
-    // later candidates stay off until the owner has heard them.
+    // Listening verdict B (2026-10-20) ships the pitch, filter and envelope
+    // residuals; the owner took the time and VCA candidates unheard
+    // (2026-10-21). Temperature has no defensible default.
     const ceres::Patch defaults;
     require(defaults.boardPitchTolerance==1 && defaults.boardFilterTolerance==1 &&
-            defaults.boardEnvelopeTolerance==1 && defaults.boardEnvelopeTimeTolerance==0 &&
-            defaults.boardVcaTolerance==0 && defaults.boardTemperatureRise==0,
-            "pitch, filter and envelope tolerances ship; time, VCA and temperature do not");
+            defaults.boardEnvelopeTolerance==1 && defaults.boardEnvelopeTimeTolerance==1 &&
+            defaults.boardVcaTolerance==1 && defaults.boardTemperatureRise==0,
+            "every board residual ships; temperature does not");
     for(const char* name:{"init","brass1","string1"}) {
         const auto preset=ceres::preset(name);
         require(preset.boardPitchTolerance==1 && preset.boardFilterTolerance==1 &&
-                preset.boardEnvelopeTolerance==1,"factory presets play the shipping boards");
+                preset.boardEnvelopeTolerance==1 && preset.boardEnvelopeTimeTolerance==1 &&
+                preset.boardVcaTolerance==1,"factory presets play the shipping boards");
     }
     auto shipping=plain();
     shipping.boardPitchTolerance=shipping.boardFilterTolerance=shipping.boardEnvelopeTolerance=1;

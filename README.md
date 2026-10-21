@@ -31,6 +31,10 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 
 ## Version history
 
+### Unreleased — 0.6.1 — every board trim on by default
+
+- The four voices now also differ slightly in envelope timing and VCA balance, by default: each board's attacks, decays and releases sit within its ±5 % EG time trims, and its sine-to-filtered balance within its level trims (`board_envelope_time_tolerance` and `board_vca_tolerance` now 1, were 0). Set both to 0 for the 0.6.0 voices. The owner took both candidates without a listening test, so neither is chosen by ear nor measured.
+
 ### Unreleased — 0.6.0 — owner verdicts and hardware laws
 
 - Filter cutoffs follow Yamaha's printed IG00156 law: one octave per volt on both filters and 62.5 Hz at middle C for 0 V, replacing the 0.7/0.65 oct/V estimates. Envelope, SUB, touch and BRILLIANCE depths rescale with it, so the filter envelope sweeps about 1.4 (HP) to 1.5 (LP) times as far. Chosen by ear from the printed candidates.
