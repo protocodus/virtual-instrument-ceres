@@ -8,12 +8,18 @@
 // --rotation runs each case at one rate and block size instead of all nine,
 // --shard runs every Nth case starting at K (1-based), --case runs only the
 // case a FAIL line names, and --count only prints how many cases there are.
+//
+// The limits below follow from the circuit (Source/DSP/ceres.cpp); each one
+// names the stage it comes from.
 
 #include "PluginProcessor.h"
 #include "ParameterMatrix.h"
 
+#include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <map>
 #include <string>
 
 namespace
@@ -21,18 +27,67 @@ namespace
 using protocodus::matrix::Case;
 using protocodus::matrix::Limits;
 
+// No limiter follows the circuit, so the ceiling is the output stage's own
+// bound. The PRA preamp clips at its rails (outputPreamp); the 33 uF line
+// coupling after it is a trapezoidal high-pass whose capacitor voltage stays
+// inside the rails, so its output stays inside their span; the decimation
+// FIR can scale a bounded stream by at most the sum of its taps' magnitudes
+// over every internal subframe.
+double outputBound (unsigned factor)
+{
+    const double span = ceres::outputPreampResponse (1.0e9, 1.0) - ceres::outputPreampResponse (-1.0e9, 1.0);
+    double taps = 0.0;
+    for (unsigned subframe = 0; subframe < factor; ++subframe)
+        for (const double tap : ceres::outputRateImpulse (factor, 512, subframe))
+            taps += std::abs (tap);
+    return span * taps;
+}
+
 class CeresDevice final : public protocodus::matrix::JuceDevice
 {
 public:
-    CeresDevice() : JuceDevice (std::make_unique<CeresAudioProcessor>()) {}
+    CeresDevice() : JuceDevice (std::make_unique<CeresAudioProcessor>())
+    {
+        for (auto* parameter : processor->getParameters())
+            if (parameter->isAutomatable())
+                if (auto* ranged = dynamic_cast<juce::RangedAudioParameter*> (parameter))
+                    columns[ranged->paramID.toStdString()] = { automatable++, ranged };
+    }
 
-    // The scaffold engine renders silence; this goes when it makes sound.
-    Limits LimitsFor (const Case&) const override
+    Limits LimitsFor (const Case& c) const override
     {
         Limits limits;
-        limits.soundsWhileHeld = false;
+        // Automation ramps between the case and its base, so each limit takes
+        // whichever of the two asks more of it.
+        double trim = 0.0;
+        for (const auto* row : { &c.values, &c.base })
+            trim = std::max (trim, std::pow (10.0, value (*row, "output_trim_db") / 20.0));
+        const auto* ceres = dynamic_cast<const CeresAudioProcessor*> (processor.get());
+        const auto factor = static_cast<unsigned> (ceres != nullptr ? ceres->appliedOversampling() : 4);
+        limits.ceiling = static_cast<float> (outputBound (factor) * trim);
         return limits;
     }
+
+private:
+    struct Column
+    {
+        std::size_t index;
+        juce::RangedAudioParameter* parameter;
+    };
+
+    // A row's value of one parameter in its own units (a choice's index).
+    double value (const std::vector<float>& row, const std::string& id) const
+    {
+        const auto found = columns.find (id);
+        if (found == columns.end())
+            return 0.0;
+        const auto& column = found->second;
+        const float normalised = column.index < row.size() ? row[column.index] : column.parameter->getValue();
+        return column.parameter->convertFrom0to1 (normalised);
+    }
+
+    std::size_t automatable = 0;
+    std::map<std::string, Column> columns;
 };
 } // namespace
 
