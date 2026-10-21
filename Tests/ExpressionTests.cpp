@@ -8,8 +8,10 @@
 namespace {
 constexpr double pi=3.14159265358979323846;
 constexpr double floorHz=1/(2*pi*1.5e-9*4.7e6);
-// R7 TBR: 47k LP, 150k HP with the .7/.65 manual slopes (SM1 p.14).
-constexpr double hpTouch=(.7/.65)*(47./150.);
+// R7 TBR: 47k LP, 150k HP (SM1 p.14). Both levers follow the printed
+// IG00156 law at 1 oct/V (guide p.34), so HP gets the bare resistor ratio;
+// this replaced the provisional .7/.65 slope ratio on 2026-10-20.
+constexpr double hpTouch=47./150.;
 // Touch level amplifier I centres the 3Vpp SUB on +.5V (guide p.56).
 constexpr double vibratoBias=1./3;
 void require(bool good,const char* why) {if(!good)throw std::runtime_error(why);}
@@ -22,6 +24,10 @@ ceres::Patch patch() {
     ceres::Patch p;p.expressionSource=1;p.pressureFilter=1.3;p.pressureVibrato=80;
     p.pressureVolume=.8;p.filterInitial=p.filterPeak=0;p.hpCutoff=90;p.lpCutoff=900;
     p.ampAttack=.001;p.ampSustain=1;p.ampRelease=10;p.lfoRate=7;
+    // Nominal boards, no drift: the expected pitch and cutoffs are the
+    // design laws.
+    p.boardPitchTolerance=p.boardFilterTolerance=p.boardEnvelopeTolerance=0;
+    p.driftCents=0;
     return p;
 }
 void advance(ceres::Synth& s,unsigned n=16) {

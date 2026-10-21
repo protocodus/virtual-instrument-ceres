@@ -1,6 +1,6 @@
-// Renders the existing standalone CIRCUIT RESEARCH preset table, unchanged,
-// from original committed MIDI phrases. This does not use the still-silent
-// CeresEngine JUCE scaffold and does not add presets/controls to that plugin.
+// Renders the CIRCUIT RESEARCH preset table, unchanged, from original
+// committed MIDI phrases, through ceres::Synth directly: the engine and seed
+// the JUCE plug-in plays, whose programs are these presets.
 // Shared PresetDemoRenderer.h fixes sample rate, block size, seed, tail and
 // finite/audible/ceiling/determinism checks. No gain trim or normalization.
 

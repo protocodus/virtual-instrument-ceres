@@ -4,10 +4,9 @@
 
 This is Ceres's canonical repository: it owns the DSP engine in
 `Source/DSP/` and the JUCE plug-in (VST3, AU, CLAP, Standalone) that wraps it.
-The repository currently contains two distinct engines: the tested C++17
-circuit synthesizer `ceres.cpp`/`ceres.hpp`, and the unchanged silent
-`CeresEngine.*` scaffold used by the JUCE plug-in. The plug-in is not yet
-connected to the circuit model. The existing Reason Rack Extension lives in the private
+The engine is the tested C++17 circuit synthesizer `ceres.cpp`/`ceres.hpp`;
+the JUCE plug-in plays it through `ceres::Synth` and takes its parameters
+from the engine's own descriptor table (`ceres::parameterInfo`). The existing Reason Rack Extension lives in the private
 `protocodus/reason-rack-extensions` repository as a thin adapter that mounts
 this repository as the pinned submodule `Examples/Ceres/Instrument` and
 compiles `Source/DSP/ceres.cpp` with `CERES_EMBEDDED_TARGET` directly. DSP and playing-model changes land here
@@ -21,7 +20,8 @@ Protocodus portfolio standard kept in the project, not in this repository.
   `CMakeLists.txt`. Any DSP or behaviour change bumps it, and versions only go
   up. A Rack device would take the same `X.Y.Z` plus its own stage suffix.
 - `Source/DSP/` is JUCE-free and C++17 (the Rack toolchain);
-  `CeresDSPCxx17` proves scaffold portability; `ceres` and `ceres_embedded`
+  `CeresDSPCxx17` compiles `ceres.cpp` the way the Rack does (C++17,
+  `CERES_EMBEDDED_TARGET`, no exceptions); `ceres` and `ceres_embedded`
   explicitly compile the circuit engine as C++17. No allocation, file I/O, locks or
   exceptions on the audio thread.
 - `PLUGIN_MANUFACTURER_CODE Cers` / `PLUGIN_CODE Cer1`, `BUNDLE_ID` and the

@@ -1,12 +1,12 @@
 # Ceres
 
-Ceres is a sample-free Yamaha CS-50 research synthesizer with a reusable C++17 circuit engine and configurable 1–16 voice polyphony. This repository also contains the existing JUCE VST3/AU/CLAP/Standalone scaffold: that plug-in still uses its separate silent placeholder engine and is **not yet connected** to the circuit synthesizer. The Reason Rack Extension consumes the shared DSP through a pinned submodule in its separate adapter repository.
+Ceres is a sample-free Yamaha CS-50 research synthesizer: a reusable C++17 circuit engine with configurable 1–16 voice polyphony, and a JUCE VST3/AU/CLAP/Standalone plug-in that plays it, with the circuit study's 14 research presets as its factory programs. The Reason Rack Extension consumes the same DSP through a pinned submodule in its separate adapter repository.
 
-![Ceres editor scaffold](Docs/screenshots/ceres.png)
+![Ceres editor](Docs/screenshots/ceres.png)
 
 ## Audio demos
 
-The CI-generated demos below use the **standalone circuit engine's existing 14 research presets**, including Init, without preset edits, gain normalization or external audio. They do not demonstrate the still-silent JUCE plug-in, which has no instrument preset bank yet. The source phrases are original committed MIDI, not recovered hardware performances; names inherited from the research table do not establish calibrated Yamaha preset matches.
+The CI-generated demos below play the **circuit engine's 14 research presets**, including Init, without preset edits, gain normalization or external audio. These are also the plug-in's factory programs: the demos drive `ceres::Synth` directly, with the seed every plug-in instance uses, rather than the plug-in's processor. The source phrases are original committed MIDI, not recovered hardware performances; names inherited from the research table do not establish calibrated Yamaha preset matches.
 
 <!-- audio-demos-begin -->
 
@@ -30,6 +30,24 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 <!-- audio-demos-end -->
 
 ## Version history
+
+### Unreleased — 0.6.0 — owner verdicts and hardware laws
+
+- Filter cutoffs follow Yamaha's printed IG00156 law: one octave per volt on both filters and 62.5 Hz at middle C for 0 V, replacing the 0.7/0.65 oct/V estimates. Envelope, SUB, touch and BRILLIANCE depths rescale with it, so the filter envelope sweeps about 1.4 (HP) to 1.5 (LP) times as far. Chosen by ear from the printed candidates.
+- Resonance follows its control voltage exponentially between the printed end points, so mid-travel settings are more resonant (Q 1.6 instead of 0.9 at half travel); the end points are unchanged. Chosen by ear.
+- Factory presets place their filters as the hardware's loaded preset buses do and assume RESONANCE at MIN. High-pass cutoffs sit 1.3–2.5 octaves higher (String 1 141 → 586 Hz), most low-pass cutoffs 0.2–1.6 octaves lower (Brass 1 2.07 kHz → 890 Hz), and presets that played at the maximum Q 5 now sit near Q 1.4. Presets sound thinner and darker.
+- The VCO sine follows the classic transistor triangle-to-sine shaper: about 1.4 % odd harmonics, mostly 5th and 7th, slightly brighter and reedier than a pure sine and 0.3 dB quieter at the same peak. The output reference and clipping rails moved to match. Chosen by ear, not measured.
+- The four voices now differ the way four calibrated CS-50 boards do, by default: a cent or two of pitch, most at the bottom of the keyboard, slightly different filter response to envelope, SUB, touch and BRILLIANCE, and envelope depth within the service checks. Each seed is one fixed instrument. Set `board_pitch_tolerance`, `board_filter_tolerance` and `board_envelope_tolerance` to 0 for identical voices. Chosen by ear.
+- Free-running pitch drift is on by default: each voice wanders within ±1 cent of its tuning (`drift_cents` 1, was 0), the band the service tuning leaves. Set it to 0 for steady pitch.
+- Correction to 0.5.0: the amplitude envelope tolerance applies to the attack peak and the −200 mV floor; every voice holds the same full-sustain level, as the alignment leaves it.
+- New opt-in board controls, off by default: `board_envelope_time_tolerance` (attack, decay and release within the ±5 % trim bands), `board_vca_tolerance` (each voice's sine-to-filtered balance within its level trims) and `board_temperature_rise` (−25 to +25 K since tuning; each voice drifts by its own IC temperature rank).
+- The ring modulator's wet signal is 3 dB quieter at full MODULATION: its two sidebands now peak at the dry tone's peak. After the last key-up, the DEPTH sweep glides back to the SPEED rate over about 14.5 s instead of 0.47 s. Both chosen by ear.
+- Very loud input to the ring modulator compresses and limits as the µA796's input pair does. Four-note chords change by about 1 % at most; touch LEVEL and extra virtual voices reach the limit.
+- FUNCTION EXT: the SUB can follow the rear EXT IN jack (`lfo_waveform` 5, `ext_level`), fed per sample by a front end. Existing patches are unchanged.
+- Front ends get the PANEL HPF/LPF lever law (`hpfLeverHz`, `lpfLeverHz`): 85 Hz to about 42 kHz at middle C, the first few percent of travel doing nothing.
+- The plug-in now plays the circuit engine instead of the silent scaffold. Every engine control is a host parameter, named by its engine key with the engine's range and default; the 14 research presets are its factory programs, Init first; the editor is laid out like the CS-50 panel. Voices (1–16) and oversampling (1×/2×/4×) are plug-in settings applied when the instrument is idle, and the plug-in reports the engine's 31-sample latency. An optional EXT IN input, off by default, feeds FUNCTION EXT (VST3 sidechain, CLAP input port, AU input bus). Sessions saved by the scaffold open as a new instance.
+- Plug-in MIDI: velocity, channel pressure as touch, ±2-semitone pitch bend, the damper pedal (CC64), and CC11, which scales the `expression` pedal parameter the way MIDI expression scales volume.
+- Research for each component is in `Docs/research/*-authenticity-2026-10-20.md`; the by-ear verdicts behind this version are in [`Docs/decisions.md`](Docs/decisions.md).
 
 ### Unreleased — 0.5.0 — component authenticity
 
@@ -107,7 +125,7 @@ The CI-generated demos below use the **standalone circuit engine's existing 14 r
 
 ## How it works
 
-`Source/DSP/ceres.cpp` and `ceres.hpp` implement the standalone circuit engine and its sample-by-sample API. `Source/DSP/CeresEngine.*` remains the distinct silent placeholder used by `Source/Plugin*`; this merge does not silently change the plug-in's sound, controls or saved-state contract. The native and embedded circuit libraries do not depend on JUCE, samples, hardware recordings or manuals at runtime.
+`Source/DSP/ceres.cpp` and `ceres.hpp` implement the circuit engine and its sample-by-sample API, and the JUCE plug-in in `Source/Plugin*` plays it (see [the plug-in](#the-plug-in)). The native and embedded circuit libraries do not depend on JUCE, samples, hardware recordings or manuals at runtime.
 
 The original product version 0.1.0 imported the canonical v0.10.0 research model and subsequent documented circuit changes. It is a reduced circuit model with provisional control calibration, not a transistor-exact recreation. No existing historical validation report is relabelled as a validation of this merged build.
 
@@ -130,6 +148,8 @@ for (unsigned frame = 0; frame < 64; ++frame)
     output[frame] = synth.process();
 ```
 
+`ceres::parameterCount()` and `parameterInfo(i)` describe every key `setParameter` accepts: its range, a default `Patch`'s value and whether the engine rounds it to whole numbers. `getParameter()` reads a key back as the engine applies it. All three are allocation-free and present in both ABIs; the plug-in builds its parameter list from them.
+
 The embedded interface has a numeric `Patch`, a C-string parameter setter, no exception path, and no allocating offline probes/preset APIs. Construction allocates the synth state. Rendering, controller changes, validated patch updates, panic, reset and configuration reuse existing state. Do not construct or replace a synth inside `RenderBatch`.
 
 The output is mono. All configured voices and their capacitor states continue running when no note is held. `activeVoices()==0` does **not** imply silence: the common output bus has a roughly 0.888-second time constant. `allNotesOff()` honors the MIDI pedal; `allSoundOff()` clears audio states while preserving controllers; `reset()` also restores seeded oscillator/controller state. The FIR has nominal group delay 31 host samples, with the decimator's sampling phase affecting event alignment.
@@ -146,7 +166,7 @@ Additional voices are a virtual extension of the four-board model. The calibrate
 
 Audio noise is the hard-limited "white noise of constant amplitude" the guide describes (printed p.32), trimmed to the same 3 Vpp as the waveforms. It is the limiter's band-limited input driven into the ±15 V rails, with the bandwidth estimated at 14 kHz from the pick-up op-amp's datasheet gain-bandwidth and the limiter's slew rate at the datasheet's 1 V/µs, simulated at 768 kHz or more so its density is the same at every quality and host sample rate. SUB noise filters the same signal. Different quality settings can still differ through filter discretization, nonlinear processing and alias rejection; this is not hardware gain calibration. See [noise-quality validation](Docs/validation/noise-quality/README.md).
 
-The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults `4` and `4`. Host adapters may choose and save different defaults independently of the 60 hardware/engineering patch keys.
+The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults `4` and `4`. Host adapters may choose and save different defaults independently of the 68 hardware/engineering patch keys.
 
 ### Ring, SUB and SUSTAIN controls
 
@@ -157,14 +177,17 @@ The native renderer accepts `--voices 1..16 --oversampling 1|2|4`, with defaults
 | `ring_depth` | 0..8 octaves | 0 | Positive carrier-frequency envelope excursion |
 | `ring_attack` | 0.001..10 s | 0.01 | Frequency-envelope time to peak |
 | `ring_decay` | 0.01..10 s T60 | 0.35 | Frequency-envelope decay toward the base rate |
-| `lfo_waveform` | 0..4 | 0 | Sine, Down, Up, Square, Noise |
+| `lfo_waveform` | 0..5 | 0 | Sine, Down, Up, Square, Noise, EXT |
+| `ext_level` | 0..1 | 1 | Rear EXT LEVEL: the share of the EXT IN signal that reaches the EXT preamp |
 | `sustain_mode` | 1..2 | 1 | I holds released key voltage; II follows the last assigned key |
 
 Live `ring_depth` changes interpolate over 20 ms in the digital control domain. This dezipper preserves the existing exponential frequency law and 220 Hz cap; it is not a newly inferred analog time constant. Startup/reset use the saved depth immediately. Repeated notifications at the same target do not prolong the transition, and a reversal starts from the current interpolated value. The change removes the immediate frequency-control step in a synthetic test; it does not prove the exact cause of a reported host crackle.
 
-The ring envelope triggers when the first physical key is pressed after all keys have been released. Additional held keys do not retrigger it, including a key that finds no free voice. Final key-up returns its frequency envelope toward zero through a fixed nominal release; the carrier phase keeps running. The total carrier is bounded at 220 Hz, so SPEED and DEPTH interact near that limit. This is a circuit-informed balanced-multiplier model with provisional envelope and wet-gain calibration.
+The ring envelope triggers when the first physical key is pressed after all keys have been released. Additional held keys do not retrigger it, including a key that finds no free voice. Final key-up returns its frequency envelope toward zero through a fixed release of 14.5 s T60, the PRA's fixed release voltage on its aligned envelope law (chosen by ear); the carrier phase keeps running. The total carrier is bounded at 220 Hz, so SPEED and DEPTH interact near that limit. The multiplier's input pair limits as the µA796's does, on a bus scale taken from the voice-board alignment: four-note chords compress it by at most about 1 %, while touch LEVEL and extra virtual voices push it into its limit. This is a circuit-informed balanced-multiplier model with provisional envelope and wet-gain calibration.
 
-The selected SUB waveform drives VCO, VCF, VCA and pressure vibrato. Noise uses the documented 22k/0.1µF low-pass and a fixed engineering level; it is independent of SUB rate and audio Noise mix. PWM retains its separate sine oscillator. No external modulation input is implemented.
+The selected SUB waveform drives VCO, VCF, VCA and pressure vibrato. Noise uses the documented 22k/0.1µF low-pass and a fixed engineering level; it is independent of SUB rate and audio Noise mix. PWM retains its separate sine oscillator.
+
+FUNCTION EXT (`lfo_waveform` 5) takes the SUB signal from the rear EXT IN jack instead, through the same routes. A front end feeds one sample per host frame with `Synth::externalInput()` before each `process()`. One unit is 1.5 V/101, about 14.9 mV at the jack: the ×101 EXT preamp lifts it to the internal waveforms' 1.5 V peak, so a ±1 signal at `ext_level` 1 modulates as deeply as the internal SUB. The preamp's 10 µF output capacitor high-passes the signal at 0.32 Hz while EXT is selected and keeps its charge when FUNCTION moves away (0.16 Hz there). The preamp and the SUI buffer clip at their datasheet-typical swings, 9.33 and 8.67 units, an estimate. The LEVEL pot's taper is not published, so `ext_level` is its wiper ratio rather than its travel. The internal waveforms ignore the jack, and EXT with nothing fed is a silent SUB. See [the SUB research note](Docs/research/sub-authenticity-2026-10-20.md).
 
 In Sustain II, released/free boards follow the last assigned key in both oscillator pitch and filter tracking. Their envelope charge, gates, oscillator phase and filter state remain continuous. Entering II applies this immediately; returning to I captures the current key voltage. MIDI-damper-held boards remain protected until pedal-up, an explicit software adaptation rather than recovered Yamaha allocation behavior. This selector is distinct from `global_release` and MIDI damper gating.
 
@@ -179,7 +202,7 @@ The ring/SUB/Sustain additions preserved the earlier audio path in their recorde
 | `amp_level` | 0..1 | 1 | Common filtered+sine VCA level before amp EG, bus and ring |
 | `output_trim_db` | −24..+24 dB | 0 | Utility gain after all circuit processing and FIR, for saved preset calibration |
 
-The first two controls use an explicitly anchored stiff-source model, not recovered passive-pot positions. The signed resonance offset is an engineering delta around existing effective Q settings; the actual hardware wiper is 0..10 V. Its capacitor state survives note/preset changes and audio panic. SUB filter depth remains the LP depth; HP now gets approximately 0.3374 times as much modulation. Common VCA level adds to the existing SUB-amplitude control and closes at zero, rather than multiplying two gain controls. Factory LEVEL now drives that common VCA instead of final master volume.
+The first two controls use an explicitly anchored stiff-source model, not recovered passive-pot positions. The signed resonance offset is an engineering delta around existing effective Q settings; the actual hardware wiper is 0..10 V, and factory presets assume the RESONANCE lever at MIN (+10 V), so from them it reaches 0 to −10 V. Its capacitor state survives note/preset changes and audio panic. SUB filter depth remains the LP depth; HP gets 47k/150k, about 0.313 times as much modulation. Common VCA level adds to the existing SUB-amplitude control and closes at zero, rather than multiplying two gain controls. Factory LEVEL now drives that common VCA instead of final master volume.
 
 Neutral offsets, common level 1 and output trim 0 preserve the prior paths when the intentionally corrected SUB filter route is inactive. The output trim is a modern linear utility, not part of the analog model; it adds no limiter and cannot promise a fixed peak under arbitrary MIDI. The [source audit](Docs/sound-path-gap-audit.md) distinguishes known resistor/capacitor relationships from provisional control calibration.
 
@@ -204,21 +227,35 @@ Velocity is latched independently for each allocated voice and stays with its re
 
 Each physical note press also retains a FIFO identity, including a press that found no free board. Its eventual key-up consumes that press alone; it never releases a board another press owns. These velocity and MIDI ownership policies are software adaptations, not recovered CS-50 keyboard circuitry. See [the rapid-note validation](Docs/validation/note-reuse/README.md).
 
-Touch LEVEL adds to the common VCA gain: `amp_level + 1.08*pressure_volume*expression`. R7 sums LEVEL (10 V full, 270k) and touch LEVEL (calibrated to 6.0 V full, 150k) into the same node, so (6/150k)/(10/270k) = 1.08 (service manual 1 p.14; guide p.55). The VCA's headroom above full LEVEL is not documented, so full touch on a full-LEVEL patch may drive the output rail harder. Filter expression is touch BRILLIANCE: `expression*pressure_filter` octaves on the low-pass variable conductance above its fixed resistor floor, and 0.3374 times that on the high-pass. The R7 matrix feeds TBR through 47k to LP and 150k to HP, the same split as SUB. `pressure_wah` scales the selected SUB waveform by touch into the same two nodes: `expression*SUB*pressure_wah` LP octaves, the hardware's level amplifier II → R7 VCF route. Vibrato adds `expression*pressure_vibrato*(SUB + 1/3)` cents. Yamaha trims level amplifier I so the 3 Vpp SUB leaves centred on +0.5 V (guide p.56), so touch vibrato bends slightly upward on average. The 1/3 offset assumes that centring scales with the touch gain. The separate native `velocity_sensitivity` gain remains multiplicative with that sum. All native research presets retain source 0. Hosts should default missing saved properties to 0 to preserve old patches, and explicitly save 1 for velocity-oriented patches.
+Touch LEVEL adds to the common VCA gain: `amp_level + 1.08*pressure_volume*expression`. R7 sums LEVEL (10 V full, 270k) and touch LEVEL (calibrated to 6.0 V full, 150k) into the same node, so (6/150k)/(10/270k) = 1.08 (service manual 1 p.14; guide p.55). The VCA's headroom above full LEVEL is not documented, so full touch on a full-LEVEL patch may drive the output rail harder. Filter expression is touch BRILLIANCE: `expression*pressure_filter` octaves on the low-pass variable conductance above its fixed resistor floor, and 47/150, about 0.313 times that, on the high-pass. The R7 matrix feeds TBR through 47k to LP and 150k to HP, the same split as SUB. `pressure_wah` scales the selected SUB waveform by touch into the same two nodes: `expression*SUB*pressure_wah` LP octaves, the hardware's level amplifier II → R7 VCF route. Vibrato adds `expression*pressure_vibrato*(SUB + 1/3)` cents. Yamaha trims level amplifier I so the 3 Vpp SUB leaves centred on +0.5 V (guide p.56), so touch vibrato bends slightly upward on average. The 1/3 offset assumes that centring scales with the touch gain. The separate native `velocity_sensitivity` gain remains multiplicative with that sum. All native research presets retain source 0. Hosts should default missing saved properties to 0 to preserve old patches, and explicitly save 1 for velocity-oriented patches.
+
+### The plug-in
+
+The JUCE processor (`Source/PluginProcessor.*`) runs one `ceres::Synth` per instance. Every engine key is a host parameter whose ID is the key itself (`lp_cutoff`, `amp_release`, …, JUCE version hint 1), with the range, default and whole-number flag the engine's descriptors report, so the plug-in keeps no second copy of the table. `Source/PluginControls.h` adds only presentation: names, panel captions, units, groups and a linear, logarithmic or centred travel. A key it does not list still appears, under Engine. Whole-number keys and switch positions (`octave`, `lfo_waveform`, `sustain_mode`, `glide_mode`, `expression_source`) are choices. Parameter IDs never change once released. The levers move the engine's own quantities; they do not follow the panel lever laws the engine offers front ends (`subSpeedLeverHz`, `hpfLeverHz` and the rest), whose travel covers only part of each key's range.
+
+Two plug-in settings sit beside them and are not automatable: `voice_count` (1–16, default 4) and `oversampling` (1×, 2× or 4×, default 4×). The engine can only be reconfigured idle, so a change made while anything sounds waits until no key or damper pedal is held and no voice is active, fades the remaining tail out over 20 ms, resets and reconfigures the engine, restores the patch, bend, pressure and pedal, and fades back in. A key or the pedal arriving during the fade-out cancels it. `prepareToPlay` applies the settings at once. The plug-in reports the engine's 31-sample latency at every quality, and a tail of 0.73 times the longer of `amp_release` and `global_release` plus 6.1 s: the slowest VCA EG release at the widest board tolerance, then the output bus's 0.888 s coupling capacitor falling 60 dB. The engine runs at 8–384 kHz; at any other rate the plug-in stays silent and the editor says so.
+
+MIDI events take effect at their own sample, on any channel. Velocity reaches `noteOn()` as velocity/127, channel pressure is the touch response (`pressure()`), pitch bend spans ±2 semitones and the damper pedal (CC64, on from 64) drives `sustain()`. CC11 scales the `expression` pedal parameter, the way General MIDI expression scales channel volume: the parameter sets where a fully raised MIDI pedal sits, and until CC11 arrives (or at 127) the parameter alone sets the pedal. Neither writes the other, so automation of the pedal and a played CC11 never fight, and the parameter's default of 1 stays the hardware's no-pedal bypass. CC120 silences, CC123 releases every key (the damper still holds what it holds) and CC121 resets bend, pressure, the damper and CC11. Other controllers, polyphonic aftertouch and program changes do nothing.
+
+The output is mono, on both channels of a stereo output. An optional **EXT IN** input bus, off by default, feeds the rear EXT IN jack through `Synth::externalInput()` on every frame, unscaled (one unit is 1.5 V/101 at the jack), from its first channel if the host gives it two; disabled or absent, the jack reads silence. FUNCTION EXT (`lfo_waveform` 5) and `ext_level` decide what it does. VST3 offers it as an auxiliary (sidechain) input, CLAP as a non-main input port and AU as an input bus, which the wrapper fills with silence when nothing is connected. The Standalone keeps it off, so it never opens an audio input.
+
+The factory programs are the 14 research presets, Init first and the one a new instance opens on. Choosing one sets every engine key except `expression`, `ext_level` and `output_trim_db`, which stay where the player or host set them. Parameters hold floats, so a program's values match its preset to float precision. Every instance is the same unit: one fixed seed sets each board's tolerances, oscillator phases and noise, the seed the README demos use, so a program plays the instrument its demo plays. The saved state is the parameter tree with a format version, the current program and the plug-in version. A parameter the state does not mention takes its default, and a state saved by the earlier silent scaffold opens as a new instance.
+
+The editor (1080×750) is laid out like the CS-50 panel: the tone-selector tablets, then the VCO, VCF and VCA levers, PITCH, RING MODULATOR, TONE, TRANSPOSITION, TOUCH RESPONSE and VOLUME, then SUB-OSCILLATOR, SUSTAIN, PORTAMENTO / GLISSANDO, the rear panel and the plug-in settings, with the engine calibration controls as knobs along the bottom. Its sections come from the processor's parameter groups, so it shows exactly the parameters the host sees.
 
 
 ## Known gaps
 
-- The JUCE plug-in remains a silent placeholder with a plain editor; connecting the actual instrument and controls is separate work. Its source, identity codes, release helpers and shared portfolio tools are preserved.
-- The plug-in still has no preset bank. The audio tier checks the separately identified circuit research presets; passing it does not establish audible JUCE plug-in functionality.
+- No host has yet exercised the plug-in's EXT IN as a sidechain input, and the AU's handling of it is untested. The factory programs are research presets from the circuit study, not calibrated Yamaha voices.
+- Every plug-in instance is the same unit, with one fixed seed; there is no per-instance board variation. Sixteen voices at 4× can need more than a whole CPU core at 48 kHz; `voice_count` and `oversampling` trade CPU for polyphony and alias rejection.
 - Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
-- No external modulation input is implemented. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
+- EXT IN's host-rate signal is interpolated linearly inside the oversampled engine; the op-amp swings are datasheet typicals, and the EXT preamp's bandwidth and slew rate are not modelled. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
 - The portamento/glissando clock rate and the noise limiter's bandwidth and slew rate are not calibrated.
 
 ## Build
 
-CMake 3.22+, a C++17/20 compiler and Python3 are required for the full unit suite. The circuit targets explicitly compile as C++17; the existing JUCE scaffold uses C++20. Build the standalone DSP without JUCE:
+CMake 3.22+, a C++17/20 compiler and Python3 are required for the full unit suite. The circuit targets explicitly compile as C++17; the JUCE plug-in uses C++20. Build the standalone DSP without JUCE:
 
 ```sh
 cmake -S . -B build-dsp -DCMAKE_BUILD_TYPE=Release -DCERES_BUILD_PLUGIN=OFF -DBUILD_TESTING=ON
@@ -230,7 +267,7 @@ ctest --test-dir build-dsp -L '^unit$' --output-on-failure
 
 `ceres` and `ceres_embedded` are the circuit libraries. `ceres_render` writes mono float32 WAV without normalization; sorted event rows are `frame type note value`. It supports note-on/off, bend, pressure, pedal, all-notes-off, panic and reset. `--patch path` reads key=value overrides and `--build-info` reports the exact compiled sources including the merged CMake file. The native research preset API is excluded from the embedded ABI.
 
-The 12 circuit checks cover oscillator/filter/envelope/ring contracts, expression, all 60 keys with zero post-construction allocations, and native/embedded parity. They are named `Ceres.<Suite>` and labelled `unit` alongside the existing scaffold unit tests. Test executables are resolved by CMake target paths for single- and multi-configuration generators. The `audio`, `render` and `fuzz` tiers remain separate; the unchanged audio contract now renders the actual circuit preset list twice.
+The circuit checks cover oscillator/filter/envelope/ring contracts, expression, all 68 keys and their descriptors, the EXT IN feed with zero post-construction allocations, and native/embedded parity. They are named `Ceres.<Suite>` and labelled `unit`; `CeresDSPCxx17` compiles `ceres.cpp` as the Rack does (C++17, `CERES_EMBEDDED_TARGET`, no exceptions). Test executables are resolved by CMake target paths for single- and multi-configuration generators. The `audio`, `render` and `fuzz` tiers remain separate; the unchanged audio contract now renders the actual circuit preset list twice.
 
 ```sh
 ctest --test-dir build-dsp -L '^audio$' --output-on-failure
@@ -245,7 +282,7 @@ cmake --build build-sanitize --parallel
 ASAN_OPTIONS=detect_leaks=0 ctest --test-dir build-sanitize -L '^unit$' --output-on-failure
 ```
 
-`CERES_SANITIZE` is a compatibility alias for the existing `CERES_ENABLE_SANITIZERS`; either instruments development targets with ASan/UBSan. `CERES_BUILD_TOOLS=OFF` excludes both renderer tools without dropping core tests. `CERES_BUILD_LIBFUZZER` retains the existing scaffold fuzz target.
+`CERES_SANITIZE` is a compatibility alias for the existing `CERES_ENABLE_SANITIZERS`; either instruments development targets with ASan/UBSan. `CERES_BUILD_TOOLS=OFF` excludes both renderer tools without dropping core tests. `Ceres.DspFuzz` (`fuzz`) feeds `ceres::Synth` seeded malformed input; `CERES_BUILD_LIBFUZZER` (Clang) builds it as a libFuzzer target instead.
 
 The separate plug-in build fetches pinned JUCE 8.0.14 and clap-juce-extensions unless `CERES_JUCE_PATH` and `CERES_CLAP_JUCE_EXTENSIONS_PATH` point to local checkouts. `CERES_BUILD_CLAP` controls the CLAP wrapper; on macOS `CERES_BUILD_UNIVERSAL` defaults to ON. Linux dependencies are listed in `.github/workflows/ci.yml`.
 
@@ -256,6 +293,8 @@ ctest --test-dir build-plugin -L '^unit$' --output-on-failure
 # Full suite also includes circuit audio, editor rendering and fuzz tiers:
 ctest --test-dir build-plugin --output-on-failure
 ```
+
+It builds the VST3, CLAP and Standalone, and the AU on macOS. `Ceres.PluginProcessor` (`unit`) checks the parameters against the engine's descriptors, the programs, state round trips, rendering bit for bit against a directly driven `ceres::Synth`, EXT IN, the bus layouts, unsupported sample rates, deferred reconfiguration and the editor. `Ceres.ParameterMatrix` (`fuzz`) plays a fixed 1/50 sample of the portfolio's parameter-extremes matrix. Its ceiling is the output stage's own bound, the rail span through the decimation filter and the trim, and silence is due by the tail the processor reports plus the bus capacitor's time to bring the largest output the stage allows down to full scale. The main build runs every case at all nine rates and block sizes in 16 shards. `Ceres.EditorRender` (`render`) renders the editor screenshot and compares its size with the committed one only while the editor source is the one that rendered it, which the PNG records.
 
 On multi-configuration generators add `--config Release` to the build and `-C Release` to CTest; command-line executables are then in the corresponding configuration directory. `scripts/build-macos.sh` retains the existing universal build and full-suite behavior.
 

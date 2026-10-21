@@ -31,6 +31,11 @@ ceres::Patch sinePatch() {
     auto p=ceres::preset("init");
     p.saw=p.pulse=p.noise=0; p.sine=1;
     p.ampAttack=.001; p.ampSustain=1; p.ampRelease=.03;
+    // Nominal boards without free-running drift: these contracts check the
+    // design laws; the shipping board tolerances and drift have their own
+    // (BoardToleranceTests.cpp).
+    p.boardPitchTolerance=p.boardFilterTolerance=p.boardEnvelopeTolerance=0;
+    p.driftCents=0;
     return p;
 }
 std::complex<double> response(const std::vector<double>& impulse,double f,double fs) {
@@ -38,6 +43,14 @@ std::complex<double> response(const std::vector<double>& impulse,double f,double
     for (std::size_t i=0;i<impulse.size();++i)
         result+=impulse[i]*std::polar(1.0,-2*pi*f*static_cast<double>(i)/fs);
     return result;
+}
+// Reference damping at the printed IG00156 endpoints, Q 5 at VQ 0V and Q .5
+// at VQ 10V (SM1 printed p.19), interpolated geometrically in VQ: the
+// exponential Q law chosen by ear on 2026-10-20 (vcf-q-law). Until then these
+// fixtures used the linear d=2-1.8r. Resonance r is 1-VQ/10.
+double printedQDamping(double resonance) {
+    const double vq=10*(1-resonance);
+    return (1/5.)*std::pow((1/.5)/(1/5.),vq/10);
 }
 std::complex<double> physicalFilter(double f,double rate,double omega,double damping,
     double sourceConductance,double referenceConductance,bool highPass) {
@@ -78,7 +91,7 @@ void circuitResponse() {
             const double referenceGs=(highPass ? 3:1)/150e3;
             const auto impulse=ceres::filterImpulse(fs,fc,resonance,highPass,262144,amplitude,gs,referenceGs);
             for (double f : {.3,1.0,5.0,50.0,250.0,1000.0,4000.0,12000.0}) {
-                const auto expected=physicalFilter(f,fs,omega,2-1.8*resonance,gs,referenceGs,highPass);
+                const auto expected=physicalFilter(f,fs,omega,printedQDamping(resonance),gs,referenceGs,highPass);
                 const auto observed=response(impulse,f,fs)/amplitude;
                 require(std::abs(observed-expected)<2e-6,
                         "Coupled source/Q capacitor response differs from physical branch-current equations");
@@ -129,8 +142,8 @@ void physicalCascade() {
         const auto impulse=ceres::filterCascadeImpulse(fs,hp,lp,resonance,.5,
             branches,262144,amplitude,1);
         for (double f : {20.0,100.0,300.0,1000.0,4000.0,8000.0}) {
-            const auto expected=physicalFilter(f,fs,wh,2-1.8*resonance,branches/150e3,3/150e3,true)
-                *physicalFilter(f,fs,wl,1.1,1/150e3,1/150e3,false)*calibration/double(branches);
+            const auto expected=physicalFilter(f,fs,wh,printedQDamping(resonance),branches/150e3,3/150e3,true)
+                *physicalFilter(f,fs,wl,printedQDamping(.5),1/150e3,1/150e3,false)*calibration/double(branches);
             require(std::abs(response(impulse,f,fs)/amplitude-expected)<3e-6,
                 "Production cascade must preserve physical mixer gain, fixed Q current and interstage units");
         }
@@ -200,6 +213,7 @@ void fixedConductanceModulation() {
     a.hpResonance=.4; a.lpResonance=.7; a.drive=.05;
     a.filterInitial=-2; a.filterPeak=2; a.filterAttack=.3;
     a.hpEnvelopeScale=.2; a.lpEnvelopeScale=.8;
+    a.boardFilterTolerance=a.boardEnvelopeTolerance=0; // nominal EG octaves per volt
     auto b=a; b.filterInitial+=1; b.filterPeak+=1;
     b.hpCutoff=fixedHz+(a.hpCutoff-fixedHz)*std::pow(2.0,-a.hpEnvelopeScale);
     b.lpCutoff=fixedHz+(a.lpCutoff-fixedHz)*std::pow(2.0,-a.lpEnvelopeScale);
@@ -244,6 +258,9 @@ void masterPitchRouting() {
                 tuned.hpResonance=.4; tuned.lpResonance=.7; tuned.drive=.05;
                 tuned.filterInitial=-2; tuned.filterPeak=3; tuned.filterAttack=.015;
                 tuned.filterDecay=.12; tuned.hpEnvelopeScale=.2; tuned.lpEnvelopeScale=.8;
+                // A trimmed board's residual depends on Kv and TRANSPOSE
+                // separately: the PITCH/TRANSPOSE equivalence is nominal.
+                tuned.boardPitchTolerance=0;
                 auto equivalent=tuned;
                 equivalent.tuneCents=0;
                 equivalent.octave=cents/1200; // Separate FT path gives the same VCO pitch.
@@ -377,10 +394,16 @@ void outputLifecycleAndPolarity() {
     require(rms(render(warm,1024))==0,"Panic must clear every output coupling and FIR history exactly");
 
     // Independent absolute phase reference: first SplitMix64 unit value for
-    // seed 1, a cosine WSC sine, and the symmetric FIR's 124-sample delay.
-    // The final-of-four output phase is 3, hence 121 internal samples delay.
-    // Physical RC phase at 440Hz is small; an omitted line inversion changes
-    // this correlation's sign. No old renderer is needed by this native test.
+    // seed 1, the WSC sine on that phase, and the symmetric FIR's 124-sample
+    // delay. The final-of-four output phase is 3, hence 121 internal samples
+    // delay. Physical RC phase at 440Hz is small; an omitted line inversion
+    // changes this correlation's sign. No old renderer is needed by this
+    // native test. Since 2026-10-20 the WSC sine is the differential-pair
+    // shaper tanh(k*tri)/tanh(k), k=1.4020, on the folded ramp: its 1.36%
+    // THD alone caps the correlation with a pure cosine at .99991, and with
+    // the RC phase it measures .99987, under the bound; against the shaped
+    // waveform it is .99997 (an ideal sine is cos(2*pi*phase), which the
+    // previous engine met at .99999). The reference follows the waveform.
     ceres::Synth sign(48000,1); p.volume=.01; sign.setPatch(p); sign.noteOn(69);
     constexpr std::size_t start=96000;
     render(sign,start);
@@ -388,7 +411,8 @@ void outputLifecycleAndPolarity() {
     double cross=0,energy=0,referenceEnergy=0;
     for (std::size_t i=0;i<audio.size();++i) {
         const double phase=.5665615751722809+440*(double(start+i)-121.0/4)/48000;
-        const double reference=std::cos(2*pi*phase);
+        const double tri=2*std::abs(1-2*(phase-std::floor(phase)))-1;
+        const double reference=std::tanh(1.4020*tri)/std::tanh(1.4020);
         cross+=audio[i]*reference; energy+=audio[i]*audio[i]; referenceEnergy+=reference*reference;
     }
     require(cross/std::sqrt(energy*referenceEnergy)<-.9999,
@@ -767,11 +791,12 @@ void filterEnvelopeCoupling() {
         const double fixedHz=1/(2*pi*1.5e-9*4.7e6);
         require(p.hpCutoff>fixedHz && p.lpCutoff>fixedHz,
                 "Finite factory cutoff CV must retain nonzero gm and respond to envelope modulation");
-        // Independent documented resistor ratio relative to the existing
-        // provisional manual slope; no claim of absolute cutoff calibration.
-        require(std::abs(p.hpEnvelopeScale/.7-39000.0/220000.0)<1e-14,
+        // Independent documented resistor ratio at the levers' printed
+        // 1 oct/V (guide p.34, read at the 39k lever). Until 2026-10-20 this
+        // divided out the provisional .7/.65 manual slopes instead.
+        require(std::abs(p.hpEnvelopeScale-39000.0/220000.0)<1e-14,
                 "Factory HP envelope must use 39k/220k relative coupling");
-        require(std::abs(p.lpEnvelopeScale/.65-39000.0/47000.0)<1e-14,
+        require(std::abs(p.lpEnvelopeScale-39000.0/47000.0)<1e-14,
                 "Factory LP envelope must use 39k/47k relative coupling");
     }
     auto p=ceres::preset("init"); p.filterInitial=-2; p.filterPeak=3;
@@ -989,9 +1014,22 @@ void ringEnvelopeAndKeyLedger() {
         require(std::abs(state.ringEnvelope-expected)<2e-13,"Ring RC attack must follow independent exponential solution");
         require(std::abs(state.ringFrequency-10*std::exp2(2*expected))<2e-11,"Ring depth controls frequency, not mix amplitude");
     }
-    // Last key-up interrupts attack through the separately sourced fixed RT.
+    // Last key-up interrupts attack through the separately sourced fixed 2DT.
+    // This fixture held the untrimmed pin-sheet law (.4678s T60); the
+    // PRA-aligned law was chosen by ear on 2026-10-20. Derived here without
+    // the engine's helpers: 2DT is the 6.8k/3.3k divider of +15V; the pin
+    // sheet's decay runs exponentially from 10s at 0V to 10ms at 10V, as
+    // five-RC durations (T60 = duration*ln1000/5); the CS-60 PRA alignment
+    // puts the attack at AT=10V at 31ms, where the pin sheet's 1s-to-1ms
+    // attack gives 1ms.
     const double initial=s.modulationState().ringEnvelope;s.noteOff(60);
-    constexpr double release=.4678104397473947;
+    const double twoDt=15*3300./(6800+3300);
+    const double trim=.031/(1*std::pow(.001/1,10/10.));
+    const double release=trim*10*std::pow(.010/10,twoDt/10)*std::log(1000.)/5;
+    require(std::abs(release-14.5021)<1e-4 && std::abs(.4678104397473947*trim/release-1)<1e-12,
+            "Ring release is the 2DT divider on the 31x PRA-aligned law, 14.50s T60");
+    require(std::abs(ceres::ringDecaySeconds(ceres::ringReleaseVolts)/release-1)<1e-14,
+            "Header DECAY TIME law at the fixed 2DT gives the derived release");
     for(unsigned n=1;n<=800;++n) {
         s.process();require(std::abs(s.modulationState().ringEnvelope-
             initial*std::exp(-std::log(1000.)*(n/fs)/release))<2e-13,"Ring fixed release toward0, independent of A/D");
@@ -1090,24 +1128,42 @@ void ringAudioAndFreeCarrier() {
     for(unsigned h=2;h<=3;++h)
         require(std::abs(toneMagnitude(w,440-47*h,fs)/low-std::abs(coefficients[h]/coefficients[1]))<2e-4,
             "Even/odd carrier sidebands match physical BJT current-ratio oracle");
-    // Absolute wet level. VR4 is assumed trimmed level-neutral: wet RMS equal
-    // to dry RMS for a steady midband carrier, so each sideband sits at
-    // (sqrt2/2)*|c1|/(s_peak/2) of the dry tone, with s_peak the steering of
-    // the midband 4.71mV carrier. The pin-1 coupling (10uF into 330+463 ohm)
-    // and the pin-6 coupling (10uF into 2.53k+10k) act at 440 and 393Hz.
+    // Absolute wet level. VR4 is trimmed peak-neutral (chosen by ear,
+    // 2026-10-20; this fixture encoded the RMS-matched trim of 0.5.0, sqrt2
+    // higher): for a steady midband carrier the two sidebands together peak
+    // at the dry peak, so each sits at (1/2)*|c1|/(s_peak/2) of the dry tone,
+    // with s_peak the steering of the midband 4.71mV carrier. The pin-1
+    // coupling (10uF into 330+463 ohm) and the pin-6 coupling (10uF into
+    // 2.53k+10k) act at 440 and 393Hz.
     {
-        const double node=1/(1/470.+1/125000.+1/(beta*(470+2*vt/i5)));
+        const double re=vt/i5,node=1/(1/470.+1/125000.+1/(beta*(470+2*re)));
         const double peak=std::tanh(1.6*shunt/(33000+shunt)/(2*vt));
         const auto hp=[&](double f,double tau){
             const std::complex<double> s(0,2*(4*fs)*std::tan(pi*f/(4*fs)));
             return std::abs(s*tau/(1.+s*tau));
         };
-        const double expected=std::sqrt(2.)*std::abs(coefficients[1])/peak
-            *hp(440,10e-6*(330+node))*hp(393,10e-6*(1/(1/2700.+1/40e3)+10e3));
+        const double couplings=hp(440,10e-6*(330+node))*hp(393,10e-6*(1/(1/2700.+1/40e3)+10e3));
+        const double expected=std::abs(coefficients[1])/peak*couplings;
         const double measured=low/toneMagnitude(d,440,fs);
         if(std::abs(measured/expected-1)>2e-3)
             std::cerr<<"wet sideband/dry "<<measured<<" expected "<<expected<<'\n';
-        require(std::abs(measured/expected-1)<2e-3,"Wet level follows the derived chain and level-neutral VR4 trim");
+        require(std::abs(measured/expected-1)<2e-3,"Wet level follows the derived chain and peak-neutral VR4 trim");
+        // Read the trimmer back off the engine's output. The modulator's
+        // single-ended gain is divider(330 into the pin-1 node) times the
+        // pin-6 load (2.7k||40k||10k) over the degeneration 470+2re; the wet
+        // buffer adds 1+VR4/10k. Only their product reaches the output, so
+        // this pins the derivation the verdict's figures rest on: the VR4
+        // the engine implies must be a setting a B-100K trimmer can reach,
+        // and the peak-neutral trim must be the quoted 38.0k / gain 4.80
+        // (to their last printed digit). Same 2e-3 tolerance as above.
+        const double modulator=node/(330+node)/(1/2700.+1/40e3+1/10e3)/(470+2*re);
+        const double vr4=10e3*(measured/(std::abs(coefficients[1])*couplings*modulator)-1);
+        const double vr4Peak=10e3*(1/(modulator*peak)-1);
+        if(std::abs(vr4-vr4Peak)>2e-3*(10e3+vr4Peak))std::cerr<<"implied VR4 "<<vr4<<" expected "<<vr4Peak<<'\n';
+        require(vr4>0 && vr4<100e3 && std::abs(vr4-vr4Peak)<2e-3*(10e3+vr4Peak),
+            "Engine wet gain implies a reachable peak-neutral VR4");
+        require(std::abs(vr4Peak-38.0e3)<50 && std::abs(1+vr4Peak/10e3-4.80)<.005,
+            "Peak-neutral VR4 is the 38.0k / gain 4.80 the owner chose by ear");
     }
     require(toneMagnitude(d,440,fs)>low && toneMagnitude(d,393,fs)<.002*low,"Dry bypass retains fundamental without ring sidebands");
     // Carrier phase is independent of note gates, allocation and mix bypass.
@@ -1122,6 +1178,68 @@ void ringAudioAndFreeCarrier() {
     }
     b.reset();b.noteOn(60);const auto first=render(b,1000);b.reset();b.noteOn(60);
     require(first==render(b,1000),"Reset restores ring phase/envelope/noise and deterministic audio");
+}
+
+void ringSignalPairLaw() {
+    // Independent pin-1 scale. One bus unit is .5V at CP4 (M-board VI.1: the
+    // sine at 1Vpp is the engine's +/-1); VI.4 gives .6Vpp at O for .8Vpp at
+    // CP4 with the VCA EG at full SUSTAIN, .98 of its peak; one O drives I1
+    // through 1k against the other three 1k branches and 47k; O1 follows I1;
+    // 330 ohm then feeds the pin-1 node.
+    const double vt=1.380649e-23*298.15/1.602176634e-19;
+    const double beta=((8-.75)/7300.)/12e-6;
+    const double ra=1/(1/1000.+2/125470.);
+    const double rail=(15/390.+3*.75/10500.)/(1/390.+3/10500.+1/(2020.+ra));
+    const double i5=(rail-.75)/10500.,re=vt/i5;
+    const double node=1/(1/470.+1/125000.+1/(beta*(470+2*re)));
+    const double others=1/(3/1e3+1/47e3);
+    const double pinOne=.5*(.6/.8)/.98*others/(1e3+others)*node/(330+node);
+    require(std::abs(pinOne-.05557)<1e-5,"Pin 1 sees 55.6mV per bus unit");
+    // The pair's current split x by bisection (production runs Halley in
+    // atanh(x)): V1-V4 = 2VT*atanh(x) + x*I5*470 (uA796 equivalent circuit,
+    // each emitter on its own I5 sink, 470 ohm between them).
+    const auto split=[&](double volts){
+        double lo=-1,hi=1;
+        for(int i=0;i<200;++i){
+            const double mid=.5*(lo+hi);
+            if(mid<=-1 || mid>=1)break;
+            (2*vt*std::atanh(mid)+mid*i5*470>volts ? hi : lo)=mid;
+        }
+        return .5*(lo+hi);
+    };
+    const double full=i5*(470+2*re)/pinOne; // bus units a linear pair needs for x=1
+    require(std::abs(full*pinOne-.5618)<1e-4,"Signal pair limits at I5*(470+2re), .56V on pin 1");
+    const auto equivalent=[&](double signal){return split(pinOne*signal)*full;};
+    // Sixteen virtual voices of sine and saw with full touch LEVEL drive pin
+    // 1 well past the limit; a quiet single sine stays linear. Every sample
+    // must follow the law at the derived scale.
+    for(const bool loud:{true,false}) {
+        auto p=sinePatch();p.ringMix=1;p.ringRate=47;p.ringDepth=0;
+        if(loud){p.saw=1;p.filterLevel=1;p.ampLevel=1;p.pressureVolume=1;}
+        else p.ampLevel=.05;
+        ceres::Synth s(8000,23);
+        require(s.configure(loud ? 16:1,4),"Virtual voice configuration");
+        s.setPatch(p);if(loud)s.pressure(1);
+        for(int note=0;note<(loud ? 16:1);++note)s.noteOn(40+2*note);
+        double peakVolts=0,leastRatio=1,worstLinear=0;
+        for(unsigned n=0;n<6000;++n) {
+            require(std::isfinite(s.process()),"Finite ring audio");
+            const auto m=s.modulationState();
+            const double expected=equivalent(m.ringSignalInput);
+            if(std::abs(m.ringSignalOutput-expected)>1e-12*std::max(1.,std::abs(m.ringSignalInput)))
+                std::cerr<<"pair "<<m.ringSignalInput<<" -> "<<m.ringSignalOutput<<" expected "<<expected<<'\n';
+            require(std::abs(m.ringSignalOutput-expected)<=1e-12*std::max(1.,std::abs(m.ringSignalInput)),
+                "Production signal pair follows the degenerated-pair law at the aligned bus scale");
+            require(std::abs(m.ringSignalOutput)<full,"Pair current never exceeds I5");
+            peakVolts=std::max(peakVolts,std::abs(m.ringSignalInput)*pinOne);
+            if(std::abs(m.ringSignalInput)>1e-9) {
+                leastRatio=std::min(leastRatio,m.ringSignalOutput/m.ringSignalInput);
+                worstLinear=std::max(worstLinear,std::abs(m.ringSignalOutput/m.ringSignalInput-1));
+            }
+        }
+        if(loud) require(peakVolts>.8 && leastRatio<.75,"Loud render reaches the pair's limiting");
+        else require(peakVolts<.005 && worstLinear<1e-5,"Quiet signals stay linear");
+    }
 }
 
 void sustainKeyCvModes() {
@@ -1162,6 +1280,7 @@ int main() {
         subOscillatorRoutes(); std::cout<<"PASS SUB shapes, sourced noise pole, destinations and separate PWM\n";
         ringEnvelopeAndKeyLedger(); std::cout<<"PASS ring RC timing, key ledger, legato/retrigger, bounds and panic\n";
         ringAudioAndFreeCarrier(); std::cout<<"PASS global ring sidebands, dry bypass, free carrier and reset\n";
+        ringSignalPairLaw(); std::cout<<"PASS ring signal pair large-signal law at the aligned bus scale\n";
         sustainKeyCvModes(); std::cout<<"PASS Sustain I/II live key CV, shared VCO/filters, state continuity and MIDI pedal adaptation\n";
         parametersAndConstruction(); std::cout<<"PASS parameter ranges and constructor validation\n";
         circuitResponse(); std::cout<<"PASS physical source/Q capacitor transfer, four source loads, DC rejection, Q and slope\n";

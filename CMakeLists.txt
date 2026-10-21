@@ -22,7 +22,7 @@ endif()
 
 # C is required in addition to C++: JUCE's macOS plug-in wrappers (AU and
 # Standalone) compile C/Objective-C sources with non-Xcode generators too.
-project(Ceres VERSION 0.5.0 LANGUAGES C CXX)
+project(Ceres VERSION 0.6.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -57,31 +57,9 @@ if(CERES_ENABLE_SANITIZERS)
     add_link_options(-fsanitize=address,undefined,float-cast-overflow)
 endif()
 
-set(CERES_DSP_SOURCES Source/DSP/CeresEngine.cpp)
-
-add_library(CeresDSP STATIC ${CERES_DSP_SOURCES})
-target_include_directories(CeresDSP PUBLIC Source Source/DSP)
-set_target_properties(CeresDSP PROPERTIES POSITION_INDEPENDENT_CODE ON)
-if(MSVC)
-    target_compile_options(CeresDSP PRIVATE /W4 /permissive-)
-else()
-    target_compile_options(CeresDSP PRIVATE -Wall -Wextra -Wpedantic)
-endif()
-
-# The Rack Extension toolchain is C++17. Compiling the engine at that standard
-# here keeps Source/DSP portable for the Rack adapter.
-if(NOT MSVC)
-    add_library(CeresDSPCxx17 OBJECT ${CERES_DSP_SOURCES})
-    target_include_directories(CeresDSPCxx17 PRIVATE Source Source/DSP)
-    set_target_properties(CeresDSPCxx17 PROPERTIES
-        CXX_STANDARD 17
-        CXX_STANDARD_REQUIRED ON
-        CXX_EXTENSIONS OFF)
-    target_compile_options(CeresDSPCxx17 PRIVATE -Wall -Wextra -Wpedantic)
-endif()
-
-# Standalone circuit engine and embedded ABI remain independent of the
-# existing CeresDSP JUCE scaffold. Do not link either into the plugin implicitly.
+# The circuit engine: `ceres` (native ABI, with the research presets) and
+# `ceres_embedded` (the Rack adapter's ABI). The JUCE plug-in links the native
+# library as CeresDSP.
 set(CERES_IDENTITY_FILES Source/DSP/ceres.hpp Source/DSP/ceres.cpp Tools/render_main.cpp Tools/build_identity.hpp.in CMakeLists.txt)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CERES_IDENTITY_FILES})
 set(CERES_SOURCE_JSON "{")
@@ -108,6 +86,21 @@ foreach(target ceres ceres_embedded)
 endforeach()
 if(NOT MSVC)
   target_compile_options(ceres_embedded PRIVATE -fno-exceptions)
+endif()
+
+add_library(CeresDSP ALIAS ceres)
+# The Rack Extension toolchain is C++17 and compiles Source/DSP/ceres.cpp with
+# CERES_EMBEDDED_TARGET. Compiling the shipping engine that way here, with the
+# warnings on and exceptions off, keeps it portable for the Rack adapter.
+if(NOT MSVC)
+  add_library(CeresDSPCxx17 OBJECT Source/DSP/ceres.cpp)
+  target_include_directories(CeresDSPCxx17 PRIVATE Source/DSP)
+  target_compile_definitions(CeresDSPCxx17 PRIVATE CERES_EMBEDDED_TARGET=1)
+  set_target_properties(CeresDSPCxx17 PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF)
+  target_compile_options(CeresDSPCxx17 PRIVATE -Wall -Wextra -Wpedantic -fno-exceptions)
 endif()
 if(CERES_BUILD_TOOLS)
 add_executable(ceres_render Tools/render_main.cpp)
@@ -202,6 +195,7 @@ if(CERES_BUILD_PLUGIN)
     juce_generate_juce_header(Ceres)
 
     target_sources(Ceres PRIVATE
+        Source/PluginControls.h
         Source/PluginProcessor.cpp
         Source/PluginProcessor.h
         Source/PluginEditor.cpp
@@ -233,11 +227,16 @@ if(CERES_BUILD_PLUGIN)
             JUCE_VST3_CAN_REPLACE_VST2=0
         PRIVATE
             CERES_BUILD_IDENTITY="${PROJECT_VERSION}-build.${CERES_BUILD_NUMBER}")
+    if(CERES_BUILD_CLAP)
+        # The processor marks EXT IN as a non-main CLAP port.
+        target_compile_definitions(Ceres PUBLIC CERES_CLAP_EXTENSIONS=1)
+    endif()
 endif()
 
 if(CERES_BUILD_TOOLS)
-    # Existing standalone circuit research presets, not the separate silent
-    # plugin scaffold. PresetDemoRenderer.h is the unchanged portfolio copy.
+    # The README demos: the circuit research presets, the plug-in's programs,
+    # played through ceres::Synth. PresetDemoRenderer.h is the unchanged
+    # portfolio copy.
     add_executable(RenderCeresPresetDemos Tools/RenderPresetDemos.cpp)
     find_package(Threads REQUIRED)
     target_link_libraries(RenderCeresPresetDemos PRIVATE ceres Threads::Threads)
@@ -314,6 +313,19 @@ if(BUILD_TESTING)
     target_compile_options(ceres_embedded_contract PRIVATE -fno-exceptions)
   endif()
   add_test(NAME Ceres.embedded_allocation_contract COMMAND ceres_embedded_contract)
+  # Front ends build their parameter lists from these descriptors: check them
+  # against setParameter in both ABIs, the embedded one without exceptions.
+  add_executable(ceres_parameter_descriptor_tests Tests/ParameterDescriptorTests.cpp)
+  target_link_libraries(ceres_parameter_descriptor_tests PRIVATE ceres)
+  add_test(NAME Ceres.parameter_descriptor_contracts COMMAND ceres_parameter_descriptor_tests)
+  add_executable(ceres_embedded_parameter_descriptor_tests Tests/ParameterDescriptorTests.cpp)
+  target_link_libraries(ceres_embedded_parameter_descriptor_tests PRIVATE ceres_embedded)
+  if(NOT MSVC)
+    target_compile_options(ceres_embedded_parameter_descriptor_tests PRIVATE -fno-exceptions)
+  endif()
+  add_test(NAME Ceres.embedded_parameter_descriptor_contracts COMMAND ceres_embedded_parameter_descriptor_tests)
+  set_target_properties(ceres_parameter_descriptor_tests ceres_embedded_parameter_descriptor_tests
+    PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
   add_executable(ceres_native_parity Tests/ParityDriver.cpp)
   target_link_libraries(ceres_native_parity PRIVATE ceres)
   add_executable(ceres_embedded_parity Tests/ParityDriver.cpp)
@@ -322,6 +334,10 @@ if(BUILD_TESTING)
   target_link_libraries(ceres_native_configuration_parity PRIVATE ceres)
   add_executable(ceres_embedded_configuration_parity Tests/ConfigurationParityDriver.cpp)
   target_link_libraries(ceres_embedded_configuration_parity PRIVATE ceres_embedded)
+  add_executable(ceres_native_external_parity Tests/ExternalParityDriver.cpp)
+  target_link_libraries(ceres_native_external_parity PRIVATE ceres)
+  add_executable(ceres_embedded_external_parity Tests/ExternalParityDriver.cpp)
+  target_link_libraries(ceres_embedded_external_parity PRIVATE ceres_embedded)
   find_package(Python3 COMPONENTS Interpreter)
   if(Python3_Interpreter_FOUND)
     if(CERES_BUILD_TOOLS)
@@ -348,28 +364,29 @@ if(BUILD_TESTING)
     add_test(NAME Ceres.capacitor_native_embedded_parity COMMAND "${Python3_EXECUTABLE}"
       "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_capacitor_parity.py" "$<TARGET_FILE_DIR:ceres_native_parity>"
       --native "$<TARGET_FILE:ceres_native_parity>" --embedded "$<TARGET_FILE:ceres_embedded_parity>")
+    add_test(NAME Ceres.external_input_audio_parity COMMAND "${Python3_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_external_parity.py" "$<TARGET_FILE_DIR:ceres_native_external_parity>"
+      --native "$<TARGET_FILE:ceres_native_external_parity>" --embedded "$<TARGET_FILE:ceres_embedded_external_parity>")
   endif()
 
   foreach(target IN ITEMS ceres_configuration_tests ceres_noise_quality_tests ceres_oscillator_circuit_tests ceres_tests ceres_sound_path_tests
       ceres_capacitor_tests ceres_ring_depth_tests ceres_ring_carrier_tests ceres_ring_switching_tests ceres_expression_tests ceres_note_reuse_tests ceres_fast_note_envelope_tests
       ceres_embedded_contract ceres_native_parity ceres_embedded_parity
-      ceres_native_configuration_parity ceres_embedded_configuration_parity)
+      ceres_native_configuration_parity ceres_embedded_configuration_parity
+      ceres_native_external_parity ceres_embedded_external_parity)
     set_target_properties(${target} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
   endforeach()
-    add_executable(CeresDSPTests Tests/test_dsp.cpp)
-    target_link_libraries(CeresDSPTests PRIVATE CeresDSP)
-    add_test(NAME Ceres.DSP COMMAND CeresDSPTests)
-
     # U4 input fuzzing. With CERES_BUILD_LIBFUZZER (Clang) it is a libFuzzer
     # target over coverage-instrumented DSP; otherwise FuzzHarness.h supplies
     # a main that replays Tests/fuzz-regressions/ and then seeded inputs.
     add_executable(CeresDspFuzz Tests/DspFuzz.cpp)
     target_include_directories(CeresDspFuzz PRIVATE Source Source/DSP)
+    set_target_properties(CeresDspFuzz PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
     if(CERES_BUILD_LIBFUZZER)
         if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
             message(FATAL_ERROR "CERES_BUILD_LIBFUZZER requires Clang")
         endif()
-        target_sources(CeresDspFuzz PRIVATE ${CERES_DSP_SOURCES})
+        target_sources(CeresDspFuzz PRIVATE Source/DSP/ceres.cpp)
         target_compile_options(CeresDspFuzz PRIVATE
             -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
         target_link_options(CeresDspFuzz PRIVATE -fsanitize=fuzzer,address,undefined)
@@ -403,6 +420,21 @@ if(BUILD_TESTING)
                 "$<TARGET_PROPERTY:Ceres,JUCE_GENERATED_SOURCES_DIRECTORY>"
                 "$<TARGET_PROPERTY:Ceres,INCLUDE_DIRECTORIES>")
         endforeach()
+
+        # The render tier compares the screenshot's size with the committed
+        # one only while the editor source is the one that rendered it: the
+        # PNG carries this hash of it, line endings normalised.
+        set(CERES_EDITOR_SOURCES Source/PluginEditor.h Source/PluginEditor.cpp)
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CERES_EDITOR_SOURCES})
+        set(CERES_EDITOR_SOURCE_TEXT "")
+        foreach(editor_source IN LISTS CERES_EDITOR_SOURCES)
+            file(READ "${CMAKE_CURRENT_SOURCE_DIR}/${editor_source}" editor_text)
+            string(REPLACE "\r\n" "\n" editor_text "${editor_text}")
+            string(APPEND CERES_EDITOR_SOURCE_TEXT "${editor_source}\n${editor_text}")
+        endforeach()
+        string(SHA256 CERES_EDITOR_SOURCE_ID "${CERES_EDITOR_SOURCE_TEXT}")
+        target_compile_definitions(CeresPluginProcessorTests PRIVATE
+            CERES_EDITOR_SOURCE_ID="${CERES_EDITOR_SOURCE_ID}")
 
         add_test(NAME Ceres.PluginProcessor COMMAND CeresPluginProcessorTests)
         set_tests_properties(Ceres.PluginProcessor PROPERTIES TIMEOUT 300)

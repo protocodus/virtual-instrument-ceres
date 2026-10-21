@@ -42,13 +42,15 @@ struct Patch {
     double hpCutoff = 30.0, lpCutoff = 6000.0;
     double hpResonance = 0.0, lpResonance = 0.0, keyTrack = 1.0;
     // Actual loaded BR-bus voltage relative to the calibrated neutral, V.
-    // The 39k/(680k HP,220k LP) network uses provisional .7/.65 oct/V
-    // manual slopes; it is not the position/taper of the passive panel pot.
+    // Through 680k (HP) and 220k (LP) beside the levers' 39k it moves the
+    // cutoffs 39/680 and 39/220 octave per volt at the printed 1 oct/V lever
+    // law (ceres.cpp); it is not the position/taper of the passive panel pot.
     double brilliance = 0.0; // [-15,15]
     // Change of loaded RES-bus voltage around the existing effective Q
-    // calibration, V. Positive lowers Q. The signed [-10,10] engineering
-    // offset does not imply every value is reachable from an unknown real
-    // 0..10V wiper baseline. Stiff preset/source, zero chip input-current
+    // calibration, V. Positive lowers Q. Factory presets assume the
+    // RESONANCE lever at MIN (+10V), so from them the real 0..10V wiper
+    // reaches 0 to -10V; positive values have no lever position. Stiff
+    // preset/source, zero chip input-current
     // limit: each pin7 has 220k to each source and 10uF to ground, giving
     // deltaVq -> offset/2 with tau1.1s. This incremental control is
     // smoothed together with the independent hp/lp_resonance anchor terms;
@@ -56,7 +58,8 @@ struct Patch {
     double resonanceOffset = 0.0;
     // Separate envelope coupling in octaves per EG unit. Defaults retain
     // direct octave-valued engineering patches. Factory EG units are volts;
-    // its scales use documented resistor ratios and provisional manual slopes.
+    // its scales are the documented 39k/220k (HP) and 39k/47k (LP) ratios
+    // at the levers' printed 1 oct/V.
     double hpEnvelopeScale = 1.0, lpEnvelopeScale = 1.0;
     // VCF EG: negative IL -> positive AL -> fixed zero sustain -> IL.
     double filterInitial = -2.0, filterPeak = 2.0; // EG units; octaves at scale 1
@@ -114,46 +117,82 @@ struct Patch {
     // this master offset is independent of the engineering keyTrack slope.
     double tuneCents = 0.0;
     // These modeled oscillator variations, like vibrato below, are VCO-only.
-    double voiceSpreadCents = 0.0, driftCents = 0.0;
+    // voiceSpreadCents is a fixed engineering spread, not a tolerance (see
+    // the board tolerances below). driftCents is the peak excursion of each
+    // board's free-running wander about its tuned pitch: a new random target
+    // every 0.2-0.7s, followed with a .3s time constant (.41 cents RMS per
+    // cent). Default 1: an OWNER-REQUESTED ENGINEERING VALUE, not a
+    // measurement. It is the most the tuning tolerance leaves room for: each
+    // warmed-up board is set and checked within +/-1 cent (Guide printed p.65
+    // after 10 minutes' warm-up; CS-80 procedure printed pp.3-5 after 30), so
+    // its wander must stay inside that band. No source gives a time course
+    // for it. The documented instability is thermal (Service News E-46; see
+    // boardTemperatureRise) and settles over those 10-30 minute warm-ups, far
+    // slower than this wander, whose time constants have no source.
+    double voiceSpreadCents = 0.0, driftCents = 1.0;
     // Board-to-board tolerance of the four M boards, each 0..1 of the
-    // documented spread; 0 (default) keeps the boards identical. Each seed is
-    // one fixed instrument: its offsets never move while it plays.
+    // documented spread; 0 keeps the boards identical. Pitch, filter and
+    // envelope ship at 1 (owner's listening verdict B, 2026-10-20, set
+    // 2026-10-20-voice-variation-board-tolerance); envelope time, VCA and
+    // temperature stay 0 until a verdict. Each seed is one fixed instrument:
+    // its offsets never move while it plays.
     // Pitch: the residual the service tuning trims leave (+/-1 cent at each
     // trim point, Guide printed p.65). Filter: the IG00156 rank-bin residual
     // of each filter's control sensitivity (+/-.146 oct per octave of Vfc
     // input, SM2 printed pp.17-18 rank table; the static cutoff and Q are
-    // trimmed by ear and stay identical). Envelope: the VCF EG (+/-10%) and
-    // VCA EG (+/-2%) output-level check bands of the sibling CS-60 alignment
-    // (CS-60 SM printed pp.37-38). See ceres.cpp.
-    double boardPitchTolerance = 0.0, boardFilterTolerance = 0.0, boardEnvelopeTolerance = 0.0;
-    // filterLfo is LP octave depth. HP gets .3374358974 times that depth:
-    // (.7/.65)*(47k/150k), independent of user-editable EG coupling scales.
+    // trimmed by ear and stay identical). Envelope: the EG level checks of
+    // the sibling CS-60/CS-80 alignments of the same board: VCF EG level
+    // (+/-10%), VCA EG peak (+/-2%) and floor (-200 +/-20mV); the output trim
+    // after them keeps each board's full-sustain level. Envelope time: both
+    // EGs' time trims (+/-5% at the 4ms and 125ms attack trims). VCA: the
+    // CP4 sine and filtered-path trims (+/-2%, +/-2.5%); the output trims
+    // after them keep the filtered path's level and the 0 dBm reference.
+    // See ceres.cpp.
+    double boardPitchTolerance = 1.0, boardFilterTolerance = 1.0, boardEnvelopeTolerance = 1.0;
+    double boardEnvelopeTimeTolerance = 0.0, boardVcaTolerance = 0.0;
+    // Ambient temperature change since the boards were tuned, in kelvin
+    // (-25..25; 0 is as tuned). Each board's VCO drifts by its own amount
+    // within the IG00153 temperature ranks one instrument may mix (Yamaha
+    // Service News E-46, 1978: 25 -> 50 C moves C6 within one 5-cent rank and
+    // C1 within two neighbouring ranks); the drift they share is left out.
+    double boardTemperatureRise = 0.0;
+    // filterLfo is LP octave depth. HP gets .3133333333 times that depth:
+    // 47k/150k at equal lever slopes, independent of user-editable EG
+    // coupling scales.
     // tremolo is SUB VCA lever travel, 0..1: R7 adds .3375 of the wiper's
     // share of SUB to LEVEL, and the B-10k lever into its 30k load delivers
     // x/(1+x(1-x)/3) of it, 7.7% low at mid-travel with exact endpoints.
     // lfoRate is Hz, wider than the hardware's .8-50 Hz SPEED range;
     // vibratoCents is cents per SUB unit (hardware full lever 25), filterLfo
-    // LP octaves per SUB unit (full lever .809). subSpeedLeverHz and its
+    // LP octaves per SUB unit (full lever 1.245). subSpeedLeverHz and its
     // siblings below map the PN3 levers onto these. The one IG00150 clock
     // free-runs: note events never reset its phase.
     double lfoRate = 5.0, vibratoCents = 0.0, tremolo = 0.0, filterLfo = 0.0;
-    // Shared SUB source: 0 sine, 1 down saw, 2 up saw, 3 square, 4 noise.
+    // Shared SUB source: 0 sine, 1 down saw, 2 up saw, 3 square, 4 noise,
+    // 5 EXT (the FUNCTION switch's sixth position: Synth::externalInput).
     // Noise uses the sourced22k/.1uF low-pass loaded by SUI's100k on the
     // +/-15V limiter: an estimated .77 RMS (limiter bandwidth and slew rate
     // from datasheet typicals, after the 33.86Hz pick-up coupling), within +/-8.2, independent of rate/audio Noise mix. The free-running PWM sine source is separate and is unaffected.
     double lfoWaveform = 0.0;
+    // Rear-panel EXT LEVEL (PN5 VOLUME, A-50K ahead of the EXT preamp): the
+    // fraction of the EXT IN jack signal its wiper passes on, 0..1. The pot's
+    // audio-taper travel law is not published, so front ends map their own
+    // knob onto this ratio. Only FUNCTION EXT hears it.
+    double extLevel = 1.0;
     // One global balanced ring multiplier after the voice bus. Base carrier
     // Hz, positive frequency-envelope excursion in octaves, initial-to-peak
     // attack seconds and decay T60. These are the quantities at the carrier;
     // the panel levers map onto them through the laws below the struct
-    // (ringSpeedHz, ringDepthOctavesPerLever). Attack/decay stay seconds:
-    // the PRA envelope is the M-board VCA-EG chip pair, so its lever law is
-    // that EG's, offset by the PRA's own trim (31ms attack at AT=10V, CS-60
-    // PRA alignment). Total carrier is bounded .2..220Hz (guide p.53's
-    // printed range), so rate/depth interact at the top.
+    // (ringSpeedHz, ringDepthOctavesPerLever, ringAttackSeconds,
+    // ringDecaySeconds). Attack/decay stay seconds: the PRA envelope is the
+    // M-board VCA-EG chip pair, so its lever law is that EG's, offset by the
+    // PRA's own trim (31ms attack at AT=10V, CS-60 PRA alignment). Total
+    // carrier is bounded .2..220Hz (guide p.53's printed range), so rate/depth
+    // interact at the top.
     // Trigger once per physical all-keys-up -> any-key-down transition; final
-    // key-up uses a fixed nominal .46781044s T60 return, independent of MIDI
-    // pedal/globalRelease. Retrigger retains capacitor charge, not phase reset.
+    // key-up uses the fixed 2DT's 14.50s T60 return (ringReleaseVolts),
+    // independent of MIDI pedal/globalRelease. Retrigger retains capacitor
+    // charge, not phase reset.
     // mix=0 preserves the previous signal path exactly; carrier phase is free.
     // mix is MODULATION lever travel: the B-10k crossfades dry against wet and
     // its own track loads the 8.04k it works into, so the whole mix sits
@@ -166,11 +205,11 @@ struct Patch {
     double ringAttack = 0.01, ringDecay = 0.35;
     // Touch response (CS-50 panel 2, guide printed pp.55-56). pressureFilter is
     // touch BRILLIANCE in LP octaves; R7 feeds TBR through 47k LP / 150k HP, so
-    // HP moves .3374358974 times as far, as for SUB. pressureVibrato is SUB
+    // HP moves .3133333333 times as far, as for SUB. pressureVibrato is SUB
     // vibrato cents per unit touch; level amplifier I is trimmed to centre the
     // 3Vpp SUB on +.5V, so touch vibrato rises by a third of its depth.
     // pressureWah is touch-scaled SUB filter depth (level amplifier II -> R7
-    // VCF pin70), LP octaves with the same .3374 HP ratio. pressureVolume is
+    // VCF pin70), LP octaves with the same .3133 HP ratio. pressureVolume is
     // touch LEVEL: R7 adds its current to LEVEL's at common VCA2, so full depth
     // and full touch add 1.08 times full amp_level; zero touch leaves amp_level.
     // Uncalibrated filter and vibrato depths.
@@ -232,6 +271,31 @@ constexpr double ringEnvelopePeakVolts = 10.0;
 constexpr double ringDepthOctavesPerLever = ringDepthOctavesPerVolt * ringEnvelopePeakVolts;
 // Carrier Hz for a VC1 voltage (0..10V is the SPEED lever's travel times 10).
 double ringSpeedHz(double vc1Volts);
+// ATTACK TIME and DECAY TIME are TVR1 and TVR2, B-10k from +10V to ground,
+// wipers to the PRA's AT and DT pins (SM2 p.26, PN2); 10V is the SHORT end
+// (CS-60 manual p.39). IC7 IG00159 with IC6 IG00151 into .22uF is the M-board
+// VCA-EG pair (SM2 p.16), whose pin sheets give attack 10^(-.3V)s to the peak
+// and decay 10*10^(-.3V)s as five-RC durations (SM2 p.21); the CS-60 M-board
+// alignment confirms .3 decade/V (4ms at 8V, 125ms at 3V, manual p.38).
+// The PRA EG is aligned 31 times slower: CS-60 PRA alignment I (sibling
+// evidence, the same board; manual p.39) puts the EO peak 31ms after key-on
+// at AT=DT=10V, where the pin sheet gives 1ms. Every segment drives the one
+// TC->EI exponential converter, so the factor applies to all of them.
+// ASSUMPTION: the PRA's fixed 100k span into EI gives the M board's trimmed
+// .3 decade/V (the M board's span is 82k+VR20, B-50K, so .246...396 decade/V
+// is possible). The fixed release follows this law: CHOSEN BY EAR over the
+// untrimmed pin-sheet law (owner listening test ring-release, 2026-10-20).
+// Over 10..0V attack runs 31ms..31s and decay .428..428s T60; ring_attack and
+// ring_decay stop at 10s (AT below 1.64V, DT below 5.44V) and also allow
+// times shorter than the hardware's 31ms and .428s.
+constexpr double ringEnvelopeTrim = 0.031 / 0.001;
+// Attack seconds, key-on to peak, for an AT pin voltage (0..10V).
+double ringAttackSeconds(double atVolts);
+// Decay T60 seconds toward the grounded SL for a DT pin voltage (0..10V).
+double ringDecaySeconds(double dtVolts);
+// 2DT (release) is fixed by 6.8k from +15V and 3.3k to ground (SM2 p.22):
+// every final key-up returns over ringDecaySeconds(4.901V) = 14.50s T60.
+constexpr double ringReleaseVolts = 15.0 * 3.3 / (6.8 + 3.3);
 
 // Keys use snake_case (e.g. lp_cutoff, filter_initial, amp_attack). Finite values
 // are range-limited; false means an unknown key or a nonfinite input.
@@ -248,6 +312,11 @@ double subSpeedLeverHz(double travel);
 double subVibratoLeverCents(double travel);
 // VCF lever travel -> filter_lfo (LP octaves per SUB unit).
 double subFilterLeverOctaves(double travel);
+// EXT IN: volts at the jack per unit of Synth::externalInput. The EXT preamp
+// gains 101, so at ext_level 1 one unit swings SUI by the internal SUB's
+// 1.5 V peak (3 Vpp): a full-scale host signal modulates as deeply as the
+// internal waveforms. See ceres.cpp.
+constexpr double subExternalUnitVolts = 1.5 / 101.0;
 // Panel 2 lever laws, for front ends that show the hardware levers. They do
 // not change what `brilliance` and `resonance_offset` mean: both stay loaded
 // bus volts. travel is lever travel, 0 at MIN and 1 at MAX, clamped; a
@@ -264,8 +333,20 @@ double brillianceLeverVolts(double travel);
 // pin-7 networks (220k to the preset Q bus, 220k to RES, 10 uF) load the
 // wiper with 55k returning to the mean of the HP and LP preset Q buses,
 // presetMeanVolts. Returns the loaded RES bus voltage, from which a front end
-// takes its own neutral to form `resonance_offset`.
+// takes its own neutral to form `resonance_offset`. Factory presets assume
+// MIN, so from them resonance_offset = resonanceLeverVolts(t, mean bus) - 10
+// reproduces the hardware, each preset bus being 10 - 20*hp/lp_resonance
+// (ceres.cpp preset()).
 double resonanceLeverVolts(double travel, double presetMeanVolts);
+// PANEL HPF and LPF levers (PN1, B-10K, 0..10V), for front ends that show the
+// hardware levers: travel 0..1, clamped, to the hp_cutoff / lp_cutoff value,
+// total Hz at middle C; NaN for a nonfinite travel. A PRA follower and a T71
+// diode put each lever on the loaded FH/FL bus the presets drive, so the
+// printed law sees the lever volts less that diode's drop: 85 Hz at 0, about
+// 42 kHz at full travel. The parameters' 20 kHz ceiling, which setParameter
+// clamps to, cuts off each lever's top tenth. See ceres.cpp.
+double hpfLeverHz(double travel);
+double lpfLeverHz(double travel);
 #if !defined(CERES_EMBEDDED_TARGET)
 bool setParameter(Patch&, const std::string& key, double value);
 Patch preset(const std::string& name);
@@ -288,6 +369,16 @@ public:
     void noteOn(int note, double velocity = 1.0);
     void noteOff(int note);
     void pressure(double value);
+    // EXT IN for FUNCTION EXT (lfo_waveform 5). Feed one host-rate sample
+    // before each process(); it holds until the next call, and is linearly
+    // interpolated across the internal oversampled steps. Units: 1.0 is
+    // subExternalUnitVolts at the jack, so a +/-1 signal at ext_level 1 gives
+    // the internal SUB's depth on every route (vibrato, VCF, VCA, touch).
+    // The EXT preamp clips at 9.33 units and the SUI buffer at 8.67 (19.4 and
+    // 18.8 dB above). Nonfinite values read as 0. reset() clears the jack and
+    // its coupling capacitor; allSoundOff() keeps them, like the SUB clock.
+    // Realtime-safe and allocation-free, in the embedded target too.
+    void externalInput(double sample) noexcept;
     void pitchBend(double semitones);
     // MIDI damper adaptation: holds envelope gates until pedal-up. Distinct
     // from globalRelease and the CS-50 SUSTAIN I/II key-CV modes.
@@ -343,6 +434,10 @@ public:
         double ringCoupledCarrier;
         double ringSwitchGain; // matched upper-pair steering, includes nominal DC bias
         double ringDepth; // actual interpolated digital Depth coordinate
+        // Last processed sample at pin 1, in bus units: the coupled bus, and
+        // the linear-pair equivalent of the signal pair's current split
+        // (equal for small signals; the pair limits near .56V at pin 1).
+        double ringSignalInput, ringSignalOutput;
     };
     struct SoundPathState {
         double resonanceVoltageOffset, hpResonance, lpResonance;
@@ -426,5 +521,23 @@ std::vector<OscillatorFrame> oscillatorTrace(double sampleRate, double frequency
     const Patch&, std::size_t frames, double initialPhase = 0.0);
 
 #endif // !CERES_EMBEDDED_TARGET
+
+// Parameter descriptors (both targets, allocation-free): one entry for every
+// key setParameter accepts, in its table order, so a front end can build its
+// parameter list from the engine instead of a copy. minimum/maximum are the
+// limits setParameter clamps to, defaultValue is a default Patch's value, and
+// integer marks keys setParameter rounds to whole numbers.
+struct ParameterInfo {
+    const char* key; // static storage; nullptr past the end
+    double minimum, maximum, defaultValue;
+    bool integer;
+};
+std::size_t parameterCount() noexcept;
+// Index in [0, parameterCount()); past the end returns a nullptr key.
+ParameterInfo parameterInfo(std::size_t index) noexcept;
+// The value the engine applies for `key`: the Patch member range-limited and
+// rounded as setParameter would store it, or the default when nonfinite.
+// False, leaving `value` unchanged, for an unknown key.
+bool getParameter(const Patch&, const char* key, double& value) noexcept;
 
 } // namespace ceres

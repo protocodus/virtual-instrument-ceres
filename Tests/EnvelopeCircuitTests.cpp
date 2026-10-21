@@ -113,7 +113,12 @@ void vcaFloorEndsDecay() {
     const auto zero=peakFrame+static_cast<std::size_t>(std::ceil(crossing));
     require(trace[zero-1]>0 && trace[zero]<=0,"Decay to S=0 reaches zero at ln(51) time constants");
     require(trace.back()>-.02-1e-9 && trace.back()<-.019,"Held S=0 settles at the -.2V floor");
+    // Each shipping board rests at its own VR17 floor (-200 +/-20mV, CS-60
+    // p.38; Tests/BoardToleranceTests.cpp); identical boards at -200mV.
     ceres::Synth synth(48000,3);
+    for(const auto& v:synth.allVoiceState())
+        require(std::abs(v.ampEnvelope+.02)<=.002,"Idle VCA-EG capacitors start at their board's floor");
+    p=ceres::Patch{};p.boardEnvelopeTolerance=0;synth.setPatch(p);
     for(const auto& v:synth.allVoiceState())
         near(v.ampEnvelope,-.02,0,"Idle VCA-EG capacitors start at the floor");
 }

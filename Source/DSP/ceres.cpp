@@ -15,12 +15,22 @@ namespace {
 constexpr double pi = 3.141592653589793238462643383279502884;
 constexpr double filterCapacitance = 1.5e-9, filterFeedResistance = 4.7e6;
 constexpr double filterFrequencyFloor = 1/(2*pi*filterCapacitance*filterFeedResistance);
-// Direct R7 matrix, CS-50 service1 PDF8/printed14. These ratios are known;
-// .7/.65 oct/V manual slopes remain the existing provisional calibration.
+// Cutoff lever law: the printed IG00156 law fc=125*Kv*2^Vfc (guide printed
+// p.34; SM1 printed p.19, "VK .25V, Vf 5V -> 1kHz") is one octave per volt
+// of Vfc. Vfc is read on the FH/FL lever bus (R7 pins 19/20), ahead of its
+// 39k into pin 4; that is the one inference (guide printed p.33 draws Vfc
+// reaching pin 4 through a resistor; see preset()). Chosen by ear 2026-10-20
+// (listening test 2026-10-20-vcf-printed-law). The same slope serves HP and
+// LP, and the law puts 125*.5V = 62.5Hz of gm at middle C (Kv=.5V) for 0V.
+constexpr double leverOctavesPerVolt=1, gmHzAtMiddleC=125*.5;
+// Direct R7 matrix, CS-50 service1 PDF8/printed14: every other cutoff input
+// shares the lever's node through its own resistor, so it moves the cutoff
+// 39k/Rin times as far per volt as the lever.
 // Interpret BR as actual loaded voltage with stiff preset/source nodes,
 // not raw preset-divider CV or a finite-impedance pot position.
-constexpr double hpBrillianceScale=.7*39/680, lpBrillianceScale=.65*39/220;
-constexpr double hpSubRelativeScale=(.7/.65)*(47./150.);
+constexpr double hpBrillianceScale=leverOctavesPerVolt*39/680, lpBrillianceScale=leverOctavesPerVolt*39/220;
+// LP-octave depths (SUB, touch) reach HP through 150k against LP's 47k.
+constexpr double hpSubRelativeScale=47./150.;
 // Guide printed p.56: touch level amplifier I is trimmed so a 0V-centred SUB
 // input leaves centred on +.5V; the SUB source is fixed at 3Vpp (p.55).
 constexpr double touchVibratoBias=.5/1.5;
@@ -139,21 +149,76 @@ constexpr double ringCollectorLoad=1/(1/ringCollectorSource+1/10e3);
 constexpr double ringWetCouplingTau=10e-6*(ringCollectorSource+10e3);
 constexpr double ringModulatorGain=ringSignalDivider*ringCollectorLoad/ringSignalDegeneration;
 double ringSteering(double volts) { return std::tanh(volts/(2*ringThermalVoltage)); }
+// Volts at O1 per unit of the engine's voice bus. The M-board alignment sets
+// the sine at CP4 to 1Vpp (CS-60 manual p.38, VI.1), the engine's +/-1, so a
+// unit is .5V at CP4. VI.4 sets a CS-50 voice output O to "0.6V" (its figure
+// marks peak to peak) for the .8Vpp filtered pulse of VI.2 with the VCA EG at
+// full SUSTAIN, .98 of its peak (ampEnvelopeFloor): .75/.98 per unit of
+// envelope. The four O outputs reach I1 through 1k each into 47k, and IC1
+// follows I1 to O1 (SM2 p.22). Sibling procedure, CS-50 value; see
+// outputPreampGain for the same anchor read at the HO terminal.
+constexpr double ringBusVolts=.5*(.75/.98)/(4+1e3/47e3);
+constexpr double ringPinOneVolts=ringBusVolts*ringSignalDivider;
+// Signal pair: 470 ohm between the emitters (pins 2-3), each emitter on its
+// own I5 sink (uA796 equivalent circuit), so V1-V4 = 2VT*atanh(x)+x*I5*470
+// for the current split x. It limits near I5*(470+2re) = .56V at pin 1.
+// Four voices at the VI.4 level, in phase, reach .17V there (H3 -62dB);
+// four-note chords on the factory presets reach .12-.31V, at most 1.1%
+// instantaneous compression; touch LEVEL and virtual voices beyond the
+// CS-50's four go further. The 470 ohm pin-1 node keeps the pair's own
+// beta*(470+2re) at its small-signal value (under 1.1% of the node).
+// Returns the bus-unit input a linear pair would need for the same split,
+// so small signals and the derived modulator gain are unchanged. Halley in
+// u=atanh(x), from the series inverse (or, past the knee and for any input
+// whose cube overflows, the limiting asymptote), stops once a step is under
+// 1e-5 of u, where the remaining error is third order: at most three tanh
+// evaluations land within 4e-16 of the exact split anywhere up to +/-20V at
+// pin 1, one or two at playing levels.
+double ringSignalPair(double signal) {
+    constexpr double a=2*ringThermalVoltage, b=ringBiasCurrent*470, c=a+b;
+    const double volts=ringPinOneVolts*signal, w=volts/c;
+    double u=w*(1+b/(3*c)*w*w);
+    const double limiting=(std::abs(volts)-b)/a;
+    if (limiting>std::abs(u) || !std::isfinite(u)) u=std::copysign(limiting,volts);
+    double split=0;
+    for (int i=0;i<8;++i) {
+        // tanh(u) = -m/(2+m) and 1-tanh(u)^2 = 4(1+m)/(2+m)^2 from one
+        // m = expm1(-2|u|), exact down to the smallest signals.
+        const double m=std::expm1(-2*std::abs(u)), t=std::copysign(-m/(2+m),u);
+        const double d=4*(1+m)/((2+m)*(2+m)), f=a*u+b*t-volts, slope=a+b*d;
+        const double step=f/(slope+f*b*t*d/slope);   // f'' = -2b*t*d
+        split=t-d*step*(1+t*step);                   // tanh(u-step), 2nd order
+        if (std::abs(step)<=1e-5*std::abs(u)) break;
+        u-=step;
+    }
+    return split*c/ringPinOneVolts;
+}
 } // namespace
 double ringSpeedHz(double vc1Volts) {
     return ringSpeedReferenceHz*std::exp2(ringSpeedOctavesPerVolt*(vc1Volts-5));
 }
+// PRA envelope lever laws: the IG00159 pin-sheet times scaled by the PRA's
+// 31ms alignment (sources, the slope assumption and the by-ear choice are
+// beside the declarations in ceres.hpp).
+double ringAttackSeconds(double atVolts) {
+    return ringEnvelopeTrim*std::pow(10.,-.3*atVolts);
+}
+double ringDecaySeconds(double dtVolts) {
+    return ringEnvelopeTrim*10*std::pow(10.,-.3*dtVolts)*std::log(1000.)/5;
+}
 namespace {
 // The wet buffer IC1-2 is non-inverting with VR4 (B-100K trimmer) over 10k:
 // gain 1+VR4/10k, 1..11. Its factory setting is not printed anywhere in the
-// service documentation. ASSUMPTION: VR4 is trimmed so that the MODULATION
-// lever is level-neutral, the wet path's RMS equal to the dry signal's for a
-// steady midband carrier. That needs VR4=57.8k, inside its range, and keeps
-// this engine's earlier wet level. Matching peaks instead (VR4=38.0k) is the
-// other defensible trim; it was rendered as a listening candidate.
+// CS-50 or CS-60 service material (the CS-60 PRA alignment trims VR3, VR5 and
+// VR7 on this board, not VR4). Two trims are defensible for a steady midband
+// carrier: wet RMS equal to the dry signal's (VR4=57.8k), or the two
+// sidebands together peaking at the dry peak, each half the dry tone
+// (VR4=38.0k). The peak-matched trim is CHOSEN BY EAR (owner listening test
+// ring-wet-trim, 2026-10-20), not measured: buffer gain 4.80, inside VR4's
+// range, 3.0dB less wet than the RMS-matched trim shipped in 0.5.0.
 double ringWetBufferGain() {
     const double carrierPeak=ringSourcePeakVolts*ringCarrierPortShunt/(33000+ringCarrierPortShunt);
-    return std::sqrt(2.)/(ringModulatorGain*std::tanh(carrierPeak/(2*ringThermalVoltage)));
+    return 1/(ringModulatorGain*std::tanh(carrierPeak/(2*ringThermalVoltage)));
 }
 // The patch specifies TOTAL integrator Hz at middle C. Only variable gm
 // responds to exponential control; the parallel 4.7Mohm path stays fixed.
@@ -201,7 +266,11 @@ const Parameter parameters[] = {
     {"board_pitch_tolerance", &Patch::boardPitchTolerance, 0, 1},
     {"board_filter_tolerance", &Patch::boardFilterTolerance, 0, 1},
     {"board_envelope_tolerance", &Patch::boardEnvelopeTolerance, 0, 1},
-    {"lfo_waveform", &Patch::lfoWaveform, 0, 4},
+    {"board_envelope_time_tolerance", &Patch::boardEnvelopeTimeTolerance, 0, 1},
+    {"board_vca_tolerance", &Patch::boardVcaTolerance, 0, 1},
+    {"board_temperature_rise", &Patch::boardTemperatureRise, -25, 25},
+    {"lfo_waveform", &Patch::lfoWaveform, 0, 5},
+    {"ext_level", &Patch::extLevel, 0, 1},
     {"ring_mix", &Patch::ringMix, 0, 1}, {"ring_rate", &Patch::ringRate, .2, 220},
     {"ring_depth", &Patch::ringDepth, 0, 8},
     {"ring_attack", &Patch::ringAttack, .001, 10},
@@ -332,12 +401,37 @@ struct Random {
 // ASSUMPTION: each residual is uniform over its band (a technician stops
 // anywhere inside it); the service guide prints only the band.
 //
+// Thermal drift (temperature, in kelvin). Yamaha Service News E-46 (January
+// 1978, CS-50/CS-60/CS-80, "Countermeasures for stabilizing the pitch") ranks
+// the IG00153 of every M board by how far the pitch of C1 and of C6 moves
+// when the ambient temperature goes from 25 to 50C: one figure per 5 cents
+// (C1 0..45, C6 0..30 cents; "32" is 10-15 cents at C1 and 5-10 at C6). One
+// instrument may use one C6 figure only and two neighbouring C1 figures, so
+// over that 25K step its boards differ by less than 5 cents at C6 and 10 at
+// C1. It covers CS-50 #1546 on (November 1977) and the earlier serials it
+// lists, which also had the 1S1555 compensation diode greased onto IC8. C1
+// and C6 are Kv 125mV and 4V: the CS-80 adjustment procedure sets the C1
+// key's Kv to 125.0mV against a 4.000V reference (TUNING 1-3, printed p.3)
+// and the CS-50's C6 key is 4V (Guide p.29), so C1 is x = 1/32. Model: each
+// board sits uniformly in its window about the window's centre (C6 +/-2.5,
+// C1 +/-5 cents), between them in the trims' gain-and-offset form (ratio 32
+// in place of 16), all scaled by the temperature change over 25K. The drift
+// the boards share (the windows' centres) moves the instrument, not a board:
+// it is left out. CONVENTIONS: uniform in the window; linear in temperature
+// (E-46 gives the 25 -> 50C step only); the same at every transposition (the
+// ranking is of the IC, not of the Rn resistors).
+//
 // The VCF, EG and VCA trims are not in the CS-50 guide. The CS-60 service
 // manual's section VI (printed pp.37-39 / PDF 39-41) aligns the same M board:
 // SM1's parts list gives the M board (NA04485) "Common Models: CS-60", the
 // CS-60 M schematic (printed p.15 / PDF 17) is drawn for "CS-60,50" with the
 // CS-50's transposition values, and the procedure itself gives the CS-50's
 // different output level (".24V (CS-50 is 0.6V)"). SIBLING EVIDENCE, below.
+// Yamaha's CS-80 "Adjustment Procedure" aligns the same board as well. SM2
+// p.16 prints the CS-80's M-board differences: the transposition circuit
+// (R1-R5, VR4-VR6) and the rank resistor R7, none in the EGs or VCAs. Where
+// it trims the same trimmer to the CS-60's target, it prints the tolerance
+// the CS-60 leaves out. SIBLING EVIDENCE as well.
 //
 // VCF sensitivity (filter amount). On that schematic the IG00156 rank
 // resistor is NOT on the fadj pin (220k, fixed): R6/R7 load each filter's Vfc
@@ -353,50 +447,133 @@ struct Random {
 // circuit boards" (CS-60 p.38): matched by ear, no numeric residual, so the
 // static cutoff and Q stay identical here and only the Vfc-driven octaves
 // (EG, SUB, touch, BRILLIANCE) carry the sensitivity residual. INFERENCE:
-// chips uniform within contiguous one-step bins.
+// chips uniform within contiguous one-step bins. The CS-80's numbers do not
+// carry over: its complete VCF alignment (printed p.11) holds FH/FL at
+// 4.0/3.3V, turns VR7/VR9 for maximum amplitude at the C1 key and sets
+// VR8/VR10 to 4.3 and 2.2 +/-1Vpp at CP3, a procedure the CS-60/50 does not
+// use, on a CS-80 R7 and bus.
 //
-// EG output levels (envelope amount). The VCF EG check (CS-60 p.37): AL, IL
-// at 10V give TP1 +5V +/-.5V and -4V +/-.5V; only the offset is trimmed (VR18,
-// 0 +/-.01V). One buffer gain must meet both bands, so the VCF EG reaches HP
-// and LP within +/-10%. The VCA EG check (p.38): peak 10V +/-.2V at TP2, so
-// the amplitude EG is within +/-2%. Uniform within the band, as for pitch.
-// Attack trims (VR19, VR20: 125ms at 3V) and the VCA level trims (VR11,
-// VR12, VR3, VR14) carry no printed tolerance and are not modelled.
+// EG levels (envelope amount). The VCF EG check (CS-60 p.37): AL, IL at 10V
+// give TP1 +5V +/-.5V and -4V +/-.5V; only the offset is trimmed (VR18, 0
+// +/-.01V, a constant offset the static VCF trims then absorb). One buffer
+// gain must meet both bands, so the VCF EG reaches HP and LP within +/-10%.
+// The VCA EG's attack ends where the sequencer's 30k/60k node trips its
+// comparator: TP2 10V +/-.2V (p.38, EG-VCA 2), a peak of each board's own.
+// Its held and released targets are the panel's SL and IL plus VR17's offset,
+// trimmed to -200 +/-20mV (EG-VCA 1; CS-80 printed p.13, the same). VR14 is
+// trimmed after both, with A, D, R short and S at 10 ("CS-50 is 0.6V", CS-60
+// p.39, VI.4), so every board's full-sustain output is the nominal one: the
+// peak and floor residuals stay, a level offset at full sustain does not.
 //
-// Not modelled, no printed tolerance: Q and static cutoff (ear-matched), EG
-// times, VCA trims, WSC level (no per-board procedure), 1.5nF/4.7M parts.
+// EG times (envelope time amount). Each EG is one exponential converter: TC
+// reaches the IG00151's EI through 82k + VR19 (VCF) or VR20 (VCA), with the
+// VR15/VR16 offsets through 100k (SM2 p.16), trimmed to an attack of 4ms at
+// 8V and 125ms at 3V (CS-60 pp.37-38). The CS-80 trims the same VR15/VR19 and
+// VR16/VR20 to the same two times and prints "(+/-5%)" for each (printed
+// pp.7 and 13). Each trim point is uniform in +/-5%; an exponential
+// converter's log-time error is linear in its control voltage, so between
+// and beyond the points it is linear in log time. D and R drive the same
+// converter (Docs/research/envelopes-authenticity-2026-10-20.md), placed on
+// it by preset()'s convention: an attack ends after 5 RC and a D/R time is a
+// T60 of ln(1000) RC, so a T60 shares the RC of an attack of 5*T60/ln(1000).
+//
+// VCA levels (VCA amount). VR11 trims the sine to 1Vpp and VR12 the filtered
+// pulse to .8Vpp at CP4 (CS-60 p.38, VI.1-2); the CS-80 trims the same VR11
+// and VR12 to 1.00 +/-.02Vpp and 800 +/-20mVpp (printed p.15). VR13 and VR14
+// act after CP4 and are trimmed on the filtered pulse (VI.3-4), restoring its
+// level, so the sine keeps its ratio to it: (1+e11)/(1+e12). The PRA's VR6
+// is trimmed last, in the finished instrument, for 0 dBm from the sine alone
+// with all keys down (CS-60 p.39, PRA III; see outputPreamp): it takes the
+// four boards' sine error out of the common gain. With the reference's
+// assumptions (RMS meter, notes adding incoherently) that is
+// sqrt(4/sum g^2) over the four physical boards' sine gains g.
+//
+// Not modelled, no printed tolerance: Q and static cutoff (ear-matched),
+// VR14's own residual (0.6V, no band for the CS-50), WSC level (no per-board
+// procedure), the 1.5nF/180pF/.22uF capacitors and 4.7M resistors (neither
+// parts list gives a tolerance), the KAS sample-holds.
 constexpr double boardTrimCents=1;          // Guide printed p.65, every trim
 constexpr double boardScaleKeyRatio=16;     // C6 key Kv / C2 key Kv, p.29
 constexpr double boardTrimKeyNormalHz=2093; // C6 key at NORMAL, p.29/p.65
+constexpr double boardThermalStepKelvin=25; // E-46: ambient 25 -> 50C
+constexpr double boardThermalKeyRatio=32;   // E-46 C6 / C1: Kv 4V / 125mV
+constexpr double boardThermalHighCents=5./2; // E-46: one 5-cent C6 figure
+constexpr double boardThermalLowCents=10./2; // E-46: two neighbouring C1 figures
 constexpr double boardFilterRankOctaves=.14624062518028906; // log2(1.5)/4
 constexpr double boardFilterEnvelopeBand=.5/5; // CS-60 p.37, TP1 +5V +/-.5V
-constexpr double boardAmpEnvelopeBand=.2/10;   // CS-60 p.38, TP2 10V +/-.2V
+constexpr double boardAmpPeakBand=.2/10;       // CS-60 p.38, TP2 10V +/-.2V
+constexpr double boardAmpFloorBand=.02/10;     // CS-60 p.38, TP2 -200 +/-20mV
+constexpr double boardEnvelopeTimeBand=.05;    // CS-80 printed pp.7, 13: +/-5%
+constexpr double boardEnvelopeFastSeconds=.004;  // attack trim at 8V
+constexpr double boardEnvelopeSlowSeconds=.125;  // attack trim at 3V
+constexpr double boardAttackTimeConstants=5;     // preset(): attack = 5 RC
+constexpr double boardSineBand=.02/1;          // CS-80 p.15: VR11 1.00 +/-.02Vpp
+constexpr double boardFilteredBand=.02/.8;     // CS-80 p.15: VR12 800 +/-20mVpp
 struct BoardTolerance {
     // C6-key residual at transposition 2-down, 1-down, NORMAL, 1-up.
     std::array<double,4> transposeCents{};
     double offsetRatio=0, hpOctaves=0, lpOctaves=0;
-    double filterEnvelopeError=0, ampEnvelopeError=0;
-    // Cached at the patch's amounts; exactly 1 when an amount is 0.
-    double hpScale=1, lpScale=1, hpEnvelopeGain=1, lpEnvelopeGain=1, ampEnvelopeGain=1;
-    void draw(Random& random) {
-        const double low=boardTrimCents*random.bipolar();
-        for (auto& cents : transposeCents) cents=boardTrimCents*random.bipolar();
+    double filterEnvelopeError=0, ampPeakError=0;
+    // Thermal drift over 25K at the C6 key, and its Kv offset ratio.
+    double thermalHighCents=0, thermalOffsetRatio=0;
+    // Log-time error at the 4ms and 125ms attack trims: VCF EG, VCA EG.
+    std::array<double,2> filterTimeLog{}, ampTimeLog{};
+    double ampFloorError=0, sineError=0, filteredError=0;
+    // Cached at the patch's amounts; the identical-board values when off.
+    double hpScale=1, lpScale=1, hpEnvelopeGain=1, lpEnvelopeGain=1;
+    double ampPeak=1, ampFloor=0, ampEnvelopeGain=1, sineGain=1;
+    std::array<double,4> filterCoefficients{}, ampCoefficients{};
+    // trims keeps the first stream's order, so a seed keeps the boards it
+    // had; everything added since draws from more, in this order.
+    void draw(Random& trims, Random& more) {
+        const double low=boardTrimCents*trims.bipolar();
+        for (auto& cents : transposeCents) cents=boardTrimCents*trims.bipolar();
         const double r=std::exp2((low-transposeCents[3])/1200);
         offsetRatio=(r-1)/(boardScaleKeyRatio-r);
-        hpOctaves=boardFilterRankOctaves*random.bipolar();
-        lpOctaves=boardFilterRankOctaves*random.bipolar();
-        filterEnvelopeError=boardFilterEnvelopeBand*random.bipolar();
-        ampEnvelopeError=boardAmpEnvelopeBand*random.bipolar();
+        hpOctaves=boardFilterRankOctaves*trims.bipolar();
+        lpOctaves=boardFilterRankOctaves*trims.bipolar();
+        filterEnvelopeError=boardFilterEnvelopeBand*trims.bipolar();
+        ampPeakError=boardAmpPeakBand*trims.bipolar();
+        const double thermalLow=boardThermalLowCents*more.bipolar();
+        thermalHighCents=boardThermalHighCents*more.bipolar();
+        const double q=std::exp2((thermalLow-thermalHighCents)/1200);
+        thermalOffsetRatio=(q-1)/(boardThermalKeyRatio-q);
+        for (auto& error : filterTimeLog) error=std::log1p(boardEnvelopeTimeBand*more.bipolar());
+        for (auto& error : ampTimeLog) error=std::log1p(boardEnvelopeTimeBand*more.bipolar());
+        ampFloorError=boardAmpFloorBand*more.bipolar();
+        sineError=boardSineBand*more.bipolar();
+        filteredError=boardFilteredBand*more.bipolar();
     }
     // octave: TRANSPOSE (-2..1); normalHz: the board's ideal NORMAL-position
     // frequency for its key voltage (key, PITCH and bend; not vibrato).
-    double pitchCents(double octave, double normalHz) const {
+    double trimCents(double octave, double normalHz) const {
         const double position=std::max(0.0,std::min(octave+2,3.0));
         const auto index=static_cast<std::size_t>(position<3 ? position : 2);
         const double gain=transposeCents[index]
             +(transposeCents[index+1]-transposeCents[index])*(position-index);
         const double x=normalHz/boardTrimKeyNormalHz;
         return gain+1200*std::log2(std::max(1e-9,1+offsetRatio/x)/(1+offsetRatio));
+    }
+    // Drift over the 25K step, the same at every transposition.
+    double thermalCents(double normalHz) const {
+        const double x=normalHz/boardTrimKeyNormalHz;
+        return thermalHighCents
+            +1200*std::log2(std::max(1e-9,1+thermalOffsetRatio/x)/(1+thermalOffsetRatio));
+    }
+    double pitchCents(const Patch& patch, double normalHz) const {
+        double cents=0;
+        if (patch.boardPitchTolerance>0)
+            cents=patch.boardPitchTolerance*trimCents(patch.octave,normalHz);
+        if (patch.boardTemperatureRise!=0)
+            cents+=patch.boardTemperatureRise/boardThermalStepKelvin*thermalCents(normalHz);
+        return cents;
+    }
+    // Duration factor of one EG at the attack time sharing the segment's RC
+    // (the duration itself for an attack, 5*T60/ln(1000) for decay/release).
+    static double timeFactor(const std::array<double,2>& trim, double attack, double amount) {
+        const double span=std::log(attack/boardEnvelopeFastSeconds)
+            /std::log(boardEnvelopeSlowSeconds/boardEnvelopeFastSeconds);
+        return std::exp(amount*(trim[0]+(trim[1]-trim[0])*span));
     }
 };
 
@@ -422,8 +599,8 @@ struct BoardTolerance {
 // actual signal-voltage scaling remain unidentified.
 // Trapezoidal capacitor integration makes the nonlinear feedback implicit.
 // Eliminating l leaves one monotone equation, solved with analytic Newton
-// derivatives at every sample. Vs and the VQ -> damping map remain calibration
-// parameters: Yamaha does not specify the internal transistor geometry.
+// derivatives at every sample. Vs remains a calibration parameter: Yamaha
+// does not specify the internal transistor geometry.
 // CS-50 M-board schematic: C=1.5nF; each 4.7Mohm resistor bypasses its
 // variable-gm block, feeding the next integrator INPUT. It is not a capacitor
 // bleed resistor. This linear input-current path sets a 22.58 Hz integrator-rate floor.
@@ -433,11 +610,16 @@ struct BoardTolerance {
 // specifies Q=.5 at VQ=10V and Q=5 at VQ=0V (SM1 printed p.19; pin 6 sets
 // the standing Q current that gives Q=5 at 0V). Guide printed p.33 draws the
 // Q path as a variable-gm block (gm=K*Icont) between BP and FB, so damping is
-// proportional to its control current; damping LINEAR in VQ is the law for a
-// linear VQ-to-Icont converter. The sheet does not say whether that converter
-// is linear or exponential; an exponential one through the same endpoints is
-// the open alternative (listening test 2026-10-20-vcf-q-law; Docs/research/
-// vcf-authenticity-2026-10-20.md).
+// proportional to its control current. The sheet does not say whether the
+// VQ-to-Icont converter is linear or exponential. Damping is EXPONENTIAL in
+// VQ through the printed endpoints, d=.2*10^(VQ/10): chosen by ear
+// 2026-10-20 (listening test 2026-10-20-vcf-q-law, B), the converter law the
+// cutoff input has, against the linear d=.2+.18*VQ shipped before. The
+// endpoints are printed; the path between them is that choice, not a
+// measurement. Yamaha's own variable-gm cell of the period (JP S59-49726 B2,
+// priority 1976-01-12, figs. 5-6) used a linear V-to-I amplifier instead,
+// sibling practice that does not identify the IG00156's converter. See
+// Docs/research/vcf-authenticity-2026-10-20.md.
 // HP and LP have independent Q trims: the nominal endpoints are anchored at
 // their usual source loads (HP three mixer branches, LP one). Changing a
 // waveform gate changes the source load, not the Q transistor conductance.
@@ -451,7 +633,8 @@ struct OtaSvf {
         constexpr double feedbackCapacitance=180e-12, sourceCapacitance=1e-6;
         const double conductance=sourceConductance+1/33e3+1/1.2e6;
         const double referenceConductance=referenceSourceConductance+1/33e3+1/1.2e6;
-        const double damping=(2.0-1.8*clamp(resonance,0,1))*referenceConductance/conductance;
+        // resonance r is 1-VQ/10, so d=.2*10^(VQ/10)=2*10^-r.
+        const double damping=2*std::pow(10.0,-clamp(resonance,0,1))*referenceConductance/conductance;
         const double ratio=sourceConductance/conductance;
         // X is the physical Thevenin source voltage, in the SAME OTA voltage
         // unit at both stages. Canonical u=2*Gs*X/D0 is a local algebraic
@@ -539,6 +722,42 @@ struct FilterChain {
 // Capacitor integration uses physical-RC trapezoids without pole prewarp.
 constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
     4.7e-6*(1e3+4*47e3),33e-6*(4.7e3+560)};
+// WSC sine shaper, IG00158 STI (pin 15) -> pin 2. Its transfer is not
+// published and no measurement isolates it. The shipping shaper is the
+// textbook bipolar-IC triangle-to-sine converter, an undegenerated
+// differential pair: y = tanh(k*tri)/tanh(k) at unit peak, at that
+// topology's own optimum, the drive k that minimises THD for an ideal
+// triangle (k = 1.40211; 1.4020 is the value auditioned): THD 1.36 %, H3
+// -54.1 dB, H5 -39.0 dB, H7 -45.1 dB. It replaced the ideal sin(pi/2*tri)
+// by ear on 2026-10-20 (owner listening verdict, set
+// 2026-10-20-vco-sine-shaper); it is not a fit to any recording.
+// The one whole-path measurement found since fits neither shaper: a public
+// CS-80 sample set (same M board, so the same IG00158;
+// Tools/measure_cs80_wsc_recordings.py) reads H3 -22.5..-30.3, H5
+// -40.4..-46.9 and H7 -59.4..-71.2 dB re H1 over 11 sine-only notes, with
+// flattened peaks. That path adds three IG00151 OTAs, the output stage and
+// an unknown capture. With one or two differential-pair (tanh) stages after
+// the shaper, driven to match each note's H3, this shaper's H5 is 3.5-7.9 dB
+// high at every note and its H7 11-20 dB high at 9 of 11, while an ideal
+// sine's H5 is 0.9-11 dB low at every note (the tool's `chains` command;
+// Docs/research/vco-authenticity-2026-10-20.md).
+// tanh is not constexpr in C++17, so tanh(k) is written out (std::tanh(1.4020)).
+constexpr double wscSineDrive=1.4020;
+constexpr double wscSineTanhDrive=0.8857831884152492;
+// g'(+/-1) = k*(1-tanh(k)^2)/tanh(k): the slope at both triangle corners.
+constexpr double wscSineCornerSlope=
+    wscSineDrive*(1-wscSineTanhDrive*wscSineTanhDrive)/wscSineTanhDrive;
+// Mean square over a period of the ideal folded triangle (no plateau):
+// (1/2)*integral_{-1}^{1} tanh(k*u)^2 du/tanh(k)^2 = (1-tanh(k)/k)/tanh(k)^2,
+// .4692770 (an ideal sine's .5, so -.275 dB RMS at the same peak).
+constexpr double wscSineMeanSquare=
+    (1-wscSineTanhDrive/wscSineDrive)/(wscSineTanhDrive*wscSineTanhDrive);
+// 2*sqrt(wscSineMeanSquare): RMS of four incoherent unit-peak shaped sines.
+constexpr double wscFourSineRms=1.370075901392172;
+static_assert(wscFourSineRms*wscFourSineRms-4*wscSineMeanSquare<1e-15 &&
+              4*wscSineMeanSquare-wscFourSineRms*wscFourSineRms<1e-15,
+              "Four-sine RMS literal must be 2*sqrt(wscSineMeanSquare)");
+
 // PRA output preamp (SM2 printed p.22 / PDF16; guide printed p.47 / PDF56).
 // VOLUME's wiper (I2) drives IC2-1/2, an HA1452, as an inverting amplifier:
 // 100k+47k in, 150k plus the VR6 B-1M rheostat as feedback, so 1.02 to 7.82,
@@ -558,8 +777,9 @@ constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
 // the sine lever, SUSTAIN and LEVEL at maximum on PANEL and all keys down:
 // a sine-only tone. The PRA board is shared (CS-50 SM2 p.22 note 7: "IC9 is
 // used for CS-60 only"). Each sine sits at CP4 1Vpp (M board VI.1, printed
-// p.38 / PDF 40), engine +/-1, so the CS-50's four voices are sqrt(4/2)
-// RMS, and .18 of that at full VOLUME reads 0 dBm, .775V RMS, at HO.
+// p.38 / PDF 40), engine +/-1 peak. Four of them add incoherently to
+// 2*sqrt(wscSineMeanSquare) RMS (the shaped sine above; sqrt(4/2) for an
+// ideal sine), and .18 of that at full VOLUME reads 0 dBm, .775V RMS, at HO.
 // Cross-check: VI.4 sets each CS-50 voice output O to 0.6V with .8Vpp at
 // CP4, and four 1Vpp sines through 0.75 and the four 1k/47k bus branches
 // are .132V RMS on the bus, so VR6 must give 5.9 of its 1.02..7.82 range.
@@ -569,7 +789,7 @@ constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
 // sits 0.2V below its 10V peak (see ampEnvelopeFloor), so the common VCA
 // passes .98 of each sine while VR6 is trimmed.
 constexpr double outputPreampGain=.18;
-constexpr double outputReferenceRms=outputPreampGain*1.4142135623730951*.98; // sqrt(4/2)
+constexpr double outputReferenceRms=outputPreampGain*wscFourSineRms*.98;
 constexpr double outputReferenceVolts=.7745966692414834; // 0 dBm, sqrt(.6)
 constexpr double outputHaSupplyCurrent=12e-3, outputSwingMargin=2;
 // HO is the inverse of this node, so HO's +8.32V bounds it below.
@@ -815,6 +1035,27 @@ constexpr double pickupCouplingTau=100e3*.047e-6;
 // SUI waveforms, 1.5V peak): the +/-15V swing times the 100/122 divider.
 constexpr double subNoiseResistance=22e3*100e3/122e3;
 constexpr double subNoiseRail=15*(100./122.)/1.5;
+// SUB-EXT. The rear EXT IN jack's tip goes to the top of the A-50K LEVEL pot
+// (PN5 VOLUME, sleeve to its foot; SM2 printed p.27), whose wiper is PRA
+// EX(53). The EXT preamp, IC3-1/2 (NJM4558D), is non-inverting with 100k
+// feedback over 1k to ground, gain 101 (SM2 printed p.22; guide printed p.56 /
+// PDF 65 draws the same stage). Its output reaches EXO(56) through a 10uF
+// non-polar capacitor with 100k to ground, and FUNCTION EXT (PN3 SSW M6)
+// joins EXO to SUI, where the SUB board's 100k to ground and the IC1-1
+// follower (SM2 printed p.8) take it to SUO like every other source. So the
+// coupling sees 100k||100k, a .318 Hz high-pass, while EXT is selected, and
+// EXO's own 100k (.159 Hz) otherwise; the capacitor charge carries across a
+// switch. In units of the 1.5 V SUB peak, the stage gain is 1 by definition of
+// subExternalUnitVolts (1.5 V / 101). Swings, NJM4558 datasheet typicals
+// (VOM, +/-15 V; ESTIMATE): the preamp drives 101k||50k, so +/-14 V (RL>=10k);
+// IC1-1 drives the three B-10k PN3 levers, about 3k, so +/-13 V (RL>=2k). The
+// square's 15k/1.8k divider assumes the same 14 V (14*1.8/16.8 = 1.5 V).
+// The preamp's 3 MHz typical gain-bandwidth (29.7 kHz closed-loop) and 1 V/us
+// slew rate act only at the top of the audio band or in hard overload, and
+// are not modelled.
+constexpr double externalPreampRail=14/1.5, externalBufferRail=13/1.5;
+constexpr double externalCouplingTauSelected=10e-6*(100e3*100e3/200e3);
+constexpr double externalCouplingTauOpen=10e-6*100e3;
 
 // Acklam's rational inverse normal CDF, relative error below 1.2e-9: one
 // uniform draw per Gaussian sample keeps the shared random sequence intact.
@@ -897,38 +1138,58 @@ struct Oscillator {
         const double fall = std::max(duty, recharge);
         double square = phase < fall ? 1 : -1;
         square += blep(phase,step) - blep(wrap(phase-fall),step);
-        // WSC pin14 -> pin3 folds the SAME conditioned ramp, then pin15 ->
-        // pin2 rounds it. Retain the existing ideal sine transfer, but stop
-        // bypassing the finite reset with an unrelated ideal phase ramp.
-        // The flat plateau is thus 1; the descending branch is cos(2pi*phi).
-        // Sine slice trim/compensation and exact transistor shape are unknown.
-        // Amplitude-domain form: -cos(pi*p) is fold tri=2|p|-1 (TO, 3.2Vpp,
-        // SL pin 4 open; SM2 p.21) through an ideal sin(pi/2*tri). TO reaches
-        // STI through 4.7uF NP with 22k to ground (SM2 p.16), which removes
-        // the triangle's 2r^2 mean; an ideal shaper cannot take that offset
-        // without an out-of-range transfer nobody has published, so it is
-        // omitted (.2% of peak at C4, 3% at C6 on 8').
-        const double resetAngle = 2*pi*recharge;
-        const double resetSine = std::sin(resetAngle);
-        const double resetCosine = std::cos(resetAngle);
-        const double sineBase = phase < recharge ? 1 : std::cos(2*pi*phase);
-        const double sine = sineBase + .5*(resetCosine-1)*blep(resetPhase,step)
-            - pi*resetSine*blamp(resetPhase,step);
+        // WSC pin14 -> pin3 folds the SAME conditioned ramp into the
+        // triangle tri=2|p|-1 (TO, 3.2Vpp, SL pin 4 open; SM2 p.21): 1 on the
+        // plateau, then 1-4*phase down to the fold at phase .5 and 4*phase-3
+        // back up (a plateau longer than .5 covers the fold). pin15 -> pin2
+        // shapes it with the bipolar differential pair tanh(k*tri)/tanh(k)
+        // (wscSineDrive above: textbook topology at its own minimum-THD
+        // drive, not measured, chosen by ear 2026-10-20; the CS-80 recording
+        // that questions it is noted there). Sine slice trim and
+        // the chip's real transistor shape are unpublished. TO reaches STI
+        // through 4.7uF NP with 22k to ground (SM2 p.16), which removes the
+        // triangle's 2r^2 mean (.2% of peak at C4, 3% at C6 on 8'); that
+        // offset is not applied (the auditioned shaper omits it).
+        // Band-limiting, analytic as for the saw: the plateau step at r is a
+        // jump g(tri(r+))-1 and a slope change to -/+4*g'(tri(r+)); the reset
+        // corner (slope 4*g'(1) into the flat plateau) and the fold corner
+        // (-4*g'(1) to +4*g'(1)) are BLAMPs.
+        const bool foldAfterPlateau = recharge < .5;
+        const double plateauEnd = foldAfterPlateau ? 1-4*recharge : 4*recharge-3;
+        const double plateauEndShape = std::tanh(wscSineDrive*plateauEnd);
+        const double plateauEndSlope = (foldAfterPlateau ? -4 : 4)*wscSineDrive
+            *(1-plateauEndShape*plateauEndShape)/wscSineTanhDrive;
+        const double tri = phase < .5 ? 1-4*phase : 4*phase-3;
+        double sine = phase < recharge ? 1 : std::tanh(wscSineDrive*tri)/wscSineTanhDrive;
+        sine += .5*(plateauEndShape/wscSineTanhDrive-1)*blep(resetPhase,step)
+            + .5*plateauEndSlope*blamp(resetPhase,step)
+            - 2*wscSineCornerSlope*blamp(phase,step);
+        if (foldAfterPlateau) sine += 4*wscSineCornerSlope*blamp(wrap(phase-.5),step);
         phase = wrap(phase + step);
-        // Empirical audio-polarity calibration: public CS-50 solo/both-on
-        // recordings support constructive saw/pulse mixing at equal nominal
-        // source levels. Negate the completed pulse, including its BLEP,
+        // Audio polarity: the completed pulse is negated, including its BLEP,
         // without moving either comparator edge, changing PW/PWM timing or
-        // introducing another oscillator. The guide's small waveform sketches
-        // do not establish an unambiguous common timing reference; this is not
-        // proof of an active-low chip output or an extra hardware inverter.
+        // introducing another oscillator, so saw and pulse fall together at
+        // the reset and equal levels mix constructively. Recordings of two
+        // instruments support that. Public CS-50 solo/both-on recordings mix
+        // constructively at equal nominal source levels. A public CS-80 sample
+        // set (same M board #21233, so the same IG00158;
+        // Tools/measure_cs80_wsc_recordings.py) holds the falling audio pulse
+        // edge fixed under PWM while the rising one moves (period-to-period
+        // spread .04-.23 against .24-12 samples, all 12 PWM notes), and its
+        // saw rises and drops at the reset (all 11 SAW notes); the fixed edge
+        // is the reset, so pulse and saw fall together. Both assume one chain
+        // polarity across the takes; neither is a transistor-level proof.
         // Yamaha's two drawings point the other way: the guide's WSC block
         // (p.31) labels SI->SO an inverter, and the SM2 p.21 pin sheet draws
         // PO high from the reset jump; read literally, SO falls as PO rises
-        // and equal-level mixing partly cancels. The M board gives both the
-        // same FET gate and 150k into one node (SM2 p.16), so no board stage
-        // reconciles them. The measured recording is kept over the sketches;
-        // see Docs/research/vco-authenticity-2026-10-20.md.
+        // and equal-level mixing partly cancels. Nippon Gakki's own 1974
+        // discrete converter (US 4,012,981, FIG. 2: NPN switch, PNP buffer)
+        // is a non-inverting comparator like that PO. The M board gives both
+        // the same FET gate and 150k into one node (SM2 p.16), so no board
+        // stage reconciles them: the inversion the recordings need would sit
+        // inside the IG00158, which no document shows. The recordings are
+        // kept over the sketches; see
+        // Docs/research/vco-authenticity-2026-10-20.md.
         return {saw, -square, sine};
     }
 };
@@ -994,16 +1255,20 @@ struct OutputRate {
 
 // SUB-OSCILLATOR lever laws. Guide printed p.55 / PDF 64: the SUB is VCO II,
 // an IG00150; SPEED (PN3 SVR1, B-10k between 0 and +10V; SM2 p.27) drives VC2,
-// which reaches pin 1 through 180k, with 330k from pin 1 to the +15V pin 4.
-// Pin 1 is a current input: the PWM oscillator, the same IG00150, takes VC1
-// through 110k (guide printed p.49) and spans log2(222/.2)=10.12 octaves over
-// 10V, the SUB log2(50/.8)=5.97; 110k/180k predicts the ratio 1.636 and the
-// table gives 1.695 (3.5%), while a voltage-input divider (330k to +15 V here,
-// to -15 V there) predicts 1.16. So the rate is exponential in VC2 and the
-// lever works into 180k. Calibration (VR7 trim) is .8+/-.16, 6.7+/-1.3 and
-// 50+/-10 Hz at 0/5/10 V. As for the PWM clock in preset() below, the law runs
-// exponentially through the end points; it gives 6.325 Hz at 5 V, 5.6% under
-// the printed nominal and inside its tolerance.
+// which the guide draws reaching pin 1 through 180k, with 330k from pin 1 to a
+// rail. The CS-50 SUB board (SM2 printed p.8) has 120k plus VR13 (B-100K
+// trim) in series, 120k..220k, and the 330k to -15 V; VR9 (B-500K) on Iadj
+// sets the frequency. Pin 1 is a current input: the guide's PWM oscillator,
+// the same IG00150, takes VC1 through 110k (printed p.49) and spans
+// log2(222/.2)=10.12 octaves over 10V, the SUB log2(50/.8)=5.97; 110k/180k
+// predicts the ratio 1.636 and the tables give 1.695 (3.5%), while a
+// voltage-input divider against the 330k predicts 1.16. So the rate is
+// exponential in VC2, and the lever works into the guide's 180k, inside the
+// board's trim range. With a scale trim and a frequency trim, both
+// table ends can be set: .8+/-.16, 6.7+/-1.3 and 50+/-10 Hz at 0/5/10 V (no
+// CS-50 trim procedure for them is printed). As for the PWM clock in preset()
+// below, the law runs exponentially through the end points; it gives 6.325 Hz
+// at 5 V, 5.6% under the printed nominal and inside its tolerance.
 double subSpeedHz(double vc2Volts) {
     return .8*std::pow(50/.8,clamp(vc2Volts,0.,10.)/10);
 }
@@ -1023,14 +1288,14 @@ double subVibratoLeverCents(double travel) {
 }
 // VCF lever (PN3 SVR3, B-10k between SUO and ground) -> R7 SUB -> 47k LP and
 // 150k HP on each of four boards (SM1 printed p.14): 8.95k load. LP octaves per
-// SUB unit at full lever are 1.5V through 47k against the manual FL's .65 oct/V
-// through 39k, the same provisional slope as lpBrillianceScale. HP follows at
-// hpSubRelativeScale inside the engine. The f-node resistors to ground (R6/R7,
+// SUB unit at full lever are 1.5V through 47k against the FL lever's 1 oct/V
+// through 39k (leverOctavesPerVolt, as for lpBrillianceScale): 1.245. HP
+// follows at hpSubRelativeScale inside the engine. The f-node resistors to ground (R6/R7,
 // 1.8-3.0k by chip rank, SM2 p.16) are neglected against 47k/150k, as the LC
 // node is for tremolo; they would ease the sag by about 4%.
 double subFilterLeverOctaves(double travel) {
     constexpr double load=1/(4/47e3+4/150e3);
-    return .65*39/47*1.5*leverFraction(clamp(travel,0.,1.),10e3/load);
+    return leverOctavesPerVolt*39/47*1.5*leverFraction(clamp(travel,0.,1.),10e3/load);
 }
 
 bool setParameter(Patch& patch, const char* key, double value) {
@@ -1082,6 +1347,60 @@ double resonanceLeverVolts(double travel, double presetMeanVolts) {
     const double a=1-std::min(1.0,std::max(0.0,travel));
     return loadedWiper(0,10,a,10e3,resonanceLeverLoad,presetMeanVolts);
 }
+
+namespace {
+// T71 tone-preset matrix outputs (SM2 printed pp.10-11; guide printed p.64).
+// Every row a-v holds a 10k to E and takes a 1S1555 from each preset column
+// (T71's, and T72's, whose rows join T71's) and one from its PANEL input
+// 1-22. The tablets and the PANEL levers share the T71 +10V regulator.
+// ESTIMATE: the 1S1555's forward curve is not published, so it is modelled
+// as the 1N4148-class silicon switching diode its ratings describe (35V,
+// 100mA, 4ns): Is = 2.52nA, N = 1.75 at 300K. That is 0.58V at the
+// stiffest preset column and 0.44V at the weakest.
+constexpr double presetSupply=10, presetLoad=10e3;
+constexpr double presetDiodeIs=2.52e-9, presetDiodeVt=1.75*25.85e-3;
+// The cutoff rows g (FH) and i (FL) are loaded beyond that 10k. The board
+// wiring lists (SM2 printed p.11 T71, p.15 R7) run them straight to R7 FH
+// (19) and FL (20) with no buffer between. R7 (SM1 printed p.14) takes each
+// cutoff bus through four 39k, one per board, to a pin-4 node that the M
+// board holds near ground (SM2 printed p.16: R6 2.2k HP, R7 2.4k LP at rank
+// B, beside the trim's 330k plus its centred B-100k's 25k; BR 680k/220k,
+// SUB/TBR/VCF 150k/47k each, EG 220k/47k on Overall): about 10.3k in all, as
+// much as the T-board's own 10k. (Docs/accuracy/preset-dc-loading solved the
+// same network under the earlier, unsourced anchors and slopes.) ESTIMATE:
+// pin 4 is taken as a high-impedance input and the VR7/VR9 trims as centred;
+// a virtual-ground pin 4 (bare 39k branches) or a trim at either rail moves
+// a cutoff bus by at most .06V.
+constexpr double hpCutoffNode=1/(1/2.2e3+1/355e3+1/680e3+3/150e3+1/220e3);
+constexpr double lpCutoffNode=1/(1/2.4e3+1/355e3+1/220e3+3/47e3+1/47e3);
+constexpr double fhBusLoad=(39e3+hpCutoffNode)/4, flBusLoad=(39e3+lpCutoffNode)/4;
+// PANEL HPF and LPF levers: B-10K slide pots across the T71 +10V on PN1
+// (Overall), so 0 to 10V ("HPF lever normal at 0", "LPF normal at 10",
+// guide printed p.35). Each wiper drives an NJM4558 follower, PRA IC4 (SM2
+// printed p.22: fHI to fHO, fLI to fLO; the Overall drawing numbers the
+// pair IC9), into T71 input 7 or 9, whose 1S1555 ORs it onto row g or i
+// beside the preset columns (SM2 printed p.11). With a stiff source only
+// that diode and the loaded row remain: the bus V solves
+// V + Vd(V/rl) = 10*travel, rl being the 10k beside the R7 load.
+double panelCutoffBus(double travel,double load) {
+    const double source=presetSupply*travel, rl=presetLoad*load/(presetLoad+load);
+    // V + Vd(V/rl) rises monotonically from 0 at V=0; bisect it onto source.
+    double low=0, high=source;
+    for (int i=0;i<64;++i) {
+        const double mid=.5*(low+high);
+        (mid+presetDiodeVt*std::log1p(mid/(rl*presetDiodeIs))<source ? low : high)=mid;
+    }
+    return .5*(low+high);
+}
+double panelCutoffHz(double travel,double load) {
+    if (!std::isfinite(travel)) return std::numeric_limits<double>::quiet_NaN();
+    return filterFrequencyFloor+gmHzAtMiddleC*
+        std::exp2(leverOctavesPerVolt*panelCutoffBus(clamp(travel,0.,1.),load));
+}
+} // namespace
+
+double hpfLeverHz(double travel) { return panelCutoffHz(travel,fhBusLoad); }
+double lpfLeverHz(double travel) { return panelCutoffHz(travel,flBusLoad); }
 
 #if !defined(CERES_EMBEDDED_TARGET)
 bool setParameter(Patch& patch, const std::string& key, double value) {
@@ -1159,6 +1478,11 @@ struct Synth::Impl {
     // the FUNCTION switch puts N on SUI, a buffer with100k to ground, so the
     // RC sees22k||100k (pole88.26Hz) and a100/122 divider.
     double subNoiseMemory = 0, subNoiseG = 0;
+    // SUB-EXT: the host input (held between calls), the previous host value
+    // and the interpolated value for this internal step; the coupling
+    // capacitor between the EXT preamp and EXO/SUI.
+    double externalTarget = 0, externalPrevious = 0, externalNow = 0;
+    OutputCoupling externalCoupling;
     Envelope ringEnvelope;
     std::array<double,4> ringCoefficients{};
     double ringPhase = 0, ringCarrier = 0, ringFrequency = 30;
@@ -1166,6 +1490,7 @@ struct Synth::Impl {
     unsigned ringDepthRemaining = 0;
     double ringCoupledCarrier=0;
     double ringSwitchGain=ringSteering(ringDifferentialDc);
+    double ringSignalInput=0, ringSignalOutput=0;
     RingCarrierCoupling ringCarrierCoupling;
     OutputCoupling ringSignalCoupling, ringWetCoupling;
     double ringWetGain=ringModulatorGain*ringWetBufferGain();
@@ -1224,24 +1549,59 @@ struct Synth::Impl {
         filterCoefficients = envelopeCoefficients(internalFs,patch.filterAttack,
             patch.filterDecay,effectiveRelease(patch.filterRelease,patch.globalRelease),
             patch.filterAttackHeadroom,patch.filterAttackSaturation);
-        // Direct CS-50 PRA RT divider: +15V through6.8k,3.3k toground.
-        // Its unloaded4.901V mapped by the existing nominal five-RC law
-        // implies .46781044s T60. External timing gain is not calibrated;
-        // this fixed key-off return is separate from the M-board global SUS.
-        constexpr double ringRelease=.4678104397473947;
+        // Direct CS-50 PRA 2DT divider: +15V through 6.8k, 3.3k to ground.
+        // Its unloaded 4.901V on the PRA-aligned DECAY TIME law gives 14.50s
+        // T60 (CS-60 sibling trim, fixed-100k slope assumption; chosen by ear
+        // 2026-10-20 over the untrimmed .4678s; see ceres.hpp). This fixed
+        // key-off return is separate from the M-board global SUS.
         ringCoefficients=envelopeCoefficients(internalFs,patch.ringAttack,
-            patch.ringDecay,ringRelease,.01,0);
+            patch.ringDecay,ringDecaySeconds(ringReleaseVolts),.01,0);
         updateBoardScales();
     }
     void updateBoardScales() {
+        const double envelope=patch.boardEnvelopeTolerance, time=patch.boardEnvelopeTimeTolerance;
+        const double vca=patch.boardVcaTolerance;
+        const double filterRelease=effectiveRelease(patch.filterRelease,patch.globalRelease);
+        const double ampRelease=effectiveRelease(patch.ampRelease,patch.globalRelease);
+        // The attack time sharing a T60's RC (see BoardTolerance).
+        const auto attack=[](double t60) { return boardAttackTimeConstants*t60/std::log(1000.0); };
         for (auto& voice : voices) {
             auto& board=voice.board;
             board.hpScale=std::exp2(patch.boardFilterTolerance*board.hpOctaves);
             board.lpScale=std::exp2(patch.boardFilterTolerance*board.lpOctaves);
-            const double envelope=1+patch.boardEnvelopeTolerance*board.filterEnvelopeError;
-            board.hpEnvelopeGain=envelope*board.hpScale;
-            board.lpEnvelopeGain=envelope*board.lpScale;
-            board.ampEnvelopeGain=1+patch.boardEnvelopeTolerance*board.ampEnvelopeError;
+            const double level=1+envelope*board.filterEnvelopeError;
+            board.hpEnvelopeGain=level*board.hpScale;
+            board.lpEnvelopeGain=level*board.lpScale;
+            board.ampPeak=1+envelope*board.ampPeakError;
+            board.ampFloor=ampEnvelopeFloor+envelope*board.ampFloorError;
+            // VR14 is trimmed at full sustain (CS-60 VI.4): there each board
+            // gives the nominal output, whatever its own floor.
+            board.ampEnvelopeGain=(1+ampEnvelopeFloor)/(1+board.ampFloor);
+            board.sineGain=(1+vca*board.sineError)/(1+vca*board.filteredError);
+            board.filterCoefficients=filterCoefficients;
+            board.ampCoefficients=ampCoefficients;
+            if (time>0) {
+                const auto& f=board.filterTimeLog;
+                board.filterCoefficients=envelopeCoefficients(internalFs,
+                    patch.filterAttack*BoardTolerance::timeFactor(f,patch.filterAttack,time),
+                    patch.filterDecay*BoardTolerance::timeFactor(f,attack(patch.filterDecay),time),
+                    filterRelease*BoardTolerance::timeFactor(f,attack(filterRelease),time),
+                    patch.filterAttackHeadroom,patch.filterAttackSaturation);
+                const auto& a=board.ampTimeLog;
+                board.ampCoefficients=envelopeCoefficients(internalFs,
+                    patch.ampAttack*BoardTolerance::timeFactor(a,patch.ampAttack,time),
+                    patch.ampDecay*BoardTolerance::timeFactor(a,attack(patch.ampDecay),time),
+                    ampRelease*BoardTolerance::timeFactor(a,attack(ampRelease),time),
+                    patch.ampAttackHeadroom,patch.ampAttackSaturation);
+            }
+        }
+        // VR6, trimmed with the four physical boards in place (see
+        // BoardTolerance): one common gain, exactly 1 when the VCA amount is 0.
+        if (vca>0) {
+            double power=0;
+            for (unsigned i=0;i<Synth::voiceCount;++i) power+=voices[i].board.sineGain*voices[i].board.sineGain;
+            const double vr6=std::sqrt(Synth::voiceCount/power);
+            for (auto& voice : voices) voice.board.ampEnvelopeGain*=vr6;
         }
     }
     void followFreeKeys() {
@@ -1283,11 +1643,13 @@ struct Synth::Impl {
         physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
         physicalKeyPresses=0; lastAssignedKey=60;
         subNoiseMemory=limiterInput=limiterOutput=0; pickupCoupling={};
+        externalTarget=externalPrevious=externalNow=0; externalCoupling={};
         limiterRandom=Random(seed^0xd1b54a32d192ed03ULL); ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={}; ringSignalCoupling={};
         ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
         ringCarrierCoupling.clear();ringCoupledCarrier=0;
         ringSwitchGain=ringSteering(ringDifferentialDc);
+        ringSignalInput=ringSignalOutput=0;
         qVoltageOffset=0;
         hpResonanceAnchor=patch.hpResonance; lpResonanceAnchor=patch.lpResonance;
         hasProcessed=false;
@@ -1307,12 +1669,14 @@ struct Synth::Impl {
             voice.driftTarget = initialRandom.bipolar();
             voice.driftCountdown = static_cast<unsigned>(internalFs * (.1 + initialRandom.unit()*.5));
         }
-        // Board tolerances come from their own seeded stream, drawn for every
+        // Board tolerances come from their own seeded streams, drawn for every
         // physical slot in a fixed order, so the shared audio/drift stream is
         // untouched and board i is the same unit at every polyphony/quality.
-        Random boards(seed^0x5851f42d4c957f2dULL);
-        for (auto& voice : voices) voice.board.draw(boards);
+        Random boards(seed^0x5851f42d4c957f2dULL), moreBoards(seed^0x2545f4914f6cdd1dULL);
+        for (auto& voice : voices) voice.board.draw(boards,moreBoards);
         updateBoardScales();
+        // An idle board rests at its own VCA-EG floor (VR17).
+        for (auto& voice : voices) voice.amp.voltage=voice.board.ampFloor;
     }
     // KAS key voltage path (guide printed pp.22-25): assigner code -> glissando
     // counter -> integrating gate -> sample-hold -> VCO and filter key CV.
@@ -1373,7 +1737,15 @@ struct Synth::Impl {
         const double noise=limiterSum/limiterSteps;
         const double subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
         subNoiseMemory=2*subNoise-subNoiseMemory;
-        const double lfo = subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
+        // SUB-EXT (see externalPreampRail): LEVEL, the preamp's swing, the
+        // switch-loaded coupling capacitor, then the IC1-1 follower's swing.
+        // The preamp and capacitor run whatever FUNCTION selects.
+        const bool external=patch.lfoWaveform==5;
+        const double externalSub=clamp(externalCoupling.process(
+            clamp(patch.extLevel*externalNow,-externalPreampRail,externalPreampRail),
+            external ? externalCouplingTauSelected : externalCouplingTauOpen,internalFs),
+            -externalBufferRail,externalBufferRail);
+        const double lfo = external ? externalSub : subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
             patch.lfoWaveform==4 ? subNoise*subNoiseRail:0.);
         lastSub=lfo;
         // Exact zero-order-held RC update. Never bypass while offset returns
@@ -1382,8 +1754,8 @@ struct Synth::Impl {
         qVoltageOffset+=(patch.resonanceOffset*.5-qVoltageOffset)*qControlCoefficient;
         hpResonanceAnchor+=(patch.hpResonance-hpResonanceAnchor)*qControlCoefficient;
         lpResonanceAnchor+=(patch.lpResonance-lpResonanceAnchor)*qControlCoefficient;
-        // Direct chip endpoints Vq0:Q5,Vq10:Q.5 only. The intermediate
-        // d=2-1.8*r law is provisional; delta d=.18*deltaVq retains that law.
+        // Direct chip endpoints Vq0:Q5,Vq10:Q.5. deltaVq moves the pin
+        // voltage itself; OtaSvf applies the exponential law to the sum.
         effectiveHpResonance=clamp(hpResonanceAnchor-qVoltageOffset*.1,0,1);
         effectiveLpResonance=clamp(lpResonanceAnchor-qVoltageOffset*.1,0,1);
         // R7 LC sums LEVEL(270k) and SUB(120k) currents before common VCA2.
@@ -1412,6 +1784,8 @@ struct Synth::Impl {
             // noteOn. This digital adaptation does not slew the keyboard CV.
             v.velocityValue+=(v.velocity-v.velocityValue)*velocityCoefficient;
             const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
+            // Free-running wander, driftCents peak (see ceres.hpp): its 0.2-0.7s
+            // hold and .3s smoothing are engineering choices with no source.
             if (v.driftCountdown-- == 0) {
                 v.driftTarget = random.bipolar();
                 v.driftCountdown = static_cast<unsigned>(internalFs * (.2 + random.unit()*.5));
@@ -1421,31 +1795,33 @@ struct Synth::Impl {
                 + v.drift*patch.driftCents + lfo*(patch.vibratoCents + expression*patch.pressureVibrato)
                 + expression*patch.pressureVibrato*touchVibratoBias;
             const double key=advanceGlide(v,dt);
-            // Trim residual of this board's linear VCO (see BoardTolerance):
-            // its key voltage is the NORMAL frequency of key, bend and PITCH.
-            if (patch.boardPitchTolerance>0)
-                cents+=patch.boardPitchTolerance*v.board.pitchCents(patch.octave,
+            // Trim residual and thermal drift of this board's linear VCO (see
+            // BoardTolerance): its key voltage is the NORMAL frequency of key,
+            // bend and PITCH.
+            if (patch.boardPitchTolerance>0 || patch.boardTemperatureRise!=0)
+                cents+=v.board.pitchCents(patch,
                     440*std::exp2((key-69+bend+patch.tuneCents*.01)/12));
             const double frequency = 440 * std::exp2((key-69 + bend + 12*patch.octave + cents*.01)/12);
             const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
                                             patch.resetMicroseconds*1e-6,internalFs);
+            // Each board's EG times, VCA-EG peak and floor (see BoardTolerance;
+            // the shared values when the envelope tolerance is off).
+            const auto& egf=v.board.filterCoefficients;
+            const auto& ega=v.board.ampCoefficients;
             const double filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
-                patch.filterAttackHeadroom,patch.filterAttackSaturation,filterCoefficients[0],
-                filterCoefficients[3],filterCoefficients[1],filterCoefficients[2]);
-            const double ampEnvelope = std::max(0.0,v.amp.advance(ampEnvelopeFloor,1,
-                patch.ampSustain+ampEnvelopeFloor,
-                patch.ampAttackHeadroom,patch.ampAttackSaturation,ampCoefficients[0],
-                ampCoefficients[3],ampCoefficients[1],ampCoefficients[2]));
+                patch.filterAttackHeadroom,patch.filterAttackSaturation,egf[0],egf[3],egf[1],egf[2]);
+            const double ampEnvelope = std::max(0.0,v.amp.advance(v.board.ampFloor,v.board.ampPeak,
+                patch.ampSustain+v.board.ampFloor,
+                patch.ampAttackHeadroom,patch.ampAttackSaturation,ega[0],ega[3],ega[1],ega[2]));
             // Guide printed p.34: fc=125*Kv*2^Vfc. Kv is LINEAR in key Hz: the
             // M board feeds IG00156 pin 2 from the same K terminal as VCO III
             // pin 2 (SM2 p.16), 0.25V at 130.8Hz to 4V at 2093Hz (Yamaha's
             // C2..C6; SM1 printed p.19, both pin sheets), so fc follows the
             // key exactly one octave per octave, through glide and PITCH but
             // not TRANSPOSITION (VCO III pin 1 FT only). keyTrack=1 is that hardware law. At Vfc=0 the printed law
-            // puts gm cutoff at 125*.5V = 62.5Hz at middle C; the patch's
-            // cutoff-at-middle-C reference does not yet use that zero point
-            // (listening test 2026-10-20-vcf-cutoff-zero-point; see
-            // Docs/research/vcf-authenticity-2026-10-20.md).
+            // puts gm cutoff at 125*.5V = 62.5Hz at middle C; factory presets
+            // convert their lever volts with it (preset()), and the patch's
+            // hp/lpCutoff stay the cutoffs at middle C.
             // This law controls the OTA gm contribution. The independent
             // feed resistor contributes the same conductance at every CV.
             // Master PITCH routes PN2 VR1 -> SUB TU -> KAS67 -> SH -> M K37,
@@ -1482,7 +1858,9 @@ struct Synth::Impl {
             // CP3 coupling precedes filtered level; CP4 coupling acts on
             // the filtered/sine sum before common level and envelope VCAs.
             const double filtered=v.filteredCoupling.process(low,outputCouplingTau[0],internalFs);
-            const double summed=filtered*patch.filterLevel + waves.sine*patch.sine;
+            // The sine's VR11/VR12 balance against the filtered path (VCA
+            // amount); exactly 1 when off.
+            const double summed=filtered*patch.filterLevel + waves.sine*patch.sine*board.sineGain;
             const double beforeVca=v.commonCoupling.process(summed,outputCouplingTau[1],internalFs);
             // IG00151 gain is LINEAR in envelope CV (guide pp.40–41). The
             // optional velocity term is zero in factory-derived presets.
@@ -1511,13 +1889,10 @@ struct Synth::Impl {
         const double bus=busCoupling.process(mixed,outputCouplingTau[2],internalFs);
         // One global processor, after the voice bus and before expression/
         // output. The carrier uses the physical matched upper-BJT steering
-        // law at the pins 7-8 carrier; the signal pair is kept linear. Its
-        // 470 ohm degeneration limits at .56V peak on pin 1; the CS-50 voice
-        // output aligns to .6V (CS-60 manual p.39, VI-4, "CS-50 is 0.6V"),
-        // which reaches pin 1 as at most .35V: 1.5% peak compression, third
-        // harmonic -48dB, and -62dB at half that. The engine's bus is not a
-        // calibrated voltage, so that bound is not applied. Wet gain is the
-        // derived modulator gain times the wet buffer's VR4 trim (see above).
+        // law at the pins 7-8 carrier, and the degenerated signal pair its
+        // large-signal law at the aligned bus level (ringSignalPair). Wet
+        // gain is the derived modulator gain times the wet buffer's VR4
+        // trim (see above).
         const double ringControl=ringEnvelope.advance(0,1,0,.01,0,
             ringCoefficients[0],0,ringCoefficients[1],ringCoefficients[2]);
         // Digital control dezippering only: retain the physical EG trajectory,
@@ -1539,8 +1914,9 @@ struct Synth::Impl {
         // Pin 1 sees the bus through 10uF into 330+463 ohm (20Hz); pin 6 and
         // the wet buffer are coupled through 10uF into 2.5k+10k (1.27Hz).
         // Both run even at mix 0, like the carrier network.
-        const double signal=ringSignalCoupling.process(bus,ringSignalCouplingTau,internalFs);
-        const double wet=ringWetGain*ringWetCoupling.process(signal*ringSwitchGain,ringWetCouplingTau,internalFs);
+        ringSignalInput=ringSignalCoupling.process(bus,ringSignalCouplingTau,internalFs);
+        ringSignalOutput=ringSignalPair(ringSignalInput);
+        const double wet=ringWetGain*ringWetCoupling.process(ringSignalOutput*ringSwitchGain,ringWetCouplingTau,internalFs);
         // Explicit bypass avoids even a rounding change for old patches.
         const double ringed=patch.ringMix==0 ? bus
             : (bus+patch.ringMix*(wet-bus))/(1+patch.ringMix*(1-patch.ringMix)*ringMixLeverRatio);
@@ -1575,8 +1951,11 @@ void Synth::setPatch(const Patch& patch) {
         impl_->lpResonanceAnchor=validated.lpResonance;
         impl_->effectiveHpResonance=validated.hpResonance;
         impl_->effectiveLpResonance=validated.lpResonance;
-        for (auto& voice : impl_->voices)
+        for (auto& voice : impl_->voices) {
             if (voice.filter.stage == Envelope::Idle) voice.filter.voltage = validated.filterInitial;
+            // ... and an idle VCA EG at its board's floor (VR17).
+            if (voice.amp.stage == Envelope::Idle) voice.amp.voltage = voice.board.ampFloor;
+        }
     } else if (changingRingDepth) {
         // Retarget from the actual interpolated value. Repeated patch writes
         // with the same target do not prolong the finite20ms transition.
@@ -1686,12 +2065,13 @@ void Synth::allNotesOff() {
 }
 void Synth::allSoundOff() {
     impl_->keysOff(); impl_->ringEnvelope={}; impl_->ringWetCoupling={}; impl_->ringSignalCoupling={};
+    impl_->ringSignalInput=impl_->ringSignalOutput=0;
     impl_->ringCarrierCoupling.clear();impl_->ringCoupledCarrier=0;
     impl_->ringSwitchGain=ringSteering(ringDifferentialDc);
     for (auto& voice : impl_->voices) {
         voice.held = voice.pedalHeld = false;
         voice.amp = {};
-        voice.amp.voltage = ampEnvelopeFloor;
+        voice.amp.voltage = voice.board.ampFloor;
         voice.filter = {};
         voice.filter.voltage = impl_->patch.filterInitial;
         voice.filters = {}; voice.filteredCoupling={}; voice.commonCoupling={};
@@ -1715,9 +2095,23 @@ std::size_t Synth::activeVoices() const {
         [](const auto& v) { return v.amp.stage != Envelope::Idle; }));
 }
 double Synth::sampleRate() const { return impl_->fs; }
+void Synth::externalInput(double sample) noexcept {
+    // Numerical guard only: 1e9 units overdrives the preamp at any LEVEL
+    // above 1e-8, and keeps the interpolation below overflow.
+    impl_->externalTarget=std::isfinite(sample) ? clamp(sample,-1e9,1e9) : 0.;
+}
 float Synth::process() {
     ++impl_->hostSamples;
-    for (unsigned i = 0; i < impl_->rateFactor; ++i) impl_->decimator.push(impl_->sample(),impl_->rateFactor);
+    // SUB-EXT arrives at the host rate: step linearly from the previous host
+    // value, landing on the new one at the last internal step (exact at 1x).
+    // A digital adaptation of the continuous jack, not a hardware stage.
+    auto& state=*impl_;
+    const double from=state.externalPrevious, to=state.externalTarget;
+    for (unsigned i = 0; i < state.rateFactor; ++i) {
+        state.externalNow=i+1==state.rateFactor ? to : from+(to-from)*(i+1)/state.rateFactor;
+        state.decimator.push(state.sample(),state.rateFactor);
+    }
+    state.externalPrevious=to;
     const double output=impl_->decimator.output(impl_->rateFactor);
     // Post-circuit/post-FIR utility gain: no change to analog state, timing,
     // nonlinear operating level or default sound. No output limiter is added.
@@ -1745,7 +2139,8 @@ std::array<Synth::VoiceState,Synth::maxVoiceCount> Synth::allVoiceState() const 
 }
 Synth::ModulationState Synth::modulationState() const {
     return {impl_->lastSub,impl_->ringEnvelope.voltage,impl_->ringFrequency,
-        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier,impl_->ringSwitchGain,impl_->ringDepthValue};
+        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier,impl_->ringSwitchGain,impl_->ringDepthValue,
+        impl_->ringSignalInput,impl_->ringSignalOutput};
 }
 Synth::SoundPathState Synth::soundPathState() const {
     return {impl_->qVoltageOffset,impl_->effectiveHpResonance,
@@ -1910,22 +2305,42 @@ Patch preset(const std::string& name) {
     // bus through a series resistor, a 1S1555 and a 10k to ground. The printed
     // table is the bare divider -- 1.3k gives 10*10/11.3 = 8.85V, exactly as
     // printed -- so the diode's drop is not in it, and the real pin sits that
-    // much lower. The destinations are op-amp inputs, which is why the printed
-    // table matches a 10k-only load, so the drop just lowers the source:
-    // Vpin = Videal*(10-Vd)/10 with Vd taken at I = Vpin/10k.
-    // ESTIMATE: the 1S1555's forward curve is not published, so it is modelled
-    // as the 1N4148-class silicon switching diode its ratings describe (35V,
-    // 100mA, 4ns): Is = 2.52nA, N = 1.75 at 300K. That is 0.58V at the
-    // stiffest column and 0.44V at the weakest, so pins land 4.2-5.8% low.
+    // much lower. Where a row drives a high-impedance input the 10k is its
+    // whole load, so the drop just lowers the source:
+    // Vpin = Videal*(10-Vd)/10 with Vd taken at I = Vpin/10k. The four filter
+    // rows drive passive R7 networks instead (loadedPresetPin below). The
+    // matrix constants and the 1S1555 ESTIMATE sit with the PANEL cutoff
+    // lever law (presetSupply); with them pins land 4.2-5.8% low.
     // A zero column has no matrix path at all and stays at ground.
-    constexpr double presetSupply=10, presetLoad=10e3;
-    constexpr double presetDiodeIs=2.52e-9, presetDiodeVt=1.75*25.85e-3;
     const auto presetPin=[](double ideal) {
         if (ideal<=0) return ideal;
         double pin=ideal;
         // Each pass moves the drop by under half a percent of the last.
         for (int i=0;i<8;++i)
             pin=ideal*(presetSupply-presetDiodeVt*std::log(pin/(presetLoad*presetDiodeIs)))/presetSupply;
+        return pin;
+    };
+    // Filter rows g-j are loaded beyond that 10k: g and i by R7's four 39k
+    // cutoff branches (fhBusLoad, flBusLoad, with the PANEL lever law). The
+    // same wiring lists (SM2 printed p.11 T71, p.15 R7) run h and j straight
+    // to QH (52) and QL (50), again with no buffer between. Each Q bus
+    // feeds four 220k to pin-7 nodes that return through 220k to RES: 110k to
+    // the RES bus, which is the T71 +10V at the presets' RESONANCE MIN. The
+    // row V then solves (10 - Vd - V)/Rs = V/10k + (V - Vret)/Rload, the
+    // diode's current, with Rs recovered from the printed bare divider,
+    // Rs = 10k(10/Videal - 1); a zero column leaves the row at the load's own
+    // Thevenin voltage. Each pin 7 is taken to draw no current.
+    constexpr double qBusLoad=(220e3+220e3)/4;
+    const auto loadedPresetPin=[](double ideal,double load,double loadReturn) {
+        // Thevenin of the 10k and the load: vl behind rl.
+        const double rl=presetLoad*load/(presetLoad+load);
+        const double vl=loadReturn*presetLoad/(presetLoad+load);
+        if (ideal<=0) return vl;
+        const double share=rl/(presetLoad*(presetSupply/ideal-1)+rl);
+        double pin=vl+(presetSupply-vl-.5)*share;
+        // Each pass scales the error by Vd's slope over Rs+rl, under 1%.
+        for (int i=0;i<8;++i)
+            pin=vl+(presetSupply-vl-presetDiodeVt*std::log((pin-vl)/(rl*presetDiodeIs)))*share;
         return pin;
     };
     std::string canonical = name;
@@ -1954,6 +2369,7 @@ Patch preset(const std::string& name) {
         auto cv = factory.v;
         for (const auto& correction : corrections)
             if (canonical == correction.name) cv[correction.column]=correction.voltage;
+        const auto ideal=cv;
         for (auto& voltage : cv) voltage=presetPin(voltage);
         Patch p; p.name=canonical;
         // Guide p.49 calibrates actual PWM VC1 to 0.2/6.7/222 Hz at
@@ -1964,37 +2380,57 @@ Patch preset(const std::string& name) {
         p.pwmRate=.2*std::pow(1110.0,cv[0]/10); p.pwmDepth=.4*cv[1]/10;
         p.pulseWidth=.5+.4*cv[2]/10;
         p.pulse=cv[3]/10; p.saw=cv[4]/10; p.noise=cv[5]/10;
-        // The exponential voltage law controls variable gm, not the fixed
-        // feed resistor. These 12/180Hz anchors and .7/.65oct/V slopes are
-        // still uncalibrated gm-component estimates. The printed IG00156 law
-        // puts 0V at 62.5Hz gm for BOTH stages at middle C (fc=125*Kv*2^Vfc,
-        // Kv=.5V; guide printed p.34, SM1 printed p.19); the slopes cannot
-        // be read off the board, because a 10V lever through 39k into the
-        // 1.8-3.3k rank resistor (SM2 pp.16,18 tables; R6 HP, R7 LP) gives
-        // about .5V at pin 4, half an octave at the pin sheet's 1V/oct. Pin 4's
-        // input current law is unpublished. The Patch API expects
-        // total integrator Hz, so include the resistor contribution once.
-        p.hpCutoff=filterFrequencyFloor+12*std::exp2(cv[6]*.7);
-        p.lpCutoff=filterFrequencyFloor+180*std::exp2(cv[8]*.65);
+        // Cutoff columns g (HP) and i (LP): the printed IG00156 law in full,
+        // fc=125*Kv*2^Vfc (guide printed p.34; SM1 printed p.19, "VK .25V,
+        // Vf 5V -> 1kHz"): 62.5Hz of gm at middle C (Kv=.5V) for 0V and one
+        // octave per volt, both stages. Chosen by ear 2026-10-20 (listening
+        // test 2026-10-20-vcf-printed-law, which supersedes the zero-point
+        // and HP/LP-slope sets). Every number is printed; the one inference
+        // is where Vfc is measured. It cannot be pin 4 itself: a 10V lever
+        // through 39k into the CS-50's 1.8-3.0k rank resistor (SM2 printed
+        // p.16; R6 HP, R7 LP) puts only .4-.6V there, and guide printed p.33
+        // draws Vfc reaching pin 4 through a variable resistor, the rank-set
+        // network. So Vfc is read on the FH/FL bus, ahead of the 39k; the
+        // PANEL lever reaches that bus through a PRA follower and a T71 diode,
+        // a preset through its loaded divider (loadedPresetPin). One slope
+        // serves both levers: the CS-50 rank column (SM2 printed p.16,
+        // "CS50,60": R7 3.0k/2.4k/2.0k beside R6 2.7k/2.2k/1.8k; p.18
+        // NA03655) is exactly the E24 set nearest equal 39k-lever gain into
+        // the two pin-4 nodes (3.09k/2.45k/1.97k); with the EG paths the
+        // as-built HP/LP gain ratio is 1.00-1.06 by rank. Not printed: the
+        // series reference behind the pin sheet's Vf, and pin 4's own input
+        // law. The law moves variable gm, not the fixed 4.7M feed, and the
+        // Patch API expects total integrator Hz, so include the resistor
+        // contribution once. See Docs/research/vcf-authenticity-2026-10-20.md.
+        const double fhBus=loadedPresetPin(ideal[6],fhBusLoad,0);
+        const double flBus=loadedPresetPin(ideal[8],flBusLoad,0);
+        p.hpCutoff=filterFrequencyFloor+gmHzAtMiddleC*std::exp2(leverOctavesPerVolt*fhBus);
+        p.lpCutoff=filterFrequencyFloor+gmHzAtMiddleC*std::exp2(leverOctavesPerVolt*flBus);
         // Overall schematic: passive FH/FL buses feed each cutoff via 39k;
-        // the shared EG uses 220k for HP and 47k for LP. Relative coupling
-        // is Rmanual/REG times the manual CV slope. Those slopes (.7/.65
-        // oct/V) remain provisional; the paired HP/LP rank shunts (SM2
-        // pp.16,18) give the 39k lever equal pin-4 gain within about 6%, so
-        // the two should be equal (listening test 2026-10-20-vcf-hp-lp-slope;
-        // Docs/research/vcf-authenticity-2026-10-20.md). This corrects the
-        // supported resistor ratio without claiming absolute pin-4 CV
-        // calibration. The ratio is
-        // relative to actual loaded FH/FL voltage, not proven to equal the
-        // T-board pin above: four-voice loading remains unresolved. Factory
-        // scales are an effective/manual-slope estimate.
-        p.hpEnvelopeScale=.7*39/220;
-        p.lpEnvelopeScale=.65*39/47;
-        // The pin takes (Q bus + RES)/2 through the 220k pair, so the hardware
-        // is r=1-(P+R)/20 for RESONANCE lever volts R. This maps the bus
-        // straight to the pin, which matches it only at R=P; the lever
-        // position the factory voicing assumed is unknown (A-Z test pending).
-        p.hpResonance=(10-cv[7])*.1; p.lpResonance=(10-cv[9])*.1;
+        // the shared EG uses 220k for HP and 47k for LP, so at the levers'
+        // 1 oct/V the EG moves the cutoffs 39/220 and 39/47 octave per EG
+        // volt, relative to the loaded bus voltage above. A board's EG also
+        // lifts its pin-4 node, which unloads the shared passive bus and so
+        // raises every board's cutoff a little: at most .03 octave per board
+        // at +5V LP EG on a weak column, .1 with all four. Not modelled.
+        p.hpEnvelopeScale=leverOctavesPerVolt*39/220;
+        p.lpEnvelopeScale=leverOctavesPerVolt*39/47;
+        // Q columns h (HP) and j (LP): each pin 7 takes its preset Q bus P
+        // and the RES bus R through 220k each, with 10uF to ground (SM1
+        // printed p.14 R7; SM2 printed p.16), so it settles at (P+R)/2 and
+        // r=1-(P+R)/20. Factory presets put the RESONANCE lever at MIN, where
+        // TVR6 sits on the +10V bus (SM2 p.26 PN2 sheet): r=(10-P)/20. The
+        // divider is printed; which lever position Yamaha voiced the presets
+        // at is not, and MIN was chosen by ear 2026-10-20 (listening test
+        // 2026-10-20-brilliance-resonance-preset-q-divider, B). Before, the
+        // bus went straight to the pin, r=(10-P)/10, which no single lever
+        // position gives for every preset. resonance_offset is then the RES
+        // change from MIN: 0 to -10V. P is the loaded row (loadedPresetPin):
+        // the four pin-7 networks pull it toward RES's +10V, so a zero column
+        // sits at .83V, not ground. Away from MIN that pull follows RES, so
+        // the pin moves up to 13/24 of each RES volt, not 1/2; not modelled.
+        p.hpResonance=(10-loadedPresetPin(ideal[7],qBusLoad,presetSupply))/20;
+        p.lpResonance=(10-loadedPresetPin(ideal[9],qBusLoad,presetSupply))/20;
         // VCF-EG levels at TP1 (EG OUT). The IG00152 pin sheet (SM1 p.20)
         // gives AL 0..10V -> LC up to +5V and IL 0..10V -> 0..-5V, but the
         // alignment of the same M board (Yamaha CS-60 Service Manual p.37,
@@ -2057,4 +2493,34 @@ Patch preset(const std::string& name) {
     throw std::invalid_argument("Unknown Ceres preset: " + name);
 }
 #endif // !CERES_EMBEDDED_TARGET
+
+// Parameter descriptors read the setParameter table itself, so a key, range
+// or rounding rule added there reaches every front end with no second list.
+std::size_t parameterCount() noexcept {
+    return sizeof parameters/sizeof parameters[0];
+}
+
+ParameterInfo parameterInfo(std::size_t index) noexcept {
+    if (index>=parameterCount()) return {nullptr,0,0,0,false};
+    const Parameter& parameter=parameters[index];
+    const Patch defaults{};
+    // A key is integer when setParameter rounds it. Probe it with a value
+    // that is not a whole number for any integer-valued range (0.318... of
+    // the span): rounding then moves it, a continuous key keeps it.
+    const double probe=parameter.low+(parameter.high-parameter.low)*.3183098861837907;
+    const bool integer=parameterValue(parameter,probe)!=probe;
+    return {parameter.key,parameter.low,parameter.high,defaults.*(parameter.member),integer};
+}
+
+bool getParameter(const Patch& patch, const char* key, double& value) noexcept {
+    if (!key) return false;
+    for (const auto& parameter : parameters) {
+        if (std::strcmp(key,parameter.key)==0) {
+            const double stored=patch.*(parameter.member);
+            value=std::isfinite(stored) ? parameterValue(parameter,stored) : Patch{}.*(parameter.member);
+            return true;
+        }
+    }
+    return false;
+}
 } // namespace ceres

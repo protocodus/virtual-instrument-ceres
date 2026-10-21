@@ -1,0 +1,109 @@
+{
+  "parent": "0f1d00f096f968cf4ca027304123e28cf0f9aaf9",
+  "compiler": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "command": [
+    "c++",
+    "-std=c++17",
+    "-O2",
+    "-DNDEBUG",
+    "<target flags>",
+    "-I",
+    "<core>",
+    "Tests/<driver>.cpp",
+    "<core>/ceres.cpp",
+    "-o",
+    "<binary>"
+  ],
+  "target_flags": {
+    "native": [],
+    "embedded": [
+      "-DCERES_EMBEDDED_TARGET=1",
+      "-fno-exceptions"
+    ]
+  },
+  "streams": {
+    "native/ParityDriver/default": {
+      "float32_samples": 384000,
+      "sha256": "b55c691a33c96f7c7b3b2582ea17031eeb816a42dffdf607fd1e6d4b5acef8ce"
+    },
+    "native/ParityDriver/neutral": {
+      "float32_samples": 384000,
+      "sha256": "bc246a9b9d4a5b60876586cfcf44a1241c7b5b7d3d357462251c68730af38366"
+    },
+    "native/ParityDriver/capacitors": {
+      "float32_samples": 384000,
+      "sha256": "92b0331cf91ca7533b595d311f920acea884dd4927951be8d165a9baaade124d"
+    },
+    "native/ParityDriver/expression": {
+      "float32_samples": 384000,
+      "sha256": "26cf5aabfa5d107ff1bffd3d8d3a502f85c83c4478252031a10b2b6b3eb317b3"
+    },
+    "native/ParityDriver/boards": {
+      "float32_samples": 384000,
+      "sha256": "2cbb03f7e1955f0fb18810a4ad41c3f8dd7a7a38ee38fd6b8007a64caca86844"
+    },
+    "native/ParityDriver/identical-boards": {
+      "float32_samples": 384000,
+      "sha256": "e04f4c9324a7955b959fb3b162fe255fb3aa6277084c63f0bb5c9a71a1c07e67"
+    },
+    "native/ParityDriver/soundpath": {
+      "float32_samples": 384000,
+      "sha256": "746ec2137e680fc0d774b93b1370f87794f36e0afe9834ebaabb1a49486a9d7a"
+    },
+    "native/ParityDriver/ring-bypass": {
+      "float32_samples": 384000,
+      "sha256": "1f1086c9135c8464469098d0f747c3514da42e2080397e88196a0339839dc10c"
+    },
+    "native/ConfigurationParityDriver/default": {
+      "float32_samples": 184320,
+      "sha256": "dff6170679525066730cde5bab183cc29706f91da70381db156327b9f3b54fc3"
+    },
+    "embedded/ParityDriver/default": {
+      "float32_samples": 384000,
+      "sha256": "b55c691a33c96f7c7b3b2582ea17031eeb816a42dffdf607fd1e6d4b5acef8ce"
+    },
+    "embedded/ParityDriver/neutral": {
+      "float32_samples": 384000,
+      "sha256": "bc246a9b9d4a5b60876586cfcf44a1241c7b5b7d3d357462251c68730af38366"
+    },
+    "embedded/ParityDriver/capacitors": {
+      "float32_samples": 384000,
+      "sha256": "92b0331cf91ca7533b595d311f920acea884dd4927951be8d165a9baaade124d"
+    },
+    "embedded/ParityDriver/expression": {
+      "float32_samples": 384000,
+      "sha256": "26cf5aabfa5d107ff1bffd3d8d3a502f85c83c4478252031a10b2b6b3eb317b3"
+    },
+    "embedded/ParityDriver/boards": {
+      "float32_samples": 384000,
+      "sha256": "2cbb03f7e1955f0fb18810a4ad41c3f8dd7a7a38ee38fd6b8007a64caca86844"
+    },
+    "embedded/ParityDriver/identical-boards": {
+      "float32_samples": 384000,
+      "sha256": "e04f4c9324a7955b959fb3b162fe255fb3aa6277084c63f0bb5c9a71a1c07e67"
+    },
+    "embedded/ParityDriver/soundpath": {
+      "float32_samples": 384000,
+      "sha256": "746ec2137e680fc0d774b93b1370f87794f36e0afe9834ebaabb1a49486a9d7a"
+    },
+    "embedded/ParityDriver/ring-bypass": {
+      "float32_samples": 384000,
+      "sha256": "1f1086c9135c8464469098d0f747c3514da42e2080397e88196a0339839dc10c"
+    },
+    "embedded/ConfigurationParityDriver/default": {
+      "float32_samples": 184320,
+      "sha256": "dff6170679525066730cde5bab183cc29706f91da70381db156327b9f3b54fc3"
+    }
+  },
+  "sources": {
+    "parent": {
+      "ceres.cpp": "d6dce79f5c26f34780c45accb9e6281ed440bd756ac227975d80534547dbe7c3",
+      "ceres.hpp": "bed20680dfea33f1bfae3993afeb11e878bce4bf1988b5a9a922c70eaab418b9"
+    },
+    "candidate": {
+      "ceres.cpp": "b7834219becb903f6efc4e55baf584177ddb8d938532bb2d8ea1d0f30e75935b",
+      "ceres.hpp": "e0bd59bc569a674159f2a971cb01e73efc14d42ad27029308dfeadc74fce2714"
+    }
+  },
+  "status": "pass"
+}
