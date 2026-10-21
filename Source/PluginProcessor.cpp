@@ -206,6 +206,9 @@ CeresAudioProcessor::CeresAudioProcessor()
     // A new instance opens on the first program, Init.
     setCurrentProgram (0);
     readControls (true);
+    // Every oversampling factor at every rate has the same 31-sample group
+    // delay, so a host may read it before the first prepareToPlay.
+    setLatencySamples (static_cast<int> (ceres::Synth::outputLatency));
 }
 
 CeresAudioProcessor::~CeresAudioProcessor() = default;
@@ -325,8 +328,6 @@ void CeresAudioProcessor::prepareToPlay (double sampleRate, int)
 {
     readControls (true);
     startEngine (sampleRate);
-    // Every oversampling factor has the same 31-sample group delay.
-    setLatencySamples (static_cast<int> (ceres::Synth::outputLatency));
 }
 
 void CeresAudioProcessor::startEngine (double sampleRate)
@@ -586,12 +587,13 @@ double CeresAudioProcessor::getTailLengthSeconds() const
     // ln (1 + 10.2 / 0.18) / ln (1000) = 0.587 of the release T60, and the EG
     // time trims (+/-5 % at the 4 ms and 125 ms attack trims, extrapolated in
     // log time over the whole 0.1 ms to 30 s range) stretch that by at most
-    // 1.22, to 0.72 T60. The slowest coupling capacitor sounding after that,
-    // the bus (4.7 uF into 189 kohm, tau 0.888 s), falls 60 dB in
-    // ln (1000) tau = 6.14 s. Both figures are rounded up below.
+    // 1.22, to 0.72 T60 (0.73 below). After that the bus coupling
+    // capacitor still discharges, falling 60 dB in ln (1000) of its 0.888 s
+    // time constant, 6.14 s.
     const auto seconds = [] (const std::atomic<float>* value)
     { return value != nullptr ? static_cast<double> (value->load()) : 30.0; };
-    return 0.73 * std::max (seconds (ampReleaseValue), seconds (globalReleaseValue)) + 6.2;
+    return 0.73 * std::max (seconds (ampReleaseValue), seconds (globalReleaseValue))
+         + kBusCouplingSeconds * std::log (1000.0);
 }
 
 void CeresAudioProcessor::setCurrentProgram (int index)

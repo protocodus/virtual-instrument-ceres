@@ -32,6 +32,11 @@ public:
     static constexpr std::uint64_t kSeed = 20261017u;
     // MIDI pitch bend reaches the engine as +/-2 semitones, as in the demos.
     static constexpr double kBendSemitones = 2.0;
+    // The circuit's slowest coupling time constant, the output bus: the four
+    // voice branches' 4.7 uF and 1k into the PRA's 47k load, 4.7 uF x (1k +
+    // 4 x 47k) (outputCouplingTau in ceres.cpp). After a release it is what
+    // still sounds longest.
+    static constexpr double kBusCouplingSeconds = 4.7e-6 * (1.0e3 + 4 * 47.0e3);
 
     CeresAudioProcessor();
     ~CeresAudioProcessor() override;

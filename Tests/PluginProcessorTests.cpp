@@ -496,6 +496,8 @@ void renderContract()
         setEngineValue (p, "pressure_vibrato", 30.0);
     };
     CeresAudioProcessor whole;
+    check (whole.getLatencySamples() == static_cast<int> (ceres::Synth::outputLatency),
+           "a new instance already reports the engine's 31 samples of latency");
     configure (whole);
     prepare (whole, 512);
     check (whole.getLatencySamples() == static_cast<int> (ceres::Synth::outputLatency), "latency is the engine's 31 samples");
