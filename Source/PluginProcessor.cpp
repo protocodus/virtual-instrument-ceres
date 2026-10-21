@@ -18,7 +18,7 @@ using ceres_plugin::Unit;
 // 1 was the silent scaffold's empty chunk; 2 holds every parameter.
 constexpr int kStateVersion = 2;
 const juce::Identifier kStateType { "Ceres" }, kStateVersionProperty { "stateVersion" },
-    kProgramProperty { "program" }, kPluginVersionProperty { "pluginVersion" };
+    kProgramProperty { "program" }, kPluginVersionProperty { "pluginVersion" }, kUnitProperty { "unit" };
 
 // "string1" -> "String 1", "electric_piano" -> "Electric Piano".
 juce::String programName (const std::string& key)
@@ -182,7 +182,8 @@ CeresAudioProcessor::CeresAudioProcessor()
     : AudioProcessor (BusesProperties()
                           .withInput ("EXT IN", juce::AudioChannelSet::mono(), false)
                           .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
-      parameters (*this, nullptr, kStateType, createLayout())
+      parameters (*this, nullptr, kStateType, createLayout()),
+      unit (static_cast<std::uint64_t> (juce::Random().nextInt64()))
 {
     for (std::size_t i = 0; i < ceres::parameterCount(); ++i)
     {
@@ -337,7 +338,7 @@ void CeresAudioProcessor::startEngine (double sampleRate)
     unsupportedRate = false;
     try
     {
-        engine = std::make_unique<ceres::Synth> (sampleRate, kSeed);
+        engine = std::make_unique<ceres::Synth> (sampleRate, unit);
     }
     catch (const std::invalid_argument&)
     {
@@ -627,6 +628,7 @@ void CeresAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     state.setProperty (kStateVersionProperty, kStateVersion, nullptr);
     state.setProperty (kProgramProperty, currentProgram.load(), nullptr);
     state.setProperty (kPluginVersionProperty, JucePlugin_VersionString, nullptr);
+    state.setProperty (kUnitProperty, static_cast<juce::int64> (unit), nullptr);
     if (const auto xml = state.createXml())
         copyXmlToBinary (*xml, destData);
 }
@@ -660,6 +662,22 @@ void CeresAudioProcessor::setStateInformation (const void* data, int sizeInBytes
             }
     currentProgram = juce::jlimit (0, getNumPrograms() - 1, static_cast<int> (state.getProperty (kProgramProperty, 0)));
     parameters.replaceState (state);
+
+    const auto saved = state.hasProperty (kUnitProperty)
+                           ? static_cast<std::uint64_t> (static_cast<juce::int64> (state.getProperty (kUnitProperty)))
+                           : kFixedUnit;
+    if (saved == unit)
+        return;
+    unit = saved;
+    if (engine == nullptr)
+        return; // prepareToPlay builds the unit
+    // A running engine is rebuilt as the saved unit off the audio thread and
+    // swapped in; the one it replaces is freed after the lock is released.
+    auto rebuilt = std::make_unique<ceres::Synth> (engine->sampleRate(), unit);
+    const juce::ScopedLock lock (getCallbackLock());
+    std::swap (engine, rebuilt);
+    readControls (false);
+    restartEngine();
 }
 
 juce::AudioProcessorEditor* CeresAudioProcessor::createEditor()

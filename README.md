@@ -6,7 +6,7 @@ Ceres is a sample-free Yamaha CS-50 research synthesizer: a reusable C++17 circu
 
 ## Audio demos
 
-The CI-generated demos below play the **circuit engine's 14 research presets**, including Init, without preset edits, gain normalization or external audio. These are also the plug-in's factory programs: the demos drive `ceres::Synth` directly, with the seed every plug-in instance uses, rather than the plug-in's processor. The source phrases are original committed MIDI, not recovered hardware performances; names inherited from the research table do not establish calibrated Yamaha preset matches.
+The CI-generated demos below play the **circuit engine's 14 research presets**, including Init, without preset edits, gain normalization or external audio. These are also the plug-in's factory programs: the demos drive `ceres::Synth` directly, on the one fixed unit every plug-in instance was before 0.6.4 (seed 20261017), rather than the plug-in's processor. The source phrases are original committed MIDI, not recovered hardware performances; names inherited from the research table do not establish calibrated Yamaha preset matches.
 
 <!-- audio-demos-begin -->
 
@@ -30,6 +30,10 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 <!-- audio-demos-end -->
 
 ## Version history
+
+### Unreleased — 0.6.4 — every instance is its own unit
+
+- Each new plug-in instance is now a different CS-50: it draws its own random unit, so its four boards' pitch, filter, envelope and VCA offsets, oscillator phases and noise differ from every other instance's, within the same service tolerances. A saved session or preset state reopens as the unit it was saved with; a state saved by an earlier version opens as the one fixed unit every instance used to be. The demos keep that fixed unit, so a program sounds like its demo but not sample for sample. The owner asked for this; it was not chosen by ear.
 
 ### Unreleased — 0.6.3 — the boards part away from their trim point
 
@@ -252,7 +256,7 @@ MIDI events take effect at their own sample, on any channel. Velocity reaches `n
 
 The output is mono, on both channels of a stereo output. An optional **EXT IN** input bus, off by default, feeds the rear EXT IN jack through `Synth::externalInput()` on every frame, unscaled (one unit is 1.5 V/101 at the jack), from its first channel if the host gives it two; disabled or absent, the jack reads silence. FUNCTION EXT (`lfo_waveform` 5) and `ext_level` decide what it does. VST3 offers it as an auxiliary (sidechain) input, CLAP as a non-main input port and AU as an input bus, which the wrapper fills with silence when nothing is connected. The Standalone keeps it off, so it never opens an audio input.
 
-The factory programs are the 14 research presets, Init first and the one a new instance opens on. Choosing one sets every engine key except `expression`, `ext_level` and `output_trim_db`, which stay where the player or host set them. Parameters hold floats, so a program's values match its preset to float precision. Every instance is the same unit: one fixed seed sets each board's tolerances, oscillator phases and noise, the seed the README demos use, so a program plays the instrument its demo plays. The saved state is the parameter tree with a format version, the current program and the plug-in version. A parameter the state does not mention takes its default, and a state saved by the earlier silent scaffold opens as a new instance.
+The factory programs are the 14 research presets, Init first and the one a new instance opens on. Choosing one sets every engine key except `expression`, `ext_level` and `output_trim_db`, which stay where the player or host set them. Parameters hold floats, so a program's values match its preset to float precision. Each instance is its own unit: a new instance draws the engine seed at random, which sets each board's tolerances, oscillator phases and noise, so a program sounds like its demo but not sample for sample. The saved state is the parameter tree with a format version, the current program, the plug-in version and the unit, so a saved session reopens as the same unit; restoring a different unit while the engine runs rebuilds it, which silences what was sounding. A state saved before 0.6.4 names no unit and opens as the fixed one every earlier instance was, the demos' seed 20261017. A parameter the state does not mention takes its default, and a state saved by the earlier silent scaffold opens as a new instance and keeps the instance's unit.
 
 The editor (1080×750) is laid out like the CS-50 panel: the tone-selector tablets, then the VCO, VCF and VCA levers, PITCH, RING MODULATOR, TONE, TRANSPOSITION, TOUCH RESPONSE and VOLUME, then SUB-OSCILLATOR, SUSTAIN, PORTAMENTO / GLISSANDO, the rear panel and the plug-in settings, with the engine calibration controls as knobs along the bottom. Its sections come from the processor's parameter groups, so it shows exactly the parameters the host sees.
 
@@ -260,7 +264,7 @@ The editor (1080×750) is laid out like the CS-50 panel: the tone-selector table
 ## Known gaps
 
 - No host has yet exercised the plug-in's EXT IN as a sidechain input, and the AU's handling of it is untested. The factory programs are research presets from the circuit study, not calibrated Yamaha voices.
-- Every plug-in instance is the same unit, with one fixed seed; there is no per-instance board variation. Sixteen voices at 4× can need more than a whole CPU core at 48 kHz; `voice_count` and `oversampling` trade CPU for polyphony and alias rejection.
+- A unit can be neither seen nor chosen; only a saved state brings one back. Sixteen voices at 4× can need more than a whole CPU core at 48 kHz; `voice_count` and `oversampling` trade CPU for polyphony and alias rejection.
 - Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. The ring envelope's alignment voltage and the output level meter's load come from the CS-80's procedure for the same circuits; no CS-50 document states them. The RESONANCE controls' 1.1 s lag assumes the filter chip's resonance pin draws no current, which the CS-30's board for the same chip argues against; a low-impedance pin would make it tens of milliseconds. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
 - EXT IN's host-rate signal is interpolated linearly inside the oversampled engine; the op-amp swings are datasheet typicals, and the EXT preamp's bandwidth and slew rate are not modelled. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.

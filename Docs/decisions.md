@@ -239,3 +239,20 @@ setting was listed as a gap then, for want of the cutoff's volts.
   set. A labelled before/after preview, not a blind test, is at
   `/mnt/project-files/ceres/listening/2026-10-21-board-static-cutoff-preview/`
   (not committed).
+
+## 2026-10-21: every plug-in instance is its own unit
+
+Not a listening choice: the owner asked for it ("you can randomize within a
+tolerance on every start"), closing the gap that every plug-in instance was
+the same unit.
+
+- **Decided:** which unit a plug-in instance is.
+- **Before:** every instance was seed 20261017, the README demos' unit.
+- **Result:** a new instance draws its seed at random (Ceres 0.6.4). The seed
+  only picks where each board falls; the tolerances and their amounts bound
+  the offsets as before. The saved state keeps the unit, so a saved session
+  reopens as the same unit, and a state that names none, saved before 0.6.4,
+  opens as seed 20261017. The demos and the parameter-extremes matrix keep
+  that fixed unit. Keeping the unit when a session reopens is the reading
+  recommended to the owner, who was asked to choose between it and a new
+  unit on every load.
