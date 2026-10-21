@@ -17,8 +17,11 @@ void near(double a,double b,double tolerance,const char* why) {
     }
 }
 // HA1452 Icc 12mA through the 390/220 ohm droppers from +/-15V, less the
-// NJM4558 sibling's typical 2V swing margin into 2k: HO +8.32V, -10.36V.
-constexpr double hoPositive=15-.012*390-2, hoNegative=-(15-.012*220-2);
+// NJM4558 sibling's typical 2V swing margin into 2k: the op-amp clips at
+// +8.32V and -10.36V, and HO, 560 ohm on into the CS-80 procedure's 10k
+// bench load (CS-80 printed p.29), reads 10/10.56 of that.
+constexpr double hoShare=10e3/(10e3+560);
+constexpr double hoPositive=(15-.012*390-2)*hoShare, hoNegative=-(15-.012*220-2)*hoShare;
 // Four sine-only voices (CP4 1Vpp, engine +/-1 peak) at full LEVEL, .18 at
 // full VOLUME, read 0 dBm (sqrt(.6) V RMS) at HO. Full SUSTAIN holds the
 // aligned VCA EG at 9.8V of its 10V peak (TP2 floor -0.2V), so .98 of each
@@ -47,16 +50,16 @@ void preampTransfer() {
     near(shapedMeanSquare(),closedMeanSquare,1e-13,"Shaped sine mean square: quadrature agrees with the closed form");
     // The engine node is HO inverted, so HO's positive limit bounds it below.
     const double high=-hoNegative*perVolt, low=-hoPositive*perVolt;
-    near(high,3.2324166750544396,1e-12,"Upper rail from the printed droppers");
-    near(low,-2.5959176386537592,1e-12,"Lower rail from the printed droppers");
+    near(high,3.2324166750544396*hoShare,1e-12,"Upper rail from the printed droppers, 10k bench load");
+    near(low,-2.5959176386537592*hoShare,1e-12,"Lower rail from the printed droppers, 10k bench load");
     for(double volume:{0.,.1,.55,1.})
         for(double x:{-20.,-3.,-.7,0.,.3,2.,9.}) {
             const double linear=x*.18*volume;
             near(ceres::outputPreampResponse(x,volume),std::clamp(linear,low,high),1e-15,
                  "Linear inverting preamp, hard-limited at the op-amp rails");
         }
-    // Four reference sines peaking together still leave 3.6dB to the rail.
-    require(20*std::log10(-low/(.18*4))>3.5,"Rails sit above the four-sine coherent peak");
+    // Four reference sines peaking together still leave 10.7dB to the rail.
+    require(20*std::log10(-low/(.18*4))>10.5,"Rails sit above the four-sine coherent peak");
     // Cross-check (CS-60 VI.4, CS-50 O = 0.6V for .8Vpp at CP4): the bus is
     // four 1k branches into 47k, so the reference needs VR6 inside its range.
     const double busRms=std::sqrt(4.)*(.5*.6/.8/std::sqrt(2.))*(1/1e3)/(4/1e3+1/47e3);

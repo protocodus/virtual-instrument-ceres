@@ -110,7 +110,7 @@ limiter; `output_trim_db` is the place to set a host level.
 | IC5 control feedthrough | IC5 has no offset trim, so SUB tremolo could reach CP5 as a DC-coupled signal into IC6 | a measurement of CP5 with a 0 V input and swinging LC |
 | LP1/LP2/LC control RC | 100 kΩ/0.01 µF at LI is a 1 ms lever smoothing only if LI is high-impedance | LI input impedance |
 | HA1452 swing and Icc | rails ±1 V either way | Hitachi HA1452 data sheet |
-| HO load during the VR6 trim | rails move 5.7 dB between unloaded and 600 Ω | the load Yamaha's service bench used, or a measured CS-50 HO clip level |
+| HO load during the VR6 trim | rails move 5.7 dB between unloaded and 600 Ω | **Narrowed 2026-10-21:** the CS-80 procedure reads into 10 kΩ (addendum); a CS-50 bench load or a measured CS-50 HO clip level would close it |
 | CP5 level (VI.3) | the CS-60 figure for IC5's trim is not printed; only the product CP4→O (0.75) is | the missing VI.3 figure |
 
 ## Listening
@@ -121,3 +121,30 @@ limiter; `output_trim_db` is the place to set a host level.
 candidates differ only in the load behind the 0 dBm anchor, which no source
 prints. The branch ships the unloaded reading (the service procedure reads a
 terminal); no by-ear verdict is claimed yet.
+
+## Addendum, 2026-10-21: the meter's load
+
+The owner allowed sibling evidence where the CS-50's own documents are
+silent. The CS-80 Adjustment Procedure's OUTPUT AMPLIFIER step (printed p.29)
+names what the CS-50 guide and the CS-60 sheet leave out: the output jack is
+read on an AC voltmeter into a 10 kΩ load, 0.78 V RMS (0 ± 3 dB), with the
+sine lever, SUSTAIN and LEVEL at 10, VCF LEVEL 0, HIGH output and eight keys
+down (VR6–VR8 on its PRA board).
+
+- **RMS.** Yamaha's bench reads this level on an AC voltmeter, RMS on a
+  sine, as the anchor above assumes; the sibling procedure gives no support
+  to a peak-to-peak reading of the guide's "0 dBm p-p".
+- **10 kΩ, not open and not 600 Ω.** HO leaves the 33 µF node through
+  560 Ω, so with 10 kΩ on HO the op-amp sits 10.56/10 (+0.47 dB) above the
+  HO reading. The engine now plays HO into that load: the rails are
+  **+3.06 and −2.46** in the engine node (were +3.23 and −2.60; HO clips at
+  +7.88 and −9.81 V), and four reference sines peaking together sit 10.7 dB
+  below the nearer rail. Reading into 600 Ω would put the rails 5.3 dB lower
+  again, so the 600 Ω candidate (C) is excluded.
+- **Coupling.** The final 33 µF now sees LO's 5.26k beside HO's 10.56k,
+  3.51k in all: its corner moves from 0.92 Hz to 1.37 Hz.
+
+Still assumed: the CS-50 was trimmed on the CS-80's bench load (its guide
+prints only "0 dBm" at HO); the four notes add incoherently; the HA1452
+draws its typical 12 mA. `Ceres.output_stage_contracts` holds the loaded
+rails and the coupling. The decision is recorded in `Docs/decisions.md`.

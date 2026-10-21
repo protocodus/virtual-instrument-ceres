@@ -170,3 +170,16 @@ the portfolio masters in `reason-rack-extensions/Tools/portfolio/`. Change
 them there, never here. Ceres's own parts are `Tools/RenderPresetDemos.cpp`
 (the preset list and demo voice) and `Tests/ParameterMatrixTests.cpp` (the
 limits Ceres's design implies).
+
+## Sibling evidence (owner decision, 2026-10-21)
+
+Where no CS-50 document or measured unit settles a value, the CS-80, CS-60
+and CS-30 service documents are acceptable evidence for a circuit or chip the
+CS-50 shares: the same board, the same custom IC, or a schematic that matches
+part for part. Check that match before borrowing, cite the sibling document
+and page beside the value in the code, and call it sibling evidence in the
+documents, never a CS-50 measurement. A sibling procedure that states a
+condition the CS-50's documents leave out decides between readings; under the
+A–Z limit it overrides an earlier by-ear choice of a reading it rejects, and
+`Docs/decisions.md` records that. Reviews and forum posts can corroborate a
+value; they do not ground one.

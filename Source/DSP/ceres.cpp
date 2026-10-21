@@ -198,8 +198,8 @@ double ringSpeedHz(double vc1Volts) {
     return ringSpeedReferenceHz*std::exp2(ringSpeedOctavesPerVolt*(vc1Volts-5));
 }
 // PRA envelope lever laws: the IG00159 pin-sheet times scaled by the PRA's
-// 31ms alignment (sources, the slope assumption and the by-ear choice are
-// beside the declarations in ceres.hpp).
+// 31ms alignment at AT=5V (sources and the slope assumption are beside the
+// declarations in ceres.hpp).
 double ringAttackSeconds(double atVolts) {
     return ringEnvelopeTrim*std::pow(10.,-.3*atVolts);
 }
@@ -716,12 +716,15 @@ struct FilterChain {
 // approximations. CP3 precedes filtered level; CP4 precedes the common VCA.
 // All four low-Z 4.7uF/1k voice branches stay connected to the 47k PRA load,
 // including silent voices. Their common bus transfer has one equivalent
-// state, independent of voice allocation. The final 33uF section assumes an
-// unloaded HIGH output (4.7k+560ohm internal load). Expression assumes an
-// ideal fully conducting CdS. No external recording-chain pole is included.
+// state, independent of voice allocation. The final 33uF section drives
+// the LO divider (4.7k+560ohm) and HO through 560ohm into the 10k load the
+// CS-80's level trim names (see outputPreamp). Expression assumes an ideal
+// fully conducting CdS. No external recording-chain pole is included.
 // Capacitor integration uses physical-RC trapezoids without pole prewarp.
+constexpr double outputBenchLoad=10e3, outputSeriesResistance=560;
+constexpr double outputLineLoad=1/(1/(4.7e3+560)+1/(outputSeriesResistance+outputBenchLoad));
 constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
-    4.7e-6*(1e3+4*47e3),33e-6*(4.7e3+560)};
+    4.7e-6*(1e3+4*47e3),33e-6*outputLineLoad};
 // WSC sine shaper, IG00158 STI (pin 15) -> pin 2. Its transfer is not
 // published and no measurement isolates it. The shipping shaper is the
 // textbook bipolar-IC triangle-to-sine converter, an undegenerated
@@ -783,20 +786,29 @@ static_assert(wscFourSineRms*wscFourSineRms-4*wscSineMeanSquare<1e-15 &&
 // Cross-check: VI.4 sets each CS-50 voice output O to 0.6V with .8Vpp at
 // CP4, and four 1Vpp sines through 0.75 and the four 1k/47k bus branches
 // are .132V RMS on the bus, so VR6 must give 5.9 of its 1.02..7.82 range.
-// What is assumed: the meter reads RMS at an unloaded HO terminal (into
-// 600 ohm both rails would sit 5.7dB lower) and the four notes add
-// incoherently. The keys are held at full SUSTAIN, where the aligned VCA EG
-// sits 0.2V below its 10V peak (see ampEnvelopeFloor), so the common VCA
-// passes .98 of each sine while VR6 is trimmed.
+// The meter and its load: the CS-80's output-amplifier step (sibling
+// evidence, CS-80 Adjustment Procedure printed p.29) reads the output jack
+// on an AC voltmeter into a 10k load, .78V RMS (0 +/-3dB). So 0 dBm is
+// .775V RMS into 10k. HO leaves the op-amp's 33uF node through 560 ohm (SM2
+// p.22), so with 10k on HO the op-amp sits 10.56/10 (+.47dB) above the HO
+// reading, and the engine plays HO into that load. Still assumed: the CS-50
+// was trimmed on the CS-80's bench load (its guide and the CS-60 sheet name
+// none; read unloaded the rails sit .47dB higher, into 600 ohm 5.3dB lower)
+// and the four notes add incoherently. The keys are held at full SUSTAIN,
+// where the aligned VCA EG sits 0.2V below its 10V peak (see
+// ampEnvelopeFloor), so the common VCA passes .98 of each sine while VR6 is
+// trimmed.
 constexpr double outputPreampGain=.18;
 constexpr double outputReferenceRms=outputPreampGain*wscFourSineRms*.98;
 constexpr double outputReferenceVolts=.7745966692414834; // 0 dBm, sqrt(.6)
 constexpr double outputHaSupplyCurrent=12e-3, outputSwingMargin=2;
+// HO per volt at the op-amp with the bench load on HO.
+constexpr double outputLoadedShare=outputBenchLoad/(outputBenchLoad+outputSeriesResistance);
 // HO is the inverse of this node, so HO's +8.32V bounds it below.
 constexpr double outputRailHigh=(15-outputHaSupplyCurrent*220-outputSwingMargin)
-    *outputReferenceRms/outputReferenceVolts;
+    *outputLoadedShare*outputReferenceRms/outputReferenceVolts;
 constexpr double outputRailLow=-(15-outputHaSupplyCurrent*390-outputSwingMargin)
-    *outputReferenceRms/outputReferenceVolts;
+    *outputLoadedShare*outputReferenceRms/outputReferenceVolts;
 double outputPreamp(double volts,double volume) {
     return clamp(volts*outputPreampGain*volume,outputRailLow,outputRailHigh);
 }
@@ -1924,8 +1936,8 @@ struct Synth::Impl {
         // the path this engine was calibrated on, so it stays a bare wire.
         const double expressed=patch.expression>=1 ? ringed : expression.process(ringed);
         const double rail=outputPreamp(expressed,patch.volume);
-        // Unloaded HIGH output 33uF/5260ohm and documented inverting preamp.
-        // No recording EQ.
+        // HIGH output, 33uF into its LO divider and the 10k-loaded HO, after
+        // the documented inverting preamp. No recording EQ.
         return -lineCoupling.process(rail,outputCouplingTau[3],internalFs);
     }
 };

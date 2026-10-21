@@ -168,20 +168,22 @@ void leverLaws(){
     // VC2 through 180k against VC1's 100k into the same node; EO peak 10V.
     near(ceres::ringDepthOctavesPerLever,std::log2(30.)/5*100/180*10,1e-14,"Full DEPTH lever at EG peak");
     require(ceres::ringDepthOctavesPerLever>5.45&&ceres::ringDepthOctavesPerLever<5.46,"5.45 octaves");
-    // ATTACK/DECAY TIME: CS-60 PRA alignment I, 31ms to the EO peak at
-    // AT=DT=10V; the M-board alignment's printed points (4ms at 8V, 125ms at
-    // 3V, CS-60 manual p.38) scaled by that 31x must hold to their 1%.
-    near(ceres::ringAttackSeconds(10),.031,1e-15,"PRA attack aligned at 31ms, AT=10V");
-    near(ceres::ringAttackSeconds(0),31,1e-12,"Three decades to 31s at 0V");
+    // ATTACK/DECAY TIME: the PRA trim, 31ms from key-on to the EO peak with
+    // ATTACK TIME at +5.0V (CS-80 procedure printed p.19, VR10; the same
+    // circuit as this board's VR2). The pin sheet's 1ms..1s attack over
+    // 10..0V puts 31.6ms there, so the M board's own trim points (4ms at 8V,
+    // 125ms at 3V, CS-60 manual p.38; +/-5% on the CS-80) hold to that band.
+    near(ceres::ringAttackSeconds(5),.031,1e-15,"PRA attack aligned at 31ms, AT=5V");
+    near(ceres::ringAttackSeconds(10),.031*std::pow(10.,-1.5),1e-15,"Three half-decades faster at 10V");
+    near(ceres::ringAttackSeconds(0),.031*std::pow(10.,1.5),1e-14,"Three half-decades slower at 0V");
     for(const auto& point:{std::pair<double,double>{8,.004},{3,.125}})
-        require(std::abs(ceres::ringAttackSeconds(point.first)/(31*point.second)-1)<.01,
-                "M-board aligned attack points, 31 times slower");
+        require(std::abs(ceres::ringAttackSeconds(point.first)/point.second-1)<.05,
+                "M-board attack trim points hold within their +/-5%");
     for(double v=0;v<=10;v+=.5)
         near(ceres::ringDecaySeconds(v)/ceres::ringAttackSeconds(v),10*std::log(1000.)/5,1e-13,
              "Decay is ten attack durations, as five-RC T60");
-    near(ceres::ringDecaySeconds(10),.031*10*std::log(1000.)/5,1e-15,"Shortest decay .428s T60");
     near(ceres::ringReleaseVolts,15*3300./10100,1e-15,"2DT divider 4.901V");
-    near(ceres::ringDecaySeconds(ceres::ringReleaseVolts),14.502123632169237,1e-12,"Fixed release 14.50s T60");
+    near(ceres::ringDecaySeconds(ceres::ringReleaseVolts),.45859741587008707,1e-14,"Fixed release .459s T60");
 }
 void invalidProbe(){
     for(double rate:{0.,std::numeric_limits<double>::quiet_NaN(),1600000.}){

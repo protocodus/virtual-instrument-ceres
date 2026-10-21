@@ -2,8 +2,9 @@
 
 Directions chosen by ear, or taken on the owner's word without a listen,
 recorded per the A–Z listening-test convention in the repository's
-`CLAUDE.md`. Each entry says which: a choice made by ear is recorded as made
-by ear, and an unheard one as unheard.
+`CLAUDE.md`, and the source readings that later superseded or refined them.
+Each entry says which: a choice made by ear is recorded as made by ear, an
+unheard one as unheard, and one a source settled as settled by that source.
 
 ## 2026-10-20: the owner chose B in every open set
 
@@ -44,6 +45,11 @@ not committed, and each `key.md` held the rendering details summarised here.
   presets also solve their filter rows under the R7 load, a schematic
   correction made after this set was rendered, which the set did not contain
   ([VCF research](research/vcf-authenticity-2026-10-20.md)).
+- **Supported 2026-10-21:** the CS-30's VCF alignment moves its low-pass
+  peak 0.96 octave per volt of the CUT OFF lever, ahead of the same kind of
+  39k and rank-resistor network, with one octave per volt inside its
+  tolerance ([sibling evidence](research/sibling-evidence-2026-10-21.md)).
+  The choice stays one made by ear; the sibling supports its reading.
 
 ### VCF cutoff zero point (`2026-10-20-vcf-cutoff-zero-point`)
 
@@ -119,6 +125,8 @@ not committed, and each `key.md` held the rendering details summarised here.
 - **Licensed:** the PRA-aligned law for the release and for the ring
   ATTACK TIME and DECAY TIME levers. It assumes the PRA's fixed 100k gives
   the M board's 0.3 decade/V slope.
+- **Superseded 2026-10-21** by the CS-80 procedure, which states the
+  alignment voltage (below).
 
 ### Output rail anchor (`2026-10-20-vca-output-rail`)
 
@@ -130,6 +138,8 @@ not committed, and each `key.md` held the rendering details summarised here.
   600 Ω, rails 5.7 dB lower.
 - **Chosen:** B.
 - **Licensed:** the unloaded reading, which Ceres already shipped in 0.5.0.
+- **Refined 2026-10-21** by the CS-80 procedure, which names the meter's
+  load (below).
 
 ## 2026-10-21: the owner took every pending candidate, unheard
 
@@ -163,3 +173,45 @@ sources.
   strong, A's 5th 1–11 dB too weak), the proposal was to keep B. The owner
   took it with the same instruction, without a new listen. The shaper stays
   as recorded above: chosen by ear, unmeasured.
+
+## 2026-10-21: a sibling procedure settles two readings
+
+The owner allowed evidence from sister instruments where the CS-50's own
+documents are silent ("you can also explore sister synths (cs60 etc) if
+original unit is unavailable"). The CS-80 Adjustment Procedure trims the same
+PRA ring envelope circuit, and its output-level step names the meter and load
+Yamaha's bench used: two conditions the CS-50 and CS-60 documents leave out.
+Nothing below was chosen by ear; the source decides both, as sibling
+evidence.
+
+### Ring release, re-read (`2026-10-20-ring-release`)
+
+- **Decided earlier, by ear:** B, the PRA law aligned to 31 ms at
+  AT = 10 V, 14.5 s T60.
+- **What the source says:** the CS-80 PRA is the same circuit (TC through
+  100k, VR10 B-100K through 100k, 0.22 µF), and its procedure trims VR10 for
+  31 ms ±5 % from key-on to the EO peak with ATTACK TIME set for +5.0 V on
+  the A terminal (printed p.19). The CS-60 sheet's "Alignment by 31mS" names
+  no voltage; 0.6.0 read it at the 10 V of the zeroing step drawn beside it.
+  At 5 V the M-board pin-sheet law already gives 31.6 ms, so the trim leaves
+  the PRA envelope on that law within 2 %.
+- **Result:** the release is 0.459 s T60, within 2 % of letter A (0.468 s).
+  B's reading is rejected by the source, and a by-ear choice cannot keep a
+  reading the sources reject (the limit in `CLAUDE.md`), so B is not
+  shipped. The owner's preference for the slower return is recorded here.
+  The ring ATTACK TIME and DECAY TIME lever laws move with it (attack about
+  1 ms–1 s, decay 13.5 ms–13.5 s T60); `ring_attack` and `ring_decay` are seconds and do not
+  change. The 0.3 decade/V slope stays an assumption, but at 0.1 V from the
+  trim point it moves the release by 2.2 % at most.
+
+### Output rail anchor, refined (`2026-10-20-vca-output-rail`)
+
+- **Decided earlier, by ear:** B, 0 dBm read at an unloaded HO terminal.
+- **What the source says:** the CS-80's output-amplifier step reads the
+  output jack on an AC voltmeter into a 10 kΩ load: 0.78 V RMS (0 ± 3 dB),
+  sine lever, SUSTAIN and LEVEL at 10 (printed p.29).
+- **Result:** HO drives 10 kΩ through its 560 Ω, so the rails sit 0.47 dB
+  below B's; C's 600 Ω would have been 5.3 dB lower still. This keeps B's
+  direction, a high-impedance RMS reading, and fixes its load. Still
+  assumed: that the CS-50 was trimmed on the same bench load, which neither
+  CS-50 source names.
