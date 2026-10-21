@@ -363,7 +363,7 @@ be an invented temperature.
 
 - `Ceres.board_tolerance_contracts` (Tests/BoardToleranceTests.cpp), every
   expected value rebuilt from the printed numbers:
-  - the defaults ship pitch, filter and envelope at 1 and the rest at 0,
+  - the defaults ship every amount at 1 and the temperature rise at 0,
     the factory presets keep them, the shipping boards differ, and zero
     amounts give identical boards;
   - every VCO trim point within +/-1 cent across 40 seeds x 4 boards, the
