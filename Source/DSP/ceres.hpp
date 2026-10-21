@@ -133,9 +133,12 @@ struct Patch {
     // Board-to-board tolerance of the four M boards, each 0..1 of the
     // documented spread; 0 keeps the boards identical. Pitch, filter and
     // envelope ship at 1 (owner's listening verdict B, 2026-10-20, set
-    // 2026-10-20-voice-variation-board-tolerance); envelope time, VCA and
-    // temperature stay 0 until a verdict. Each seed is one fixed instrument:
-    // its offsets never move while it plays.
+    // 2026-10-20-voice-variation-board-tolerance). Envelope time and VCA
+    // ship at 1 too: the owner took every candidate of set
+    // 2026-10-20-voice-variation-eg-time-vca without listening (2026-10-21).
+    // Temperature stays 0: a default would need an invented temperature.
+    // Each seed is one fixed instrument: its offsets never move while it
+    // plays.
     // Pitch: the residual the service tuning trims leave (+/-1 cent at each
     // trim point, Guide printed p.65). Filter: the IG00156 rank-bin residual
     // of each filter's control sensitivity (+/-.146 oct per octave of Vfc
@@ -149,7 +152,7 @@ struct Patch {
     // after them keep the filtered path's level and the 0 dBm reference.
     // See ceres.cpp.
     double boardPitchTolerance = 1.0, boardFilterTolerance = 1.0, boardEnvelopeTolerance = 1.0;
-    double boardEnvelopeTimeTolerance = 0.0, boardVcaTolerance = 0.0;
+    double boardEnvelopeTimeTolerance = 1.0, boardVcaTolerance = 1.0;
     // Ambient temperature change since the boards were tuned, in kelvin
     // (-25..25; 0 is as tuned). Each board's VCO drifts by its own amount
     // within the IG00153 temperature ranks one instrument may mix (Yamaha
