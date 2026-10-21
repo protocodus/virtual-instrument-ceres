@@ -57,14 +57,25 @@ public:
     Limits LimitsFor (const Case& c) const override
     {
         Limits limits;
-        // Automation ramps between the case and its base, so each limit takes
-        // whichever of the two asks more of it.
+        // Automation ramps between the case and its base, so the ceiling
+        // takes whichever of the two asks more of it.
         double trim = 0.0;
         for (const auto* row : { &c.values, &c.base })
             trim = std::max (trim, std::pow (10.0, value (*row, "output_trim_db") / 20.0));
         const auto* ceres = dynamic_cast<const CeresAudioProcessor*> (processor.get());
         const auto factor = static_cast<unsigned> (ceres != nullptr ? ceres->appliedOversampling() : 4);
-        limits.ceiling = static_cast<float> (outputBound (factor) * trim);
+        const double ceiling = outputBound (factor) * trim;
+        limits.ceiling = static_cast<float> (ceiling);
+
+        // The ramp has returned to the case's own values before note-off,
+        // so the tail is the one the processor reports for them: its VCA EG
+        // release, then the bus coupling capacitor falling 60 dB from full
+        // scale. Whatever the bus still holds can start as high as the
+        // ceiling, which takes that capacitor ln (ceiling) time constants
+        // more to bring down to full scale.
+        limits.releaseSeconds = processor->getTailLengthSeconds()
+                              + CeresAudioProcessor::kBusCouplingSeconds * std::log (std::max (1.0, ceiling));
+        limits.soundsWhileHeld = ! closesBeforeRamp (c);
         return limits;
     }
 
@@ -74,6 +85,23 @@ private:
         std::size_t index;
         juce::RangedAudioParameter* parameter;
     };
+
+    // A percussive patch falls silent while its keys are held, as the CS-50
+    // does: with the VCA EG's sustain level at zero in both rows, the ramp
+    // never raises it, and each board's EG decays from its peak towards its
+    // floor below zero and closes. From the attack peak that takes at most
+    // 0.73 of the decay T60, as the release does (getTailLengthSeconds), and
+    // the EG time trims stretch an attack this short by less than 1.22. When
+    // every board has closed before the ramp first moves the parameters
+    // (0.25 s; the chord's last notes start at 0.1 s), nothing reopens it
+    // before note-off.
+    bool closesBeforeRamp (const Case& c) const
+    {
+        if (value (c.values, "amp_sustain") > 0.0 || value (c.base, "amp_sustain") > 0.0)
+            return false;
+        constexpr double lastNoteOn = 0.1, rampStart = 0.25;
+        return 1.22 * value (c.values, "amp_attack") + 0.73 * value (c.values, "amp_decay") < rampStart - lastNoteOn;
+    }
 
     // A row's value of one parameter in its own units (a choice's index).
     double value (const std::vector<float>& row, const std::string& id) const
