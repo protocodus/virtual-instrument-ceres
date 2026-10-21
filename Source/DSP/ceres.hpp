@@ -42,13 +42,15 @@ struct Patch {
     double hpCutoff = 30.0, lpCutoff = 6000.0;
     double hpResonance = 0.0, lpResonance = 0.0, keyTrack = 1.0;
     // Actual loaded BR-bus voltage relative to the calibrated neutral, V.
-    // The 39k/(680k HP,220k LP) network uses provisional .7/.65 oct/V
-    // manual slopes; it is not the position/taper of the passive panel pot.
+    // Through 680k (HP) and 220k (LP) beside the levers' 39k it moves the
+    // cutoffs 39/680 and 39/220 octave per volt at the printed 1 oct/V lever
+    // law (ceres.cpp); it is not the position/taper of the passive panel pot.
     double brilliance = 0.0; // [-15,15]
     // Change of loaded RES-bus voltage around the existing effective Q
-    // calibration, V. Positive lowers Q. The signed [-10,10] engineering
-    // offset does not imply every value is reachable from an unknown real
-    // 0..10V wiper baseline. Stiff preset/source, zero chip input-current
+    // calibration, V. Positive lowers Q. Factory presets assume the
+    // RESONANCE lever at MIN (+10V), so from them the real 0..10V wiper
+    // reaches 0 to -10V; positive values have no lever position. Stiff
+    // preset/source, zero chip input-current
     // limit: each pin7 has 220k to each source and 10uF to ground, giving
     // deltaVq -> offset/2 with tau1.1s. This incremental control is
     // smoothed together with the independent hp/lp_resonance anchor terms;
@@ -56,7 +58,8 @@ struct Patch {
     double resonanceOffset = 0.0;
     // Separate envelope coupling in octaves per EG unit. Defaults retain
     // direct octave-valued engineering patches. Factory EG units are volts;
-    // its scales use documented resistor ratios and provisional manual slopes.
+    // its scales are the documented 39k/220k (HP) and 39k/47k (LP) ratios
+    // at the levers' printed 1 oct/V.
     double hpEnvelopeScale = 1.0, lpEnvelopeScale = 1.0;
     // VCF EG: negative IL -> positive AL -> fixed zero sustain -> IL.
     double filterInitial = -2.0, filterPeak = 2.0; // EG units; octaves at scale 1
@@ -153,14 +156,15 @@ struct Patch {
     // Service News E-46, 1978: 25 -> 50 C moves C6 within one 5-cent rank and
     // C1 within two neighbouring ranks); the drift they share is left out.
     double boardTemperatureRise = 0.0;
-    // filterLfo is LP octave depth. HP gets .3374358974 times that depth:
-    // (.7/.65)*(47k/150k), independent of user-editable EG coupling scales.
+    // filterLfo is LP octave depth. HP gets .3133333333 times that depth:
+    // 47k/150k at equal lever slopes, independent of user-editable EG
+    // coupling scales.
     // tremolo is SUB VCA lever travel, 0..1: R7 adds .3375 of the wiper's
     // share of SUB to LEVEL, and the B-10k lever into its 30k load delivers
     // x/(1+x(1-x)/3) of it, 7.7% low at mid-travel with exact endpoints.
     // lfoRate is Hz, wider than the hardware's .8-50 Hz SPEED range;
     // vibratoCents is cents per SUB unit (hardware full lever 25), filterLfo
-    // LP octaves per SUB unit (full lever .809). subSpeedLeverHz and its
+    // LP octaves per SUB unit (full lever 1.245). subSpeedLeverHz and its
     // siblings below map the PN3 levers onto these. The one IG00150 clock
     // free-runs: note events never reset its phase.
     double lfoRate = 5.0, vibratoCents = 0.0, tremolo = 0.0, filterLfo = 0.0;
@@ -201,11 +205,11 @@ struct Patch {
     double ringAttack = 0.01, ringDecay = 0.35;
     // Touch response (CS-50 panel 2, guide printed pp.55-56). pressureFilter is
     // touch BRILLIANCE in LP octaves; R7 feeds TBR through 47k LP / 150k HP, so
-    // HP moves .3374358974 times as far, as for SUB. pressureVibrato is SUB
+    // HP moves .3133333333 times as far, as for SUB. pressureVibrato is SUB
     // vibrato cents per unit touch; level amplifier I is trimmed to centre the
     // 3Vpp SUB on +.5V, so touch vibrato rises by a third of its depth.
     // pressureWah is touch-scaled SUB filter depth (level amplifier II -> R7
-    // VCF pin70), LP octaves with the same .3374 HP ratio. pressureVolume is
+    // VCF pin70), LP octaves with the same .3133 HP ratio. pressureVolume is
     // touch LEVEL: R7 adds its current to LEVEL's at common VCA2, so full depth
     // and full touch add 1.08 times full amp_level; zero touch leaves amp_level.
     // Uncalibrated filter and vibrato depths.
@@ -329,8 +333,20 @@ double brillianceLeverVolts(double travel);
 // pin-7 networks (220k to the preset Q bus, 220k to RES, 10 uF) load the
 // wiper with 55k returning to the mean of the HP and LP preset Q buses,
 // presetMeanVolts. Returns the loaded RES bus voltage, from which a front end
-// takes its own neutral to form `resonance_offset`.
+// takes its own neutral to form `resonance_offset`. Factory presets assume
+// MIN, so from them resonance_offset = resonanceLeverVolts(t, mean bus) - 10
+// reproduces the hardware, each preset bus being 10 - 20*hp/lp_resonance
+// (ceres.cpp preset()).
 double resonanceLeverVolts(double travel, double presetMeanVolts);
+// PANEL HPF and LPF levers (PN1, B-10K, 0..10V), for front ends that show the
+// hardware levers: travel 0..1, clamped, to the hp_cutoff / lp_cutoff value,
+// total Hz at middle C; NaN for a nonfinite travel. A PRA follower and a T71
+// diode put each lever on the loaded FH/FL bus the presets drive, so the
+// printed law sees the lever volts less that diode's drop: 85 Hz at 0, about
+// 42 kHz at full travel. The parameters' 20 kHz ceiling, which setParameter
+// clamps to, cuts off each lever's top tenth. See ceres.cpp.
+double hpfLeverHz(double travel);
+double lpfLeverHz(double travel);
 #if !defined(CERES_EMBEDDED_TARGET)
 bool setParameter(Patch&, const std::string& key, double value);
 Patch preset(const std::string& name);

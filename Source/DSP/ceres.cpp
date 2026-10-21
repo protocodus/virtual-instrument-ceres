@@ -15,12 +15,22 @@ namespace {
 constexpr double pi = 3.141592653589793238462643383279502884;
 constexpr double filterCapacitance = 1.5e-9, filterFeedResistance = 4.7e6;
 constexpr double filterFrequencyFloor = 1/(2*pi*filterCapacitance*filterFeedResistance);
-// Direct R7 matrix, CS-50 service1 PDF8/printed14. These ratios are known;
-// .7/.65 oct/V manual slopes remain the existing provisional calibration.
+// Cutoff lever law: the printed IG00156 law fc=125*Kv*2^Vfc (guide printed
+// p.34; SM1 printed p.19, "VK .25V, Vf 5V -> 1kHz") is one octave per volt
+// of Vfc. Vfc is read on the FH/FL lever bus (R7 pins 19/20), ahead of its
+// 39k into pin 4; that is the one inference (guide printed p.33 draws Vfc
+// reaching pin 4 through a resistor; see preset()). Chosen by ear 2026-10-20
+// (listening test 2026-10-20-vcf-printed-law). The same slope serves HP and
+// LP, and the law puts 125*.5V = 62.5Hz of gm at middle C (Kv=.5V) for 0V.
+constexpr double leverOctavesPerVolt=1, gmHzAtMiddleC=125*.5;
+// Direct R7 matrix, CS-50 service1 PDF8/printed14: every other cutoff input
+// shares the lever's node through its own resistor, so it moves the cutoff
+// 39k/Rin times as far per volt as the lever.
 // Interpret BR as actual loaded voltage with stiff preset/source nodes,
 // not raw preset-divider CV or a finite-impedance pot position.
-constexpr double hpBrillianceScale=.7*39/680, lpBrillianceScale=.65*39/220;
-constexpr double hpSubRelativeScale=(.7/.65)*(47./150.);
+constexpr double hpBrillianceScale=leverOctavesPerVolt*39/680, lpBrillianceScale=leverOctavesPerVolt*39/220;
+// LP-octave depths (SUB, touch) reach HP through 150k against LP's 47k.
+constexpr double hpSubRelativeScale=47./150.;
 // Guide printed p.56: touch level amplifier I is trimmed so a 0V-centred SUB
 // input leaves centred on +.5V; the SUB source is fixed at 3Vpp (p.55).
 constexpr double touchVibratoBias=.5/1.5;
@@ -589,8 +599,8 @@ struct BoardTolerance {
 // actual signal-voltage scaling remain unidentified.
 // Trapezoidal capacitor integration makes the nonlinear feedback implicit.
 // Eliminating l leaves one monotone equation, solved with analytic Newton
-// derivatives at every sample. Vs and the VQ -> damping map remain calibration
-// parameters: Yamaha does not specify the internal transistor geometry.
+// derivatives at every sample. Vs remains a calibration parameter: Yamaha
+// does not specify the internal transistor geometry.
 // CS-50 M-board schematic: C=1.5nF; each 4.7Mohm resistor bypasses its
 // variable-gm block, feeding the next integrator INPUT. It is not a capacitor
 // bleed resistor. This linear input-current path sets a 22.58 Hz integrator-rate floor.
@@ -600,11 +610,16 @@ struct BoardTolerance {
 // specifies Q=.5 at VQ=10V and Q=5 at VQ=0V (SM1 printed p.19; pin 6 sets
 // the standing Q current that gives Q=5 at 0V). Guide printed p.33 draws the
 // Q path as a variable-gm block (gm=K*Icont) between BP and FB, so damping is
-// proportional to its control current; damping LINEAR in VQ is the law for a
-// linear VQ-to-Icont converter. The sheet does not say whether that converter
-// is linear or exponential; an exponential one through the same endpoints is
-// the open alternative (listening test 2026-10-20-vcf-q-law; Docs/research/
-// vcf-authenticity-2026-10-20.md).
+// proportional to its control current. The sheet does not say whether the
+// VQ-to-Icont converter is linear or exponential. Damping is EXPONENTIAL in
+// VQ through the printed endpoints, d=.2*10^(VQ/10): chosen by ear
+// 2026-10-20 (listening test 2026-10-20-vcf-q-law, B), the converter law the
+// cutoff input has, against the linear d=.2+.18*VQ shipped before. The
+// endpoints are printed; the path between them is that choice, not a
+// measurement. Yamaha's own variable-gm cell of the period (JP S59-49726 B2,
+// priority 1976-01-12, figs. 5-6) used a linear V-to-I amplifier instead,
+// sibling practice that does not identify the IG00156's converter. See
+// Docs/research/vcf-authenticity-2026-10-20.md.
 // HP and LP have independent Q trims: the nominal endpoints are anchored at
 // their usual source loads (HP three mixer branches, LP one). Changing a
 // waveform gate changes the source load, not the Q transistor conductance.
@@ -618,7 +633,8 @@ struct OtaSvf {
         constexpr double feedbackCapacitance=180e-12, sourceCapacitance=1e-6;
         const double conductance=sourceConductance+1/33e3+1/1.2e6;
         const double referenceConductance=referenceSourceConductance+1/33e3+1/1.2e6;
-        const double damping=(2.0-1.8*clamp(resonance,0,1))*referenceConductance/conductance;
+        // resonance r is 1-VQ/10, so d=.2*10^(VQ/10)=2*10^-r.
+        const double damping=2*std::pow(10.0,-clamp(resonance,0,1))*referenceConductance/conductance;
         const double ratio=sourceConductance/conductance;
         // X is the physical Thevenin source voltage, in the SAME OTA voltage
         // unit at both stages. Canonical u=2*Gs*X/D0 is a local algebraic
@@ -1272,14 +1288,14 @@ double subVibratoLeverCents(double travel) {
 }
 // VCF lever (PN3 SVR3, B-10k between SUO and ground) -> R7 SUB -> 47k LP and
 // 150k HP on each of four boards (SM1 printed p.14): 8.95k load. LP octaves per
-// SUB unit at full lever are 1.5V through 47k against the manual FL's .65 oct/V
-// through 39k, the same provisional slope as lpBrillianceScale. HP follows at
-// hpSubRelativeScale inside the engine. The f-node resistors to ground (R6/R7,
+// SUB unit at full lever are 1.5V through 47k against the FL lever's 1 oct/V
+// through 39k (leverOctavesPerVolt, as for lpBrillianceScale): 1.245. HP
+// follows at hpSubRelativeScale inside the engine. The f-node resistors to ground (R6/R7,
 // 1.8-3.0k by chip rank, SM2 p.16) are neglected against 47k/150k, as the LC
 // node is for tremolo; they would ease the sag by about 4%.
 double subFilterLeverOctaves(double travel) {
     constexpr double load=1/(4/47e3+4/150e3);
-    return .65*39/47*1.5*leverFraction(clamp(travel,0.,1.),10e3/load);
+    return leverOctavesPerVolt*39/47*1.5*leverFraction(clamp(travel,0.,1.),10e3/load);
 }
 
 bool setParameter(Patch& patch, const char* key, double value) {
@@ -1331,6 +1347,60 @@ double resonanceLeverVolts(double travel, double presetMeanVolts) {
     const double a=1-std::min(1.0,std::max(0.0,travel));
     return loadedWiper(0,10,a,10e3,resonanceLeverLoad,presetMeanVolts);
 }
+
+namespace {
+// T71 tone-preset matrix outputs (SM2 printed pp.10-11; guide printed p.64).
+// Every row a-v holds a 10k to E and takes a 1S1555 from each preset column
+// (T71's, and T72's, whose rows join T71's) and one from its PANEL input
+// 1-22. The tablets and the PANEL levers share the T71 +10V regulator.
+// ESTIMATE: the 1S1555's forward curve is not published, so it is modelled
+// as the 1N4148-class silicon switching diode its ratings describe (35V,
+// 100mA, 4ns): Is = 2.52nA, N = 1.75 at 300K. That is 0.58V at the
+// stiffest preset column and 0.44V at the weakest.
+constexpr double presetSupply=10, presetLoad=10e3;
+constexpr double presetDiodeIs=2.52e-9, presetDiodeVt=1.75*25.85e-3;
+// The cutoff rows g (FH) and i (FL) are loaded beyond that 10k. The board
+// wiring lists (SM2 printed p.11 T71, p.15 R7) run them straight to R7 FH
+// (19) and FL (20) with no buffer between. R7 (SM1 printed p.14) takes each
+// cutoff bus through four 39k, one per board, to a pin-4 node that the M
+// board holds near ground (SM2 printed p.16: R6 2.2k HP, R7 2.4k LP at rank
+// B, beside the trim's 330k plus its centred B-100k's 25k; BR 680k/220k,
+// SUB/TBR/VCF 150k/47k each, EG 220k/47k on Overall): about 10.3k in all, as
+// much as the T-board's own 10k. (Docs/accuracy/preset-dc-loading solved the
+// same network under the earlier, unsourced anchors and slopes.) ESTIMATE:
+// pin 4 is taken as a high-impedance input and the VR7/VR9 trims as centred;
+// a virtual-ground pin 4 (bare 39k branches) or a trim at either rail moves
+// a cutoff bus by at most .06V.
+constexpr double hpCutoffNode=1/(1/2.2e3+1/355e3+1/680e3+3/150e3+1/220e3);
+constexpr double lpCutoffNode=1/(1/2.4e3+1/355e3+1/220e3+3/47e3+1/47e3);
+constexpr double fhBusLoad=(39e3+hpCutoffNode)/4, flBusLoad=(39e3+lpCutoffNode)/4;
+// PANEL HPF and LPF levers: B-10K slide pots across the T71 +10V on PN1
+// (Overall), so 0 to 10V ("HPF lever normal at 0", "LPF normal at 10",
+// guide printed p.35). Each wiper drives an NJM4558 follower, PRA IC4 (SM2
+// printed p.22: fHI to fHO, fLI to fLO; the Overall drawing numbers the
+// pair IC9), into T71 input 7 or 9, whose 1S1555 ORs it onto row g or i
+// beside the preset columns (SM2 printed p.11). With a stiff source only
+// that diode and the loaded row remain: the bus V solves
+// V + Vd(V/rl) = 10*travel, rl being the 10k beside the R7 load.
+double panelCutoffBus(double travel,double load) {
+    const double source=presetSupply*travel, rl=presetLoad*load/(presetLoad+load);
+    // V + Vd(V/rl) rises monotonically from 0 at V=0; bisect it onto source.
+    double low=0, high=source;
+    for (int i=0;i<64;++i) {
+        const double mid=.5*(low+high);
+        (mid+presetDiodeVt*std::log1p(mid/(rl*presetDiodeIs))<source ? low : high)=mid;
+    }
+    return .5*(low+high);
+}
+double panelCutoffHz(double travel,double load) {
+    if (!std::isfinite(travel)) return std::numeric_limits<double>::quiet_NaN();
+    return filterFrequencyFloor+gmHzAtMiddleC*
+        std::exp2(leverOctavesPerVolt*panelCutoffBus(clamp(travel,0.,1.),load));
+}
+} // namespace
+
+double hpfLeverHz(double travel) { return panelCutoffHz(travel,fhBusLoad); }
+double lpfLeverHz(double travel) { return panelCutoffHz(travel,flBusLoad); }
 
 #if !defined(CERES_EMBEDDED_TARGET)
 bool setParameter(Patch& patch, const std::string& key, double value) {
@@ -1684,8 +1754,8 @@ struct Synth::Impl {
         qVoltageOffset+=(patch.resonanceOffset*.5-qVoltageOffset)*qControlCoefficient;
         hpResonanceAnchor+=(patch.hpResonance-hpResonanceAnchor)*qControlCoefficient;
         lpResonanceAnchor+=(patch.lpResonance-lpResonanceAnchor)*qControlCoefficient;
-        // Direct chip endpoints Vq0:Q5,Vq10:Q.5 only. The intermediate
-        // d=2-1.8*r law is provisional; delta d=.18*deltaVq retains that law.
+        // Direct chip endpoints Vq0:Q5,Vq10:Q.5. deltaVq moves the pin
+        // voltage itself; OtaSvf applies the exponential law to the sum.
         effectiveHpResonance=clamp(hpResonanceAnchor-qVoltageOffset*.1,0,1);
         effectiveLpResonance=clamp(lpResonanceAnchor-qVoltageOffset*.1,0,1);
         // R7 LC sums LEVEL(270k) and SUB(120k) currents before common VCA2.
@@ -1749,10 +1819,9 @@ struct Synth::Impl {
             // C2..C6; SM1 printed p.19, both pin sheets), so fc follows the
             // key exactly one octave per octave, through glide and PITCH but
             // not TRANSPOSITION (VCO III pin 1 FT only). keyTrack=1 is that hardware law. At Vfc=0 the printed law
-            // puts gm cutoff at 125*.5V = 62.5Hz at middle C; the patch's
-            // cutoff-at-middle-C reference does not yet use that zero point
-            // (listening test 2026-10-20-vcf-cutoff-zero-point; see
-            // Docs/research/vcf-authenticity-2026-10-20.md).
+            // puts gm cutoff at 125*.5V = 62.5Hz at middle C; factory presets
+            // convert their lever volts with it (preset()), and the patch's
+            // hp/lpCutoff stay the cutoffs at middle C.
             // This law controls the OTA gm contribution. The independent
             // feed resistor contributes the same conductance at every CV.
             // Master PITCH routes PN2 VR1 -> SUB TU -> KAS67 -> SH -> M K37,
@@ -2236,22 +2305,42 @@ Patch preset(const std::string& name) {
     // bus through a series resistor, a 1S1555 and a 10k to ground. The printed
     // table is the bare divider -- 1.3k gives 10*10/11.3 = 8.85V, exactly as
     // printed -- so the diode's drop is not in it, and the real pin sits that
-    // much lower. The destinations are op-amp inputs, which is why the printed
-    // table matches a 10k-only load, so the drop just lowers the source:
-    // Vpin = Videal*(10-Vd)/10 with Vd taken at I = Vpin/10k.
-    // ESTIMATE: the 1S1555's forward curve is not published, so it is modelled
-    // as the 1N4148-class silicon switching diode its ratings describe (35V,
-    // 100mA, 4ns): Is = 2.52nA, N = 1.75 at 300K. That is 0.58V at the
-    // stiffest column and 0.44V at the weakest, so pins land 4.2-5.8% low.
+    // much lower. Where a row drives a high-impedance input the 10k is its
+    // whole load, so the drop just lowers the source:
+    // Vpin = Videal*(10-Vd)/10 with Vd taken at I = Vpin/10k. The four filter
+    // rows drive passive R7 networks instead (loadedPresetPin below). The
+    // matrix constants and the 1S1555 ESTIMATE sit with the PANEL cutoff
+    // lever law (presetSupply); with them pins land 4.2-5.8% low.
     // A zero column has no matrix path at all and stays at ground.
-    constexpr double presetSupply=10, presetLoad=10e3;
-    constexpr double presetDiodeIs=2.52e-9, presetDiodeVt=1.75*25.85e-3;
     const auto presetPin=[](double ideal) {
         if (ideal<=0) return ideal;
         double pin=ideal;
         // Each pass moves the drop by under half a percent of the last.
         for (int i=0;i<8;++i)
             pin=ideal*(presetSupply-presetDiodeVt*std::log(pin/(presetLoad*presetDiodeIs)))/presetSupply;
+        return pin;
+    };
+    // Filter rows g-j are loaded beyond that 10k: g and i by R7's four 39k
+    // cutoff branches (fhBusLoad, flBusLoad, with the PANEL lever law). The
+    // same wiring lists (SM2 printed p.11 T71, p.15 R7) run h and j straight
+    // to QH (52) and QL (50), again with no buffer between. Each Q bus
+    // feeds four 220k to pin-7 nodes that return through 220k to RES: 110k to
+    // the RES bus, which is the T71 +10V at the presets' RESONANCE MIN. The
+    // row V then solves (10 - Vd - V)/Rs = V/10k + (V - Vret)/Rload, the
+    // diode's current, with Rs recovered from the printed bare divider,
+    // Rs = 10k(10/Videal - 1); a zero column leaves the row at the load's own
+    // Thevenin voltage. Each pin 7 is taken to draw no current.
+    constexpr double qBusLoad=(220e3+220e3)/4;
+    const auto loadedPresetPin=[](double ideal,double load,double loadReturn) {
+        // Thevenin of the 10k and the load: vl behind rl.
+        const double rl=presetLoad*load/(presetLoad+load);
+        const double vl=loadReturn*presetLoad/(presetLoad+load);
+        if (ideal<=0) return vl;
+        const double share=rl/(presetLoad*(presetSupply/ideal-1)+rl);
+        double pin=vl+(presetSupply-vl-.5)*share;
+        // Each pass scales the error by Vd's slope over Rs+rl, under 1%.
+        for (int i=0;i<8;++i)
+            pin=vl+(presetSupply-vl-presetDiodeVt*std::log((pin-vl)/(rl*presetDiodeIs)))*share;
         return pin;
     };
     std::string canonical = name;
@@ -2280,6 +2369,7 @@ Patch preset(const std::string& name) {
         auto cv = factory.v;
         for (const auto& correction : corrections)
             if (canonical == correction.name) cv[correction.column]=correction.voltage;
+        const auto ideal=cv;
         for (auto& voltage : cv) voltage=presetPin(voltage);
         Patch p; p.name=canonical;
         // Guide p.49 calibrates actual PWM VC1 to 0.2/6.7/222 Hz at
@@ -2290,37 +2380,57 @@ Patch preset(const std::string& name) {
         p.pwmRate=.2*std::pow(1110.0,cv[0]/10); p.pwmDepth=.4*cv[1]/10;
         p.pulseWidth=.5+.4*cv[2]/10;
         p.pulse=cv[3]/10; p.saw=cv[4]/10; p.noise=cv[5]/10;
-        // The exponential voltage law controls variable gm, not the fixed
-        // feed resistor. These 12/180Hz anchors and .7/.65oct/V slopes are
-        // still uncalibrated gm-component estimates. The printed IG00156 law
-        // puts 0V at 62.5Hz gm for BOTH stages at middle C (fc=125*Kv*2^Vfc,
-        // Kv=.5V; guide printed p.34, SM1 printed p.19); the slopes cannot
-        // be read off the board, because a 10V lever through 39k into the
-        // 1.8-3.3k rank resistor (SM2 pp.16,18 tables; R6 HP, R7 LP) gives
-        // about .5V at pin 4, half an octave at the pin sheet's 1V/oct. Pin 4's
-        // input current law is unpublished. The Patch API expects
-        // total integrator Hz, so include the resistor contribution once.
-        p.hpCutoff=filterFrequencyFloor+12*std::exp2(cv[6]*.7);
-        p.lpCutoff=filterFrequencyFloor+180*std::exp2(cv[8]*.65);
+        // Cutoff columns g (HP) and i (LP): the printed IG00156 law in full,
+        // fc=125*Kv*2^Vfc (guide printed p.34; SM1 printed p.19, "VK .25V,
+        // Vf 5V -> 1kHz"): 62.5Hz of gm at middle C (Kv=.5V) for 0V and one
+        // octave per volt, both stages. Chosen by ear 2026-10-20 (listening
+        // test 2026-10-20-vcf-printed-law, which supersedes the zero-point
+        // and HP/LP-slope sets). Every number is printed; the one inference
+        // is where Vfc is measured. It cannot be pin 4 itself: a 10V lever
+        // through 39k into the CS-50's 1.8-3.0k rank resistor (SM2 printed
+        // p.16; R6 HP, R7 LP) puts only .4-.6V there, and guide printed p.33
+        // draws Vfc reaching pin 4 through a variable resistor, the rank-set
+        // network. So Vfc is read on the FH/FL bus, ahead of the 39k; the
+        // PANEL lever reaches that bus through a PRA follower and a T71 diode,
+        // a preset through its loaded divider (loadedPresetPin). One slope
+        // serves both levers: the CS-50 rank column (SM2 printed p.16,
+        // "CS50,60": R7 3.0k/2.4k/2.0k beside R6 2.7k/2.2k/1.8k; p.18
+        // NA03655) is exactly the E24 set nearest equal 39k-lever gain into
+        // the two pin-4 nodes (3.09k/2.45k/1.97k); with the EG paths the
+        // as-built HP/LP gain ratio is 1.00-1.06 by rank. Not printed: the
+        // series reference behind the pin sheet's Vf, and pin 4's own input
+        // law. The law moves variable gm, not the fixed 4.7M feed, and the
+        // Patch API expects total integrator Hz, so include the resistor
+        // contribution once. See Docs/research/vcf-authenticity-2026-10-20.md.
+        const double fhBus=loadedPresetPin(ideal[6],fhBusLoad,0);
+        const double flBus=loadedPresetPin(ideal[8],flBusLoad,0);
+        p.hpCutoff=filterFrequencyFloor+gmHzAtMiddleC*std::exp2(leverOctavesPerVolt*fhBus);
+        p.lpCutoff=filterFrequencyFloor+gmHzAtMiddleC*std::exp2(leverOctavesPerVolt*flBus);
         // Overall schematic: passive FH/FL buses feed each cutoff via 39k;
-        // the shared EG uses 220k for HP and 47k for LP. Relative coupling
-        // is Rmanual/REG times the manual CV slope. Those slopes (.7/.65
-        // oct/V) remain provisional; the paired HP/LP rank shunts (SM2
-        // pp.16,18) give the 39k lever equal pin-4 gain within about 6%, so
-        // the two should be equal (listening test 2026-10-20-vcf-hp-lp-slope;
-        // Docs/research/vcf-authenticity-2026-10-20.md). This corrects the
-        // supported resistor ratio without claiming absolute pin-4 CV
-        // calibration. The ratio is
-        // relative to actual loaded FH/FL voltage, not proven to equal the
-        // T-board pin above: four-voice loading remains unresolved. Factory
-        // scales are an effective/manual-slope estimate.
-        p.hpEnvelopeScale=.7*39/220;
-        p.lpEnvelopeScale=.65*39/47;
-        // The pin takes (Q bus + RES)/2 through the 220k pair, so the hardware
-        // is r=1-(P+R)/20 for RESONANCE lever volts R. This maps the bus
-        // straight to the pin, which matches it only at R=P; the lever
-        // position the factory voicing assumed is unknown (A-Z test pending).
-        p.hpResonance=(10-cv[7])*.1; p.lpResonance=(10-cv[9])*.1;
+        // the shared EG uses 220k for HP and 47k for LP, so at the levers'
+        // 1 oct/V the EG moves the cutoffs 39/220 and 39/47 octave per EG
+        // volt, relative to the loaded bus voltage above. A board's EG also
+        // lifts its pin-4 node, which unloads the shared passive bus and so
+        // raises every board's cutoff a little: at most .03 octave per board
+        // at +5V LP EG on a weak column, .1 with all four. Not modelled.
+        p.hpEnvelopeScale=leverOctavesPerVolt*39/220;
+        p.lpEnvelopeScale=leverOctavesPerVolt*39/47;
+        // Q columns h (HP) and j (LP): each pin 7 takes its preset Q bus P
+        // and the RES bus R through 220k each, with 10uF to ground (SM1
+        // printed p.14 R7; SM2 printed p.16), so it settles at (P+R)/2 and
+        // r=1-(P+R)/20. Factory presets put the RESONANCE lever at MIN, where
+        // TVR6 sits on the +10V bus (SM2 p.26 PN2 sheet): r=(10-P)/20. The
+        // divider is printed; which lever position Yamaha voiced the presets
+        // at is not, and MIN was chosen by ear 2026-10-20 (listening test
+        // 2026-10-20-brilliance-resonance-preset-q-divider, B). Before, the
+        // bus went straight to the pin, r=(10-P)/10, which no single lever
+        // position gives for every preset. resonance_offset is then the RES
+        // change from MIN: 0 to -10V. P is the loaded row (loadedPresetPin):
+        // the four pin-7 networks pull it toward RES's +10V, so a zero column
+        // sits at .83V, not ground. Away from MIN that pull follows RES, so
+        // the pin moves up to 13/24 of each RES volt, not 1/2; not modelled.
+        p.hpResonance=(10-loadedPresetPin(ideal[7],qBusLoad,presetSupply))/20;
+        p.lpResonance=(10-loadedPresetPin(ideal[9],qBusLoad,presetSupply))/20;
         // VCF-EG levels at TP1 (EG OUT). The IG00152 pin sheet (SM1 p.20)
         // gives AL 0..10V -> LC up to +5V and IL 0..10V -> 0..-5V, but the
         // alignment of the same M board (Yamaha CS-60 Service Manual p.37,
