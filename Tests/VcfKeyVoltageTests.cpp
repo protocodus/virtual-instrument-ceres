@@ -6,11 +6,13 @@
 // except that transposition moves the oscillator and not the filters. The
 // factory presets convert their cutoff columns with the same printed law,
 // and their Q columns through the pin-7 divider, each column as the voltage
-// its T-board row actually holds under R7's load.
+// its T-board row actually holds under R7's load. The PANEL HPF and LPF
+// levers reach the same cutoff rows through a follower and a T71 diode.
 // Expected values come from those laws, not from the engine's own formulas.
 #include "ceres.hpp"
 #include <cmath>
 #include <cstdio>
+#include <limits>
 #include <stdexcept>
 
 namespace {
@@ -193,12 +195,49 @@ void factoryQThroughDivider() {
         near(p.lpResonance,1-(qBus(row.j)+10)/2/10,1e-13,"Factory LP Q pin at (P + RES MIN)/2");
     }
 }
+
+// PANEL HPF/LPF lever: a B-10K wiper, 0..10V (guide printed p.35), buffered
+// by a PRA follower (SM2 printed p.22, IC4) that drives T71 input 7 or 9 and
+// its 1S1555 onto the cutoff row. Solved here as a current balance at the
+// row: the diode's Shockley current at (lever - V) against what the row's
+// 10k and R7 draw at V.
+template<class Draw> double panelRow(double travel,Draw r7Draw) {
+    const double vt=1.75*25.85e-3,is=2.52e-9,lever=10*travel;
+    double low=0,high=lever;
+    for(int i=0;i<200;++i) {
+        const double mid=(low+high)/2;
+        (is*std::expm1((lever-mid)/vt)>mid/10e3+r7Draw(mid) ? low : high)=mid;
+    }
+    return (low+high)/2;
+}
+
+void panelLeversFollowPrintedLaw() {
+    const auto hpDraw=[](double v){return cutoffDraw(v,2.2e3,680e3,150e3,220e3);};
+    const auto lpDraw=[](double v){return cutoffDraw(v,2.4e3,220e3,47e3,47e3);};
+    double lastHp=0,lastLp=0;
+    for(double t:{0.,.001,.02,.05,.1,.25,.5,.75,.9,1.}) {
+        const double hp=ceres::hpfLeverHz(t),lp=ceres::lpfLeverHz(t);
+        near(std::log2((hp-floorHz)/(125*kvMiddleC)),panelRow(t,hpDraw),1e-12,
+             "PANEL HPF lever follows the printed law through its T71 diode");
+        near(std::log2((lp-floorHz)/(125*kvMiddleC)),panelRow(t,lpDraw),1e-12,
+             "PANEL LPF lever follows the printed law through its T71 diode");
+        if(t>0&&!(hp>lastHp&&lp>lastLp)) throw std::runtime_error("PANEL cutoff levers rise with travel");
+        lastHp=hp;lastLp=lp;
+    }
+    near(ceres::hpfLeverHz(0),floorHz+125*kvMiddleC,1e-12,"HPF lever at 0: 62.5Hz of gm at middle C");
+    near(ceres::hpfLeverHz(-1),ceres::hpfLeverHz(0),0,"Lever travel clamps at 0");
+    near(ceres::lpfLeverHz(2),ceres::lpfLeverHz(1),0,"Lever travel clamps at 1");
+    if(!std::isnan(ceres::hpfLeverHz(std::numeric_limits<double>::quiet_NaN()))||
+       !std::isnan(ceres::lpfLeverHz(std::numeric_limits<double>::infinity())))
+        throw std::runtime_error("A nonfinite lever travel returns NaN");
+}
 }
 
 int main() {
     try {
         tracksKeyVoltage();transpositionLeavesFilters();pitchMovesFilters();glideMovesFilters();
         factoryCutoffsFollowPrintedLaw();factoryQThroughDivider();
+        panelLeversFollowPrintedLaw();
         std::puts("VCF key-voltage contracts passed");
         return 0;
     } catch(const std::exception& e) {std::fprintf(stderr,"%s\n",e.what());return 1;}

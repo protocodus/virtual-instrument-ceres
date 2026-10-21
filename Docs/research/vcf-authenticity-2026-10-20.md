@@ -4,6 +4,10 @@ Scope: the two IG00156 stages (`OtaSvf`, `FilterChain`), the cutoff control
 law (`modulatedFilterFrequency`, key tracking, the preset CV conversion), the
 Q law and the input/saturation scales. Score before this pass: 6/10.
 
+The sections run in the order the work was done. Round 3 below supersedes
+the earlier ones where they differ: the slopes, zero point and Q law are
+no longer provisional, and the preset rows are now solved under load.
+
 Page references are printed page / PDF page. Sources: Yamaha CS Series
 Servicing Guide ("Guide"), CS-50 Service Manual 1 and 2 ("SM1", "SM2"), the
 CS-50 Overall Circuit Diagram ("Overall"), and, as labelled sibling evidence,
@@ -427,7 +431,9 @@ wiring lists settle it for the four filter rows.
   p.15 / PDF 11), and T71 g (27) → T72-g (27), one wire, the T-boards'
   outputs being bussed (SM2 p.11 / PDF 9). No buffer sits on the preset
   path; the Overall diagram, traced at 300 dpi, agrees. The PRA "Buff Amp"
-  (IC9, two followers) serves only the PANEL HPF and LPF levers: T71 inputs
+  (two NJM4558 followers, IC4 on the CS-50 PRA sheet, SM2 p.22 / PDF 16;
+  the Overall drawing numbers the pair IC9, the number that sheet reserves
+  for a CS-60-only part) serves only the PANEL HPF and LPF levers: T71 inputs
   7 (26') and 9 (23') come from PRA fHO (59) and fLO (57) (SM2 p.11 / PDF 9),
   and a diode ORs each onto the same row as the preset columns (SM2 p.10 /
   PDF 8 shows that input diode and the 10k to E on every row; Guide p.63 /
@@ -509,6 +515,66 @@ candidates, so it ships without a listening test.
   own node equation, with R7's draw written out as the explicit pin-4 and
   pin-7 node solutions, and requires every factory cutoff and Q anchor to
   match. The earlier 10k-only expectation encoded the unloaded premise.
+
+### The PANEL HPF and LPF lever law (schematic)
+
+The scorecard's "panel-to-Vfc offset" was the missing step from a panel
+lever to the cutoff. The engine keeps `hp_cutoff` and `lp_cutoff` as total
+Hz at middle C; `hpfLeverHz` and `lpfLeverHz` now give front ends that show
+the hardware levers the printed path from lever travel to that value.
+
+- **Lever.** HPF and LPF are B-10K slide pots on PN1, across the line that
+  the PANEL switch takes from the T71 +10 V regulator (Overall; Guide p.64 /
+  PDF 73: "the control lever of Panel 1 ... the controllable voltage", input
+  to T71 terminals 1–22). The Guide's sketch spans 0 to 10 V ("HPF lever
+  normal at 0", "LPF normal at 10", Guide p.35 / PDF 44).
+- **Buffer.** Each wiper drives an NJM4558 follower: PRA IC4, fHI (60) →
+  fHO (59) and fLI (58) → fLO (57) (SM2 p.22 / PDF 16; note 1 lists IC4 as
+  NJM4558D). The follower's input draws nothing worth counting (25 nA
+  typical bias behind at most 2.5k of wiper is 60 µV), so the wiper is
+  exactly 10 V × travel.
+- **Diode and load.** fHO and fLO drive T71 inputs 7 and 9 (SM2 p.11 /
+  PDF 9), each through one 1S1555 onto row g or i (SM2 p.10 / PDF 8), the
+  same rows the presets drive, so the load is the one solved above: the
+  row's 10k beside R7's four 39k branches, 5.07k in all. In PANEL the
+  tablets are off, so the preset column diodes are reverse-biased. The bus
+  solves V + Vd(V/5.07k) = 10 × travel with the same 1S1555 estimate.
+- **Law.** The printed law then reads the bus as for a preset.
+
+| Travel | Bus V | Diode drop V | Cutoff at middle C, Hz |
+| --- | --- | --- | --- |
+| 0 | 0.000 | 0.000 | 85.1 |
+| 0.05 | 0.096 | 0.404 | 89.4 |
+| 0.1 | 0.520 | 0.480 | 112.2 |
+| 0.3 | 2.450 | 0.550 | 364.0 |
+| 0.5 | 4.423 | 0.577 | 1363 |
+| 0.7 | 6.406 | 0.594 | 5323 |
+| 0.893 | 8.324 | 0.606 | 20056 |
+| 1 | 9.389 | 0.611 | 41924 |
+
+HP and LP differ by under 0.0002 V. Below about 0.03 of travel the diode
+passes almost nothing and the cutoff stays within half a hertz of the
+85.1 Hz it has at 0, so the bottom few percent of each lever do nothing.
+
+The LPF lever's top tenth (from about 0.893, 20 kHz at middle C) is above
+the `lp_cutoff` parameter's 20 kHz ceiling, which `setParameter` clamps to.
+At middle C and above that changes nothing audible, since the stage clamps
+its own cutoff at 0.22 of the internal rate anyway; but key tracking halves
+the cutoff each octave down, so on the lowest C (Kv 0.25 V) a full LPF
+lever gives 21 kHz on the hardware and 10 kHz here. The HPF lever's top
+tenth meets the same `hp_cutoff` ceiling, which matters even less: by then
+the high-pass has removed nearly the whole note. Raising both ceilings to
+about 42 kHz would close this; it is a parameter-range change that the
+front ends' own tables would have to follow, so it is left to integration.
+
+- **Estimate carried:** the 1S1555 curve (as for the presets) and a stiff
+  T71 +10 V under the PANEL levers' parallel load (about 0.5 kΩ); the
+  regulator's output resistance is not printed.
+- **Fixture:** `VcfKeyVoltageTests` solves the PANEL row as a current
+  balance (the diode's Shockley current at lever − V against the 10k and the
+  explicit R7 node draws) and requires both helpers to match at ten travels,
+  to rise monotonically, to clamp travel and to return NaN for a nonfinite
+  travel.
 
 ## What would close the gap
 

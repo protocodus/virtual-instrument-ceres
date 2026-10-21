@@ -273,6 +273,15 @@ double brillianceLeverVolts(double travel);
 // reproduces the hardware, each preset bus being 10 - 20*hp/lp_resonance
 // (ceres.cpp preset()).
 double resonanceLeverVolts(double travel, double presetMeanVolts);
+// PANEL HPF and LPF levers (PN1, B-10K, 0..10V), for front ends that show the
+// hardware levers: travel 0..1, clamped, to the hp_cutoff / lp_cutoff value,
+// total Hz at middle C; NaN for a nonfinite travel. A PRA follower and a T71
+// diode put each lever on the loaded FH/FL bus the presets drive, so the
+// printed law sees the lever volts less that diode's drop: 85 Hz at 0, about
+// 42 kHz at full travel. The parameters' 20 kHz ceiling, which setParameter
+// clamps to, cuts off each lever's top tenth. See ceres.cpp.
+double hpfLeverHz(double travel);
+double lpfLeverHz(double travel);
 #if !defined(CERES_EMBEDDED_TARGET)
 bool setParameter(Patch&, const std::string& key, double value);
 Patch preset(const std::string& name);

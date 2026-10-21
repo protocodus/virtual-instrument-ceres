@@ -21,8 +21,8 @@ constexpr double filterFrequencyFloor = 1/(2*pi*filterCapacitance*filterFeedResi
 // 39k into pin 4; that is the one inference (guide printed p.33 draws Vfc
 // reaching pin 4 through a resistor; see preset()). Chosen by ear 2026-10-20
 // (listening test 2026-10-20-vcf-printed-law). The same slope serves HP and
-// LP.
-constexpr double leverOctavesPerVolt=1;
+// LP, and the law puts 125*.5V = 62.5Hz of gm at middle C (Kv=.5V) for 0V.
+constexpr double leverOctavesPerVolt=1, gmHzAtMiddleC=125*.5;
 // Direct R7 matrix, CS-50 service1 PDF8/printed14: every other cutoff input
 // shares the lever's node through its own resistor, so it moves the cutoff
 // 39k/Rin times as far per volt as the lever.
@@ -1099,6 +1099,60 @@ double resonanceLeverVolts(double travel, double presetMeanVolts) {
     return loadedWiper(0,10,a,10e3,resonanceLeverLoad,presetMeanVolts);
 }
 
+namespace {
+// T71 tone-preset matrix outputs (SM2 printed pp.10-11; guide printed p.64).
+// Every row a-v holds a 10k to E and takes a 1S1555 from each preset column
+// (T71's, and T72's, whose rows join T71's) and one from its PANEL input
+// 1-22. The tablets and the PANEL levers share the T71 +10V regulator.
+// ESTIMATE: the 1S1555's forward curve is not published, so it is modelled
+// as the 1N4148-class silicon switching diode its ratings describe (35V,
+// 100mA, 4ns): Is = 2.52nA, N = 1.75 at 300K. That is 0.58V at the
+// stiffest preset column and 0.44V at the weakest.
+constexpr double presetSupply=10, presetLoad=10e3;
+constexpr double presetDiodeIs=2.52e-9, presetDiodeVt=1.75*25.85e-3;
+// The cutoff rows g (FH) and i (FL) are loaded beyond that 10k. The board
+// wiring lists (SM2 printed p.11 T71, p.15 R7) run them straight to R7 FH
+// (19) and FL (20) with no buffer between. R7 (SM1 printed p.14) takes each
+// cutoff bus through four 39k, one per board, to a pin-4 node that the M
+// board holds near ground (SM2 printed p.16: R6 2.2k HP, R7 2.4k LP at rank
+// B, beside the trim's 330k plus its centred B-100k's 25k; BR 680k/220k,
+// SUB/TBR/VCF 150k/47k each, EG 220k/47k on Overall): about 10.3k in all, as
+// much as the T-board's own 10k. (Docs/accuracy/preset-dc-loading solved the
+// same network under the earlier, unsourced anchors and slopes.) ESTIMATE:
+// pin 4 is taken as a high-impedance input and the VR7/VR9 trims as centred;
+// a virtual-ground pin 4 (bare 39k branches) or a trim at either rail moves
+// a cutoff bus by at most .06V.
+constexpr double hpCutoffNode=1/(1/2.2e3+1/355e3+1/680e3+3/150e3+1/220e3);
+constexpr double lpCutoffNode=1/(1/2.4e3+1/355e3+1/220e3+3/47e3+1/47e3);
+constexpr double fhBusLoad=(39e3+hpCutoffNode)/4, flBusLoad=(39e3+lpCutoffNode)/4;
+// PANEL HPF and LPF levers: B-10K slide pots across the T71 +10V on PN1
+// (Overall), so 0 to 10V ("HPF lever normal at 0", "LPF normal at 10",
+// guide printed p.35). Each wiper drives an NJM4558 follower, PRA IC4 (SM2
+// printed p.22: fHI to fHO, fLI to fLO; the Overall drawing numbers the
+// pair IC9), into T71 input 7 or 9, whose 1S1555 ORs it onto row g or i
+// beside the preset columns (SM2 printed p.11). With a stiff source only
+// that diode and the loaded row remain: the bus V solves
+// V + Vd(V/rl) = 10*travel, rl being the 10k beside the R7 load.
+double panelCutoffBus(double travel,double load) {
+    const double source=presetSupply*travel, rl=presetLoad*load/(presetLoad+load);
+    // V + Vd(V/rl) rises monotonically from 0 at V=0; bisect it onto source.
+    double low=0, high=source;
+    for (int i=0;i<64;++i) {
+        const double mid=.5*(low+high);
+        (mid+presetDiodeVt*std::log1p(mid/(rl*presetDiodeIs))<source ? low : high)=mid;
+    }
+    return .5*(low+high);
+}
+double panelCutoffHz(double travel,double load) {
+    if (!std::isfinite(travel)) return std::numeric_limits<double>::quiet_NaN();
+    return filterFrequencyFloor+gmHzAtMiddleC*
+        std::exp2(leverOctavesPerVolt*panelCutoffBus(clamp(travel,0.,1.),load));
+}
+} // namespace
+
+double hpfLeverHz(double travel) { return panelCutoffHz(travel,fhBusLoad); }
+double lpfLeverHz(double travel) { return panelCutoffHz(travel,flBusLoad); }
+
 #if !defined(CERES_EMBEDDED_TARGET)
 bool setParameter(Patch& patch, const std::string& key, double value) {
     if (!std::isfinite(value)) return false;
@@ -1928,14 +1982,10 @@ Patch preset(const std::string& name) {
     // much lower. Where a row drives a high-impedance input the 10k is its
     // whole load, so the drop just lowers the source:
     // Vpin = Videal*(10-Vd)/10 with Vd taken at I = Vpin/10k. The four filter
-    // rows drive passive R7 networks instead (loadedPresetPin below).
-    // ESTIMATE: the 1S1555's forward curve is not published, so it is modelled
-    // as the 1N4148-class silicon switching diode its ratings describe (35V,
-    // 100mA, 4ns): Is = 2.52nA, N = 1.75 at 300K. That is 0.58V at the
-    // stiffest column and 0.44V at the weakest, so pins land 4.2-5.8% low.
+    // rows drive passive R7 networks instead (loadedPresetPin below). The
+    // matrix constants and the 1S1555 ESTIMATE sit with the PANEL cutoff
+    // lever law (presetSupply); with them pins land 4.2-5.8% low.
     // A zero column has no matrix path at all and stays at ground.
-    constexpr double presetSupply=10, presetLoad=10e3;
-    constexpr double presetDiodeIs=2.52e-9, presetDiodeVt=1.75*25.85e-3;
     const auto presetPin=[](double ideal) {
         if (ideal<=0) return ideal;
         double pin=ideal;
@@ -1944,29 +1994,16 @@ Patch preset(const std::string& name) {
             pin=ideal*(presetSupply-presetDiodeVt*std::log(pin/(presetLoad*presetDiodeIs)))/presetSupply;
         return pin;
     };
-    // Filter rows g-j are loaded beyond that 10k. The board wiring lists (SM2
-    // printed p.11 T71, p.15 R7) run T-board outputs g and i straight to R7
-    // FH (19) and FL (20), and h and j to QH (52) and QL (50), with no buffer
-    // between; the PRA followers (fHO, fLO) drive only T71 inputs 7 and 9,
-    // the PANEL levers' diodes. R7 (SM1 printed p.14) takes each cutoff bus
-    // through four 39k, one per board, to a pin-4 node that the M board holds
-    // near ground (SM2 printed p.16: R6 2.2k HP, R7 2.4k LP at rank B, beside
-    // the trim's 330k plus its centred B-100k's 25k; BR 680k/220k, SUB/TBR/VCF
-    // 150k/47k each, EG 220k/47k on Overall): about 10.3k in all, as much as
-    // the T-board's own 10k. (Docs/accuracy/preset-dc-loading solved the same
-    // network under the earlier, unsourced anchors and slopes.) Each Q bus
+    // Filter rows g-j are loaded beyond that 10k: g and i by R7's four 39k
+    // cutoff branches (fhBusLoad, flBusLoad, with the PANEL lever law). The
+    // same wiring lists (SM2 printed p.11 T71, p.15 R7) run h and j straight
+    // to QH (52) and QL (50), again with no buffer between. Each Q bus
     // feeds four 220k to pin-7 nodes that return through 220k to RES: 110k to
     // the RES bus, which is the T71 +10V at the presets' RESONANCE MIN. The
     // row V then solves (10 - Vd - V)/Rs = V/10k + (V - Vret)/Rload, the
     // diode's current, with Rs recovered from the printed bare divider,
     // Rs = 10k(10/Videal - 1); a zero column leaves the row at the load's own
-    // Thevenin voltage. ESTIMATE: pin 4 is taken as a high-impedance input and
-    // the VR7/VR9 trims as centred; a virtual-ground pin 4 (bare 39k
-    // branches) or a trim at either rail moves a cutoff bus by at most .06V.
-    // Each pin 7 is taken to draw no current.
-    constexpr double hpCutoffNode=1/(1/2.2e3+1/355e3+1/680e3+3/150e3+1/220e3);
-    constexpr double lpCutoffNode=1/(1/2.4e3+1/355e3+1/220e3+3/47e3+1/47e3);
-    constexpr double fhBusLoad=(39e3+hpCutoffNode)/4, flBusLoad=(39e3+lpCutoffNode)/4;
+    // Thevenin voltage. Each pin 7 is taken to draw no current.
     constexpr double qBusLoad=(220e3+220e3)/4;
     const auto loadedPresetPin=[](double ideal,double load,double loadReturn) {
         // Thevenin of the 10k and the load: vl behind rl.
@@ -2039,7 +2076,6 @@ Patch preset(const std::string& name) {
         // law. The law moves variable gm, not the fixed 4.7M feed, and the
         // Patch API expects total integrator Hz, so include the resistor
         // contribution once. See Docs/research/vcf-authenticity-2026-10-20.md.
-        constexpr double gmHzAtMiddleC=125*.5;
         const double fhBus=loadedPresetPin(ideal[6],fhBusLoad,0);
         const double flBus=loadedPresetPin(ideal[8],flBusLoad,0);
         p.hpCutoff=filterFrequencyFloor+gmHzAtMiddleC*std::exp2(leverOctavesPerVolt*fhBus);
