@@ -68,8 +68,9 @@ not committed, and each `key.md` held the rendering details summarised here.
 - **A:** damping linear in VQ, d = 0.2 + 0.18·VQ. **B:** damping exponential
   in VQ, d = 0.2·10^(VQ/10).
 - **Chosen:** B.
-- **Licensed:** the exponential law; mid-travel resonance settings are less
-  resonant than before, with the endpoints unchanged.
+- **Licensed:** the exponential law; mid-travel resonance settings are more
+  resonant than before (Q 1.58 instead of 0.91 at VQ 5 V), with the endpoints
+  unchanged.
 
 ### Preset Q through the pin-7 divider (`2026-10-20-brilliance-resonance-preset-q-divider`)
 
