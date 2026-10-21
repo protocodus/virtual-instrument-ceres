@@ -10,7 +10,9 @@
 //  - SM2 printed pp.17-18 (PDF 13-14) note 9: IG00156 rank resistors
 //    R6 2.7k/2.2k/1.8k, R7 3.3k/2.7k/2.2k on each filter's Vfc node (CS-60
 //    SM printed p.15, the "CS-60,50" M circuit); half a rank step bounds the
-//    control-sensitivity residual. Static cutoff and Q are trimmed by ear.
+//    control-sensitivity residual. Static cutoff and Q are trimmed by ear,
+//    each filter with its own lever at the centre (CS-60 SM printed p.38,
+//    III-IV), so only a static cutoff at that centre is every board's.
 //  - Sibling CS-60 SM printed pp.37-39 (PDF 39-41) alignment checks: VCF EG
 //    +5V +/-.5V at TP1; VCA EG 10V +/-.2V and -200 +/-20mV at TP2; VR14 sets
 //    the output at full sustain (VI.4); VR6 sets 0 dBm from the sine alone
@@ -280,10 +282,7 @@ void filterRankResidual() {
     auto ideal=p;ideal.boardFilterTolerance=ideal.boardEnvelopeTolerance=0;
     double widest=0;
     for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<4;++board) {
-        // Static cutoff and Q are trimmed by ear to match the other boards.
         const auto s=play(seed,p,board,60),i=play(seed,ideal,board,60);
-        require(s.hpFrequency==i.hpFrequency && s.lpFrequency==i.lpFrequency,
-                "the trimmed static cutoff stays identical across boards");
         require(s.oscillatorFrequency==i.oscillatorFrequency,"filter tolerance leaves the VCO alone");
         for(bool high:{true,false}) {
             const double scale=std::log2(sensitivity(seed,p,board,high));
@@ -294,6 +293,52 @@ void filterRankResidual() {
         }
     }
     require(widest>.13,"sensitivity residuals span the rank bin");
+}
+
+// The trims are offsets set with each filter's lever at its centre (CS-60 SM
+// printed p.38: "HPF lever to the center position", "LPF to center
+// position"). A static cutoff there is every board's; away from it the
+// board's sensitivity, measured above through BRILLIANCE, stretches the gm
+// octaves from that point, which the printed law makes the bus volts.
+void staticCutoffFromTheLeverCentre() {
+    const double hpCentre=ceres::hpfLeverHz(.5)-floorHz, lpCentre=ceres::lpfLeverHz(.5)-floorHz;
+    auto centred=plain();centred.boardFilterTolerance=1;
+    centred.hpCutoff=hpCentre+floorHz;centred.lpCutoff=lpCentre+floorHz;
+    auto atFloor=centred;atFloor.hpCutoff=floorHz-1;atFloor.lpCutoff=floorHz;
+    const auto ideal=[](ceres::Patch q){q.boardFilterTolerance=0;return q;};
+    double widest=0;
+    for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<4;++board) {
+        const auto c=play(seed,centred,board,60),ci=play(seed,ideal(centred),board,60);
+        near(variableOctaves(c,ci,true),0,1e-12,"HP static cutoff is every board's at the HPF lever centre");
+        near(variableOctaves(c,ci,false),0,1e-12,"LP static cutoff is every board's at the LPF lever centre");
+        const auto f=play(seed,atFloor,board,60),fi=play(seed,ideal(atFloor),board,60);
+        require(f.hpFrequency==fi.hpFrequency && f.lpFrequency==fi.lpFrequency,
+                "a cutoff at the 4.7M floor has no gm to spread");
+        for(double amount:{1.,.5}) {
+            auto q=centred;q.boardFilterTolerance=amount;
+            const double hpScale=sensitivity(seed,q,board,true), lpScale=sensitivity(seed,q,board,false);
+            for(double hp:{40.,200.,6000.})for(double lp:{150.,3000.,12000.}) {
+                auto p=q;p.hpCutoff=hp;p.lpCutoff=lp;
+                const auto s=play(seed,p,board,60),i=play(seed,ideal(p),board,60);
+                const double hpOctaves=(hpScale-1)*std::log2((hp-floorHz)/hpCentre);
+                const double lpOctaves=(lpScale-1)*std::log2((lp-floorHz)/lpCentre);
+                near(variableOctaves(s,i,true),hpOctaves,1e-9,"HP static cutoff spreads from the lever centre");
+                near(variableOctaves(s,i,false),lpOctaves,1e-9,"LP static cutoff spreads from the lever centre");
+                if(amount==1)widest=std::max(widest,std::abs(hpOctaves));
+            }
+            // Kv scales gm at pin 2, outside the rank network, so every key
+            // keeps the board's spread.
+            if(amount==1)for(int key:{36,84}) {
+                auto p=q;p.hpCutoff=200;p.lpCutoff=3000;
+                const auto s=play(seed,p,board,key),i=play(seed,ideal(p),board,key);
+                near(variableOctaves(s,i,true),(hpScale-1)*std::log2((200-floorHz)/hpCentre),1e-9,
+                     "Kv leaves the HP spread alone");
+                near(variableOctaves(s,i,false),(lpScale-1)*std::log2((3000-floorHz)/lpCentre),1e-9,
+                     "Kv leaves the LP spread alone");
+            }
+        }
+    }
+    require(widest>.25,"three octaves below the centre, boards spread by a quarter octave of gm");
 }
 
 void envelopeLevelResidual() {
@@ -563,6 +608,7 @@ int main() {
         linearVcoBetweenTrimPoints();
         thermalDriftWithinTheRanks();
         filterRankResidual();
+        staticCutoffFromTheLeverCentre();
         envelopeLevelResidual();
         ampEnvelopeTrims();
         outputTrimAtFullSustain();

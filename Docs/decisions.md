@@ -215,3 +215,27 @@ evidence.
   direction, a high-impedance RMS reading, and fixes its load. Still
   assumed: that the CS-50 was trimmed on the same bench load, which neither
   CS-50 source names.
+
+## 2026-10-21: the boards part away from their trim point
+
+Not a listening choice: the sources decide it. Verdict B on
+`2026-10-20-voice-variation-board-tolerance` (revision 2) turned the
+documented filter spread on by default, on a model whose static cutoffs were
+identical on every board. The term that moves them apart away from the trim
+setting was listed as a gap then, for want of the cutoff's volts.
+
+- **Decided:** where each board's static cutoff sits when its lever is away
+  from the point the boards were matched at.
+- **What the sources say:** VR7 and VR9 are offsets on the Vfc node, matched
+  by ear with each filter's lever at its centre (CS-60 SM printed p.38,
+  III-IV, sibling evidence for the shared M board), and the rank residual
+  scales every input on that node, the lever's volts included. The 0.6.0
+  printed law, fc = 125 Hz/V * Kv * 2^Vfc, gives those volts.
+- **Result:** at `board_filter_tolerance` 1 a board's gm is
+  gm_c * (gm/gm_c)^s about the lever centre's gm; Q, and a cutoff with its
+  lever at the centre, stay every board's (Ceres 0.6.3). The amount still
+  runs from 0, identical boards, to 1. The verdict chose the documented
+  spread; this adds the part of it 0.5.0 could not express, unheard in that
+  set. A labelled before/after preview, not a blind test, is at
+  `/mnt/project-files/ceres/listening/2026-10-21-board-static-cutoff-preview/`
+  (not committed).

@@ -31,6 +31,10 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 
 ## Version history
 
+### Unreleased — 0.6.3 — the boards part away from their trim point
+
+- The four voices' filter cutoffs now also differ when a filter lever is away from its centre. The boards are matched by ear with each lever at its centre (the CS-60's alignment of the same board), and each filter chip's sensitivity residual, which already spread the envelope, SUB, touch and BRILLIANCE depths, now stretches the lever's own octaves around that point. At the factory settings one instrument's four voices spread by up to about half an octave of the chip's share of the cutoff (Brass 1's high-pass, at the bottom of its lever, anywhere from 68 to 107 Hz at middle C instead of 85 Hz on every voice). A lever at its centre and Q are unchanged, and `board_filter_tolerance` 0 still gives identical voices. The alignment procedure decides this; it was not chosen by ear.
+
 ### Unreleased — 0.6.2 — two readings from the CS-80 procedure
 
 - After the last key-up, the ring modulator's DEPTH sweep returns to the SPEED rate over 0.46 s instead of 14.5 s. The CS-80's service procedure aligns the same ring envelope circuit at ATTACK TIME 5 V, which rules out 0.6.0's reading at 10 V; this reverses a choice made by ear in 0.6.0. The panel lever laws for ring ATTACK TIME and DECAY TIME (`ringAttackSeconds`, `ringDecaySeconds`) are 31.6 times faster at every position (attack about 1 ms to 1 s, decay 13.5 ms to 13.5 s T60). The `ring_attack` and `ring_decay` controls are unchanged.

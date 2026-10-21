@@ -142,8 +142,10 @@ struct Patch {
     // Pitch: the residual the service tuning trims leave (+/-1 cent at each
     // trim point, Guide printed p.65). Filter: the IG00156 rank-bin residual
     // of each filter's control sensitivity (+/-.146 oct per octave of Vfc
-    // input, SM2 printed pp.17-18 rank table; the static cutoff and Q are
-    // trimmed by ear and stay identical). Envelope: the EG level checks of
+    // input, SM2 printed pp.17-18 rank table). The boards are matched by ear
+    // with each filter's lever at its centre (sibling CS-60 p.38), so a static
+    // cutoff there is identical and spreads with the sensitivity away from
+    // it; Q stays identical. Envelope: the EG level checks of
     // the sibling CS-60/CS-80 alignments of the same board: VCF EG level
     // (+/-10%), VCA EG peak (+/-2%) and floor (-200 +/-20mV); the output trim
     // after them keeps each board's full-sustain level. Envelope time: both
