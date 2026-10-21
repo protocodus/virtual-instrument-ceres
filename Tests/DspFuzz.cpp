@@ -11,6 +11,7 @@
 #include "DSP/ceres.hpp"
 #include "FuzzHarness.h"
 
+#include <cmath>
 #include <memory>
 #include <stdexcept>
 
@@ -75,11 +76,16 @@ extern "C" int LLVMFuzzerTestOneInput (const std::uint8_t* data, std::size_t siz
             }
             case 9:
             {
+                // A finite value lands inside the key's range; a nonfinite
+                // one is refused and leaves the patch as it was.
                 const auto info = anyKey();
-                Require (ceres::setParameter (patch, info.key, anyValue (info)));
-                double stored = 0.0;
+                const double value = anyValue (info);
+                double before = 0.0, stored = 0.0;
+                Require (ceres::getParameter (patch, info.key, before));
+                Require (ceres::setParameter (patch, info.key, value) == std::isfinite (value));
                 Require (ceres::getParameter (patch, info.key, stored));
                 Require (stored >= info.minimum && stored <= info.maximum);
+                Require (std::isfinite (value) || stored == before);
                 engine->setPatch (patch);
                 break;
             }
