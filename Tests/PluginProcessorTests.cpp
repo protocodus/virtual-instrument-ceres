@@ -15,6 +15,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <limits>
 #include <map>
 #include <memory>
 #include <new>
@@ -87,6 +88,17 @@ double engineValue (CeresAudioProcessor& p, const ceres::ParameterInfo& info)
     auto& ranged = parameter (p, info.key);
     const double plain = ranged.convertFrom0to1 (ranged.getValue());
     return isChoice (ranged) ? info.minimum + plain : plain;
+}
+
+// How closely a parameter returns an engine value. It stores its position as a
+// float in 0..1, so a linear range is good to a float step of the position times
+// the span: 1.4e-4 cents on PITCH's -500..+700. Whether 0 cents comes back exactly
+// depends on the compiler: x86-64 rounds the product to 500 before adding -500,
+// while Apple clang fuses the multiply-add and keeps the position's error, -1.2e-5.
+double floatPrecision (const ceres::ParameterInfo& info, double value)
+{
+    return 1.0e-6 * std::max (1.0, std::abs (value))
+           + static_cast<double> (std::numeric_limits<float>::epsilon()) * (info.maximum - info.minimum);
 }
 
 void setEngineValue (CeresAudioProcessor& p, const char* key, double value)
@@ -336,7 +348,7 @@ void parameterContract()
             // Hosts reset to the normalised default; a logarithmic lever maps
             // it back to the engine default within float precision.
             const double reset = number->convertFrom0to1 (found->getDefaultValue());
-            check (std::abs (reset - info.defaultValue) <= 1.0e-6 * std::max (1.0, std::abs (info.defaultValue)),
+            check (std::abs (reset - info.defaultValue) <= floatPrecision (info, info.defaultValue),
                    juce::String (info.key) + ": the default is the engine default");
             check (juce::exactlyEqual (number->convertFrom0to1 (0.0f), number->range.start)
                        && juce::exactlyEqual (number->convertFrom0to1 (1.0f), number->range.end),
@@ -404,7 +416,7 @@ void programContract()
             ceres::getParameter (preset, info.key, expected);
             const double actual = engineValue (p, info);
             // Parameters hold floats: a preset value lands within float precision.
-            check (std::abs (actual - expected) <= 1.0e-6 * std::max (1.0, std::abs (expected)),
+            check (std::abs (actual - expected) <= floatPrecision (info, expected),
                    p.getProgramName (index) + " sets " + info.key + " to " + juce::String (expected) + ", got "
                        + juce::String (actual));
         }

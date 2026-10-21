@@ -21,7 +21,7 @@ Protocodus portfolio standard kept in the project, not in this repository.
   up. A Rack device would take the same `X.Y.Z` plus its own stage suffix.
 - `Source/DSP/` is JUCE-free and C++17 (the Rack toolchain);
   `CeresDSPCxx17` compiles `ceres.cpp` the way the Rack does (C++17,
-  `CERES_EMBEDDED_TARGET`, no exceptions); `ceres` and `ceres_embedded`
+  `CERES_EMBEDDED_TARGET`, no exceptions); `ceres_native` and `ceres_embedded`
   explicitly compile the circuit engine as C++17. No allocation, file I/O, locks or
   exceptions on the audio thread.
 - `PLUGIN_MANUFACTURER_CODE Cers` / `PLUGIN_CODE Cer1`, `BUNDLE_ID` and the
