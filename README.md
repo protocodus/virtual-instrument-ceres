@@ -31,6 +31,24 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 
 ## Version history
 
+### Unreleased — 0.6.0 — owner verdicts and hardware laws
+
+- Filter cutoffs follow Yamaha's printed IG00156 law: one octave per volt on both filters and 62.5 Hz at middle C for 0 V, replacing the 0.7/0.65 oct/V estimates. Envelope, SUB, touch and BRILLIANCE depths rescale with it, so the filter envelope sweeps about 1.4 (HP) to 1.5 (LP) times as far. Chosen by ear from the printed candidates.
+- Resonance follows its control voltage exponentially between the printed end points, so mid-travel settings are more resonant (Q 1.6 instead of 0.9 at half travel); the end points are unchanged. Chosen by ear.
+- Factory presets place their filters as the hardware's loaded preset buses do and assume RESONANCE at MIN. High-pass cutoffs sit 1.3–2.5 octaves higher (String 1 141 → 586 Hz), most low-pass cutoffs 0.2–1.6 octaves lower (Brass 1 2.07 kHz → 890 Hz), and presets that played at the maximum Q 5 now sit near Q 1.4. Presets sound thinner and darker.
+- The VCO sine follows the classic transistor triangle-to-sine shaper: about 1.4 % odd harmonics, mostly 5th and 7th, slightly brighter and reedier than a pure sine and 0.3 dB quieter at the same peak. The output reference and clipping rails moved to match. Chosen by ear, not measured.
+- The four voices now differ the way four calibrated CS-50 boards do, by default: a cent or two of pitch, most at the bottom of the keyboard, slightly different filter response to envelope, SUB, touch and BRILLIANCE, and envelope depth within the service checks. Each seed is one fixed instrument. Set `board_pitch_tolerance`, `board_filter_tolerance` and `board_envelope_tolerance` to 0 for identical voices. Chosen by ear.
+- Free-running pitch drift is on by default: each voice wanders within ±1 cent of its tuning (`drift_cents` 1, was 0), the band the service tuning leaves. Set it to 0 for steady pitch.
+- Correction to 0.5.0: the amplitude envelope tolerance applies to the attack peak and the −200 mV floor; every voice holds the same full-sustain level, as the alignment leaves it.
+- New opt-in board controls, off by default: `board_envelope_time_tolerance` (attack, decay and release within the ±5 % trim bands), `board_vca_tolerance` (each voice's sine-to-filtered balance within its level trims) and `board_temperature_rise` (−25 to +25 K since tuning; each voice drifts by its own IC temperature rank).
+- The ring modulator's wet signal is 3 dB quieter at full MODULATION: its two sidebands now peak at the dry tone's peak. After the last key-up, the DEPTH sweep glides back to the SPEED rate over about 14.5 s instead of 0.47 s. Both chosen by ear.
+- Very loud input to the ring modulator compresses and limits as the µA796's input pair does. Four-note chords change by about 1 % at most; touch LEVEL and extra virtual voices reach the limit.
+- FUNCTION EXT: the SUB can follow the rear EXT IN jack (`lfo_waveform` 5, `ext_level`), fed per sample by a front end. Existing patches are unchanged.
+- Front ends get the PANEL HPF/LPF lever law (`hpfLeverHz`, `lpfLeverHz`): 85 Hz to about 42 kHz at middle C, the first few percent of travel doing nothing.
+- The plug-in now plays the circuit engine instead of the silent scaffold. Every engine control is a host parameter, named by its engine key with the engine's range and default; the 14 research presets are its factory programs, Init first; the editor is laid out like the CS-50 panel. Voices (1–16) and oversampling (1×/2×/4×) are plug-in settings applied when the instrument is idle, and the plug-in reports the engine's 31-sample latency. An optional EXT IN input, off by default, feeds FUNCTION EXT (VST3 sidechain, CLAP input port, AU input bus). Sessions saved by the scaffold open as a new instance.
+- Plug-in MIDI: velocity, channel pressure as touch, ±2-semitone pitch bend, the damper pedal (CC64), and CC11, which scales the `expression` pedal parameter the way MIDI expression scales volume.
+- Research for each component is in `Docs/research/*-authenticity-2026-10-20.md`; the by-ear verdicts behind this version are in [`Docs/decisions.md`](Docs/decisions.md).
+
 ### Unreleased — 0.5.0 — component authenticity
 
 - The ring modulator now multiplies by a sine instead of switching a square: the 33k sits in series between the carrier's 100 µF and the multiplier, as the PRA schematic draws it, so the µA796 stays in its linear region. You hear the two sum and difference tones without square-wave sidebands, and slow SPEED settings are no longer up to 38 dB weaker. Some dry signal leaks through, about 5 dB below each sideband, as a typical µA796 does. The wet path now loses lows below about 20 Hz. Wet loudness at full MODULATION is unchanged.
