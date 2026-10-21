@@ -13,7 +13,7 @@ MODULATION crossfade loading and the expression network were done earlier
 | SM2 | CS-50 Service Manual 2/2 | printed 9 / PDF 7 (IG00150 pin sheet); printed 16 / PDF 12 (M board VCA EG); printed 21 / PDF 15 (IG00159 pin sheet); printed 22 / PDF 16 (PRA schematic and parts note) |
 | Guide | Yamaha CS Series Servicing Guide | printed 18–19 / PDF 27–28 (KAS timing chart, ring trigger); printed 49 / PDF 58 (PWM VCO law); printed 50–53 / PDF 59–62 (ring modulator, oscillator and envelope outlines) |
 | Overall | CS-50 overall circuit diagram | PRA section, grid L–M 3–5 |
-| CS-60 SM | Yamaha CS-60 Service Manual (sibling) | PDF 15 (PRA schematic); printed 38–39 / PDF 40–41 (section VI alignment: M-board EG/VCA, PRA). Page numbers below are printed. |
+| CS-60 SM | Yamaha CS-60 Service Manual (sibling) | PDF 15 (PRA schematic); printed 38–39 / PDF 40–41 (section VI alignment: M-board VI.1 CP4 sine, VI.2–VI.4 EG/VCA and output level, PRA). Page numbers below are printed. |
 | µA796 | Fairchild 1973 Linear IC Data Catalog | pp.7-74 to 7-77 (µA796 sheet) |
 | MC1496 | Motorola/ON MC1496 data sheet (second source) | bias formula I5 = (V − φ)/(R5 + 500 Ω), φ = 0.75 V |
 
@@ -22,6 +22,8 @@ CS-60 notes ("IC9 is used for CS-60 only", "Value of R: CS-50 270K, CS-60
 470K"), so it is one board drawn for both instruments. The CS-60 manual's PRA
 schematic (PDF 15) matches it part for part in the ring section. Its alignment
 values are used below as the procedure for this board, labelled as CS-60.
+The M-board steps print the CS-50's own value where it differs ("CS-50 is
+0.6V" in VI.4), so they also serve as the CS-50 voice-board procedure.
 
 ## Findings
 
@@ -93,17 +95,47 @@ under 2 % (`Ceres.ring_switching_circuit_contracts`).
 - **Wet buffer.** IC1-2 is non-inverting, gain 1 + VR4/10k, with VR4 a
   B-100K trimmer (SM2 p.22, overall, CS-60 PDF 15). **No document gives its
   setting**: the CS-60 alignment trims VR3, VR7 and VR5 on this board, not
-  VR4. The engine assumes VR4 is trimmed level-neutral: wet RMS equals dry
-  RMS for a steady midband carrier. That needs 57.8k, inside the trimmer's
-  range, and keeps the previous wet loudness. The peak-matched alternative
-  (38.0k, 3 dB less wet) went into a listening test. That the level-neutral
-  trim lands mid-range is what independently supports the 330 Ω reading.
-- **Signal-pair nonlinearity.** The degenerated pair limits at 0.56 V peak on
-  pin 1. CS-60 SM p.39 (VI-4) aligns the CS-50 voice output to 0.6 V
-  ("CS-50 is 0.6V"). At pin 1 that is at most 0.35 V: 1.5 % peak
-  compression, third harmonic −48 dB, and −62 dB at half that level.
-  The engine's bus is not a calibrated voltage, so this is a bound, not a
-  modelled effect.
+  VR4. Two trims are defensible for a steady midband carrier:
+  - wet RMS equal to dry RMS: VR4 = 57.8k, gain 6.78 (shipped in 0.5.0);
+  - the two sidebands together peaking at the dry peak, each half the dry
+    tone: VR4 = 38.0k, gain 4.80, 3.0 dB less wet.
+
+  The owner chose the peak-matched trim **by ear** (listening test
+  ring-wet-trim, 2026-10-20), so the engine uses 38.0k. That is a choice
+  between two defensible trims, not a measurement of VR4. Both trims land
+  inside the trimmer's range, while the 330K reading would need a buffer
+  gain of about 2000 against the trimmer's maximum of 11. That is what
+  independently supports the 330 Ω reading.
+  `Ceres.native_dsp_contracts` reads VR4 back off the engine's wet level
+  through an independently derived chain and checks it is 38.0k and
+  reachable.
+- **Signal-pair nonlinearity.** Each emitter of the lower pair has its own
+  I5 sink and 470 Ω joins them (µA796 equivalent circuit), so
+  V1 − V4 = 2V_T·atanh(x) + x·I5·470 for the current split x. The pair
+  limits near I5(470 + 2r_e) = 0.562 V on pin 1. The bus scale comes from
+  the M-board alignment in the CS-60 manual (sibling procedure, CS-50
+  value):
+  - VI.1 (p.38) sets the sine at CP4 to 1 Vpp, the engine's ±1, so one
+    unit is 0.5 V at CP4;
+  - VI.4 (p.39) sets each CS-50 voice output O to 0.6 V ("CS-50 is
+    0.6V"; the figure marks it peak to peak) for VI.2's 0.8 Vpp filtered
+    pulse at CP4, with the VCA EG at full SUSTAIN, 0.98 of its peak;
+  - the four O outputs reach I1 through 1k each into 47k, and IC1 follows
+    I1 to O1 (SM2 p.22).
+
+  One bus unit is then 95.2 mV at O1 and 55.6 mV at pin 1. Four voices at
+  the VI.4 level, in phase, reach 0.17 V there: third harmonic −62 dB.
+  Four-note chords on the factory presets reach 0.12–0.31 V at pin 1, at
+  most 1.1 % instantaneous compression. Touch LEVEL and virtual voices
+  beyond the CS-50's four drive the pair into its limit. Round 1 read the
+  0.6 V as a peak and bounded the compression at 1.5 %, without applying
+  it. The engine now solves the law per internal sample and hands the wet
+  path the input a linear pair would need for the same split, so small
+  signals and the 2.279 gain are unchanged. `Ceres.native_dsp_contracts`
+  checks every sample of a 16-voice overdrive and a quiet sine against a
+  bisection of the law at an independently derived pin-1 scale. On the
+  development container the solve costs about 0.7 % of one core at a
+  48 kHz host with 4× oversampling.
 
 ### 4. Carrier oscillator law
 
@@ -136,19 +168,37 @@ under 2 % (`Ceres.ring_switching_circuit_contracts`).
 - 2DT (pin 11) is held at 15 × 3.3/10.1 = 4.901 V by 6.8k/3.3k, so the
   release is fixed, as modelled.
 - The PRA's TC path is a fixed 100k with VR2 as an offset trim; the M board
-  uses 82k + VR20 (B-50K) and VR16. CS-60 SM p.39 (PRA I) aligns the ring
-  EG so that, with AT = DT = 10 V, it reaches its 10 V peak **31 ms** after
-  key-on. The M-board pin-sheet law gives 1 ms there, and CS-60 SM p.38
-  confirms that law on the M board: 4 ms at 8 V, 125 ms at 3 V,
-  0.3 decade/V.
-- The PRA envelope is therefore trimmed about 31× slower than the M-board
-  law at the short end. If the slope is the same, that factor applies to
-  every segment, including the fixed release: 14.5 s T60 instead of the
-  0.468 s inferred earlier. That conclusion rests on the slope assumption
-  (a fixed 100k against the M board's trimmed 82k–132k), so it went into a
-  listening test. The shipping release stays at 0.468 s.
-- `ring_attack` / `ring_decay` stay in seconds. On hardware the shortest
-  attack is about 31 ms.
+  uses 82k + VR20 (B-50K) and VR16. CS-60 SM p.39 (PRA I) sets AT = DT =
+  10 V ("on SHORT side") and marks the time from key-on to the 10 ± 2 V EO
+  peak "Alignment by 31mS". The M-board pin-sheet law gives 1 ms there, and
+  CS-60 SM p.38 confirms that law on the M board: 4 ms at 8 V, 125 ms at
+  3 V, 0.3 decade/V.
+- The PRA envelope is therefore aligned 31× slower than the M-board law at
+  the short end. Every segment drives the same TC → EI converter, so the
+  factor applies to all of them if the slope is the same. That is an
+  assumption: a fixed 100k against the M board's trimmed 82k–132k span
+  could put the slope anywhere from 0.246 to 0.396 decade/V, which at the
+  fixed 2DT means 7.7–45 s T60.
+- **Release, chosen by ear.** The 0.5.0 engine used the untrimmed pin-sheet
+  law at 2DT: 0.468 s T60. The PRA-aligned law gives 31 × 0.468 =
+  **14.50 s T60**. The owner chose the aligned law by ear (listening test
+  ring-release, 2026-10-20), so after the last key-up the DEPTH excursion
+  now returns to SPEED over 14.5 s. That is a choice between two laws; the
+  0.3 decade/V slope is still an assumption, not a measurement. The
+  listening render took 2DT as the rounded 4.901 V (14.50202 s against the
+  engine's 14.50212 s, 7 ppm apart).
+- **Lever laws.** TVR1 (ATTACK TIME) and TVR2 (DECAY TIME) are B-10K from
+  +10 V to ground, wipers to AT and DT (SM2 p.26). 10 V is the SHORT end
+  (CS-60 SM p.39). On the aligned law the attack runs 31 ms–31 s and the
+  decay 0.428–428 s T60 over 10–0 V. `ringAttackSeconds` and
+  `ringDecaySeconds` in `ceres.hpp` give them, and the release is
+  `ringDecaySeconds(ringReleaseVolts)`. `ring_attack` / `ring_decay` stay
+  in seconds and stop at 10 s, so the slow end of each lever (AT below
+  1.64 V, DT below 5.44 V) is outside their range. They also allow times
+  below the hardware's 31 ms and 0.428 s.
+  `Ceres.ring_carrier_circuit_contracts` checks the laws against the
+  printed alignment points, and `Ceres.native_dsp_contracts` checks the
+  engine's release trajectory against an independent derivation.
 
 ### 6. Trigger
 
@@ -163,20 +213,23 @@ an all-keys-up → any-key-down transition, matches this and is unchanged.
 
 `/mnt/project-files/ceres/listening/2026-10-20-ring-wet-trim/` and
 `/mnt/project-files/ceres/listening/2026-10-20-ring-release/`, each with a
-`key.md` the listener reads after deciding. A is the shipping engine in both.
-No verdict yet; `Docs/decisions.md` takes it when one is given.
+`key.md` the listener reads after deciding. A was the 0.5.0 engine in both.
+The owner's verdicts go in `Docs/decisions.md`. The wet trim and the
+release now follow the owner's choices (§3, §5).
 
 ## What still needs data
 
 1. **VR4's factory setting**, or a recording of a CS-50 at full MODULATION
    next to the same patch at zero. That one number fixes the absolute wet
    level.
-2. **The ring EG's release on a real unit**: the EO trace after key-up at
-   any DT setting. One trace settles the slope question in §5.
+2. **One ring EG time on a real unit away from the 10 V alignment point**:
+   the EO trace of an attack at any AT below 10 V, or of the release. One
+   trace settles the slope assumption in §5 and with it the release.
 3. **IG00150 output impedance and sine purity.** The 0.047 µF on its pin 6
    and any shaper distortion are not modelled.
-4. **Bus voltage calibration** (with the VCA/output component), so the
-   bounded signal-pair compression in §3 can be applied rather than bounded.
+4. **A measured CS-50 voice-output level** (O or O1, any known patch). The
+   bus scale in §3, and with it the signal-pair compression, rests on the
+   CS-60 manual's alignment of the M board, not on a CS-50 measurement.
 5. **Part-to-part spread.** Carrier-port offset (12 µA typ, 30 µA max bias
    current) and V_BE mismatch move the dry leakage by several dB between
    units.
