@@ -274,7 +274,7 @@ ctest --test-dir build-dsp -L '^unit$' --output-on-failure
   --rate 48000 --frames 288000 --seed 50 --output /tmp/ceres-init.wav
 ```
 
-`ceres` and `ceres_embedded` are the circuit libraries. `ceres_render` writes mono float32 WAV without normalization; sorted event rows are `frame type note value`. It supports note-on/off, bend, pressure, pedal, all-notes-off, panic and reset. `--patch path` reads key=value overrides and `--build-info` reports the exact compiled sources including the merged CMake file. The native research preset API is excluded from the embedded ABI.
+`ceres_native` and `ceres_embedded` are the circuit libraries. `ceres_render` writes mono float32 WAV without normalization; sorted event rows are `frame type note value`. It supports note-on/off, bend, pressure, pedal, all-notes-off, panic and reset. `--patch path` reads key=value overrides and `--build-info` reports the exact compiled sources including the merged CMake file. The native research preset API is excluded from the embedded ABI.
 
 The circuit checks cover oscillator/filter/envelope/ring contracts, expression, all 68 keys and their descriptors, the EXT IN feed with zero post-construction allocations, and native/embedded parity. They are named `Ceres.<Suite>` and labelled `unit`; `CeresDSPCxx17` compiles `ceres.cpp` as the Rack does (C++17, `CERES_EMBEDDED_TARGET`, no exceptions). Test executables are resolved by CMake target paths for single- and multi-configuration generators. The `audio`, `render` and `fuzz` tiers remain separate; the unchanged audio contract now renders the actual circuit preset list twice.
 
