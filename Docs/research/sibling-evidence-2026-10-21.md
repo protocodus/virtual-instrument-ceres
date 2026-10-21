@@ -102,7 +102,7 @@ could not be read).
 | VR4, the ring wet trim | Nothing: the CS-80's VR4 is the carrier speed trim, a different function. |
 | IG00153 pin-15 impedance, IG00150 and IG00158 sine shape | Levels only (3.2 and 3 Vpp); no impedance or harmonic data. |
 | IG00151 above 10 V LI | The 10–30 kΩ output check load and the current-output reading; no transfer above 10 V. |
-| IG00156 input scale, saturation and pin-7 current | Gotharman's module calls the IG00156 input "very sensitive", which says it clips early but gives no level. No pin-7 current is printed. |
+| IG00156 input scale, saturation and pin-7 current | Gotharman's module calls the IG00156 input "very sensitive", which says it clips early but gives no level. No pin-7 current is printed, but the CS-30's board implies a low-impedance pin 7 ([addendum](#addendum-the-research-cross-check)). |
 | Envelope scope captures, warm-up pitch log, measured voice spreads | None: the procedures trim to bands, and no capture of a unit was found. |
 
 ## Scores after this round
@@ -121,3 +121,41 @@ could not be read).
 
 All three raised scores rest on sibling evidence, CS-80 and CS-30 documents
 for circuits the CS-50 shares, not on a CS-50 measurement.
+
+## Addendum: the research cross-check
+
+A wider search (19 sources; 25 claims each put to three independent checks)
+found no measured value for any row of **Still open**. It confirmed the
+readings above, the CS-30 slope check included: the step on B5 at
++7 ± 0.1 V reads as quoted, and only an inference that the law is not
+log-linear, which rested on the unreachable B2 step, was rejected. Three new
+leads come from board wiring. None is implemented, because each needs a value
+no document prints.
+
+1. **IG00156 pin 7 may be a current input.** The CS-30 feeds the same chip's
+   VQ pin through 22k into a rank shunt of 470, 430 or 390 Ω, with 10 µF
+   (CS-30 SM pp.8–9), and prints Q = 10 at 0 V and 0.5 at 10 V. A
+   high-impedance pin there would see at most 0.2 V and stay near maximum Q
+   over the whole knob, while a pin that responds over 0.2 V would sit at
+   minimum Q almost everywhere on the CS-50's 220k/220k network. Both boards
+   work only if pin 7 takes current into a low impedance. Ceres takes pin 7 as
+   drawing no current, which gives the RESONANCE controls their 1.1 s lag
+   (10 µF × 110k) and loads each preset Q row with 110k to RES. With a current
+   input the lag would be tens of milliseconds, and each Q row would see 55k
+   to a node near 0 V instead. If both boards' 10 V endpoints mean the same
+   pin current, the input is near 1.7 kΩ and the lag about 17 ms; that is an
+   inference, not a datum. Measuring pin 7's voltage against the RES lever on
+   a real M board would settle it.
+2. **A capacitor on the WSC sine output.** One reading of the CS-80 M-board
+   drawing (SM p.41) puts 0.047 µF from the IG00158 SIO to ground. Its corner
+   depends on SIO's output impedance, which is not printed (about 34 kHz at
+   100 Ω, 3.4 kHz at 1 kΩ). The CS-50's own drawing (SM2 p.16) should be
+   checked first.
+3. **The IG00150 sine output may be high-impedance.** The CS-80 PRA drives the
+   µA796's 100 Ω-terminated carrier port straight from SIO (CS-80 SM p.53),
+   which a stiff 3.2 Vpp source could not do. Ceres treats SIO as an ideal
+   source into the CS-50's 100 µF and 33k; that holds only if SIO's impedance
+   is well below 33k.
+
+E-46's temperature ranks and the factory trim bands came up again; the drift
+and board-tolerance models already use them.
