@@ -225,6 +225,16 @@ double ringWetBufferGain() {
 double modulatedFilterFrequency(double referenceHz, double factor) {
     return filterFrequencyFloor + std::max(0.0,referenceHz-filterFrequencyFloor)*factor;
 }
+// One board's static cutoff for the patch's: its offset trim matched it to
+// the other boards at alignedGm Hz of gm, and its Vfc sensitivity, scale
+// times nominal, stretches the bus octaves away from there (see
+// BoardTolerance). The 4.7Mohm part does not move, so a cutoff at or below
+// it is every board's. Exactly the patch's value at scale 1.
+double boardCutoff(double referenceHz, double alignedGm, double scale) {
+    const double gm=referenceHz-filterFrequencyFloor;
+    if (scale==1 || gm<=0) return referenceHz;
+    return filterFrequencyFloor+alignedGm*std::pow(gm/alignedGm,scale);
+}
 double clamp(double x, double lo, double hi) { return std::max(lo, std::min(x, hi)); }
 double wrap(double x) { return x - std::floor(x); }
 
@@ -442,11 +452,21 @@ struct Random {
 // 2.7k/2.2k/1.8k, R7 3.3k/2.7k/2.2k (CS-60/50 column 3.0k/2.4k/2.0k); every
 // column spans x1.5 over two steps, so a chip lands within half a step of
 // nominal: octaves per Vfc volt scaled by 2^(u*.14624), |u|<=1, HP and LP
-// independent. The static cutoff is then trimmed (VR7 HP, VR9 LP) and Q
-// (VR8, VR10) until "the tone color ... may be the same as that of other M
-// circuit boards" (CS-60 p.38): matched by ear, no numeric residual, so the
-// static cutoff and Q stay identical here and only the Vfc-driven octaves
-// (EG, SUB, touch, BRILLIANCE) carry the sensitivity residual. INFERENCE:
+// independent. The trims then match the boards by ear, each with its own
+// filter's lever at the centre: PANEL, pulse on, "HPF lever to the center
+// position" with LPF, RES L and RES H high for VR7 (cutoff) and VR8 (Q);
+// "LPF to center position" with HPF and both RES low for the LPF trims (the
+// text names VR9), until "the tone color ... may be the same as that of
+// other M circuit boards" (CS-60 p.38, III-IV). No number bounds the ear
+// match, so a static cutoff at that lever centre is identical on every
+// board. The trims are offsets, though, and the sensitivity still stretches
+// every Vfc input's octaves about the point they were set at. The procedure
+// names no key or envelope setting, so the model takes the levers alone: the
+// EG, SUB, touch and BRILLIANCE octaves scale about their own zero, and the
+// cutoff bus about the lever centre, so a static cutoff one bus volt (one
+// octave at the printed law) from it differs by (scale-1) octave of gm
+// (boardCutoff). Q stays identical everywhere: nothing bounds a chip's pin-7
+// law, which the CS-50 does not rank. INFERENCE:
 // chips uniform within contiguous one-step bins. The CS-80's numbers do not
 // carry over: its complete VCF alignment (printed p.11) holds FH/FL at
 // 4.0/3.3V, turns VR7/VR9 for maximum amplitude at the C1 key and sets
@@ -488,7 +508,8 @@ struct Random {
 // assumptions (RMS meter, notes adding incoherently) that is
 // sqrt(4/sum g^2) over the four physical boards' sine gains g.
 //
-// Not modelled, no printed tolerance: Q and static cutoff (ear-matched),
+// Not modelled, no printed tolerance: Q, and the static cutoff at the trims'
+// lever centre (both ear-matched),
 // VR14's own residual (0.6V, no band for the CS-50), WSC level (no per-board
 // procedure), the 1.5nF/180pF/.22uF capacitors and 4.7M resistors (neither
 // parts list gives a tolerance), the KAS sample-holds.
@@ -521,6 +542,8 @@ struct BoardTolerance {
     double ampFloorError=0, sineError=0, filteredError=0;
     // Cached at the patch's amounts; the identical-board values when off.
     double hpScale=1, lpScale=1, hpEnvelopeGain=1, lpEnvelopeGain=1;
+    // Static cutoffs at middle C (boardCutoff): the patch's when off.
+    double hpCutoff=0, lpCutoff=0;
     double ampPeak=1, ampFloor=0, ampEnvelopeGain=1, sineGain=1;
     std::array<double,4> filterCoefficients{}, ampCoefficients{};
     // trims keeps the first stream's order, so a seed keeps the boards it
@@ -1562,10 +1585,10 @@ struct Synth::Impl {
             patch.filterDecay,effectiveRelease(patch.filterRelease,patch.globalRelease),
             patch.filterAttackHeadroom,patch.filterAttackSaturation);
         // Direct CS-50 PRA 2DT divider: +15V through 6.8k, 3.3k to ground.
-        // Its unloaded 4.901V on the PRA-aligned DECAY TIME law gives 14.50s
-        // T60 (CS-60 sibling trim, fixed-100k slope assumption; chosen by ear
-        // 2026-10-20 over the untrimmed .4678s; see ceres.hpp). This fixed
-        // key-off return is separate from the M-board global SUS.
+        // Its unloaded 4.901V on the PRA-aligned DECAY TIME law gives .459s
+        // T60 (the CS-80 procedure's 5V trim point, fixed-100k slope
+        // assumption; see ceres.hpp). This fixed key-off return is separate
+        // from the M-board global SUS.
         ringCoefficients=envelopeCoefficients(internalFs,patch.ringAttack,
             patch.ringDecay,ringDecaySeconds(ringReleaseVolts),.01,0);
         updateBoardScales();
@@ -1577,10 +1600,15 @@ struct Synth::Impl {
         const double ampRelease=effectiveRelease(patch.ampRelease,patch.globalRelease);
         // The attack time sharing a T60's RC (see BoardTolerance).
         const auto attack=[](double t60) { return boardAttackTimeConstants*t60/std::log(1000.0); };
+        // The gm at each lever's centre, where the VCF trims match the boards.
+        const double hpAligned=hpfLeverHz(.5)-filterFrequencyFloor;
+        const double lpAligned=lpfLeverHz(.5)-filterFrequencyFloor;
         for (auto& voice : voices) {
             auto& board=voice.board;
             board.hpScale=std::exp2(patch.boardFilterTolerance*board.hpOctaves);
             board.lpScale=std::exp2(patch.boardFilterTolerance*board.lpOctaves);
+            board.hpCutoff=boardCutoff(patch.hpCutoff,hpAligned,board.hpScale);
+            board.lpCutoff=boardCutoff(patch.lpCutoff,lpAligned,board.lpScale);
             const double level=1+envelope*board.filterEnvelopeError;
             board.hpEnvelopeGain=level*board.hpScale;
             board.lpEnvelopeGain=level*board.lpScale;
@@ -1847,8 +1875,9 @@ struct Synth::Impl {
             // and 150k HP, like SUB: the HP coupling is hpSubRelativeScale.
             const double touchOctaves=expression*(patch.pressureFilter+lfo*patch.pressureWah);
             // Board tolerance (see BoardTolerance): each Vfc input's octaves
-            // scale with this board's rank residual; the EG also with its
-            // output-level residual. Every factor is exactly 1 when off.
+            // scale with this board's rank residual, the static cutoff's from
+            // the lever centre; the EG also with its output-level residual.
+            // Every factor is exactly 1, and each cutoff the patch's, when off.
             const auto& board=v.board;
             const double hpFactor=std::exp2(keyOctaves+filterEnvelope*board.hpEnvelopeGain*patch.hpEnvelopeScale
                 + touchOctaves*board.hpScale*hpSubRelativeScale+lfo*board.hpScale*(patch.filterLfo*hpSubRelativeScale)
@@ -1860,8 +1889,8 @@ struct Synth::Impl {
                     + touchOctaves*board.lpScale+lfo*board.lpScale*patch.filterLfo
                     + patch.brilliance*board.lpScale*lpBrillianceScale);
             const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*noise;
-            const double hpFrequency=modulatedFilterFrequency(patch.hpCutoff,hpFactor);
-            const double lpFrequency=modulatedFilterFrequency(patch.lpCutoff,lpFactor);
+            const double hpFrequency=modulatedFilterFrequency(board.hpCutoff,hpFactor);
+            const double lpFrequency=modulatedFilterFrequency(board.lpCutoff,lpFactor);
 #if !defined(CERES_EMBEDDED_TARGET)
             v.oscillatorFrequency=frequency; v.hpFrequency=hpFrequency; v.lpFrequency=lpFrequency;
 #endif

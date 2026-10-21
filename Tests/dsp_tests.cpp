@@ -184,6 +184,10 @@ void fixedConductanceModulation() {
         tracking.filterAttack=.015; tracking.filterDecay=.12;
         tracking.hpEnvelopeScale=.2; tracking.lpEnvelopeScale=.8;
         tracking.drive=.05;
+        // A board's rank residual bends a cutoff change, which is lever volts
+        // on the Vfc bus, but not Kv's gm: the key/cutoff equivalence is
+        // nominal (BoardToleranceTests.cpp holds the spread on every key).
+        tracking.boardFilterTolerance=0;
         auto fixed=tracking; fixed.keyTrack=0;
         const double keyRatio=std::pow(2.0,(note-60)/12.0);
         const auto electrical=[&](double totalHz) {
@@ -259,8 +263,9 @@ void masterPitchRouting() {
                 tuned.filterInitial=-2; tuned.filterPeak=3; tuned.filterAttack=.015;
                 tuned.filterDecay=.12; tuned.hpEnvelopeScale=.2; tuned.lpEnvelopeScale=.8;
                 // A trimmed board's residual depends on Kv and TRANSPOSE
-                // separately: the PITCH/TRANSPOSE equivalence is nominal.
-                tuned.boardPitchTolerance=0;
+                // separately, and its rank residual bends a cutoff change but
+                // not Kv's gm: both equivalences are nominal.
+                tuned.boardPitchTolerance=tuned.boardFilterTolerance=0;
                 auto equivalent=tuned;
                 equivalent.tuneCents=0;
                 equivalent.octave=cents/1200; // Separate FT path gives the same VCO pitch.

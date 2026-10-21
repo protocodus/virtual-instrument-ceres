@@ -10,16 +10,16 @@ default 0. Neither is a tolerance model. (`drift_cents` now ships at 1: see
 This pass adds the per-board variation the service documents bound, as
 amounts from 0 (four identical boards) to 1 (the documented spread). The
 owner chose the pitch, filter and envelope amounts by ear (verdict B on the
-listening set below), so those three ship at 1; the others ship at 0 until
-the owner has heard them:
+listening set below), so those three ship at 1; the EG-time and VCA amounts
+ship at 1 too since 0.6.1, taken by the owner unheard (`Docs/decisions.md`):
 
 | Key | Range | Default | 1 means |
 | --- | --- | --- | --- |
 | `board_pitch_tolerance` | 0..1 | 1 | the VCO trim residual the tuning method allows |
-| `board_filter_tolerance` | 0..1 | 1 | the IG00156 rank-bin residual of each filter's control sensitivity |
+| `board_filter_tolerance` | 0..1 | 1 | the IG00156 rank-bin residual of each filter's control sensitivity, about the lever-centre trim point (0.6.3) |
 | `board_envelope_tolerance` | 0..1 | 1 | the EG level checks: VCF EG +/-10%, VCA EG peak +/-2% and floor -200 +/-20 mV, with VR14's full-sustain trim after them |
-| `board_envelope_time_tolerance` | 0..1 | 0 | both EGs' attack-time trims, +/-5% at 4 ms and 125 ms |
-| `board_vca_tolerance` | 0..1 | 0 | the VR11/VR12 CP4 level trims, with VR13/VR14 and VR6 after them |
+| `board_envelope_time_tolerance` | 0..1 | 1 | both EGs' attack-time trims, +/-5% at 4 ms and 125 ms |
+| `board_vca_tolerance` | 0..1 | 1 | the VR11/VR12 CP4 level trims, with VR13/VR14 and VR6 after them |
 | `board_temperature_rise` | -25..25 K | 0 | the ambient change since tuning; each board's VCO drifts within the IG00153 temperature ranks |
 
 Each seed is one instrument: the offsets are drawn once per physical board
@@ -41,6 +41,7 @@ amounts the boards' checks allow.
 | Yamaha CS-60 Service Manual | project sources (`cs60-service-manual.pdf`, SHA-256 `4b03579a...106636`) | section VI alignment of the shared M board |
 | Yamaha CS-80 "Adjustment Procedures and updates" | `https://www.therogoffs.com/cs80/CS80%20Adjustment%20Procedures%20and%20updates.PDF` (36-page scan, SHA-256 `eea101eb...276ba`) | the same trims with printed tolerances (printed pp.3-15 / PDF 5-17); Service News E-46 (PDF 33-36) |
 | CS-80 parts list | `https://www.therogoffs.com/cs80/cs80_parts_list.pdf` (SHA-256 `eaea3c1b...aabe28`) | checked for capacitor tolerances: none printed |
+| US 3,981,217 "Key assigner" (Nippon Gakki) | `https://patents.google.com/patent/US3981217A` (fetched 2026-10-21) | the assigner's channel choice, corroboration only (Research pass, 2026-10-21) |
 | Soundgas CS-50 listing, "Engineer's report" | `https://soundgas.com/products/yamaha-cs-50` (page created 2024-02-13, published 2024-06-05; fetched 2026-10-20, SHA-256 `cb818990...badfb9`) | a restorer's service of one CS-50: qualitative only, no numbers |
 
 None of these files is in the repository. CS-80 procedure pages are cited as
@@ -198,24 +199,72 @@ scales with R6/R7: the rank sets the chip's control **sensitivity**.
   over two steps, a step of sqrt(1.5) = 1.2247.
 - A chip lands within half a step: Vfc octaves scaled by 2^(u*0.14624),
   |u| <= 1, HP and LP independent.
-- Alignment (CS-60 p.38, III-IV): "adjust VR7 for cut off frequency and VR8
-  for Q so that the tone color of the M circuit board may be the same as
-  that of other M circuit boards"; for the LPF, VR9 likewise. Matched by ear.
+- Alignment (CS-60 p.38, III-IV): "Set the "HPF" lever to the center
+  position. Then, place the levers "LPF", "RESL" and RESH" in the High
+  position. Adjust VR7 for cut off frequency and VR8 for Q so that the tone
+  color of the M circuit board may be the same as that of other M circuit
+  boards"; for the LPF, "LPF" to center position with "RESL", "HPF" and
+  "RESH" at Low, and VR9 likewise. Matched by ear.
 
-Static cutoff and Q stay identical. No printed number bounds the ear match:
-the trimmers' range bounds what can be corrected, not what is left. The CS-80
+What the ear match leaves at that point has no printed number: the
+trimmers' range bounds what can be corrected, not what is left. The CS-80
 does print numbers (its VCF alignment, printed p.11 / PDF 13, holds FH and FL
 at 4.0 and 3.3 V, turns VR7/VR9 for maximum amplitude at the C1 key and sets
 VR8/VR10 to 4.3 and 2.2 +/-1 Vpp at CP3), but that is a different procedure
 on a CS-80 R7 and bus, so its bands do not carry over to a CS-50 aligned by
 ear. A restorer servicing one CS-50 found its "Filters well matched"
 (Soundgas engineer's report): consistent with a small ear-matched residual,
-but not a number.
+but not a number. So Q, and a static cutoff with its lever at the centre,
+are every board's.
 
-Strictly, the static cutoff away from the trim setting would also move by
-(sensitivity - 1) times its distance from the trim point in volts. Ceres's
-static cutoff is defined in Hz at C4, not in panel volts, so that term is
-left out and listed as a gap.
+### Away from the centre the boards part (0.6.3, 2026-10-21)
+
+0.5.0 left out one term: the static cutoff away from the trim setting moves
+by (sensitivity - 1) times its distance from the trim point in volts, and
+Ceres defined its cutoffs in Hz at C4, not in volts. The 0.6.0 printed law
+supplies the volts. VR7 and VR9 are offsets on the Vfc node, so the trim
+matches the boards at one bus voltage, the lever's centre; the lever's own
+volts then scale with the board's sensitivity like every other Vfc input.
+fc = 125 Hz/V * Kv * 2^Vfc (guide printed p.34) makes a static cutoff's bus
+volts its gm octaves at middle C, so a board's gm is
+
+    gm_board = gm_c * (gm / gm_c)^s
+
+with gm_c the gm at the lever's centre (`hpfLeverHz(.5)`, `lpfLeverHz(.5)`:
+1363 Hz at middle C for both filters, 1341 Hz of it gm) and s the board's
+sensitivity factor above. The 4.7 Mohm path (22.6 Hz) does not move, so a
+cutoff at or below it is every board's. Kv scales gm at pin 2, outside the
+rank network, so the spread in octaves is the same on every key.
+
+The procedure names the lever positions and nothing else: no key, and no
+envelope setting. Kv cancels, as above. An envelope voltage held while the
+aligner listened would move the match point by its own volts; the model
+takes the lever alone, as the procedure states it.
+
+With s at the edges of the rank bin (x0.904..x1.107), the factory settings
+give, at middle C:
+
+| Preset | HP | four boards within | LP | four boards within |
+| --- | --- | --- | --- | --- |
+| init | 15 Hz | 15 (below the floor) | 10000 Hz | 8245..12382 |
+| string1 | 587 | 537..636 | 9584 | 7934..11813 |
+| string2 | 173 | 141..208 | 1036 | 1007..1064 |
+| brass1 | 85 | 68..107 | 890 | 851..927 |
+| brass2 | 163 | 133..197 | 325 | 280..372 |
+| flute | 118 | 94..145 | 671 | 623..718 |
+| electric_piano | 121 | 97..149 | 131 | 105..160 |
+| clavichord | 672 | 624..719 | 890 | 851..927 |
+| harpsichord | 1413 | 1408..1418 | 4398 | 3926..4986 |
+| guitar1 | 325 | 281..372 | 1036 | 1007..1064 |
+| guitar2 | 184 | 151..221 | 199 | 164..237 |
+| funky1 | 587 | 537..636 | 1036 | 1007..1064 |
+| funky2 | 892 | 852..929 | 2844 | 2649..3077 |
+| funky3 | 349 | 304..397 | 513 | 463..563 |
+
+The widest is brass1's HP, at the bottom of its lever 4.4 octaves below the
+centre: -0.47..+0.43 octave of gm. Seed 50's four boards, which the listening
+sets use, put brass1's HP at 96.4, 78.2, 70.7 and 74.7 Hz and
+electric_piano's LP at 134.7, 132.7, 149.8 and 152.3 Hz.
 
 ## EG output levels
 
@@ -280,7 +329,7 @@ error.
 
 | Mechanism | What the documents give | Why left out |
 | --- | --- | --- |
-| Static cutoff and Q | VR7, VR9 (cutoff), VR8, VR10 (Q) matched by ear (CS-60 p.38) | no numeric residual for the CS-50 procedure |
+| Q, and a static cutoff at its lever's centre | VR7, VR9 (cutoff), VR8, VR10 (Q) matched by ear (CS-60 p.38) | no numeric residual for the CS-50 procedure |
 | VR14's own residual | 0.6 V on the CS-50 (CS-60 VI.4), no band | the CS-80's 80 +/-5 mVpp is a different target on the sine |
 | VR6's own residual | 0 +/-1 dBm (CS-60 PRA III) | an instrument level, not a board difference |
 | WSC level | no per-board procedure in either manual | no data |
@@ -306,15 +355,15 @@ plays it as its A.
 letters A-D with `key.md`: A the shipping engine (verdict B, `drift_cents`
 1) against the envelope-time and VCA amounts, alone and together. Material:
 factory `electric_piano` (pulse and sine, long decays), seed 50, the same
-unisons and chord; whole-file RMS matched. It decides whether those two
-amounts ship. `board_temperature_rise` is not a candidate: its default would
+unisons and chord; whole-file RMS matched. It decided whether those two
+amounts ship: the owner took both, unheard (0.6.1). `board_temperature_rise` is not a candidate: its default would
 be an invented temperature.
 
 ## Verification
 
 - `Ceres.board_tolerance_contracts` (Tests/BoardToleranceTests.cpp), every
   expected value rebuilt from the printed numbers:
-  - the defaults ship pitch, filter and envelope at 1 and the rest at 0,
+  - the defaults ship every amount at 1 and the temperature rise at 0,
     the factory presets keep them, the shipping boards differ, and zero
     amounts give identical boards;
   - every VCO trim point within +/-1 cent across 40 seeds x 4 boards, the
@@ -323,8 +372,10 @@ be an invented temperature.
     instrument's spread under 5 and 10 cents, one linear VCO's gain and
     offset drift between and above (rebuilt from C1 and C6), linear in the
     temperature change, independent of TRANSPOSE and additive to the trim;
-  - static cutoffs identical, and each filter's control sensitivity within
-    half a rank step;
+  - each filter's control sensitivity within half a rank step; static
+    cutoffs identical with the lever at its centre and at the 4.7 Mohm
+    floor, and elsewhere (s - 1) log2(gm/gm_c) octaves of gm from nominal,
+    at full and half amount, on the C2, C4 and C6 keys alike;
   - one VCF EG level factor for both filters, within +/-10%;
   - VCA EG peak within 10 +/-0.2 V and floor within -200 +/-20 mV; a lone
     board's held output, once the attack has left the output couplings, at
@@ -361,7 +412,10 @@ be an invented temperature.
   octaves per volt, touch and vibrato depths) set the three shipping
   amounts to 0, and those that read a pitch `drift_cents` too, each with a
   comment; the board contracts above own the tolerance and the drift
-  bound. The idle VCA-EG floor contract checks each shipping
+  bound. Since 0.6.3 the two that equate a Kv change (key tracking, master
+  PITCH) with a cutoff change set the filter amount to 0 as well: a board
+  bends a cutoff change, which is lever volts, but not Kv's gm. The idle
+  VCA-EG floor contract checks each shipping
   board's own floor (-200 +/-20 mV) and the exact -200 mV of identical
   boards.
 - With every board amount and `drift_cents` at 0, the native parity driver
@@ -369,12 +423,45 @@ be an invented temperature.
   driver and `ceres_render` of all 14 presets are byte-identical to 0.5.0
   (`0f1d00f`), checked again after the default changes.
 
+## Research pass, 2026-10-21
+
+A search for any measured board-to-board spread of a CS-50, CS-60 or CS-80
+(service bulletins, restorers' reports, forum threads, reviews) found none:
+every account is qualitative or about a single unit. Under the sibling rule
+such sources could corroborate a number but not supply one, and there was
+no number to corroborate. Three findings:
+
+- **The trim point** (implemented, above): the CS-60 procedure's lever
+  positions, with the 0.6.0 printed law, give the static cutoff's spread
+  away from the centre.
+- **The assigner.** US 3,981,217 "Key assigner" (Nippon Gakki, A. Oya;
+  priority 1974-09-05, granted 1976-09-21) gives a new key the released
+  channel "in which decay has progressed further than any other channels",
+  found by counting the releases since each channel's own. The CS-50 guide's
+  chart (printed p.19) shows the same outcome: C5 takes the channel of C2,
+  the first stored key released. Ceres re-keys a released board that holds
+  the key, then takes an idle board, then the quietest released one, which
+  agrees with both wherever they speak. Where several boards have died away
+  completely Ceres takes the one keyed first and the patent the one released
+  first; no CS-50 document decides between them, and the patent is a Yamaha
+  assigner not shown to be the CS-50's KAS chip, so it corroborates and does
+  not ground. Allocation is unchanged.
+- **Q away from its trim point** (a lead). The CS-30 ranks the same chip's
+  pin-7 shunt (470, 430 or 390 Ohm; CS-30 SM pp.8-9), so the IG00156's Q
+  control varies enough between chips to be binned. The CS-50 does not rank
+  pin 7, so its boards' Q would part away from the RES positions they were
+  matched at, as the cutoff does. The pin-7 law is unresolved
+  (`sibling-evidence-2026-10-21.md`, lead 1), so there is no number to scale;
+  not implemented.
+
 ## What would close the gap
 
 - A numeric residual for the ear-matched static cutoff and Q trims, e.g.
   measured cutoff and Q of the four boards of one aligned CS-50.
-- The panel-lever-to-Vfc law, so the sensitivity residual can also move the
-  static cutoff away from the trim setting.
+- The IG00156 pin-7 law and the spread the CS-30's shunt ranks compensate,
+  so Q can part from its trim point like the cutoff.
+- Whether the alignment was heard with an envelope voltage on the Vfc node,
+  which would move the cutoff's match point by that voltage.
 - Decay/release spread of the .22 uF capacitors and IG00152/159 ranks beyond
   the converter's trim line, and a WSC level tolerance.
 - Measured per-board pitch error of a calibrated unit across the keyboard,
