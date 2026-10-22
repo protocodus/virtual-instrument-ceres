@@ -22,6 +22,9 @@ class BenchmarkSourceProvenance(unittest.TestCase):
         self.git('init', '-q')
         self.git('config', 'user.name', 'Provenance Test')
         self.git('config', 'user.email', 'provenance@example.invalid')
+        # The clean fixture deliberately contains CRLF bytes; do not let a
+        # Windows runner's global autocrlf setting normalize its parent blobs.
+        self.git('config', 'core.autocrlf', 'false')
         self.original = {}
         for index, relative in enumerate(BENCHMARK.INPUT_PATHS):
             path = self.root / relative
@@ -101,6 +104,23 @@ class BenchmarkSourceProvenance(unittest.TestCase):
         (rebuilt / BENCHMARK.INPUT_PATHS[0]).write_bytes(b'// tampered snapshot\n')
         with self.assertRaisesRegex(RuntimeError, 'Frozen compiler input changed'):
             BENCHMARK.verify_frozen_inputs(report)
+
+    def test_autocrlf_checkout_records_compiled_bytes_even_when_git_is_clean(self):
+        cpp = BENCHMARK.INPUT_PATHS[0]
+        self.git('config', 'core.autocrlf', 'true')
+        normalized = self.original[cpp].replace(b'\r\n', b'\n')
+        (self.root / cpp).write_bytes(normalized)
+        self.git('add', cpp)
+        self.git('commit', '-qm', 'Store LF source with CRLF checkout policy')
+        (self.root / cpp).write_bytes(b'// force checkout\n')
+        self.git('checkout', '--', cpp)
+        checked_out = (self.root / cpp).read_bytes()
+        self.assertEqual(checked_out, self.original[cpp])
+        state = BENCHMARK.capture_candidate_state(self.root)
+        self.assertEqual(state['status_porcelain_v1'], '')
+        self.assertTrue(state['compiled_inputs_dirty'])
+        self.assertFalse(state['inputs'][cpp]['matches_parent_commit'])
+        self.assertEqual((self.reconstruct(state) / cpp).read_bytes(), checked_out)
 
 
 if __name__ == '__main__':
