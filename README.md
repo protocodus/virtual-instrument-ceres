@@ -31,6 +31,10 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 
 ## Version history
 
+### Unreleased — 1.0.0 — first public release preparation
+
+- Prepares the shared engine for the first public Rack Extension release. Retains the 0.6.6 CPU optimizations and circuit sound; the Rack adapter supplies its own factory patch bank and release metadata.
+
 ### Unreleased — 0.6.6 — lower CPU cost
 
 - Shares filter setup across voices, reuses unchanged filter/pitch calculations and skips muted sine shaping while retaining its capacitor history. Before/after audio matches byte for byte across 439,296 regression samples. Native benchmarks measured 17.7% lower median CPU for four-voice/4x Init and 10–12% lower mean CPU in the unchanged Rack callback at its four-voice/1x default; these are development-machine measurements, not Reason host results. [Protocol, complete timings and validation](Docs/benchmarks/cpu-efficiency-2026-10-23.md).
