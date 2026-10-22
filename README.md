@@ -13,19 +13,19 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 | # | Preset | Demo | Length | Peak |
 | --- | --- | --- | --- | --- |
 | 1 | init | [01-init.mp3](Docs/audio/01-init.mp3) | 12.0 s | -10.2 dBFS |
-| 2 | string1 | [02-string1.mp3](Docs/audio/02-string1.mp3) | 12.0 s | -11.4 dBFS |
+| 2 | string1 | [02-string1.mp3](Docs/audio/02-string1.mp3) | 12.0 s | -11.3 dBFS |
 | 3 | string2 | [03-string2.mp3](Docs/audio/03-string2.mp3) | 12.0 s | -15.0 dBFS |
-| 4 | brass1 | [04-brass1.mp3](Docs/audio/04-brass1.mp3) | 12.0 s | -12.1 dBFS |
-| 5 | brass2 | [05-brass2.mp3](Docs/audio/05-brass2.mp3) | 12.0 s | -13.6 dBFS |
-| 6 | flute | [06-flute.mp3](Docs/audio/06-flute.mp3) | 12.0 s | -11.6 dBFS |
-| 7 | electric_piano | [07-electric-piano.mp3](Docs/audio/07-electric-piano.mp3) | 12.0 s | -8.5 dBFS |
-| 8 | clavichord | [08-clavichord.mp3](Docs/audio/08-clavichord.mp3) | 12.0 s | -16.0 dBFS |
-| 9 | harpsichord | [09-harpsichord.mp3](Docs/audio/09-harpsichord.mp3) | 12.0 s | -20.1 dBFS |
-| 10 | guitar1 | [10-guitar1.mp3](Docs/audio/10-guitar1.mp3) | 12.0 s | -13.8 dBFS |
-| 11 | guitar2 | [11-guitar2.mp3](Docs/audio/11-guitar2.mp3) | 12.0 s | -16.0 dBFS |
-| 12 | funky1 | [12-funky1.mp3](Docs/audio/12-funky1.mp3) | 12.0 s | -15.9 dBFS |
-| 13 | funky2 | [13-funky2.mp3](Docs/audio/13-funky2.mp3) | 12.0 s | -15.3 dBFS |
-| 14 | funky3 | [14-funky3.mp3](Docs/audio/14-funky3.mp3) | 12.0 s | -15.4 dBFS |
+| 4 | brass1 | [04-brass1.mp3](Docs/audio/04-brass1.mp3) | 12.0 s | -11.8 dBFS |
+| 5 | brass2 | [05-brass2.mp3](Docs/audio/05-brass2.mp3) | 12.0 s | -13.3 dBFS |
+| 6 | flute | [06-flute.mp3](Docs/audio/06-flute.mp3) | 12.0 s | -11.3 dBFS |
+| 7 | electric_piano | [07-electric-piano.mp3](Docs/audio/07-electric-piano.mp3) | 12.0 s | -7.8 dBFS |
+| 8 | clavichord | [08-clavichord.mp3](Docs/audio/08-clavichord.mp3) | 12.0 s | -15.7 dBFS |
+| 9 | harpsichord | [09-harpsichord.mp3](Docs/audio/09-harpsichord.mp3) | 12.0 s | -19.9 dBFS |
+| 10 | guitar1 | [10-guitar1.mp3](Docs/audio/10-guitar1.mp3) | 12.0 s | -13.3 dBFS |
+| 11 | guitar2 | [11-guitar2.mp3](Docs/audio/11-guitar2.mp3) | 12.0 s | -15.2 dBFS |
+| 12 | funky1 | [12-funky1.mp3](Docs/audio/12-funky1.mp3) | 12.0 s | -15.1 dBFS |
+| 13 | funky2 | [13-funky2.mp3](Docs/audio/13-funky2.mp3) | 12.0 s | -14.9 dBFS |
+| 14 | funky3 | [14-funky3.mp3](Docs/audio/14-funky3.mp3) | 12.0 s | -15.0 dBFS |
 
 <!-- audio-demos-end -->
 
@@ -141,7 +141,7 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 ## Downloads
 
 <!-- build-download-begin -->
-**[Download main build 31](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/39773655985/artifacts/12425373497)**, built from [`f0fa3768a8b2`](https://github.com/protocodus/virtual-instrument-ceres/commit/f0fa3768a8b2294c7bd1e51ed28c773a041bcaf2). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
+**[Download main build 32](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/39811315153/artifacts/12441121978)**, built from [`8f543ce05f37`](https://github.com/protocodus/virtual-instrument-ceres/commit/8f543ce05f37ebef8de5084480f26757b6cfdc18). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
 <!-- build-download-end -->
 
 ---
