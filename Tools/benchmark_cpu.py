@@ -28,6 +28,8 @@ ROOT = Path(__file__).resolve().parents[1]
 FLAGS = ['-std=c++17', '-O3', '-DNDEBUG', '-DCERES_EMBEDDED_TARGET=1',
          '-fno-exceptions', '-Wall', '-Wextra', '-Wpedantic']
 DRIVERS = {'native': 'native_performance.cpp', 'configuration': 'benchmark_configuration.cpp'}
+INPUT_PATHS = ('Source/DSP/ceres.cpp', 'Source/DSP/ceres.hpp',
+               *('Tools/' + name for name in DRIVERS.values()))
 RUNS = [('baseline', 'init', 'native', []), ('candidate', 'init', 'native', []),
         ('baseline', 'active', 'native', ['active']), ('candidate', 'active', 'native', ['active']),
         ('baseline', 'configuration', 'configuration', []),
@@ -64,12 +66,59 @@ def command_record(command, label, directory):
     return record
 
 
-def git_output(*arguments):
-    result = subprocess.run(['git', *arguments], cwd=ROOT, capture_output=True)
+def git_output(*arguments, root=ROOT):
+    result = subprocess.run(['git', *arguments], cwd=root, capture_output=True)
     if result.returncode:
         raise RuntimeError('git ' + shlex.join(arguments) + ': ' +
                            result.stderr.decode('utf-8', errors='replace').strip())
     return result.stdout
+
+
+def capture_candidate_state(root=ROOT):
+    """Embed the exact working-tree inputs; HEAD identifies their parent only."""
+    parent = git_output('rev-parse', 'HEAD', root=root).decode().strip()
+    status = git_output('status', '--porcelain=v1', '--untracked-files=all',
+                        '--', *INPUT_PATHS, root=root).decode('utf-8')
+    diff = git_output('diff', '--binary', parent, '--', *INPUT_PATHS,
+                      root=root).decode('utf-8')
+    inputs = {}
+    for relative in INPUT_PATHS:
+        content = (root / relative).read_bytes()
+        exists = git_output('ls-tree', '--name-only', parent, '--', relative, root=root)
+        parent_content = (git_output('show', parent + ':' + relative, root=root)
+                          if exists else None)
+        inputs[relative] = {
+            'sha256': hashlib.sha256(content).hexdigest(),
+            'text_utf8': content.decode('utf-8'),
+            'matches_parent_commit': content == parent_content,
+            'parent_sha256': (hashlib.sha256(parent_content).hexdigest()
+                              if parent_content is not None else None)}
+    if git_output('rev-parse', 'HEAD', root=root).decode().strip() != parent:
+        raise RuntimeError('HEAD changed while capturing candidate inputs')
+    matches = all(item['matches_parent_commit'] for item in inputs.values())
+    return {'parent_commit': parent,
+            'commit_meaning': 'HEAD is the working-tree parent, not a claim that its blobs were compiled.',
+            'status_scope': 'Only the four compiled core/driver inputs; other worktree changes are excluded.',
+            'status_porcelain_v1': status, 'diff_from_parent': diff,
+            'inputs_match_parent_commit': matches, 'compiled_inputs_dirty': not matches,
+            'inputs': inputs}
+
+
+def write_snapshot(path, content, expected_sha256):
+    if hashlib.sha256(content).hexdigest() != expected_sha256:
+        raise ValueError('Embedded input hash mismatch: ' + str(path))
+    path.write_bytes(content)
+    if sha(path) != expected_sha256:
+        raise RuntimeError('Written input snapshot hash mismatch: ' + str(path))
+
+
+def verify_frozen_inputs(report):
+    """The compiler reads these snapshots, never the live working-tree files."""
+    snapshots = [item for variant in report['sources'].values() for item in variant.values()]
+    snapshots += list(report['drivers'].values())
+    for item in snapshots:
+        if sha(Path(item['snapshot'])) != item['sha256']:
+            raise RuntimeError('Frozen compiler input changed: ' + item['snapshot'])
 
 
 def invalid_json_constant(value):
@@ -170,7 +219,8 @@ def main():
                 raise RuntimeError('compiler --version failed')
             baseline = git_output('rev-parse', '--verify', '--end-of-options', args.baseline_ref + '^{commit}').decode().strip()
             report['baseline_commit'] = baseline
-            report['candidate_head'] = git_output('rev-parse', 'HEAD').decode().strip()
+            report['candidate_source_state'] = capture_candidate_state()
+            report['candidate_parent_commit'] = report['candidate_source_state']['parent_commit']
             report['sources'] = {}
             for variant in ('baseline', 'candidate'):
                 core = directory / variant
@@ -178,17 +228,23 @@ def main():
                 report['sources'][variant] = {}
                 for name in ('ceres.cpp', 'ceres.hpp'):
                     relative = 'Source/DSP/' + name
-                    content = git_output('show', baseline + ':' + relative) if variant == 'baseline' else (ROOT / relative).read_bytes()
+                    content = (git_output('show', baseline + ':' + relative) if variant == 'baseline'
+                               else report['candidate_source_state']['inputs'][relative]['text_utf8'].encode('utf-8'))
                     destination = core / name
-                    destination.write_bytes(content)
+                    expected = (hashlib.sha256(content).hexdigest() if variant == 'baseline' else
+                                report['candidate_source_state']['inputs'][relative]['sha256'])
+                    write_snapshot(destination, content, expected)
                     report['sources'][variant][relative] = {'sha256': sha(destination), 'snapshot': str(destination)}
             drivers = directory / 'drivers'
             drivers.mkdir()
             report['drivers'] = {}
             for name in DRIVERS.values():
                 path = drivers / name
-                path.write_bytes((ROOT / 'Tools' / name).read_bytes())
+                frozen = report['candidate_source_state']['inputs']['Tools/' + name]
+                write_snapshot(path, frozen['text_utf8'].encode('utf-8'), frozen['sha256'])
                 report['drivers']['Tools/' + name] = {'sha256': sha(path), 'snapshot': str(path)}
+            verify_frozen_inputs(report)
+            save(handle, report)
             binaries = {}
             for variant in ('baseline', 'candidate'):
                 for driver, name in DRIVERS.items():
@@ -196,9 +252,12 @@ def main():
                     core = directory / variant
                     command = compiler + FLAGS + ['-I', str(core), str(drivers / name),
                                                  str(core / 'ceres.cpp'), '-o', str(binary)]
+                    verify_frozen_inputs(report)
                     record = command_record(command, 'compile-' + variant + '-' + driver, directory)
                     record.update({'variant': variant, 'driver': driver})
                     report['compilations'].append(record)
+                    verify_frozen_inputs(report)
+                    record['input_snapshots_verified_before_and_after'] = True
                     save(handle, report)
                     if record['returncode']:
                         raise RuntimeError('compilation failed: ' + variant + '/' + driver)

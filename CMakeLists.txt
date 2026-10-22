@@ -348,6 +348,8 @@ if(BUILD_TESTING)
   target_link_libraries(ceres_embedded_external_parity PRIVATE ceres_embedded)
   find_package(Python3 COMPONENTS Interpreter)
   if(Python3_Interpreter_FOUND)
+    add_test(NAME Ceres.benchmark_cpu_provenance COMMAND "${Python3_EXECUTABLE}" -B
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tests/test_benchmark_cpu_provenance.py")
     if(CERES_BUILD_TOOLS)
       add_test(NAME Ceres.configuration_cli_contract COMMAND "${Python3_EXECUTABLE}"
         "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_configuration_cli.py"
