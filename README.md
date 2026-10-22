@@ -149,7 +149,7 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 ## Downloads
 
 <!-- build-download-begin -->
-**[Download main build 32](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/39811315153/artifacts/12441121978)**, built from [`8f543ce05f37`](https://github.com/protocodus/virtual-instrument-ceres/commit/8f543ce05f37ebef8de5084480f26757b6cfdc18). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
+**[Download main build 33](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/39870968344/artifacts/12466961974)**, built from [`9c292b76c892`](https://github.com/protocodus/virtual-instrument-ceres/commit/9c292b76c892483991092c278be499a1910f0fec). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
 <!-- build-download-end -->
 
 ---
