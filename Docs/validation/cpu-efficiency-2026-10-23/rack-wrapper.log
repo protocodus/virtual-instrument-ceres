@@ -1,0 +1,6 @@
+PASS: attacks beyond the bounded ledger remain audible in Mono/Double and all qualities
+PASS: repeated Reason pitch states release on one off across five rates, Mono/Double and every quality
+PASS: repeated notes, pedal-up, reset, stale releases and replay in both layers
+Touch LEVEL hard/soft energy ratio: 2.6734152629
+EXT IN: engine provides FUNCTION EXT; jack fed at every host frame
+PASS:6 browser-preset property vectors and exact audio commits, 66 parameter mappings, all 36 selector states, BRILLIANCE/RESONANCE lever laws against independent nodal math, Expression pedal Off/CC11, EXT IN socket feed or inertness, per-note velocity and legacy compatibility, exact event/reset/pedal/FIFO timing, unstored-key release isolation in Mono/Double at1x/2x/4x, warm independent Double engines, symmetric detune, unity-sum pan,20ms mode transitions, Mono parity,5 rates, live Q/idle-IL capacitor history, physical ring low/mid/high-rate routing,48 voice/quality combinations, deferred idle reconfiguration and note/pedal cancellation,0 realtime allocations

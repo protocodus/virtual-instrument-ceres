@@ -1,0 +1,63 @@
+{
+  "schema": "ceres.benchmark-source-state-annotation.v1",
+  "measurement": {
+    "path": "Docs/benchmarks/cpu-efficiency-2026-10-23.json",
+    "sha256": "1c488adcbace9c8d807cb4065c7caa95dd7875a90a42931eeb8caae5c38ea2bd",
+    "raw_report_unchanged": true
+  },
+  "historical_candidate_head_field": "1cad0810e17ce0a735c50fabf9f9bdd1a1594c6b",
+  "historical_field_meaning": "Working-tree HEAD at measurement time; this is the parent commit, not the revision of the dirty compiled candidate source.",
+  "baseline_commit": "1cad0810e17ce0a735c50fabf9f9bdd1a1594c6b",
+  "reproducible_candidate_source_commit": "87cf83597d1f7485b0995408ae9dc9d453cd42fe",
+  "candidate_inputs_match_historical_parent": false,
+  "exact_candidate_core_driver_and_runner_hashes_verified": true,
+  "files": {
+    "Source/DSP/ceres.cpp": {
+      "sha256": "690a3f86c2972d0950f4bf79d070a92477b688b4fadb8b9d54aebba6af8e55ac",
+      "matches_frozen_measurement": true,
+      "verification_command": [
+        "git",
+        "show",
+        "87cf83597d1f7485b0995408ae9dc9d453cd42fe:Source/DSP/ceres.cpp"
+      ]
+    },
+    "Source/DSP/ceres.hpp": {
+      "sha256": "29733a0d6a46d249e8ffb37317acec4a6555b3f3a49a656b79e53dcdf72e926a",
+      "matches_frozen_measurement": true,
+      "verification_command": [
+        "git",
+        "show",
+        "87cf83597d1f7485b0995408ae9dc9d453cd42fe:Source/DSP/ceres.hpp"
+      ]
+    },
+    "Tools/native_performance.cpp": {
+      "sha256": "d4becb82fdaeb40a66eb33b701bb50d107995170e77e17a06de54b84c9d50075",
+      "matches_frozen_measurement": true,
+      "verification_command": [
+        "git",
+        "show",
+        "87cf83597d1f7485b0995408ae9dc9d453cd42fe:Tools/native_performance.cpp"
+      ]
+    },
+    "Tools/benchmark_configuration.cpp": {
+      "sha256": "2e1354068a861b11fc2e2942d073e610e63cfbfb0e71f5ede1322833af4aef78",
+      "matches_frozen_measurement": true,
+      "verification_command": [
+        "git",
+        "show",
+        "87cf83597d1f7485b0995408ae9dc9d453cd42fe:Tools/benchmark_configuration.cpp"
+      ]
+    },
+    "Tools/benchmark_cpu.py": {
+      "sha256": "ebfdccacbfe6c817daffbd53a7dd22653276b506529da27e6cd27ed90aa0eee1",
+      "matches_frozen_measurement": true,
+      "verification_command": [
+        "git",
+        "show",
+        "87cf83597d1f7485b0995408ae9dc9d453cd42fe:Tools/benchmark_cpu.py"
+      ]
+    }
+  },
+  "verification_method": "For each listed path, compute SHA-256 over the raw stdout bytes from its verification_command and compare with sha256 and the original report. No benchmark or timing was rerun.",
+  "scope": "This separate retrospective source annotation resolves the old ambiguous candidate_head field. The raw report, measurements, run order, deadline misses and checksums remain untouched. It identifies exact input contents; it does not claim a clean working tree existed at measurement time."
+}

@@ -1,0 +1,853 @@
+{
+  "status": "pass",
+  "started_utc": "2026-10-22T22:05:43.602922+00:00",
+  "scope": "One native embedded-ABI synth; no Rack, host or target CPU claim. One pass per workload, no retry, selection, removal of overruns or checksum tolerance.",
+  "baseline_ref_requested": "1cad081",
+  "platform": {
+    "description": "macOS-26.5.1-arm64-arm-64bit",
+    "uname": {
+      "system": "Darwin",
+      "node": "MacBookPro",
+      "release": "25.5.0",
+      "version": "Darwin Kernel Version 25.5.0: Mon Apr 27 20:38:56 PDT 2026; root:xnu-12377.121.6~2/RELEASE_ARM64_T6000",
+      "machine": "arm64"
+    },
+    "logical_cpu_count": 10,
+    "python": "3.11.0 (v3.11.0:deaf509e8f, Oct 24 2022, 14:43:23) [Clang 13.0.0 (clang-1300.0.29.30)]"
+  },
+  "runner_sha256": "ebfdccacbfe6c817daffbd53a7dd22653276b506529da27e6cd27ed90aa0eee1",
+  "compiler_flags": [
+    "-std=c++17",
+    "-O3",
+    "-DNDEBUG",
+    "-DCERES_EMBEDDED_TARGET=1",
+    "-fno-exceptions",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic"
+  ],
+  "fixed_run_order": [
+    "baseline/init",
+    "candidate/init",
+    "baseline/active",
+    "candidate/active",
+    "baseline/configuration",
+    "candidate/configuration"
+  ],
+  "compilations": [
+    {
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-DCERES_EMBEDDED_TARGET=1",
+        "-fno-exceptions",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-I",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/baseline",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/drivers/native_performance.cpp",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/baseline/ceres.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/baseline-native"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.8723712499486282,
+      "stdout": "",
+      "stderr": "",
+      "stdout_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/compile-baseline-native.stdout.log",
+      "stderr_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/compile-baseline-native.stderr.log",
+      "variant": "baseline",
+      "driver": "native",
+      "binary_sha256": "52fb1ffe3e8bc9e4c6876b348e3452736b058fa8d7139542f7a61bc6fcd707e2"
+    },
+    {
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-DCERES_EMBEDDED_TARGET=1",
+        "-fno-exceptions",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-I",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/baseline",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/drivers/benchmark_configuration.cpp",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/baseline/ceres.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/baseline-configuration"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.7620094580342993,
+      "stdout": "",
+      "stderr": "",
+      "stdout_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/compile-baseline-configuration.stdout.log",
+      "stderr_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/compile-baseline-configuration.stderr.log",
+      "variant": "baseline",
+      "driver": "configuration",
+      "binary_sha256": "6174e68802ee92cb00e895dfd42312c1ecb8c3ca36807faf3b4039530057ad74"
+    },
+    {
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-DCERES_EMBEDDED_TARGET=1",
+        "-fno-exceptions",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-I",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/candidate",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/drivers/native_performance.cpp",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/candidate/ceres.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/candidate-native"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.8961370410397649,
+      "stdout": "",
+      "stderr": "",
+      "stdout_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/compile-candidate-native.stdout.log",
+      "stderr_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/compile-candidate-native.stderr.log",
+      "variant": "candidate",
+      "driver": "native",
+      "binary_sha256": "cc7343627e0fd51e8cd0e10df88cf62656a70b9155fd933d42e2312b602f4637"
+    },
+    {
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-DCERES_EMBEDDED_TARGET=1",
+        "-fno-exceptions",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-I",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/candidate",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/drivers/benchmark_configuration.cpp",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/candidate/ceres.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/candidate-configuration"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.7545290839625522,
+      "stdout": "",
+      "stderr": "",
+      "stdout_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/compile-candidate-configuration.stdout.log",
+      "stderr_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/compile-candidate-configuration.stderr.log",
+      "variant": "candidate",
+      "driver": "configuration",
+      "binary_sha256": "64b6e1e6f55a0c4666605897bfff156c26fef32f3f2404cd259bb80f0eefda04"
+    }
+  ],
+  "runs": [
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/baseline-native"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 3.471860791905783,
+      "stdout": "{\"workload\":\"engineering Init\",\"rate\":48000,\"block_size\":64,\"voices\":4,\"oversampling\":4,\"measured_blocks\":10000,\"warmup_blocks\":500,\"deadline_ms\":1.33333333,\"wall_median_ms\":0.28700009,\"wall_p99_ms\":0.688,\"wall_max_ms\":2.07699998,\"wall_deadline_misses\":3,\"cpu_median_ms\":0.287,\"cpu_p99_ms\":0.603708,\"cpu_max_ms\":0.770041,\"cpu_deadline_misses\":0,\"checksum\":-0.45724582610599462,\"scope\":\"native DSP only; no Rack host or target CPU evidence\"}\n",
+      "stderr": "",
+      "stdout_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/run-baseline-init.stdout.log",
+      "stderr_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/run-baseline-init.stderr.log",
+      "variant": "baseline",
+      "workload": "init",
+      "binary_sha256": "52fb1ffe3e8bc9e4c6876b348e3452736b058fa8d7139542f7a61bc6fcd707e2",
+      "measurement": {
+        "workload": "engineering Init",
+        "rate": 48000,
+        "block_size": 64,
+        "voices": 4,
+        "oversampling": 4,
+        "measured_blocks": 10000,
+        "warmup_blocks": 500,
+        "deadline_ms": 1.33333333,
+        "wall_median_ms": 0.28700009,
+        "wall_p99_ms": 0.688,
+        "wall_max_ms": 2.07699998,
+        "wall_deadline_misses": 3,
+        "cpu_median_ms": 0.287,
+        "cpu_p99_ms": 0.603708,
+        "cpu_max_ms": 0.770041,
+        "cpu_deadline_misses": 0,
+        "checksum": -0.4572458261059946,
+        "scope": "native DSP only; no Rack host or target CPU evidence"
+      }
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/candidate-native"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 2.9009618329582736,
+      "stdout": "{\"workload\":\"engineering Init\",\"rate\":48000,\"block_size\":64,\"voices\":4,\"oversampling\":4,\"measured_blocks\":10000,\"warmup_blocks\":500,\"deadline_ms\":1.33333333,\"wall_median_ms\":0.236999942,\"wall_p99_ms\":0.505000004,\"wall_max_ms\":2.57599994,\"wall_deadline_misses\":4,\"cpu_median_ms\":0.236333,\"cpu_p99_ms\":0.426709,\"cpu_max_ms\":0.587417,\"cpu_deadline_misses\":0,\"checksum\":-0.45724582610599462,\"scope\":\"native DSP only; no Rack host or target CPU evidence\"}\n",
+      "stderr": "",
+      "stdout_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/run-candidate-init.stdout.log",
+      "stderr_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/run-candidate-init.stderr.log",
+      "variant": "candidate",
+      "workload": "init",
+      "binary_sha256": "cc7343627e0fd51e8cd0e10df88cf62656a70b9155fd933d42e2312b602f4637",
+      "measurement": {
+        "workload": "engineering Init",
+        "rate": 48000,
+        "block_size": 64,
+        "voices": 4,
+        "oversampling": 4,
+        "measured_blocks": 10000,
+        "warmup_blocks": 500,
+        "deadline_ms": 1.33333333,
+        "wall_median_ms": 0.236999942,
+        "wall_p99_ms": 0.505000004,
+        "wall_max_ms": 2.57599994,
+        "wall_deadline_misses": 4,
+        "cpu_median_ms": 0.236333,
+        "cpu_p99_ms": 0.426709,
+        "cpu_max_ms": 0.587417,
+        "cpu_deadline_misses": 0,
+        "checksum": -0.4572458261059946,
+        "scope": "native DSP only; no Rack host or target CPU evidence"
+      }
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/baseline-native",
+        "active"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 3.28013720898889,
+      "stdout": "{\"workload\":\"active sound paths\",\"rate\":48000,\"block_size\":64,\"voices\":4,\"oversampling\":4,\"measured_blocks\":10000,\"warmup_blocks\":500,\"deadline_ms\":1.33333333,\"wall_median_ms\":0.296999933,\"wall_p99_ms\":0.747999991,\"wall_max_ms\":9.28100001,\"wall_deadline_misses\":9,\"cpu_median_ms\":0.296333,\"cpu_p99_ms\":0.725834,\"cpu_max_ms\":0.815625,\"cpu_deadline_misses\":0,\"checksum\":0.053977252670012632,\"scope\":\"native DSP only; no Rack host or target CPU evidence\"}\n",
+      "stderr": "",
+      "stdout_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/run-baseline-active.stdout.log",
+      "stderr_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/run-baseline-active.stderr.log",
+      "variant": "baseline",
+      "workload": "active",
+      "binary_sha256": "52fb1ffe3e8bc9e4c6876b348e3452736b058fa8d7139542f7a61bc6fcd707e2",
+      "measurement": {
+        "workload": "active sound paths",
+        "rate": 48000,
+        "block_size": 64,
+        "voices": 4,
+        "oversampling": 4,
+        "measured_blocks": 10000,
+        "warmup_blocks": 500,
+        "deadline_ms": 1.33333333,
+        "wall_median_ms": 0.296999933,
+        "wall_p99_ms": 0.747999991,
+        "wall_max_ms": 9.28100001,
+        "wall_deadline_misses": 9,
+        "cpu_median_ms": 0.296333,
+        "cpu_p99_ms": 0.725834,
+        "cpu_max_ms": 0.815625,
+        "cpu_deadline_misses": 0,
+        "checksum": 0.05397725267001263,
+        "scope": "native DSP only; no Rack host or target CPU evidence"
+      }
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/candidate-native",
+        "active"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 3.07440795795992,
+      "stdout": "{\"workload\":\"active sound paths\",\"rate\":48000,\"block_size\":64,\"voices\":4,\"oversampling\":4,\"measured_blocks\":10000,\"warmup_blocks\":500,\"deadline_ms\":1.33333333,\"wall_median_ms\":0.258999993,\"wall_p99_ms\":0.65400009,\"wall_max_ms\":21.9299999,\"wall_deadline_misses\":38,\"cpu_median_ms\":0.258417,\"cpu_p99_ms\":0.59,\"cpu_max_ms\":0.6795,\"cpu_deadline_misses\":0,\"checksum\":0.053977252670012632,\"scope\":\"native DSP only; no Rack host or target CPU evidence\"}\n",
+      "stderr": "",
+      "stdout_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/run-candidate-active.stdout.log",
+      "stderr_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/run-candidate-active.stderr.log",
+      "variant": "candidate",
+      "workload": "active",
+      "binary_sha256": "cc7343627e0fd51e8cd0e10df88cf62656a70b9155fd933d42e2312b602f4637",
+      "measurement": {
+        "workload": "active sound paths",
+        "rate": 48000,
+        "block_size": 64,
+        "voices": 4,
+        "oversampling": 4,
+        "measured_blocks": 10000,
+        "warmup_blocks": 500,
+        "deadline_ms": 1.33333333,
+        "wall_median_ms": 0.258999993,
+        "wall_p99_ms": 0.65400009,
+        "wall_max_ms": 21.9299999,
+        "wall_deadline_misses": 38,
+        "cpu_median_ms": 0.258417,
+        "cpu_p99_ms": 0.59,
+        "cpu_max_ms": 0.6795,
+        "cpu_deadline_misses": 0,
+        "checksum": 0.05397725267001263,
+        "scope": "native DSP only; no Rack host or target CPU evidence"
+      }
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/baseline-configuration"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 4.48137516702991,
+      "stdout": "[\n{\"voices\":1,\"oversampling\":1,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.0370000489056,\"wall_p99_ms\":0.0989999389276,\"wall_max_ms\":0.179999973625,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.036916,\"thread_cpu_p99_ms\":0.095167,\"thread_cpu_max_ms\":0.105125,\"thread_cpu_overruns\":0,\"checksum\":1.173694244332637},\n{\"voices\":1,\"oversampling\":2,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.0690000597388,\"wall_p99_ms\":0.0879999715835,\"wall_max_ms\":0.170000013895,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.068833,\"thread_cpu_p99_ms\":0.081625,\"thread_cpu_max_ms\":0.17,\"thread_cpu_overruns\":0,\"checksum\":1.1996746384573642},\n{\"voices\":1,\"oversampling\":4,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.12300000526,\"wall_p99_ms\":0.297000049613,\"wall_max_ms\":0.450000050478,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.123,\"thread_cpu_p99_ms\":0.28275,\"thread_cpu_max_ms\":0.30725,\"thread_cpu_overruns\":0,\"checksum\":1.2398687591847066},\n{\"voices\":4,\"oversampling\":1,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.086999963969,\"wall_p99_ms\":0.0950000248849,\"wall_max_ms\":0.106999999844,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.086667,\"thread_cpu_p99_ms\":0.094125,\"thread_cpu_max_ms\":0.098916,\"thread_cpu_overruns\":0,\"checksum\":-3.2881493236152863},\n{\"voices\":4,\"oversampling\":2,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.163000077009,\"wall_p99_ms\":0.219999928959,\"wall_max_ms\":0.308000016958,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.162833,\"thread_cpu_p99_ms\":0.200542,\"thread_cpu_max_ms\":0.30025,\"thread_cpu_overruns\":0,\"checksum\":-3.8340924778282002},\n{\"voices\":4,\"oversampling\":4,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.308000016958,\"wall_p99_ms\":0.74000004679,\"wall_max_ms\":0.845000031404,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.307125,\"thread_cpu_p99_ms\":0.735209,\"thread_cpu_max_ms\":0.767917,\"thread_cpu_overruns\":0,\"checksum\":-2.6386798486894545},\n{\"voices\":16,\"oversampling\":1,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.307000009343,\"wall_p99_ms\":4.43000008818,\"wall_max_ms\":14.9450000608,\"wall_overruns\":30,\"thread_cpu_median_ms\":0.306834,\"thread_cpu_p99_ms\":0.721084,\"thread_cpu_max_ms\":0.759833,\"thread_cpu_overruns\":0,\"checksum\":-7.5041173319392698},\n{\"voices\":16,\"oversampling\":2,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.579999992624,\"wall_p99_ms\":4.45500004571,\"wall_max_ms\":9.91199992131,\"wall_overruns\":103,\"thread_cpu_median_ms\":0.578292,\"thread_cpu_p99_ms\":1.381375,\"thread_cpu_max_ms\":1.419625,\"thread_cpu_overruns\":48,\"checksum\":-10.093064482996638},\n{\"voices\":16,\"oversampling\":4,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":1.06100004632,\"wall_p99_ms\":2.70500010811,\"wall_max_ms\":3.55500006117,\"wall_overruns\":100,\"thread_cpu_median_ms\":1.058542,\"thread_cpu_p99_ms\":2.595209,\"thread_cpu_max_ms\":2.68175,\"thread_cpu_overruns\":82,\"checksum\":-9.8202709569125517}\n]\n",
+      "stderr": "",
+      "stdout_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/run-baseline-configuration.stdout.log",
+      "stderr_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/run-baseline-configuration.stderr.log",
+      "variant": "baseline",
+      "workload": "configuration",
+      "binary_sha256": "6174e68802ee92cb00e895dfd42312c1ecb8c3ca36807faf3b4039530057ad74",
+      "measurement": [
+        {
+          "voices": 1,
+          "oversampling": 1,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.0370000489056,
+          "wall_p99_ms": 0.0989999389276,
+          "wall_max_ms": 0.179999973625,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.036916,
+          "thread_cpu_p99_ms": 0.095167,
+          "thread_cpu_max_ms": 0.105125,
+          "thread_cpu_overruns": 0,
+          "checksum": 1.173694244332637
+        },
+        {
+          "voices": 1,
+          "oversampling": 2,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.0690000597388,
+          "wall_p99_ms": 0.0879999715835,
+          "wall_max_ms": 0.170000013895,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.068833,
+          "thread_cpu_p99_ms": 0.081625,
+          "thread_cpu_max_ms": 0.17,
+          "thread_cpu_overruns": 0,
+          "checksum": 1.1996746384573642
+        },
+        {
+          "voices": 1,
+          "oversampling": 4,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.12300000526,
+          "wall_p99_ms": 0.297000049613,
+          "wall_max_ms": 0.450000050478,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.123,
+          "thread_cpu_p99_ms": 0.28275,
+          "thread_cpu_max_ms": 0.30725,
+          "thread_cpu_overruns": 0,
+          "checksum": 1.2398687591847066
+        },
+        {
+          "voices": 4,
+          "oversampling": 1,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.086999963969,
+          "wall_p99_ms": 0.0950000248849,
+          "wall_max_ms": 0.106999999844,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.086667,
+          "thread_cpu_p99_ms": 0.094125,
+          "thread_cpu_max_ms": 0.098916,
+          "thread_cpu_overruns": 0,
+          "checksum": -3.2881493236152863
+        },
+        {
+          "voices": 4,
+          "oversampling": 2,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.163000077009,
+          "wall_p99_ms": 0.219999928959,
+          "wall_max_ms": 0.308000016958,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.162833,
+          "thread_cpu_p99_ms": 0.200542,
+          "thread_cpu_max_ms": 0.30025,
+          "thread_cpu_overruns": 0,
+          "checksum": -3.8340924778282
+        },
+        {
+          "voices": 4,
+          "oversampling": 4,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.308000016958,
+          "wall_p99_ms": 0.74000004679,
+          "wall_max_ms": 0.845000031404,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.307125,
+          "thread_cpu_p99_ms": 0.735209,
+          "thread_cpu_max_ms": 0.767917,
+          "thread_cpu_overruns": 0,
+          "checksum": -2.6386798486894545
+        },
+        {
+          "voices": 16,
+          "oversampling": 1,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.307000009343,
+          "wall_p99_ms": 4.43000008818,
+          "wall_max_ms": 14.9450000608,
+          "wall_overruns": 30,
+          "thread_cpu_median_ms": 0.306834,
+          "thread_cpu_p99_ms": 0.721084,
+          "thread_cpu_max_ms": 0.759833,
+          "thread_cpu_overruns": 0,
+          "checksum": -7.50411733193927
+        },
+        {
+          "voices": 16,
+          "oversampling": 2,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.579999992624,
+          "wall_p99_ms": 4.45500004571,
+          "wall_max_ms": 9.91199992131,
+          "wall_overruns": 103,
+          "thread_cpu_median_ms": 0.578292,
+          "thread_cpu_p99_ms": 1.381375,
+          "thread_cpu_max_ms": 1.419625,
+          "thread_cpu_overruns": 48,
+          "checksum": -10.093064482996638
+        },
+        {
+          "voices": 16,
+          "oversampling": 4,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 1.06100004632,
+          "wall_p99_ms": 2.70500010811,
+          "wall_max_ms": 3.55500006117,
+          "wall_overruns": 100,
+          "thread_cpu_median_ms": 1.058542,
+          "thread_cpu_p99_ms": 2.595209,
+          "thread_cpu_max_ms": 2.68175,
+          "thread_cpu_overruns": 82,
+          "checksum": -9.820270956912552
+        }
+      ]
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/candidate-configuration"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.737891917000525,
+      "stdout": "[\n{\"voices\":1,\"oversampling\":1,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.0340000260621,\"wall_p99_ms\":0.0780000118539,\"wall_max_ms\":0.819000066258,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.033834,\"thread_cpu_p99_ms\":0.040667,\"thread_cpu_max_ms\":0.08725,\"thread_cpu_overruns\":0,\"checksum\":1.173694244332637},\n{\"voices\":1,\"oversampling\":2,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.0630000140518,\"wall_p99_ms\":0.144999939948,\"wall_max_ms\":0.216000014916,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.062917,\"thread_cpu_p99_ms\":0.117958,\"thread_cpu_max_ms\":0.153667,\"thread_cpu_overruns\":0,\"checksum\":1.1996746384573642},\n{\"voices\":1,\"oversampling\":4,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.112999929115,\"wall_p99_ms\":0.261999899521,\"wall_max_ms\":0.347000081092,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.112333,\"thread_cpu_p99_ms\":0.248959,\"thread_cpu_max_ms\":0.276791,\"thread_cpu_overruns\":0,\"checksum\":1.2398687591847066},\n{\"voices\":4,\"oversampling\":1,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.0770000042394,\"wall_p99_ms\":0.17899996601,\"wall_max_ms\":0.227999989875,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.076666,\"thread_cpu_p99_ms\":0.178209,\"thread_cpu_max_ms\":0.18325,\"thread_cpu_overruns\":0,\"checksum\":-3.2881493236152863},\n{\"voices\":4,\"oversampling\":2,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.142999924719,\"wall_p99_ms\":0.283999950625,\"wall_max_ms\":0.679000047967,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.142125,\"thread_cpu_p99_ms\":0.199417,\"thread_cpu_max_ms\":0.333416,\"thread_cpu_overruns\":0,\"checksum\":-3.8340924778282002},\n{\"voices\":4,\"oversampling\":4,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.267000054009,\"wall_p99_ms\":0.34200004302,\"wall_max_ms\":0.667999964207,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.266958,\"thread_cpu_p99_ms\":0.3255,\"thread_cpu_max_ms\":0.581958,\"thread_cpu_overruns\":0,\"checksum\":-2.6386798486894545},\n{\"voices\":16,\"oversampling\":1,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.260000000708,\"wall_p99_ms\":0.384999904782,\"wall_max_ms\":0.571000040509,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.259708,\"thread_cpu_p99_ms\":0.344375,\"thread_cpu_max_ms\":0.57,\"thread_cpu_overruns\":0,\"checksum\":-7.5041173319392698},\n{\"voices\":16,\"oversampling\":2,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.49200002104,\"wall_p99_ms\":0.745999976061,\"wall_max_ms\":1.15000002552,\"wall_overruns\":0,\"thread_cpu_median_ms\":0.490709,\"thread_cpu_p99_ms\":0.735417,\"thread_cpu_max_ms\":1.059167,\"thread_cpu_overruns\":0,\"checksum\":-10.093064482996638},\n{\"voices\":16,\"oversampling\":4,\"blocks\":1000,\"warmup_blocks\":128,\"rate\":48000,\"block_frames\":64,\"deadline_ms\":1.33333333333,\"wall_median_ms\":0.901999999769,\"wall_p99_ms\":1.48599990644,\"wall_max_ms\":1.83199997991,\"wall_overruns\":21,\"thread_cpu_median_ms\":0.900125,\"thread_cpu_p99_ms\":1.44775,\"thread_cpu_max_ms\":1.783208,\"thread_cpu_overruns\":15,\"checksum\":-9.8202709569125517}\n]\n",
+      "stderr": "",
+      "stdout_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/run-candidate-configuration.stdout.log",
+      "stderr_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/run-candidate-configuration.stderr.log",
+      "variant": "candidate",
+      "workload": "configuration",
+      "binary_sha256": "64b6e1e6f55a0c4666605897bfff156c26fef32f3f2404cd259bb80f0eefda04",
+      "measurement": [
+        {
+          "voices": 1,
+          "oversampling": 1,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.0340000260621,
+          "wall_p99_ms": 0.0780000118539,
+          "wall_max_ms": 0.819000066258,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.033834,
+          "thread_cpu_p99_ms": 0.040667,
+          "thread_cpu_max_ms": 0.08725,
+          "thread_cpu_overruns": 0,
+          "checksum": 1.173694244332637
+        },
+        {
+          "voices": 1,
+          "oversampling": 2,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.0630000140518,
+          "wall_p99_ms": 0.144999939948,
+          "wall_max_ms": 0.216000014916,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.062917,
+          "thread_cpu_p99_ms": 0.117958,
+          "thread_cpu_max_ms": 0.153667,
+          "thread_cpu_overruns": 0,
+          "checksum": 1.1996746384573642
+        },
+        {
+          "voices": 1,
+          "oversampling": 4,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.112999929115,
+          "wall_p99_ms": 0.261999899521,
+          "wall_max_ms": 0.347000081092,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.112333,
+          "thread_cpu_p99_ms": 0.248959,
+          "thread_cpu_max_ms": 0.276791,
+          "thread_cpu_overruns": 0,
+          "checksum": 1.2398687591847066
+        },
+        {
+          "voices": 4,
+          "oversampling": 1,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.0770000042394,
+          "wall_p99_ms": 0.17899996601,
+          "wall_max_ms": 0.227999989875,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.076666,
+          "thread_cpu_p99_ms": 0.178209,
+          "thread_cpu_max_ms": 0.18325,
+          "thread_cpu_overruns": 0,
+          "checksum": -3.2881493236152863
+        },
+        {
+          "voices": 4,
+          "oversampling": 2,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.142999924719,
+          "wall_p99_ms": 0.283999950625,
+          "wall_max_ms": 0.679000047967,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.142125,
+          "thread_cpu_p99_ms": 0.199417,
+          "thread_cpu_max_ms": 0.333416,
+          "thread_cpu_overruns": 0,
+          "checksum": -3.8340924778282
+        },
+        {
+          "voices": 4,
+          "oversampling": 4,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.267000054009,
+          "wall_p99_ms": 0.34200004302,
+          "wall_max_ms": 0.667999964207,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.266958,
+          "thread_cpu_p99_ms": 0.3255,
+          "thread_cpu_max_ms": 0.581958,
+          "thread_cpu_overruns": 0,
+          "checksum": -2.6386798486894545
+        },
+        {
+          "voices": 16,
+          "oversampling": 1,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.260000000708,
+          "wall_p99_ms": 0.384999904782,
+          "wall_max_ms": 0.571000040509,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.259708,
+          "thread_cpu_p99_ms": 0.344375,
+          "thread_cpu_max_ms": 0.57,
+          "thread_cpu_overruns": 0,
+          "checksum": -7.50411733193927
+        },
+        {
+          "voices": 16,
+          "oversampling": 2,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.49200002104,
+          "wall_p99_ms": 0.745999976061,
+          "wall_max_ms": 1.15000002552,
+          "wall_overruns": 0,
+          "thread_cpu_median_ms": 0.490709,
+          "thread_cpu_p99_ms": 0.735417,
+          "thread_cpu_max_ms": 1.059167,
+          "thread_cpu_overruns": 0,
+          "checksum": -10.093064482996638
+        },
+        {
+          "voices": 16,
+          "oversampling": 4,
+          "blocks": 1000,
+          "warmup_blocks": 128,
+          "rate": 48000,
+          "block_frames": 64,
+          "deadline_ms": 1.33333333333,
+          "wall_median_ms": 0.901999999769,
+          "wall_p99_ms": 1.48599990644,
+          "wall_max_ms": 1.83199997991,
+          "wall_overruns": 21,
+          "thread_cpu_median_ms": 0.900125,
+          "thread_cpu_p99_ms": 1.44775,
+          "thread_cpu_max_ms": 1.783208,
+          "thread_cpu_overruns": 15,
+          "checksum": -9.820270956912552
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "build_directory": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native",
+  "compiler": {
+    "command": [
+      "c++",
+      "--version"
+    ],
+    "returncode": 0,
+    "elapsed_seconds": 0.014434708980843425,
+    "stdout": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin\n",
+    "stderr": "",
+    "stdout_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/compiler-version.stdout.log",
+    "stderr_log": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/compiler-version.stderr.log"
+  },
+  "baseline_commit": "1cad0810e17ce0a735c50fabf9f9bdd1a1594c6b",
+  "candidate_head": "1cad0810e17ce0a735c50fabf9f9bdd1a1594c6b",
+  "sources": {
+    "baseline": {
+      "Source/DSP/ceres.cpp": {
+        "sha256": "8be046a072db3c19f605b61c5d2efa712ccf20b95949e809ad76bb6f1b555855",
+        "snapshot": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/baseline/ceres.cpp"
+      },
+      "Source/DSP/ceres.hpp": {
+        "sha256": "29733a0d6a46d249e8ffb37317acec4a6555b3f3a49a656b79e53dcdf72e926a",
+        "snapshot": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/baseline/ceres.hpp"
+      }
+    },
+    "candidate": {
+      "Source/DSP/ceres.cpp": {
+        "sha256": "690a3f86c2972d0950f4bf79d070a92477b688b4fadb8b9d54aebba6af8e55ac",
+        "snapshot": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/candidate/ceres.cpp"
+      },
+      "Source/DSP/ceres.hpp": {
+        "sha256": "29733a0d6a46d249e8ffb37317acec4a6555b3f3a49a656b79e53dcdf72e926a",
+        "snapshot": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/candidate/ceres.hpp"
+      }
+    }
+  },
+  "drivers": {
+    "Tools/native_performance.cpp": {
+      "sha256": "d4becb82fdaeb40a66eb33b701bb50d107995170e77e17a06de54b84c9d50075",
+      "snapshot": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/drivers/native_performance.cpp"
+    },
+    "Tools/benchmark_configuration.cpp": {
+      "sha256": "2e1354068a861b11fc2e2942d073e610e63cfbfb0e71f5ede1322833af4aef78",
+      "snapshot": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/final-native/drivers/benchmark_configuration.cpp"
+    }
+  },
+  "comparisons": [
+    {
+      "workload": "init",
+      "checksum_exact": true,
+      "baseline_checksum": -0.4572458261059946,
+      "candidate_checksum": -0.4572458261059946,
+      "checksum_float64_bits": [
+        "bfdd4383ff56e560",
+        "bfdd4383ff56e560"
+      ],
+      "baseline_cpu_median_ms": 0.287,
+      "candidate_cpu_median_ms": 0.236333,
+      "candidate_over_baseline_cpu_median": 0.8234599303135889,
+      "cpu_median_reduction_percent": 17.654006968641113
+    },
+    {
+      "workload": "active",
+      "checksum_exact": true,
+      "baseline_checksum": 0.05397725267001263,
+      "candidate_checksum": 0.05397725267001263,
+      "checksum_float64_bits": [
+        "3faba2e80de42a00",
+        "3faba2e80de42a00"
+      ],
+      "baseline_cpu_median_ms": 0.296333,
+      "candidate_cpu_median_ms": 0.258417,
+      "candidate_over_baseline_cpu_median": 0.8720493498867827,
+      "cpu_median_reduction_percent": 12.795065011321727
+    },
+    {
+      "workload": "configuration/1v/1x",
+      "checksum_exact": true,
+      "baseline_checksum": 1.173694244332637,
+      "candidate_checksum": 1.173694244332637,
+      "checksum_float64_bits": [
+        "3ff2c7739dae9800",
+        "3ff2c7739dae9800"
+      ],
+      "baseline_cpu_median_ms": 0.036916,
+      "candidate_cpu_median_ms": 0.033834,
+      "candidate_over_baseline_cpu_median": 0.9165131650232963,
+      "cpu_median_reduction_percent": 8.348683497670372
+    },
+    {
+      "workload": "configuration/1v/2x",
+      "checksum_exact": true,
+      "baseline_checksum": 1.1996746384573642,
+      "candidate_checksum": 1.1996746384573642,
+      "checksum_float64_bits": [
+        "3ff331de08a03d74",
+        "3ff331de08a03d74"
+      ],
+      "baseline_cpu_median_ms": 0.068833,
+      "candidate_cpu_median_ms": 0.062917,
+      "candidate_over_baseline_cpu_median": 0.9140528525561866,
+      "cpu_median_reduction_percent": 8.594714744381339
+    },
+    {
+      "workload": "configuration/1v/4x",
+      "checksum_exact": true,
+      "baseline_checksum": 1.2398687591847066,
+      "candidate_checksum": 1.2398687591847066,
+      "checksum_float64_bits": [
+        "3ff3d6809fc07c94",
+        "3ff3d6809fc07c94"
+      ],
+      "baseline_cpu_median_ms": 0.123,
+      "candidate_cpu_median_ms": 0.112333,
+      "candidate_over_baseline_cpu_median": 0.9132764227642277,
+      "cpu_median_reduction_percent": 8.672357723577228
+    },
+    {
+      "workload": "configuration/4v/1x",
+      "checksum_exact": true,
+      "baseline_checksum": -3.2881493236152863,
+      "candidate_checksum": -3.2881493236152863,
+      "checksum_float64_bits": [
+        "c00a4e213b8a5660",
+        "c00a4e213b8a5660"
+      ],
+      "baseline_cpu_median_ms": 0.086667,
+      "candidate_cpu_median_ms": 0.076666,
+      "candidate_over_baseline_cpu_median": 0.8846042899835,
+      "cpu_median_reduction_percent": 11.539571001649996
+    },
+    {
+      "workload": "configuration/4v/2x",
+      "checksum_exact": true,
+      "baseline_checksum": -3.8340924778282,
+      "candidate_checksum": -3.8340924778282,
+      "checksum_float64_bits": [
+        "c00eac38ad50e4d0",
+        "c00eac38ad50e4d0"
+      ],
+      "baseline_cpu_median_ms": 0.162833,
+      "candidate_cpu_median_ms": 0.142125,
+      "candidate_over_baseline_cpu_median": 0.8728267611602071,
+      "cpu_median_reduction_percent": 12.717323883979292
+    },
+    {
+      "workload": "configuration/4v/4x",
+      "checksum_exact": true,
+      "baseline_checksum": -2.6386798486894545,
+      "candidate_checksum": -2.6386798486894545,
+      "checksum_float64_bits": [
+        "c0051c042e35e22c",
+        "c0051c042e35e22c"
+      ],
+      "baseline_cpu_median_ms": 0.307125,
+      "candidate_cpu_median_ms": 0.266958,
+      "candidate_over_baseline_cpu_median": 0.8692161172161171,
+      "cpu_median_reduction_percent": 13.078388278388287
+    },
+    {
+      "workload": "configuration/16v/1x",
+      "checksum_exact": true,
+      "baseline_checksum": -7.50411733193927,
+      "candidate_checksum": -7.50411733193927,
+      "checksum_float64_bits": [
+        "c01e043755781a90",
+        "c01e043755781a90"
+      ],
+      "baseline_cpu_median_ms": 0.306834,
+      "candidate_cpu_median_ms": 0.259708,
+      "candidate_over_baseline_cpu_median": 0.8464120664593885,
+      "cpu_median_reduction_percent": 15.35879335406115
+    },
+    {
+      "workload": "configuration/16v/2x",
+      "checksum_exact": true,
+      "baseline_checksum": -10.093064482996638,
+      "candidate_checksum": -10.093064482996638,
+      "checksum_float64_bits": [
+        "c0242fa625ddc788",
+        "c0242fa625ddc788"
+      ],
+      "baseline_cpu_median_ms": 0.578292,
+      "candidate_cpu_median_ms": 0.490709,
+      "candidate_over_baseline_cpu_median": 0.8485488300028359,
+      "cpu_median_reduction_percent": 15.145116999716413
+    },
+    {
+      "workload": "configuration/16v/4x",
+      "checksum_exact": true,
+      "baseline_checksum": -9.820270956912552,
+      "candidate_checksum": -9.820270956912552,
+      "checksum_float64_bits": [
+        "c023a3fa8e0b9898",
+        "c023a3fa8e0b9898"
+      ],
+      "baseline_cpu_median_ms": 1.058542,
+      "candidate_cpu_median_ms": 0.900125,
+      "candidate_over_baseline_cpu_median": 0.8503441526174681,
+      "cpu_median_reduction_percent": 14.96558473825319
+    }
+  ],
+  "completed_utc": "2026-10-22T22:06:09.908644+00:00",
+  "build_directory_retained": true
+}

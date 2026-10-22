@@ -1,0 +1,376 @@
+{
+  "status": "measured",
+  "scope": "Actual native CCeres::RenderBatch linked against before/after canonical DSP with a test-only MOM/buffer shim. Not Reason, SDK target, target-chip, package, or host scheduling evidence.",
+  "workload": "Descriptor Init defaults; 4 held notes [48,55,60,64] at velocity 127; 48 kHz; 64 frames; actual 4 voices/1x per engine asserted before and after measurement; both independent engines computed in Mono and Double; EXT IN disconnected; 1 initial note block + 1000 warmup + 10000 measured blocks per run. Double uses descriptor 12 cents total detune and full pan.",
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+  "machine": {
+    "logical_cpu_count": 10,
+    "machine": "arm64",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "processor": "arm",
+    "uname": [
+      "Darwin",
+      "MacBookPro",
+      "25.5.0",
+      "Darwin Kernel Version 25.5.0: Mon Apr 27 20:38:56 PDT 2026; root:xnu-12377.121.6~2/RELEASE_ARM64_T6000",
+      "arm64",
+      "arm"
+    ]
+  },
+  "created_utc": "2026-10-22T22:04:16.696996+00:00",
+  "finished_utc": "2026-10-22T22:04:34.413865+00:00",
+  "retry_count": 0,
+  "run_order": [
+    "before mono",
+    "after mono",
+    "before double",
+    "after double"
+  ],
+  "comparisons": {
+    "double": {
+      "exact_audio_field_matches": {
+        "audio_fnv1a64": true,
+        "checksum": true,
+        "left_rms": true,
+        "peak": true,
+        "right_rms": true
+      },
+      "timing": {
+        "thread_cpu": {
+          "mean_ms": {
+            "after_over_before": 0.8986195096307523,
+            "reduction_percent": 10.138049036924768
+          },
+          "p50_ms": {
+            "after_over_before": 0.9091692339825596,
+            "reduction_percent": 9.083076601744045
+          },
+          "p99_ms": {
+            "after_over_before": 0.8700111511971139,
+            "reduction_percent": 12.998884880288609
+          }
+        },
+        "wall": {
+          "mean_ms": {
+            "after_over_before": 0.9176399328217101,
+            "reduction_percent": 8.236006717828992
+          },
+          "p50_ms": {
+            "after_over_before": 0.915032033237989,
+            "reduction_percent": 8.496796676201102
+          },
+          "p99_ms": {
+            "after_over_before": 0.8722663014790057,
+            "reduction_percent": 12.773369852099425
+          }
+        }
+      }
+    },
+    "mono": {
+      "exact_audio_field_matches": {
+        "audio_fnv1a64": true,
+        "checksum": true,
+        "left_rms": true,
+        "peak": true,
+        "right_rms": true
+      },
+      "timing": {
+        "thread_cpu": {
+          "mean_ms": {
+            "after_over_before": 0.8800734422777395,
+            "reduction_percent": 11.992655772226046
+          },
+          "p50_ms": {
+            "after_over_before": 0.903986981285598,
+            "reduction_percent": 9.601301871440205
+          },
+          "p99_ms": {
+            "after_over_before": 0.8370685458039718,
+            "reduction_percent": 16.293145419602816
+          }
+        },
+        "wall": {
+          "mean_ms": {
+            "after_over_before": 0.6366853275175973,
+            "reduction_percent": 36.331467248240266
+          },
+          "p50_ms": {
+            "after_over_before": 0.9025974222329639,
+            "reduction_percent": 9.74025777670361
+          },
+          "p99_ms": {
+            "after_over_before": 0.6045247645001356,
+            "reduction_percent": 39.547523549986444
+          }
+        }
+      }
+    }
+  },
+  "all_audio_witnesses_exact": true,
+  "all_runs_zero_post_construction_new": true,
+  "all_runs_zero_wall_and_cpu_deadline_misses": false,
+  "timing_notes": [
+    "One fixed-order run per case; all failures and measured overruns retained without retries.",
+    "Per-block wall and thread CPU bracket RenderBatch only; finite checks, fingerprinting and output statistics are outside the measured interval.",
+    "Wall overruns are retained; thread CPU distinguishes charged execution cost from elapsed scheduling delay for those same measured blocks.",
+    "Machine may concurrently execute parent test/sanitizer work; no host process was launched or device installed by this benchmark.",
+    "FNV-1a64 covers every measured stereo float bit pattern plus double checksum; deterministic regression witness, not a cryptographic audio hash."
+  ],
+  "full_local_report_sha256": "98be26a315a19e0a4f5ad8620dab393c6cd5eec911768144b5b3bc2b6a830369",
+  "full_local_report": "build-cpu-evidence/wrapper/report.json (ignored local evidence; includes all per-block overruns and reproduction inputs)",
+  "canonical_core_sha256": "690a3f86c2972d0950f4bf79d070a92477b688b4fadb8b9d54aebba6af8e55ac",
+  "runs": [
+    {
+      "build": "before",
+      "mode": "mono",
+      "measurement": {
+        "applied_engine_configurations": [
+          {
+            "oversampling": 1,
+            "voices": 4
+          },
+          {
+            "oversampling": 1,
+            "voices": 4
+          }
+        ],
+        "audible_engines": 1,
+        "audio_fnv1a64": "a073be49ad1d1dc1",
+        "block_size": 64,
+        "checksum": 4.606851201188434,
+        "computed_engines": 2,
+        "computed_voices": 8,
+        "cpu_deadline_misses": 0,
+        "deadline_ms": 1.33333333333,
+        "held_notes": [
+          48,
+          55,
+          60,
+          64
+        ],
+        "initial_note_blocks": 1,
+        "left_rms": 0.0639168710589302,
+        "measured_blocks": 10000,
+        "mode": "mono",
+        "oversampling": 1,
+        "pan_spread": 0,
+        "parameter_count": 66,
+        "peak": 0.2224949151277542,
+        "post_construction_new_calls": 0,
+        "right_rms": 0.0639168710589302,
+        "sample_rate": 48000,
+        "thread_cpu": {
+          "maximum_ms": 0.467916,
+          "mean_ms": 0.1764841233,
+          "minimum_ms": 0.141958,
+          "p50_ms": 0.153625,
+          "p95_ms": 0.371084,
+          "p999_ms": 0.41875,
+          "p99_ms": 0.39025
+        },
+        "total_detune_cents": 0,
+        "velocity": 127,
+        "wall": {
+          "maximum_ms": 71.9700000482,
+          "mean_ms": 0.415220499795,
+          "minimum_ms": 0.141999917105,
+          "p50_ms": 0.154000008479,
+          "p95_ms": 0.86199992802,
+          "p999_ms": 17.6429999992,
+          "p99_ms": 6.80699991062
+        },
+        "wall_deadline_misses": 425,
+        "warmup_blocks": 1000
+      }
+    },
+    {
+      "build": "after",
+      "mode": "mono",
+      "measurement": {
+        "applied_engine_configurations": [
+          {
+            "oversampling": 1,
+            "voices": 4
+          },
+          {
+            "oversampling": 1,
+            "voices": 4
+          }
+        ],
+        "audible_engines": 1,
+        "audio_fnv1a64": "a073be49ad1d1dc1",
+        "block_size": 64,
+        "checksum": 4.606851201188434,
+        "computed_engines": 2,
+        "computed_voices": 8,
+        "cpu_deadline_misses": 0,
+        "deadline_ms": 1.33333333333,
+        "held_notes": [
+          48,
+          55,
+          60,
+          64
+        ],
+        "initial_note_blocks": 1,
+        "left_rms": 0.0639168710589302,
+        "measured_blocks": 10000,
+        "mode": "mono",
+        "oversampling": 1,
+        "pan_spread": 0,
+        "parameter_count": 66,
+        "peak": 0.2224949151277542,
+        "post_construction_new_calls": 0,
+        "right_rms": 0.0639168710589302,
+        "sample_rate": 48000,
+        "thread_cpu": {
+          "maximum_ms": 0.385333,
+          "mean_ms": 0.1553189899,
+          "minimum_ms": 0.130625,
+          "p50_ms": 0.138875,
+          "p95_ms": 0.315458,
+          "p999_ms": 0.350208,
+          "p99_ms": 0.326666
+        },
+        "total_detune_cents": 0,
+        "velocity": 127,
+        "wall": {
+          "maximum_ms": 27.0299999975,
+          "mean_ms": 0.264364799904,
+          "minimum_ms": 0.130000058562,
+          "p50_ms": 0.139000010677,
+          "p95_ms": 0.32300001476,
+          "p999_ms": 11.4730000496,
+          "p99_ms": 4.11500001792
+        },
+        "wall_deadline_misses": 231,
+        "warmup_blocks": 1000
+      }
+    },
+    {
+      "build": "before",
+      "mode": "double",
+      "measurement": {
+        "applied_engine_configurations": [
+          {
+            "oversampling": 1,
+            "voices": 4
+          },
+          {
+            "oversampling": 1,
+            "voices": 4
+          }
+        ],
+        "audible_engines": 2,
+        "audio_fnv1a64": "c50fc7614e0ba40b",
+        "block_size": 64,
+        "checksum": -2.684881250323201,
+        "computed_engines": 2,
+        "computed_voices": 8,
+        "cpu_deadline_misses": 0,
+        "deadline_ms": 1.33333333333,
+        "held_notes": [
+          48,
+          55,
+          60,
+          64
+        ],
+        "initial_note_blocks": 1,
+        "left_rms": 0.06390027272557541,
+        "measured_blocks": 10000,
+        "mode": "double",
+        "oversampling": 1,
+        "pan_spread": 1,
+        "parameter_count": 66,
+        "peak": 0.2249893695116043,
+        "post_construction_new_calls": 0,
+        "right_rms": 0.06366055368105664,
+        "sample_rate": 48000,
+        "thread_cpu": {
+          "maximum_ms": 0.468084,
+          "mean_ms": 0.1715351409,
+          "minimum_ms": 0.139417,
+          "p50_ms": 0.153208,
+          "p95_ms": 0.368209,
+          "p999_ms": 0.40375,
+          "p99_ms": 0.381125
+        },
+        "total_detune_cents": 12,
+        "velocity": 127,
+        "wall": {
+          "maximum_ms": 27.3739999393,
+          "mean_ms": 0.310209800117,
+          "minimum_ms": 0.139000010677,
+          "p50_ms": 0.153000000864,
+          "p95_ms": 0.396999996156,
+          "p999_ms": 12.4530000612,
+          "p99_ms": 5.16699999571
+        },
+        "wall_deadline_misses": 274,
+        "warmup_blocks": 1000
+      }
+    },
+    {
+      "build": "after",
+      "mode": "double",
+      "measurement": {
+        "applied_engine_configurations": [
+          {
+            "oversampling": 1,
+            "voices": 4
+          },
+          {
+            "oversampling": 1,
+            "voices": 4
+          }
+        ],
+        "audible_engines": 2,
+        "audio_fnv1a64": "c50fc7614e0ba40b",
+        "block_size": 64,
+        "checksum": -2.684881250323201,
+        "computed_engines": 2,
+        "computed_voices": 8,
+        "cpu_deadline_misses": 0,
+        "deadline_ms": 1.33333333333,
+        "held_notes": [
+          48,
+          55,
+          60,
+          64
+        ],
+        "initial_note_blocks": 1,
+        "left_rms": 0.06390027272557541,
+        "measured_blocks": 10000,
+        "mode": "double",
+        "oversampling": 1,
+        "pan_spread": 1,
+        "parameter_count": 66,
+        "peak": 0.2249893695116043,
+        "post_construction_new_calls": 0,
+        "right_rms": 0.06366055368105664,
+        "sample_rate": 48000,
+        "thread_cpu": {
+          "maximum_ms": 0.364667,
+          "mean_ms": 0.1541448242,
+          "minimum_ms": 0.127708,
+          "p50_ms": 0.139292,
+          "p95_ms": 0.315375,
+          "p999_ms": 0.349958,
+          "p99_ms": 0.331583
+        },
+        "total_detune_cents": 12,
+        "velocity": 127,
+        "wall": {
+          "maximum_ms": 20.3960000072,
+          "mean_ms": 0.28466090014,
+          "minimum_ms": 0.127999926917,
+          "p50_ms": 0.139999901876,
+          "p95_ms": 0.346999964677,
+          "p999_ms": 13.0000000354,
+          "p99_ms": 4.506999976
+        },
+        "wall_deadline_misses": 262,
+        "warmup_blocks": 1000
+      }
+    }
+  ]
+}

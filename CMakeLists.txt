@@ -22,7 +22,7 @@ endif()
 
 # C is required in addition to C++: JUCE's macOS plug-in wrappers (AU and
 # Standalone) compile C/Objective-C sources with non-Xcode generators too.
-project(Ceres VERSION 0.6.5 LANGUAGES C CXX)
+project(Ceres VERSION 1.0.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -332,6 +332,10 @@ if(BUILD_TESTING)
     PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
   add_executable(ceres_native_parity Tests/ParityDriver.cpp)
   target_link_libraries(ceres_native_parity PRIVATE ceres_native)
+  # Build the same driver against a previous engine for the byte-exact CPU
+  # regression check in Tests/check_cpu_parity.py; no frozen audio fixtures.
+  add_executable(ceres_cpu_parity Tests/CpuParityDriver.cpp)
+  target_link_libraries(ceres_cpu_parity PRIVATE ceres_native)
   add_executable(ceres_embedded_parity Tests/ParityDriver.cpp)
   target_link_libraries(ceres_embedded_parity PRIVATE ceres_embedded)
   add_executable(ceres_native_configuration_parity Tests/ConfigurationParityDriver.cpp)
@@ -344,6 +348,8 @@ if(BUILD_TESTING)
   target_link_libraries(ceres_embedded_external_parity PRIVATE ceres_embedded)
   find_package(Python3 COMPONENTS Interpreter)
   if(Python3_Interpreter_FOUND)
+    add_test(NAME Ceres.benchmark_cpu_provenance COMMAND "${Python3_EXECUTABLE}" -B
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tests/test_benchmark_cpu_provenance.py")
     if(CERES_BUILD_TOOLS)
       add_test(NAME Ceres.configuration_cli_contract COMMAND "${Python3_EXECUTABLE}"
         "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_configuration_cli.py"
@@ -375,7 +381,7 @@ if(BUILD_TESTING)
 
   foreach(target IN ITEMS ceres_configuration_tests ceres_noise_quality_tests ceres_oscillator_circuit_tests ceres_tests ceres_sound_path_tests
       ceres_capacitor_tests ceres_ring_depth_tests ceres_ring_carrier_tests ceres_ring_switching_tests ceres_expression_tests ceres_note_reuse_tests ceres_fast_note_envelope_tests
-      ceres_embedded_contract ceres_native_parity ceres_embedded_parity
+      ceres_embedded_contract ceres_native_parity ceres_embedded_parity ceres_cpu_parity
       ceres_native_configuration_parity ceres_embedded_configuration_parity
       ceres_native_external_parity ceres_embedded_external_parity)
     set_target_properties(${target} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)

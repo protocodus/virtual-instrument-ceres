@@ -1,0 +1,55 @@
+{
+  "status": "pass",
+  "version": "0.6.6",
+  "baseline_commit": "1cad0810e17ce0a735c50fabf9f9bdd1a1594c6b",
+  "dsp_scope": "Efficiency only; no installed build or Rack pin change",
+  "audio_protocol_samples": 439296,
+  "audio_maximum_difference": 0.0,
+  "release_ctest": {
+    "passed": 32,
+    "failed": 0,
+    "command": "ctest --test-dir build-cpu-after --output-on-failure"
+  },
+  "sanitizer_ctest": {
+    "passed": 31,
+    "failed": 0,
+    "command": "ASAN_OPTIONS=detect_leaks=0 ctest --test-dir build-cpu-sanitize -L 'unit|fuzz' --parallel 4 --output-on-failure",
+    "build_type": "RelWithDebInfo",
+    "optimization": "-O1 -g -DNDEBUG",
+    "instrumentation": "address,undefined,float-cast-overflow"
+  },
+  "rack_wrapper": {
+    "release": "pass",
+    "sanitizer": "pass",
+    "production_files_changed": false,
+    "instrument_override": "canonical candidate source"
+  },
+  "sdk": {
+    "version": "JukeboxSDK_500_028",
+    "target_version": "5.0",
+    "result": "C++17 bitcode compile/link and immutable-global check pass; compile-only"
+  },
+  "host_tested": false,
+  "installed": false,
+  "verified_file_sha256": {
+    "CMakeLists.txt": "5a6a54d75a15c2999822c0df4d339e96ea2a79aceed3ee46f67285d202a5207c",
+    "README.md": "edf87ac16f22125fdf033f4a6af95223ceba85eb444df1f24649492798166b85",
+    "Source/DSP/ceres.cpp": "690a3f86c2972d0950f4bf79d070a92477b688b4fadb8b9d54aebba6af8e55ac",
+    "Source/DSP/ceres.hpp": "29733a0d6a46d249e8ffb37317acec4a6555b3f3a49a656b79e53dcdf72e926a",
+    "Tests/CpuParityDriver.cpp": "4e3c74d534b6e271df9af7a5bd48edc0ba69ebbfa814e3b6f56b9dfdd6fb6cd9",
+    "Tests/check_cpu_parity.py": "859574bd0ee6a08850b31e629c962fde139b2eb4a04c6d59826ec7f4dd9e7097",
+    "Tools/benchmark_cpu.py": "ebfdccacbfe6c817daffbd53a7dd22653276b506529da27e6cd27ed90aa0eee1",
+    "Tools/native_performance.cpp": "d4becb82fdaeb40a66eb33b701bb50d107995170e77e17a06de54b84c9d50075",
+    "Tools/benchmark_configuration.cpp": "2e1354068a861b11fc2e2942d073e610e63cfbfb0e71f5ede1322833af4aef78",
+    "Docs/benchmarks/cpu-efficiency-2026-10-23.json": "1c488adcbace9c8d807cb4065c7caa95dd7875a90a42931eeb8caae5c38ea2bd",
+    "Docs/benchmarks/cpu-efficiency-2026-10-23.md": "6af47cfc6a6cd3f0e2a9796ae6c1782740820b6a3dca1ca752bc205bfc6274b6",
+    "Docs/benchmarks/cpu-efficiency-rack-native-2026-10-23.json": "520ad5f19b8ea1932f1671a631748931071cc44a31a0542525f5102b4f5a2baa",
+    "Docs/validation/cpu-efficiency-2026-10-23/audio-parity-no-builtin.json": "acb06001af416d71964c83a80f8611df98aaa0102034efb87a1e2ed2f23c76ff",
+    "Docs/validation/cpu-efficiency-2026-10-23/audio-parity.json": "512a015ae8fdf10499201f7e910a69a23901cc07666b1034aa82736ad51cbf42",
+    "Docs/validation/cpu-efficiency-2026-10-23/rack-wrapper-sanitizer.log": "1fd979545204dcef6dd6597949b398f6e9dcf63e29b57f3f11d8731adb52afa0",
+    "Docs/validation/cpu-efficiency-2026-10-23/rack-wrapper.log": "1fd979545204dcef6dd6597949b398f6e9dcf63e29b57f3f11d8731adb52afa0",
+    "Docs/validation/cpu-efficiency-2026-10-23/release-ctest.log": "4034fd14d4c331a3ccd72ec621587bdd3becd1ddaa135b36b1ed1acc05367567",
+    "Docs/validation/cpu-efficiency-2026-10-23/sanitizer-ctest.log": "812cfd1bdecaf45178f1880e46280645ee2692919b6278366d8d46a29a577f7c",
+    "Docs/validation/cpu-efficiency-2026-10-23/sdk5-compile-only.log": "d596fccdc9f83fbe505a1832196a91abdb732ffaa88f34ed856e326f45977368"
+  }
+}
