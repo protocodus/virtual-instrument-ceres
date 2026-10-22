@@ -145,7 +145,16 @@ no document prints.
    to a node near 0 V instead. If both boards' 10 V endpoints mean the same
    pin current, the input is near 1.7 kΩ and the lag about 17 ms; that is an
    inference, not a datum. Measuring pin 7's voltage against the RES lever on
-   a real M board would settle it.
+   a real M board would settle it. **Implemented 2026-10-22 (Ceres 0.6.5).**
+   Two more boards wire VQ as the CS-30 does: the CS-15's CPB board (CS-15
+   SM printed p.10, VCF I and II; the rank table on its board page gives R2
+   and R4 470, 430 or 390 Ω) and the CS-40M's FA board (overall circuit
+   diagram, IC5 and IC14, with 10 µF on the pin). The CS-80's R51·52 board
+   (SM printed p.39) feeds QH1–8 and QL1–8 through 220k from each preset bus
+   and 220k from RES, the CS-50's network, into pins with 10 µF (SM p.52).
+   Ceres now takes the pin as a 1.72 kΩ current input: the lag is 17 ms and
+   the preset Q rows and the RES lever see the loads given in
+   [the decision log](../decisions.md).
 2. **A capacitor on the WSC sine output.** One reading of the CS-80 M-board
    drawing (SM p.41) puts 0.047 µF from the IG00158 SIO to ground. Its corner
    depends on SIO's output impedance, which is not printed (about 34 kHz at

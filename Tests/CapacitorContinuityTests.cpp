@@ -18,13 +18,18 @@ void advance(ceres::Synth& s,unsigned n) {
 double rc(double initial,double target,double seconds,double tau) {
     return target+(initial-target)*std::exp(-seconds/tau);
 }
+// Pin 7 is a current input, taken as 1.72k (ceres.cpp, beside qControlTau):
+// each node's 10uF sees 220k, 220k and that input, 17ms.
+constexpr double pinResistance=1720,qTau=10e-6/(2/220e3+1/pinResistance);
 void qStepsAndSuperposition() {
-    // KCL C*dq/dt=(P-q)/220k+(RES-q)/220k. The unchanged anchor
-    // coordinate implies P=20*(1-r); q=10*(1-anchor)+offset. These are
-    // affine compatibility coordinates, not calibrated preset/pin volts.
-    // Solve their combined KCL independently of the implementation split.
-    constexpr double resistance=220000,capacitance=10e-6;
-    constexpr double tau=capacitance/(2/resistance);
+    // KCL C*dv/dt=(P-v)/220k+(RES-v)/220k-v/Rin at the pin node; q, the pin
+    // current times 110k+Rin, is proportional to v, so it shares the RC and
+    // settles at (P+RES)/2. The unchanged anchor coordinate implies
+    // P=20*(1-r); q=10*(1-anchor)+offset. These are affine compatibility
+    // coordinates, not calibrated preset/pin volts. Solve their combined KCL
+    // independently of the implementation split.
+    constexpr double resistance=220000;
+    constexpr double tau=qTau;
     for(double fs:{8000.,48000.,192000.}) {
         ceres::Patch p;p.hpResonance=.2;p.lpResonance=.7;
         ceres::Synth s(fs,72);s.setPatch(p);
@@ -84,7 +89,7 @@ void independentStageAndAudio() {
         const double difference=changed.process()-fixed.process();energy+=difference*difference;
         near(changed.soundPathState().hpResonanceAnchor,.2,0,"LP edit cannot alter HP anchor");
     }
-    near(changed.soundPathState().lpResonanceAnchor,rc(.3,.9,.2,1.1),2e-12,"Independent LP pole");
+    near(changed.soundPathState().lpResonanceAnchor,rc(.3,.9,.2,qTau),2e-12,"Independent LP pole");
     require(energy>1e-7,"Smoothed Q must reach actual filtered audio");
     const auto before=changed.soundPathState();
     auto recalled=ceres::preset("flute");changed.setPatch(recalled);

@@ -90,8 +90,10 @@ void clockAndCoefficients(){
         near(after.oscillatorPhase,expected,2e-13,"actual quality sample clock");
         p.resonanceOffset=8;p.lpResonance=.9;s.setPatch(p);advance(s,128);
         const auto q=s.soundPathState();
-        near(q.resonanceVoltageOffset,4*(1-std::exp(-128/(fs*1.1))),3e-12,"Q tau independent of quality");
-        near(q.lpResonanceAnchor,.9*(1-std::exp(-128/(fs*1.1))),3e-12,"Q anchor rate conversion");
+        // Pin 7's 10uF against 220k, 220k and its 1.72k current input (ceres.cpp).
+        const double qTau=10e-6/(2/220e3+1/1720.);
+        near(q.resonanceVoltageOffset,4*(1-std::exp(-128/(fs*qTau))),3e-12,"Q tau independent of quality");
+        near(q.lpResonanceAnchor,.9*(1-std::exp(-128/(fs*qTau))),3e-12,"Q anchor rate conversion");
         s.noteOff(60);advance(s,128);
     }
 }

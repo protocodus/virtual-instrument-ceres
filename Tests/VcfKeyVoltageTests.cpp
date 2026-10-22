@@ -135,9 +135,10 @@ double cutoffDraw(double bus,double shunt,double br,double sub,double eg) {
     return 4*(bus-node)/39e3;
 }
 // Each Q bus feeds four 220k into pin-7 nodes that return through 220k to the
-// RES bus, +10V at RESONANCE MIN; pin 7 taken to draw nothing.
+// RES bus, +10V at RESONANCE MIN, and through the pin's current input, taken
+// as 1.72k to ground (ceres.cpp, beside qControlTau).
 double qDraw(double bus) {
-    const double pin=(bus/220e3+10/220e3)/(2/220e3);
+    const double pin=(bus/220e3+10/220e3)/(2/220e3+1/1720.);
     return 4*(bus-pin)/220e3;
 }
 double fhBus(double g) { return presetRow(g,[](double v){return cutoffDraw(v,2.2e3,680e3,150e3,220e3);}); }
@@ -187,12 +188,12 @@ void factoryCutoffsFollowPrintedLaw() {
 
 void factoryQThroughDivider() {
     // Each pin 7 takes its preset Q bus and the RES bus through 220k each
-    // (SM1 printed p.14; SM2 printed p.16), so it settles at their mean. The
-    // presets assume RESONANCE at MIN, RES = +10V (chosen by ear 2026-10-20,
-    // brilliance-resonance-preset-q-divider). The engine coordinate r is
-    // 1 - VQ/10 (r = 1 is VQ 0V, Q 5). Until then presets put the bus
-    // straight on the pin, r = 1 - P/10. P is the row as loaded by the four
-    // pin-7 networks returning to RES, so a zero column sits at 10/12V.
+    // (SM1 printed p.14; SM2 printed p.16), so its current, read as VQ,
+    // settles at their mean. The presets assume RESONANCE at MIN, RES = +10V
+    // (chosen by ear 2026-10-20, brilliance-resonance-preset-q-divider). The
+    // engine coordinate r is 1 - VQ/10 (r = 1 is VQ 0V, Q 5). Until then
+    // presets put the bus straight on the pin, r = 1 - P/10. P is the row as
+    // loaded by the four pin-7 networks, so a zero column sits at .012V.
     for(const auto& row:factoryFilterColumns) {
         const auto p=ceres::preset(row.name);
         near(p.hpResonance,1-(qBus(row.h)+10)/2/10,1e-13,"Factory HP Q pin at (P + RES MIN)/2");

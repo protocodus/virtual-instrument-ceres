@@ -50,9 +50,9 @@ struct Patch {
     // calibration, V. Positive lowers Q. Factory presets assume the
     // RESONANCE lever at MIN (+10V), so from them the real 0..10V wiper
     // reaches 0 to -10V; positive values have no lever position. Stiff
-    // preset/source, zero chip input-current
-    // limit: each pin7 has 220k to each source and 10uF to ground, giving
-    // deltaVq -> offset/2 with tau1.1s. This incremental control is
+    // preset/source: each pin7 has 220k to each source, 10uF to ground and
+    // a current input (1.72k, inferred; ceres.cpp), giving
+    // deltaVq -> offset/2 with tau 17ms. This incremental control is
     // smoothed together with the independent hp/lp_resonance anchor terms;
     // live edits preserve both stage capacitor coordinates.
     double resonanceOffset = 0.0;
@@ -344,13 +344,14 @@ constexpr double subExternalUnitVolts = 1.5 / 101.0;
 // Returns `brilliance` volts.
 double brillianceLeverVolts(double travel);
 // RESONANCE TVR6: +10 V at MIN, ground at MAX. In steady state the eight
-// pin-7 networks (220k to the preset Q bus, 220k to RES, 10 uF) load the
-// wiper with 55k returning to the mean of the HP and LP preset Q buses,
-// presetMeanVolts. Returns the loaded RES bus voltage, from which a front end
-// takes its own neutral to form `resonance_offset`. Factory presets assume
-// MIN, so from them resonance_offset = resonanceLeverVolts(t, mean bus) - 10
-// reproduces the hardware, each preset bus being 10 - 20*hp/lp_resonance
-// (ceres.cpp preset()).
+// pin-7 networks (220k to the preset Q bus, 220k to RES, 10 uF, the pin's
+// current input) load the wiper with 27.7k returning to .78% of the mean of
+// the HP and LP preset Q buses, presetMeanVolts. Returns the loaded RES bus
+// voltage, from which a front end takes its own neutral to form
+// `resonance_offset`. Factory presets assume MIN, so from them
+// resonance_offset = resonanceLeverVolts(t, mean bus) - 10 reproduces the
+// hardware, each preset bus being 10 - 20*hp/lp_resonance (ceres.cpp
+// preset()).
 double resonanceLeverVolts(double travel, double presetMeanVolts);
 // PANEL HPF and LPF levers (PN1, B-10K, 0..10V), for front ends that show the
 // hardware levers: travel 0..1, clamped, to the hp_cutoff / lp_cutoff value,
@@ -530,7 +531,9 @@ std::vector<double> envelopeTrace(double sampleRate, const Patch&, bool filter,
     std::size_t frames, const std::vector<EnvelopeGate>& gates);
 
 // Raw source generator, before voice filters/VCA/decimation. sampleRate is
-// its actual processing rate (use 4*hostRate to match the synth core).
+// its actual processing rate (use 4*hostRate to match the synth core). The
+// sine's input coupling starts precharged to the triangle's mean at this
+// frequency, as on a board that has been running at it.
 std::vector<OscillatorFrame> oscillatorTrace(double sampleRate, double frequency,
     const Patch&, std::size_t frames, double initialPhase = 0.0);
 

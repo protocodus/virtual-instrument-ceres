@@ -235,7 +235,24 @@ changed since. Two things remain:
   6.33 kHz top). For the ideal shaper that needed a transfer beyond its
   nominal input range, which is unpublished. The shipping tanh shaper is
   defined there, but the auditioned candidate omitted the offset, so it is
-  still not applied and is noted in the code.
+  still not applied and is noted in the code. **Applied 2026-10-22 (Ceres
+  0.6.5):** the coupling is the M board's own (SM2 p.16), so it now sits in
+  front of the chosen shaper as an RC high-pass, 103 ms, on the held
+  triangle; the 22k biases STI, so the pair's base is taken as a high
+  impedance. Its capacitor starts precharged to the mean at the board's
+  first pitch and re-centres STI after every pitch change. Harmonics re H1
+  of the continuous waveform with the coupling settled, before and after:
+
+  | Note | Mean | H2 dB | H3 dB | H4 dB |
+  | --- | --- | --- | --- | --- |
+  | C4 on 8', 523 Hz | 0.2 % | −56.4 → −51.5 | −61.7 → −61.7 | −56.5 → −56.3 |
+  | C5 on 8', 1047 Hz | 0.8 % | −43.6 → −39.2 | −45.4 → −45.2 | −44.0 → −43.8 |
+  | C6 on 8', 2093 Hz | 3.1 % | −30.2 → −27.1 | −30.8 → −30.3 | −31.9 → −31.4 |
+  | C6 on 4', 4186 Hz | 12.5 % | −16.8 → −17.1 | −19.1 → −18.0 | −22.2 → −20.9 |
+  | top, 6331 Hz | 28.6 % | −9.7 → −12.7 | −14.3 → −13.7 | −17.2 → −17.5 |
+
+  The fundamental moves by at most 0.27 dB, at the top. See the
+  [decision log](../decisions.md).
 
 ### Round 2: patents and a CS-80 sine measurement
 

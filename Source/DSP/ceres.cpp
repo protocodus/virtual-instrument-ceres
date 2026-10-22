@@ -59,9 +59,25 @@ double leverFraction(double x,double ratio) { return x/(1+x*(1-x)*ratio); }
 constexpr double ringMixLoad=1/(1/(68e3/2+2.2e3)+1/(10e3+330));
 constexpr double ringMixLeverRatio=10e3/ringMixLoad;
 // Each pin 7 has 220k to its preset Q bus, 220k to RES and 10uF (SM1 p.14;
-// SM2 p.16): 1.1s with stiff sources. The lever's own track adds 8*Rs to the
-// common-mode RES path, 1.15s at mid-travel on the parts-list B-10K; kept stiff.
-constexpr double qControlTau=10e-6*(220e3/2);
+// SM2 p.16), and pin 7 takes current into a low impedance. The CS-30 drives
+// the same IG00156's VQ through 22k into a 390-470 ohm rank shunt with 10uF
+// (CS-30 SM pp.8-9) and prints Q .5 at 10V, as SM1 p.19 does: a pin that read
+// voltage would see at most .2V there against 10V here, so no one voltage law
+// fits both boards, while a current input fits both. (The CS-15 CPB and CS-40M
+// FA boards wire VQ as the CS-30 does: corroboration only.) Equal current at
+// the two printed 10V points puts the input at four times the shunt, 1.72k at
+// rank B's 430 ohm: an inference, not a datum. At any such input the current
+// is (P+R)/2 through 110k+Rin, so the printed law reads (P+R)/2 exactly as
+// before; what the input changes is the node's RC, 10uF*(110k||Rin) = 17ms
+// rather than 1.1s, and the bus loads (qBranchLoad). The lever's track, 2.5k
+// at most, is negligible beside Rin.
+constexpr double qPinResistance=4*430.;
+constexpr double qControlTau=10e-6/(2/220e3+1/qPinResistance);
+// One 220k branch seen from its bus: 220k on to the pin node, where the other
+// 220k and Rin make a source of qBranchReturn times the other bus behind
+// 220k||Rin.
+constexpr double qBranchLoad=220e3+1/(1/220e3+1/qPinResistance);
+constexpr double qBranchReturn=qPinResistance/(220e3+qPinResistance);
 // KAS gate/integrator, one per channel (SM2 p.3; guide printed p.24). The D-A
 // output reaches the channel's .033uF hold capacitor through a permanent 3.3M
 // and two TC4016 gates in parallel with it: one direct, one through 470k.
@@ -774,9 +790,13 @@ constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
 // tanh is not constexpr in C++17, so tanh(k) is written out (std::tanh(1.4020)).
 constexpr double wscSineDrive=1.4020;
 constexpr double wscSineTanhDrive=0.8857831884152492;
-// g'(+/-1) = k*(1-tanh(k)^2)/tanh(k): the slope at both triangle corners.
-constexpr double wscSineCornerSlope=
-    wscSineDrive*(1-wscSineTanhDrive*wscSineTanhDrive)/wscSineTanhDrive;
+double wscSine(double input) {return std::tanh(wscSineDrive*input)/wscSineTanhDrive;}
+double wscSineSlope(double input) {
+    const double t=std::tanh(wscSineDrive*input);
+    return wscSineDrive*(1-t*t)/wscSineTanhDrive;
+}
+// TO reaches STI through 4.7uF NP with 22k to ground (SM2 p.16): see Oscillator.
+constexpr double wscSineInputTau=22e3*4.7e-6;
 // Mean square over a period of the ideal folded triangle (no plateau):
 // (1/2)*integral_{-1}^{1} tanh(k*u)^2 du/tanh(k)^2 = (1-tanh(k)/k)/tanh(k)^2,
 // .4692770 (an ideal sine's .5, so -.275 dB RMS at the same peak).
@@ -1129,7 +1149,14 @@ double subWaveform(double phase,double step,double waveform,double noise) {
 
 struct Oscillator {
     double phase = 0;
-    OscillatorFrame process(double frequency, double pulseWidth, double resetSeconds, double fs) {
+    // The TO-STI coupling capacitor's voltage, in units of the triangle's
+    // peak. A board's VCO runs from power-on, so the first sample precharges
+    // it to the triangle's mean at that pitch.
+    double stiCoupling = 0;
+    bool stiPrecharged = false;
+    // stiCoefficient: -expm1(-1/(fs*wscSineInputTau)).
+    OscillatorFrame process(double frequency, double pulseWidth, double resetSeconds, double fs,
+                            double stiCoefficient) {
         // Guide pp.28-31: OUT7 conditions the integrating-capacitor signal
         // with the monostable pulse before the WSC. It is not the exposed raw
         // recharge triangle. In the nominal current law r=f*tau, fixed A0
@@ -1180,30 +1207,43 @@ struct Oscillator {
         // WSC pin14 -> pin3 folds the SAME conditioned ramp into the
         // triangle tri=2|p|-1 (TO, 3.2Vpp, SL pin 4 open; SM2 p.21): 1 on the
         // plateau, then 1-4*phase down to the fold at phase .5 and 4*phase-3
-        // back up (a plateau longer than .5 covers the fold). pin15 -> pin2
-        // shapes it with the bipolar differential pair tanh(k*tri)/tanh(k)
-        // (wscSineDrive above: textbook topology at its own minimum-THD
-        // drive, not measured, chosen by ear 2026-10-20; the CS-80 recording
-        // that questions it is noted there). Sine slice trim and
-        // the chip's real transistor shape are unpublished. TO reaches STI
-        // through 4.7uF NP with 22k to ground (SM2 p.16), which removes the
-        // triangle's 2r^2 mean (.2% of peak at C4, 3% at C6 on 8'); that
-        // offset is not applied (the auditioned shaper omits it).
+        // back up (a plateau longer than .5 covers the fold). TO reaches STI
+        // through 4.7uF NP with 22k to ground (SM2 p.16). STI is the input of
+        // the shaper's differential pair, which that 22k biases, so the
+        // coupling is a 103ms (1.54Hz) high-pass into a high impedance: its
+        // capacitor c settles at the triangle's mean, 2r^2 of peak with the
+        // plateau (.2% at C4, 3% at C6 on 8', 29% at the 6.33kHz top), and
+        // each new pitch re-centres STI with that time constant. pin15 -> pin2
+        // shapes STI, u=tri-c, with the bipolar differential pair
+        // g(u)=tanh(k*u)/tanh(k) (wscSineDrive above: textbook topology at its
+        // own minimum-THD drive, not measured, chosen by ear 2026-10-20 without
+        // the coupling; the CS-80 recording that questions it is noted there).
+        // Sine slice trim and the chip's real transistor shape are unpublished.
         // Band-limiting, analytic as for the saw: the plateau step at r is a
-        // jump g(tri(r+))-1 and a slope change to -/+4*g'(tri(r+)); the reset
-        // corner (slope 4*g'(1) into the flat plateau) and the fold corner
-        // (-4*g'(1) to +4*g'(1)) are BLAMPs.
-        const bool foldAfterPlateau = recharge < .5;
-        const double plateauEnd = foldAfterPlateau ? 1-4*recharge : 4*recharge-3;
-        const double plateauEndShape = std::tanh(wscSineDrive*plateauEnd);
-        const double plateauEndSlope = (foldAfterPlateau ? -4 : 4)*wscSineDrive
-            *(1-plateauEndShape*plateauEndShape)/wscSineTanhDrive;
+        // jump g(tri(r+)-c)-g(1-c) and a slope change to -/+4*g'(tri(r+)-c);
+        // the reset corner (slope 4*g'(1-c) into the flat plateau) and the
+        // fold corner (-4*g'(-1-c) to +4*g'(-1-c)) are BLAMPs. The step also
+        // turns c's own slope by 4*resetSeconds/tau per unit phase, under .1%
+        // of the triangle's, which is left unlimited.
         const double tri = phase < .5 ? 1-4*phase : 4*phase-3;
-        double sine = phase < recharge ? 1 : std::tanh(wscSineDrive*tri)/wscSineTanhDrive;
-        sine += .5*(plateauEndShape/wscSineTanhDrive-1)*blep(resetPhase,step)
-            + .5*plateauEndSlope*blamp(resetPhase,step)
-            - 2*wscSineCornerSlope*blamp(phase,step);
-        if (foldAfterPlateau) sine += 4*wscSineCornerSlope*blamp(wrap(phase-.5),step);
+        const double conditioned = phase < recharge ? 1 : tri;
+        if (!stiPrecharged) {
+            stiCoupling = recharge < .5 ? 2*recharge*recharge : 4*recharge-1-2*recharge*recharge;
+            stiPrecharged = true;
+        }
+        const double c = stiCoupling;
+        double sine = wscSine(conditioned-c);
+        if (resetPhase < step || resetPhase > 1-step) {
+            const bool foldAfterPlateau = recharge < .5;
+            const double plateauEnd = (foldAfterPlateau ? 1-4*recharge : 4*recharge-3)-c;
+            sine += .5*(wscSine(plateauEnd)-wscSine(1-c))*blep(resetPhase,step)
+                + .5*(foldAfterPlateau ? -4 : 4)*wscSineSlope(plateauEnd)*blamp(resetPhase,step);
+        }
+        if (phase < step || phase > 1-step) sine -= 2*wscSineSlope(1-c)*blamp(phase,step);
+        const double fold = wrap(phase-.5);
+        if (recharge < .5 && (fold < step || fold > 1-step))
+            sine += 4*wscSineSlope(-1-c)*blamp(fold,step);
+        stiCoupling += (conditioned-stiCoupling)*stiCoefficient;
         phase = wrap(phase + step);
         // Audio polarity: the completed pulse is negated, including its BLEP,
         // without moving either comparator edge, changing PW/PWM timing or
@@ -1359,10 +1399,10 @@ namespace {
 // the two levers agree on orientation.
 // Loads are the R7 matrix (SM1 p.14): BR drives four 680k (HP) and four 220k
 // (LP) into cutoff nodes held near ground by the M-board R6/R7 shunts (about
-// 2k, SM2 p.16); RES drives eight 220k into pin-7 nodes that sit, in steady
-// state, halfway between RES and their own preset bus.
+// 2k, SM2 p.16); RES drives eight 220k branches into the pin-7 current
+// inputs (qBranchLoad), which return to .78% of their own preset buses.
 constexpr double brillianceLeverLoad=1/(4/680e3+4/220e3);
-constexpr double resonanceLeverLoad=440e3/8;
+constexpr double resonanceLeverLoad=qBranchLoad/8;
 // A wiper at fraction a of a track R between sources Ea (a=0) and Eb (a=1)
 // is Ea+(Eb-Ea)a behind R*a*(1-a); the load returns to Vload.
 double loadedWiper(double ea,double eb,double a,double track,double load,double vload) {
@@ -1384,7 +1424,7 @@ double resonanceLeverVolts(double travel, double presetMeanVolts) {
         return std::numeric_limits<double>::quiet_NaN();
     // Fraction of the 10k track between the wiper and terminal 3 (ground, MAX).
     const double a=1-std::min(1.0,std::max(0.0,travel));
-    return loadedWiper(0,10,a,10e3,resonanceLeverLoad,presetMeanVolts);
+    return loadedWiper(0,10,a,10e3,resonanceLeverLoad,presetMeanVolts*qBranchReturn);
 }
 
 namespace {
@@ -1494,11 +1534,11 @@ struct Synth::Impl {
     std::array<double,4> ampCoefficients{}, filterCoefficients{};
     double hpSourceBranches = 3, lastSub = 0;
     // Eight equal pin7 networks reduce exactly to one common delta state
-    // for this stiff-source/zero-input-current limit and equal initial delta.
+    // for stiff sources, equal pin inputs and equal initial delta.
     // Existing per-stage effective Q anchors are NOT raw chip voltages.
     // Two independently smoothed anchors plus the shared delta decompose
     // two stage capacitor coordinates, not three physical capacitors.
-    double qVoltageOffset=0, qControlCoefficient=0;
+    double qVoltageOffset=0, qControlCoefficient=0, stiCoefficient=0;
     double hpResonanceAnchor=0, lpResonanceAnchor=0;
     bool hasProcessed=false;
     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
@@ -1571,6 +1611,7 @@ struct Synth::Impl {
         velocityCoefficient = 1-std::exp(-1/(internalFs*.005));
         driftCoefficient = 1-std::exp(-1/(internalFs*.3));
         qControlCoefficient=-std::expm1(-1/(internalFs*qControlTau));
+        stiCoefficient=-std::expm1(-1/(internalFs*wscSineInputTau));
         subNoiseG=1/(2*internalFs*subNoiseResistance*.1e-6);
         ringCarrierCoupling.configure(internalFs);
         updateCoefficients();
@@ -1798,8 +1839,9 @@ struct Synth::Impl {
         qVoltageOffset+=(patch.resonanceOffset*.5-qVoltageOffset)*qControlCoefficient;
         hpResonanceAnchor+=(patch.hpResonance-hpResonanceAnchor)*qControlCoefficient;
         lpResonanceAnchor+=(patch.lpResonance-lpResonanceAnchor)*qControlCoefficient;
-        // Direct chip endpoints Vq0:Q5,Vq10:Q.5. deltaVq moves the pin
-        // voltage itself; OtaSvf applies the exponential law to the sum.
+        // Printed endpoints Vq0:Q5,Vq10:Q.5, Vq being the pin current times
+        // 110k+Rin. deltaVq moves Vq itself; OtaSvf applies the exponential
+        // law to the sum.
         effectiveHpResonance=clamp(hpResonanceAnchor-qVoltageOffset*.1,0,1);
         effectiveLpResonance=clamp(lpResonanceAnchor-qVoltageOffset*.1,0,1);
         // R7 LC sums LEVEL(270k) and SUB(120k) currents before common VCA2.
@@ -1849,7 +1891,7 @@ struct Synth::Impl {
                     440*std::exp2((key-69+bend+patch.tuneCents*.01)/12));
             const double frequency = 440 * std::exp2((key-69 + bend + 12*patch.octave + cents*.01)/12);
             const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
-                                            patch.resetMicroseconds*1e-6,internalFs);
+                                            patch.resetMicroseconds*1e-6,internalFs,stiCoefficient);
             // Each board's EG times, VCA-EG peak and floor (see BoardTolerance;
             // the shared values when the envelope tolerance is off).
             const auto& egf=v.board.filterCoefficients;
@@ -2304,12 +2346,13 @@ std::vector<OscillatorFrame> oscillatorTrace(double fs,double frequency,
         throw std::invalid_argument("Invalid oscillator probe input");
     const Patch patch=validatePatch(supplied);
     Oscillator oscillator; oscillator.phase=wrap(initialPhase);
+    const double stiCoefficient=-std::expm1(-1/(fs*wscSineInputTau));
     std::vector<OscillatorFrame> result(frames);
     double pwmPhase=0;
     for (auto& frame : result) {
         const double pwm=std::sin(2*pi*(pwmPhase+patch.pwmPhase));
         frame=oscillator.process(frequency,patch.pulseWidth+patch.pwmDepth*pwm,
-            patch.resetMicroseconds*1e-6,fs);
+            patch.resetMicroseconds*1e-6,fs,stiCoefficient);
         pwmPhase=wrap(pwmPhase+patch.pwmRate/fs);
     }
     return result;
@@ -2371,13 +2414,13 @@ Patch preset(const std::string& name) {
     // cutoff branches (fhBusLoad, flBusLoad, with the PANEL lever law). The
     // same wiring lists (SM2 printed p.11 T71, p.15 R7) run h and j straight
     // to QH (52) and QL (50), again with no buffer between. Each Q bus
-    // feeds four 220k to pin-7 nodes that return through 220k to RES: 110k to
-    // the RES bus, which is the T71 +10V at the presets' RESONANCE MIN. The
-    // row V then solves (10 - Vd - V)/Rs = V/10k + (V - Vret)/Rload, the
-    // diode's current, with Rs recovered from the printed bare divider,
-    // Rs = 10k(10/Videal - 1); a zero column leaves the row at the load's own
-    // Thevenin voltage. Each pin 7 is taken to draw no current.
-    constexpr double qBusLoad=(220e3+220e3)/4;
+    // feeds four 220k branches into the pin-7 current inputs: 55.4k in all,
+    // returning to qBranchReturn of the RES bus, which is the T71 +10V at the
+    // presets' RESONANCE MIN (.078V). The row V then solves
+    // (10 - Vd - V)/Rs = V/10k + (V - Vret)/Rload, the diode's current, with
+    // Rs recovered from the printed bare divider, Rs = 10k(10/Videal - 1); a
+    // zero column leaves the row at the load's own Thevenin voltage.
+    constexpr double qBusLoad=qBranchLoad/4;
     const auto loadedPresetPin=[](double ideal,double load,double loadReturn) {
         // Thevenin of the 10k and the load: vl behind rl.
         const double rl=presetLoad*load/(presetLoad+load);
@@ -2464,7 +2507,8 @@ Patch preset(const std::string& name) {
         p.lpEnvelopeScale=leverOctavesPerVolt*39/47;
         // Q columns h (HP) and j (LP): each pin 7 takes its preset Q bus P
         // and the RES bus R through 220k each, with 10uF to ground (SM1
-        // printed p.14 R7; SM2 printed p.16), so it settles at (P+R)/2 and
+        // printed p.14 R7; SM2 printed p.16), so its current settles at
+        // (P+R)/2 through 110k+Rin (qPinResistance), VQ=(P+R)/2 and
         // r=1-(P+R)/20. Factory presets put the RESONANCE lever at MIN, where
         // TVR6 sits on the +10V bus (SM2 p.26 PN2 sheet): r=(10-P)/20. The
         // divider is printed; which lever position Yamaha voiced the presets
@@ -2473,11 +2517,11 @@ Patch preset(const std::string& name) {
         // bus went straight to the pin, r=(10-P)/10, which no single lever
         // position gives for every preset. resonance_offset is then the RES
         // change from MIN: 0 to -10V. P is the loaded row (loadedPresetPin):
-        // the four pin-7 networks pull it toward RES's +10V, so a zero column
-        // sits at .83V, not ground. Away from MIN that pull follows RES, so
-        // the pin moves up to 13/24 of each RES volt, not 1/2; not modelled.
-        p.hpResonance=(10-loadedPresetPin(ideal[7],qBusLoad,presetSupply))/20;
-        p.lpResonance=(10-loadedPresetPin(ideal[9],qBusLoad,presetSupply))/20;
+        // the four pin-7 branches pull it toward .078V, so a zero column sits
+        // at .012V. Away from MIN that return follows RES through the 10k, so VQ
+        // moves at most .12% more than half of each RES volt; not modelled.
+        p.hpResonance=(10-loadedPresetPin(ideal[7],qBusLoad,presetSupply*qBranchReturn))/20;
+        p.lpResonance=(10-loadedPresetPin(ideal[9],qBusLoad,presetSupply*qBranchReturn))/20;
         // VCF-EG levels at TP1 (EG OUT). The IG00152 pin sheet (SM1 p.20)
         // gives AL 0..10V -> LC up to +5V and IL 0..10V -> 0..-5V, but the
         // alignment of the same M board (Yamaha CS-60 Service Manual p.37,

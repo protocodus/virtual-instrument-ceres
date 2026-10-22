@@ -31,6 +31,11 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 
 ## Version history
 
+### Unreleased — 0.6.5 — the filter's Q pin and the sine's coupling
+
+- RESONANCE is heard as the lever moves: a change of RESONANCE, or of a preset's Q, settles in about 17 ms instead of 1.1 s. The filter chip's Q pin takes current into a low impedance: the CS-30, CS-15 and CS-40M drive it through 22 kΩ into a 390–470 Ω shunt, the CS-50 and CS-80 through a pair of 220 kΩ, and Yamaha prints the same Q at 10 V for both, which only a current input allows. Its 1.72 kΩ is inferred from that; no document prints it. Because a preset's Q row no longer leans on the RESONANCE bus, factory Q rises by up to 10 % (Guitar 2 and Funky 2: 1.44 → 1.58), and the RESONANCE lever law (`resonanceLeverVolts`) sags up to 0.5 V near a third of its travel. The sources decide this; it was not chosen by ear.
+- The VCO sine's shaper now hears the triangle through the M board's 4.7 µF coupling into 22 kΩ, which centres it on its own average. That matters where the oscillator's reset plateau makes the triangle lopsided, toward the top of the range: the sine's second harmonic moves by up to 5 dB (C6 on 8': −30 → −27 dB below the fundamental), and after a large jump in pitch the sine re-centres over about 0.3 s. The shaper's curve is still the one chosen by ear in 0.6.0; the coupling comes from the schematic, not from a listen.
+
 ### Unreleased — 0.6.4 — every instance is its own unit
 
 - Each new plug-in instance is now a different CS-50: it draws its own random unit, so its boards' pitch, filter, envelope and VCA offsets, oscillator phases and noise differ from every other instance's, within the same service tolerances. Every voice up to `voice_count` is a board of its own, the four physical ones and each further voice alike. A saved session or preset state reopens as the unit it was saved with; a state saved by an earlier version opens as the one fixed unit every instance used to be. The demos keep that fixed unit, so a program sounds like its demo but not sample for sample. The owner asked for this; it was not chosen by ear.
@@ -216,7 +221,7 @@ The ring/SUB/Sustain additions preserved the earlier audio path in their recorde
 | Key | Range | Default | Meaning |
 | --- | --- | --- | --- |
 | `brilliance` | −15..+15 V | 0 | Loaded shared BR-node offset; different HP/LP cutoff gains |
-| `resonance_offset` | −10..+10 V | 0 | Shared RES-node voltage change; positive lowers Q, with sourced 1.1-second RC response |
+| `resonance_offset` | −10..+10 V | 0 | Shared RES-node voltage change; positive lowers Q, with a 17 ms RC response (the Q pin's input inferred) |
 | `amp_level` | 0..1 | 1 | Common filtered+sine VCA level before amp EG, bus and ring |
 | `output_trim_db` | −24..+24 dB | 0 | Utility gain after all circuit processing and FIR, for saved preset calibration |
 
@@ -266,7 +271,7 @@ The editor (1080×750) is laid out like the CS-50 panel: the tone-selector table
 
 - No host has yet exercised the plug-in's EXT IN as a sidechain input, and the AU's handling of it is untested. The factory programs are research presets from the circuit study, not calibrated Yamaha voices.
 - A unit can be neither seen nor chosen; only a saved state brings one back. Sixteen voices at 4× can need more than a whole CPU core at 48 kHz; `voice_count` and `oversampling` trade CPU for polyphony and alias rejection.
-- Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. The ring envelope's alignment voltage and the output level meter's load come from the CS-80's procedure for the same circuits; no CS-50 document states them. The RESONANCE controls' 1.1 s lag assumes the filter chip's resonance pin draws no current, which the CS-30's board for the same chip argues against; a low-impedance pin would make it tens of milliseconds. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
+- Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. The ring envelope's alignment voltage and the output level meter's load come from the CS-80's procedure for the same circuits; no CS-50 document states them. The RESONANCE controls' 17 ms lag and the Q buses' loads take the filter chip's resonance pin as a 1.72 kΩ current input: the CS-30, CS-15 and CS-40M boards for the same chip show that it takes current, but its input resistance is inferred, not printed. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
 - EXT IN's host-rate signal is interpolated linearly inside the oversampled engine; the op-amp swings are datasheet typicals, and the EXT preamp's bandwidth and slew rate are not modelled. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
 - The portamento/glissando clock rate and the noise limiter's bandwidth and slew rate are not calibrated.
