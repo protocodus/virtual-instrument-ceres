@@ -391,7 +391,10 @@ struct Random {
 };
 
 // Board-to-board tolerance: what the four M boards keep after Yamaha's own
-// calibration, and nothing the service documents do not bound.
+// calibration, and nothing the service documents do not bound. Voices beyond
+// the CS-50's four are further boards: each draws its own residuals from the
+// same bands, after the four physical boards (reset()), so a board is the
+// same at every voice count.
 //
 // Pitch. IG00153 (VCO III) is LINEAR in the key voltage Kv (Guide printed
 // pp.28-29: f = I/(Iref*tau), I = Kv/Rn; NORMAL Kv 250mV..4V gives
@@ -506,7 +509,8 @@ struct Random {
 // with all keys down (CS-60 p.39, PRA III; see outputPreamp): it takes the
 // four boards' sine error out of the common gain. With the reference's
 // assumptions (RMS meter, notes adding incoherently) that is
-// sqrt(4/sum g^2) over the four physical boards' sine gains g.
+// sqrt(4/sum g^2) over the four physical boards' sine gains g. A further
+// board is added after that trim and keeps its own sine error.
 //
 // Not modelled, no printed tolerance: Q, and the static cutoff at the trims'
 // lever centre (both ear-matched),
@@ -1831,7 +1835,9 @@ struct Synth::Impl {
                 v.driftCountdown = static_cast<unsigned>(internalFs * (.2 + random.unit()*.5));
             }
             v.drift += (v.driftTarget-v.drift) * driftCoefficient;
-            double cents = patch.tuneCents + (static_cast<double>(i)-1.5)*patch.voiceSpreadCents
+            // The fixed spread steps from board to board, centred on the
+            // voices in use (i-1.5 at the default four).
+            double cents = patch.tuneCents + (static_cast<double>(i)-.5*(voiceLimit-1))*patch.voiceSpreadCents
                 + v.drift*patch.driftCents + lfo*(patch.vibratoCents + expression*patch.pressureVibrato)
                 + expression*patch.pressureVibrato*touchVibratoBias;
             const double key=advanceGlide(v,dt);

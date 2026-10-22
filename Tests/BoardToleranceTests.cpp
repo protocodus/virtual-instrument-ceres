@@ -1,4 +1,5 @@
-// Board-to-board tolerance of the four M boards. Expected values are rebuilt
+// Board-to-board tolerance of the M boards: the CS-50's four, and each
+// further voice up to 16, a board of its own. Expected values are rebuilt
 // here from the service documents, not read back from the engine's tables:
 //  - Guide printed p.65 (PDF 74) tuning method: every VCO trim point lands
 //    within +/-1 cent (OCT-UP C2 and C6 keys; C6 key at NORMAL/-1/-2 oct).
@@ -36,6 +37,17 @@ namespace {
 constexpr double pi=3.14159265358979323846;
 constexpr double floorHz=1/(2*pi*1.5e-9*4.7e6);
 constexpr double rate=48000;
+// Every board slot: the four physical boards, then the further voices. A
+// board is the same at every voice count that holds it, so each contract
+// plays board b at max(4, b+1) voices.
+constexpr unsigned boards=ceres::Synth::maxVoiceCount;
+unsigned voicesFor(unsigned board) {return std::max(4u,board+1);}
+// The boards a contract checks on its seed-th of `units` instruments: the
+// four physical boards on every one, and the further boards on the first
+// quarter of them.
+unsigned boardsFor(std::uint64_t seed,std::uint64_t units) {return seed<=units/4 ? boards : 4;}
+// Keys for the boards before the one under test, below every tested key.
+constexpr int firstOtherKey=21;
 void require(bool good,const char* why) {if(!good)throw std::runtime_error(why);}
 void near(double a,double b,double tolerance,const char* why) {
     if(!std::isfinite(a)||std::abs(a-b)>tolerance) {
@@ -59,13 +71,12 @@ ceres::Patch everything(ceres::Patch p) {
     p.boardEnvelopeTimeTolerance=p.boardVcaTolerance=1;p.boardTemperatureRise=25;
     return p;
 }
-// State of one physical board playing one key: earlier boards take other keys.
+// State of one board playing one key: earlier boards take other keys.
 ceres::Synth::VoiceState play(std::uint64_t seed,const ceres::Patch& p,unsigned board,int key,
-                              unsigned voices=4) {
-    ceres::Synth s(rate,seed);require(s.configure(voices,4),"configure");
+                              unsigned voices=0) {
+    ceres::Synth s(rate,seed);require(s.configure(voices ? voices : voicesFor(board),4),"configure");
     s.setPatch(p);
-    const int others[]={30,31,32,33,34,35,36,37};
-    for(unsigned i=0;i<board;++i)s.noteOn(others[i]);
+    for(unsigned i=0;i<board;++i)s.noteOn(firstOtherKey+int(i));
     s.noteOn(key);
     for(unsigned n=0;n<4;++n)s.process();
     const auto state=s.allVoiceState()[board];
@@ -88,10 +99,9 @@ double error(std::uint64_t seed,ceres::Patch p,unsigned board,int key,double oct
 // is released at frame `release`.
 struct Trace {std::vector<double> amp,filter;};
 Trace trace(std::uint64_t seed,const ceres::Patch& p,unsigned board,unsigned frames,unsigned release) {
-    ceres::Synth s(rate,seed);require(s.configure(4,1),"configure");
+    ceres::Synth s(rate,seed);require(s.configure(voicesFor(board),1),"configure");
     s.setPatch(p);
-    const int others[]={30,31,32};
-    for(unsigned i=0;i<board;++i)s.noteOn(others[i]);
+    for(unsigned i=0;i<board;++i)s.noteOn(firstOtherKey+int(i));
     s.noteOn(60);
     Trace t;
     for(unsigned n=0;n<frames;++n) {
@@ -108,9 +118,9 @@ Trace trace(std::uint64_t seed,const ceres::Patch& p,unsigned board,unsigned fra
 // and released before the first sample, so their VCA EGs never leave the
 // floor and their VCAs pass nothing.
 std::vector<double> solo(std::uint64_t seed,const ceres::Patch& p,unsigned board,unsigned frames) {
-    ceres::Synth s(rate,seed);require(s.configure(4,1),"configure");
+    ceres::Synth s(rate,seed);require(s.configure(voicesFor(board),1),"configure");
     s.setPatch(p);
-    for(unsigned i=0;i<board;++i){s.noteOn(30+int(i));s.noteOff(30+int(i));}
+    for(unsigned i=0;i<board;++i){s.noteOn(firstOtherKey+int(i));s.noteOff(firstOtherKey+int(i));}
     s.noteOn(60);
     std::vector<double> out(frames);
     for(unsigned n=0;n<frames;++n) {
@@ -150,18 +160,18 @@ void defaultsShipTheVerdict() {
     require(play(9,shipping,0,60).oscillatorFrequency!=play(9,shipping,1,60).oscillatorFrequency,
             "the shipping boards differ");
     auto p=plain();
-    for(unsigned board=1;board<4;++board) {
+    for(unsigned board=1;board<boards;++board) {
         const auto a=play(9,p,0,60),b=play(9,p,board,60);
         require(a.oscillatorFrequency==b.oscillatorFrequency && a.hpFrequency==b.hpFrequency &&
                 a.lpFrequency==b.lpFrequency && a.ampEnvelope==b.ampEnvelope &&
-                a.filterEnvelope==b.filterEnvelope,"tolerance 0 keeps the four boards bit-identical");
+                a.filterEnvelope==b.filterEnvelope,"tolerance 0 keeps every board bit-identical");
     }
 }
 
 void trimPointsHoldTheirBand() {
     auto p=plain();p.boardPitchTolerance=1;
     double widest=0;
-    for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<4;++board) {
+    for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<boardsFor(seed,40);++board) {
         // Trim points: OCT-UP C2 key (MIDI 48 -> 261.6Hz) and C6 key (MIDI 96),
         // and the C6 key at NORMAL, 1 down and 2 down.
         const double points[]={error(seed,p,board,48,1),error(seed,p,board,96,1),
@@ -185,7 +195,7 @@ void linearVcoBetweenTrimPoints() {
     // points, carry the offset (a fixed Kv offset, so half the Hz at NORMAL)
     // to the NORMAL gain trim, and predict an untrimmed key.
     auto p=plain();p.boardPitchTolerance=1;
-    for(std::uint64_t seed:{3u,17u,29u})for(unsigned board=0;board<4;++board) {
+    for(std::uint64_t seed:{3u,17u,29u})for(unsigned board=0;board<boards;++board) {
         auto up=p;up.octave=1;auto normal=p;normal.octave=0;
         const double fl=play(seed,up,board,48).oscillatorFrequency;
         const double fh=play(seed,up,board,96).oscillatorFrequency;
@@ -215,7 +225,7 @@ void thermalDriftWithinTheRanks() {
     double widestHigh=0,widestLow=0;
     for(std::uint64_t seed=1;seed<=40;++seed) {
         double lowMin=1e9,lowMax=-1e9,highMin=1e9,highMax=-1e9;
-        for(unsigned board=0;board<4;++board) {
+        for(unsigned board=0;board<boardsFor(seed,40);++board) {
             const double low=centsVersus(seed,warm,tuned,board,36);
             const double high=centsVersus(seed,warm,tuned,board,96);
             require(std::abs(high)<=2.5+1e-6,"C6 drifts within one 5-cent figure");
@@ -243,7 +253,7 @@ void thermalDriftWithinTheRanks() {
     auto cool=tuned;cool.boardTemperatureRise=-25;
     auto trimmed=tuned;trimmed.boardPitchTolerance=1;
     auto both=warm;both.boardPitchTolerance=1;
-    for(std::uint64_t seed:{2u,23u})for(unsigned board=0;board<4;++board)for(int key:{36,60,96}) {
+    for(std::uint64_t seed:{2u,23u})for(unsigned board=0;board<boards;++board)for(int key:{36,60,96}) {
         const double drift=centsVersus(seed,warm,tuned,board,key);
         near(centsVersus(seed,mild,tuned,board,key),.4*drift,1e-9,"drift scales with the temperature change");
         near(centsVersus(seed,cool,tuned,board,key),-drift,1e-9,"cooling reverses the drift");
@@ -281,7 +291,7 @@ void filterRankResidual() {
     auto halfAmount=p;halfAmount.boardFilterTolerance=.5;
     auto ideal=p;ideal.boardFilterTolerance=ideal.boardEnvelopeTolerance=0;
     double widest=0;
-    for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<4;++board) {
+    for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<boardsFor(seed,40);++board) {
         const auto s=play(seed,p,board,60),i=play(seed,ideal,board,60);
         require(s.oscillatorFrequency==i.oscillatorFrequency,"filter tolerance leaves the VCO alone");
         for(bool high:{true,false}) {
@@ -307,7 +317,7 @@ void staticCutoffFromTheLeverCentre() {
     auto atFloor=centred;atFloor.hpCutoff=floorHz-1;atFloor.lpCutoff=floorHz;
     const auto ideal=[](ceres::Patch q){q.boardFilterTolerance=0;return q;};
     double widest=0;
-    for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<4;++board) {
+    for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<boardsFor(seed,40);++board) {
         const auto c=play(seed,centred,board,60),ci=play(seed,ideal(centred),board,60);
         near(variableOctaves(c,ci,true),0,1e-12,"HP static cutoff is every board's at the HPF lever centre");
         near(variableOctaves(c,ci,false),0,1e-12,"LP static cutoff is every board's at the LPF lever centre");
@@ -349,7 +359,7 @@ void envelopeLevelResidual() {
     auto ideal=p;ideal.boardFilterTolerance=ideal.boardEnvelopeTolerance=0;
     auto low=p;low.filterInitial=-2;auto idealLow=ideal;idealLow.filterInitial=-2;
     double widest=0;
-    for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<4;++board) {
+    for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<boardsFor(seed,40);++board) {
         double gains[2];
         for(bool high:{true,false}) {
             const double tolerant=variableOctaves(play(seed,low,board,60),play(seed,p,board,60),high);
@@ -371,7 +381,7 @@ void ampEnvelopeTrims() {
     auto p=plain();p.ampAttack=.001;p.ampDecay=.002;p.ampSustain=0;p.boardEnvelopeTolerance=1;
     auto ideal=p;ideal.boardEnvelopeTolerance=0;
     double widestPeak=0,widestFloor=0;
-    for(std::uint64_t seed=1;seed<=20;++seed)for(unsigned board=0;board<4;++board) {
+    for(std::uint64_t seed=1;seed<=20;++seed)for(unsigned board=0;board<boardsFor(seed,20);++board) {
         const auto t=trace(seed,p,board,2400,~0u),i=trace(seed,ideal,board,2400,~0u);
         const double peak=*std::max_element(t.amp.begin(),t.amp.end());
         const double held=t.amp.back();
@@ -395,9 +405,11 @@ void outputTrimAtFullSustain() {
         auto p=plain();p.volume=1e-4;p.sine=0;p.ampAttack=.001;p.ampDecay=.002;p.ampSustain=sustain;
         p.boardEnvelopeTolerance=1;
         auto ideal=p;ideal.boardEnvelopeTolerance=0;
-        for(std::uint64_t seed=1;seed<=12;++seed) {
-            const auto x=solo(seed,p,0,72000),y=solo(seed,ideal,0,72000);
-            const double held=trace(seed,p,0,2400,~0u).amp.back(); // SL + this board's floor
+        // Board 0, and the first further board on a quarter of the units.
+        for(std::uint64_t seed=1;seed<=12;++seed)for(unsigned board:{0u,4u}) {
+            if(board && seed>3)continue;
+            const auto x=solo(seed,p,board,72000),y=solo(seed,ideal,board,72000);
+            const double held=trace(seed,p,board,2400,~0u).amp.back(); // SL + this board's floor
             const double floor=held-sustain, nominal=-.2/10;
             const auto g=gainOf(x,y,48000);
             near(g.gain,(sustain+floor)/(1+floor)*(1+nominal)/(sustain+nominal),2e-7,
@@ -439,7 +451,7 @@ void envelopeTimesHoldTheirTrims() {
     };
     const double decayAttack=5*.35/std::log(1000.0),releaseAttack=5*2/std::log(1000.0);
     double widest=0;bool independent=false;
-    for(std::uint64_t seed=1;seed<=10;++seed)for(unsigned board=0;board<4;++board) {
+    for(std::uint64_t seed=1;seed<=10;++seed)for(unsigned board=0;board<boardsFor(seed,10);++board) {
         std::array<double,2> fast{},slow{};
         for(unsigned eg=0;eg<2;++eg) {
             auto pick=[&](const Trace& t) -> const std::vector<double>& {return eg ? t.filter : t.amp;};
@@ -481,15 +493,16 @@ void vcaBalance() {
     // pulse to 800 +/-20mVpp at CP4; VR13/VR14 then restore the filtered
     // path (CS-60 VI.3-4), so a board's sine keeps s = (1+e11)/(1+e12) of
     // its level. VR6, trimmed last for 0 dBm from four sines (PRA III),
-    // scales every path by V with V^2*sum(s^2) = 4 (RMS meter, incoherent
-    // notes, as the engine's output reference assumes).
+    // scales every path by V with V^2*sum(s^2) = 4 over the four physical
+    // boards (RMS meter, incoherent notes, as the engine's output reference
+    // assumes); a further board keeps its own balance under the same V.
     auto sine=plain();sine.saw=sine.pulse=sine.noise=0;sine.sine=1;sine.volume=1e-4;sine.boardVcaTolerance=1;
     auto filtered=plain();filtered.sine=0;filtered.volume=1e-4;filtered.boardVcaTolerance=1;
     auto idealSine=sine,idealFiltered=filtered;idealSine.boardVcaTolerance=idealFiltered.boardVcaTolerance=0;
     double widest=0;
     for(std::uint64_t seed=1;seed<=10;++seed) {
         double power=0,common=0;
-        for(unsigned board=0;board<4;++board) {
+        for(unsigned board=0;board<boardsFor(seed,10);++board) {
             const auto gs=gainOf(solo(seed,sine,board,6000),solo(seed,idealSine,board,6000),0);
             const auto gf=gainOf(solo(seed,filtered,board,6000),solo(seed,idealFiltered,board,6000),0);
             require(gs.residual<1e-6 && gf.residual<1e-6,"each path changes by one gain");
@@ -498,7 +511,8 @@ void vcaBalance() {
             const double s=gs.gain/gf.gain;
             require(s>=(1-.02)/(1+.02/.8)-1e-7 && s<=(1+.02)/(1-.02/.8)+1e-7,
                     "the sine keeps its trimmed balance to the filtered path");
-            power+=s*s;widest=std::max(widest,std::abs(s-1));
+            if(board<4)power+=s*s;
+            widest=std::max(widest,std::abs(s-1));
         }
         near(common*common*power,4,1e-6,"VR6 holds the four-sine reference");
     }
@@ -550,11 +564,15 @@ void sharedStreamUntouched() {
 
 void boardsAreFixedUnits() {
     auto p=everything(plain());p.filterInitial=-1;p.filterPeak=1;
-    for(unsigned board=0;board<4;++board) {
-        const auto four=play(5,p,board,60,4),sixteen=play(5,p,board,60,16);
-        require(four.oscillatorFrequency==sixteen.oscillatorFrequency && four.hpFrequency==sixteen.hpFrequency &&
-                four.lpFrequency==sixteen.lpFrequency && four.ampEnvelope==sixteen.ampEnvelope &&
-                four.filterEnvelope==sixteen.filterEnvelope,"a board keeps its tolerances at any polyphony");
+    // Every board, at every voice count that holds it.
+    for(unsigned board=0;board<boards;++board) {
+        const auto widest=play(5,p,board,60,boards);
+        for(unsigned voices=board+1;voices<boards;++voices) {
+            const auto state=play(5,p,board,60,voices);
+            require(state.oscillatorFrequency==widest.oscillatorFrequency && state.hpFrequency==widest.hpFrequency &&
+                    state.lpFrequency==widest.lpFrequency && state.ampEnvelope==widest.ampEnvelope &&
+                    state.filterEnvelope==widest.filterEnvelope,"a board keeps its tolerances at any polyphony");
+        }
     }
     // Same seed, same instrument; reset does not redraw a different unit.
     ceres::Synth s(rate,5);s.setPatch(p);s.noteOn(60);s.process();
@@ -563,6 +581,29 @@ void boardsAreFixedUnits() {
     require(s.allVoiceState()[0].oscillatorFrequency==before,"reset keeps the same physical boards");
     const auto other=play(6,p,0,60),mine=play(5,p,0,60);
     require(other.oscillatorFrequency!=mine.oscillatorFrequency,"another seed is another instrument");
+}
+
+// Every voice up to the voice count is a board of its own: with all sixteen
+// holding one key at the shipping tolerances, no two share a pitch, a cutoff
+// or an envelope, so no further voice repeats a physical board.
+void everyVoiceIsItsOwnBoard() {
+    ceres::Patch p;p.driftCents=0;p.ampAttack=.001;
+    p.hpCutoff=60;p.lpCutoff=900;p.filterInitial=-1;p.filterPeak=1; // levers away from their centres
+    for(std::uint64_t seed:{5u,20261017u}) {
+        ceres::Synth s(rate,seed);require(s.configure(boards,4),"configure");
+        s.setPatch(p);
+        for(unsigned i=0;i<boards;++i)s.noteOn(60);
+        for(unsigned n=0;n<4;++n)s.process();
+        const auto state=s.allVoiceState();
+        for(unsigned a=0;a<boards;++a) {
+            require(state[a].note==60 && state[a].held,"every board holds the key");
+            for(unsigned b=0;b<a;++b)
+                require(state[a].oscillatorFrequency!=state[b].oscillatorFrequency &&
+                        state[a].hpFrequency!=state[b].hpFrequency && state[a].lpFrequency!=state[b].lpFrequency &&
+                        state[a].ampEnvelope!=state[b].ampEnvelope && state[a].filterEnvelope!=state[b].filterEnvelope,
+                        "no two boards share a residual");
+        }
+    }
 }
 
 // drift_cents ships at 1, an owner-requested engineering value: the wander
@@ -574,29 +615,33 @@ void driftStaysInTheTuningBand() {
             "drift ships at the tuning tolerance, factory presets included");
     auto p=plain();p.driftCents=defaults.driftCents;p.vibratoCents=0;
     auto twice=p;twice.driftCents=2;
-    ceres::Synth s(8000,50),d(8000,50);
-    require(s.configure(4,1) && d.configure(4,1),"configure");
-    s.setPatch(p);d.setPatch(twice);
-    for(unsigned board=0;board<4;++board){s.noteOn(60);d.noteOn(60);}
-    std::array<double,4> peak{},power{};
-    double apart=0;unsigned samples=0;
-    for(unsigned n=0;n<30*8000;++n) {
-        s.process();d.process();
-        if(n%80)continue;
-        const auto a=s.voiceState(),b=d.voiceState();
-        for(unsigned k=0;k<4;++k) {
-            require(a[k].note==60 && a[k].held,"four boards hold one key");
-            const double c=cents(a[k].oscillatorFrequency,keyHz(60));
-            near(cents(b[k].oscillatorFrequency,keyHz(60)),2*c,1e-9,"drift_cents is the wander's peak depth");
-            peak[k]=std::max(peak[k],std::abs(c));power[k]+=c*c;
+    // The four boards, then all sixteen voices: every board wanders.
+    for(unsigned voices:{4u,boards}) {
+        ceres::Synth s(8000,50),d(8000,50);
+        require(s.configure(voices,1) && d.configure(voices,1),"configure");
+        s.setPatch(p);d.setPatch(twice);
+        for(unsigned board=0;board<voices;++board){s.noteOn(60);d.noteOn(60);}
+        std::array<double,boards> peak{},power{};
+        double apart=0,apartLast=0;unsigned samples=0;
+        for(unsigned n=0;n<30*8000;++n) {
+            s.process();d.process();
+            if(n%80)continue;
+            const auto a=s.allVoiceState(),b=d.allVoiceState();
+            for(unsigned k=0;k<voices;++k) {
+                require(a[k].note==60 && a[k].held,"every board holds one key");
+                const double c=cents(a[k].oscillatorFrequency,keyHz(60));
+                near(cents(b[k].oscillatorFrequency,keyHz(60)),2*c,1e-9,"drift_cents is the wander's peak depth");
+                peak[k]=std::max(peak[k],std::abs(c));power[k]+=c*c;
+            }
+            apart+=std::pow(cents(a[0].oscillatorFrequency,a[1].oscillatorFrequency),2);
+            apartLast+=std::pow(cents(a[0].oscillatorFrequency,a[voices-1].oscillatorFrequency),2);++samples;
         }
-        apart+=std::pow(cents(a[0].oscillatorFrequency,a[1].oscillatorFrequency),2);++samples;
+        for(unsigned k=0;k<voices;++k) {
+            require(peak[k]<=1,"each board's wander stays within +/-1 cent");
+            require(peak[k]>.5 && std::sqrt(power[k]/samples)>.2,"each board wanders");
+        }
+        require(std::sqrt(apart/samples)>.2 && std::sqrt(apartLast/samples)>.2,"the boards wander independently");
     }
-    for(unsigned k=0;k<4;++k) {
-        require(peak[k]<=1,"each board's wander stays within +/-1 cent");
-        require(peak[k]>.5 && std::sqrt(power[k]/samples)>.2,"each board wanders");
-    }
-    require(std::sqrt(apart/samples)>.2,"the boards wander independently");
 }
 }
 
@@ -617,6 +662,7 @@ int main() {
         outputReferenceHolds();
         sharedStreamUntouched();
         boardsAreFixedUnits();
+        everyVoiceIsItsOwnBoard();
     } catch(const std::exception& e) {std::fprintf(stderr,"FAIL %s\n",e.what());return 1;}
     std::puts("PASS board tolerance contracts");
     return 0;

@@ -256,3 +256,10 @@ the same unit.
   that fixed unit. Keeping the unit when a session reopens is the reading
   recommended to the owner, who was asked to choose between it and a new
   unit on every load.
+- **Every voice (2026-10-22):** the owner asked that all voices be
+  randomized, depending on the voice count. Each voice slot up to 16 was
+  already a board of its own, drawn from the same bands after the four
+  physical boards, and the tests now check every slot. The PRA's VR6 stays
+  the four physical boards' trim, so a further board keeps its own sine
+  error. `voice_spread_cents`, a fixed engineering spread, was centred only
+  at four voices and is now centred on the voices in use.

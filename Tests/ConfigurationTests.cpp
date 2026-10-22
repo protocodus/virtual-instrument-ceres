@@ -53,6 +53,26 @@ void voices(){
         for(unsigned i=1;i<n;++i)require(state[i].held,"repeated note others stay held");
     }
 }
+// voice_spread_cents steps the pitch from board to board, centred on the
+// voices in use: no voice count is detuned on average.
+void spreadCentredOnTheVoices(){
+    for(unsigned n=1;n<=16;++n){
+        ceres::Synth s(48000,23),flat(48000,23);require(s.configure(n,1)&&flat.configure(n,1),"configure polyphony");
+        ceres::Patch p;auto spread=p;spread.voiceSpreadCents=10;
+        s.setPatch(spread);flat.setPatch(p);
+        for(unsigned i=0;i<n;++i){s.noteOn(60);flat.noteOn(60);}
+        advance(s,8);advance(flat,8);
+        const auto a=s.allVoiceState(),b=flat.allVoiceState();
+        double sum=0;
+        for(unsigned i=0;i<n;++i){
+            require(a[i].held&&a[i].note==60,"every voice holds the key");
+            const double cents=1200*std::log2(a[i].oscillatorFrequency/b[i].oscillatorFrequency);
+            near(cents,(i-(n-1)/2.0)*10,1e-9,"neighbouring boards differ by the spread, centred on the voices in use");
+            sum+=cents;
+        }
+        near(sum,0,1e-8,"the spread detunes no voice count on average");
+    }
+}
 void clockAndCoefficients(){
     for(double fs:{8000.,44100.,48000.,96000.,192000.,384000.})for(unsigned factor:{1u,2u,4u}){
         ceres::Synth s(fs,50);require(s.configure(1,factor),"rate configuration");
@@ -99,4 +119,4 @@ void outputFilters(){
     }
 }
 }
-int main(){configuration();voices();clockAndCoefficients();outputFilters();std::puts("PASS configuration: 1/4/16 voices, real1/2/4x clocks, lifecycle and independent output-filter delay/response");}
+int main(){configuration();voices();spreadCentredOnTheVoices();clockAndCoefficients();outputFilters();std::puts("PASS configuration: 1/4/16 voices, centred spread, real1/2/4x clocks, lifecycle and independent output-filter delay/response");}

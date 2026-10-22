@@ -27,8 +27,11 @@ slot, from two dedicated seeded streams (the first keeps the order of the
 0.5.0 draws, so a seed keeps the boards it had), in a fixed order. The shared
 audio and drift stream, the oscillator start phases and the noise sequence
 are unchanged, and board *i* is the same unit at every polyphony and quality.
-`reset()` keeps the same boards. Since 0.6.4 each plug-in instance draws its
-own seed and keeps it in its saved state, so two instances are two units;
+Every slot up to 16 draws its own offsets, so each voice up to the voice
+count is a board of its own; the four physical boards come first, and VR6
+stays their trim. `reset()` keeps the same boards. Since 0.6.4 each plug-in
+instance draws its own seed and keeps it in its saved state, so two instances
+are two units;
 the demos stay on seed 20261017. With every amount at 0 each factor is
 exactly the identical-board value, and the audio is byte-identical to 0.5.0;
 the shipping defaults therefore change the sound of every patch, by the
