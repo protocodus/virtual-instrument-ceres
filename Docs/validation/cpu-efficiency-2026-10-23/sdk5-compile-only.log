@@ -1,0 +1,4 @@
+Building CeresRack.cpp
+Building JukeboxExports.cpp
+Building Instrument/Source/DSP/ceres.cpp
+Ceres SDK 5 bitcode compile/link and immutable-global checks passed; no host launched or installed.

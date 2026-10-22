@@ -666,33 +666,72 @@ struct BoardTolerance {
 // HP and LP have independent Q trims: the nominal endpoints are anchored at
 // their usual source loads (HP three mixer branches, LP one). Changing a
 // waveform gate changes the source load, not the Q transistor conductance.
+// The passive network depends on rate and mixer gates, not on a voice's
+// capacitor charge or instantaneous cutoff. Share its exact coefficients
+// across the boards; configure() never touches a filter's electrical state.
+struct OtaNetwork {
+    double fs=0, conductance=0, referenceConductance=0, ratio=0;
+    double qBlend=0, sourceBlend=0, divisor=0, linear=0, sourceInput=0;
+    double resonance=0, qBand=0, effectiveDamping=0;
+    bool resonanceReady=false;
+    void configure(double rate, double sourceConductance=1/150e3,
+                   double referenceSourceConductance=1/150e3) {
+        fs=rate;
+        constexpr double feedbackCapacitance=180e-12, sourceCapacitance=1e-6;
+        conductance=sourceConductance+1/33e3+1/1.2e6;
+        referenceConductance=referenceSourceConductance+1/33e3+1/1.2e6;
+        ratio=sourceConductance/conductance;
+        qBlend=conductance/(conductance+2*fs*feedbackCapacitance);
+        sourceBlend=sourceConductance/(sourceConductance+2*fs*sourceCapacitance);
+        divisor=1-qBlend*ratio*sourceBlend;
+        linear=1/(2*fs*filterCapacitance*filterFeedResistance);
+        sourceInput=conductance/(sourceConductance+2*fs*sourceCapacitance);
+        resonanceReady=false;
+    }
+    void setResonance(double value) {
+        if (resonanceReady && value==resonance) return;
+        // resonance r is 1-VQ/10, so d=.2*10^(VQ/10)=2*10^-r.
+        const double damping=2*std::pow(10.0,-clamp(value,0,1))*referenceConductance/conductance;
+        qBand=qBlend*(2-damping-2*ratio*sourceBlend)/divisor;
+        effectiveDamping=(2*(1-qBlend)+qBlend*damping)/divisor;
+        resonance=value;
+        resonanceReady=true;
+    }
+};
+
 struct OtaSvf {
     double sb = 0, sl = 0, sz = 0, sy = 0, previousB = 0;
+    double cachedCutoff=0, cachedRate=0, cachedG=0;
     double process(double sourceVoltage, double frequency, double resonance,
                    double fs, bool highPass, double sourceConductance = 1/150e3,
                    double referenceSourceConductance = 1/150e3) {
-        const double cutoff = clamp(frequency, filterFrequencyFloor, .22 * fs);
-        const double g = std::tan(pi * cutoff / fs); // capacitor TPT prewarp
-        constexpr double feedbackCapacitance=180e-12, sourceCapacitance=1e-6;
-        const double conductance=sourceConductance+1/33e3+1/1.2e6;
-        const double referenceConductance=referenceSourceConductance+1/33e3+1/1.2e6;
-        // resonance r is 1-VQ/10, so d=.2*10^(VQ/10)=2*10^-r.
-        const double damping=2*std::pow(10.0,-clamp(resonance,0,1))*referenceConductance/conductance;
-        const double ratio=sourceConductance/conductance;
+        OtaNetwork network;
+        network.configure(fs,sourceConductance,referenceSourceConductance);
+        network.setResonance(resonance);
+        return process(sourceVoltage,frequency,highPass,network);
+    }
+    double process(double sourceVoltage, double frequency, bool highPass, const OtaNetwork& network) {
+        const double cutoff = clamp(frequency, filterFrequencyFloor, .22 * network.fs);
+        if (cutoff!=cachedCutoff || network.fs!=cachedRate) {
+            // Exact input equality only: moving cutoff CVs retain the same
+            // capacitor TPT prewarp, with no control-rate approximation.
+            cachedG=std::tan(pi * cutoff / network.fs);
+            cachedCutoff=cutoff;
+            cachedRate=network.fs;
+        }
+        const double g = cachedG;
+        const double ratio=network.ratio, qBlend=network.qBlend;
+        const double sourceBlend=network.sourceBlend, divisor=network.divisor;
         // X is the physical Thevenin source voltage, in the SAME OTA voltage
         // unit at both stages. Canonical u=2*Gs*X/D0 is a local algebraic
         // coordinate, not a separate per-stage signal normalization.
         const double input=2*ratio*sourceVoltage;
-        const double qBlend=conductance/(conductance+2*fs*feedbackCapacitance);
-        const double sourceBlend=sourceConductance/(sourceConductance+2*fs*sourceCapacitance);
-        const double divisor=1-qBlend*ratio*sourceBlend;
         // Eliminate both linear capacitor nodes simultaneously. The remaining
         // OTA equation has positive derivative because effectiveDamping>0.
         const double qConstant=((1-qBlend)*sz+
             qBlend*(1-sourceBlend)*(input-ratio*sy))/divisor;
-        const double qBand=qBlend*(2-damping-2*ratio*sourceBlend)/divisor;
-        const double effectiveDamping=(2*(1-qBlend)+qBlend*damping)/divisor;
-        const double linear = 1/(2*fs*filterCapacitance*filterFeedResistance);
+        const double qBand=network.qBand, effectiveDamping=network.effectiveDamping;
+        const double linear = network.linear;
         const double nonlinear = cutoff<=filterFrequencyFloor ? 0.0 : std::max(0.0,g-linear);
         double b = previousB;
         for (int iteration = 0; iteration < 7; ++iteration) {
@@ -712,8 +751,7 @@ struct OtaSvf {
         const double h = z - 2*b - l;
         // Expand sourceBlend/ratio analytically so tiny positive diagnostic
         // conductances cannot overflow at the intermediate input/ratio.
-        const double sourceInput=conductance/(sourceConductance+2*fs*sourceCapacitance);
-        const double y=(1-sourceBlend)*sy+sourceBlend*(-z+2*b)+sourceInput*input;
+        const double y=(1-sourceBlend)*sy+sourceBlend*(-z+2*b)+network.sourceInput*input;
         sb = 2 * b - sb;
         sl = 2 * l - sl;
         sz = 2 * z - sz;
@@ -748,6 +786,14 @@ struct FilterChain {
         const double high=hp.process(inputScale*waveSum/branches,hpFrequency,hpResonance,
                                      fs,true,branches/150e3,3/150e3);
         const double low=lp.process(high,lpFrequency,lpResonance,fs,false);
+        return low*filteredVcaCalibration/inputScale;
+    }
+    double process(double waveSum, double branches, double hpFrequency, double lpFrequency,
+                   double drive,
+                   const OtaNetwork& hpNetwork, const OtaNetwork& lpNetwork) {
+        const double inputScale=.3*drive;
+        const double high=hp.process(inputScale*waveSum/branches,hpFrequency,true,hpNetwork);
+        const double low=lp.process(high,lpFrequency,false,lpNetwork);
         return low*filteredVcaCalibration/inputScale;
     }
 };
@@ -1156,7 +1202,7 @@ struct Oscillator {
     bool stiPrecharged = false;
     // stiCoefficient: -expm1(-1/(fs*wscSineInputTau)).
     OscillatorFrame process(double frequency, double pulseWidth, double resetSeconds, double fs,
-                            double stiCoefficient) {
+                            double stiCoefficient, bool sineEnabled = true) {
         // Guide pp.28-31: OUT7 conditions the integrating-capacitor signal
         // with the monostable pulse before the WSC. It is not the exposed raw
         // recharge triangle. In the nominal current law r=f*tau, fixed A0
@@ -1231,18 +1277,23 @@ struct Oscillator {
             stiCoupling = recharge < .5 ? 2*recharge*recharge : 4*recharge-1-2*recharge*recharge;
             stiPrecharged = true;
         }
-        const double c = stiCoupling;
-        double sine = wscSine(conditioned-c);
-        if (resetPhase < step || resetPhase > 1-step) {
-            const bool foldAfterPlateau = recharge < .5;
-            const double plateauEnd = (foldAfterPlateau ? 1-4*recharge : 4*recharge-3)-c;
-            sine += .5*(wscSine(plateauEnd)-wscSine(1-c))*blep(resetPhase,step)
-                + .5*(foldAfterPlateau ? -4 : 4)*wscSineSlope(plateauEnd)*blamp(resetPhase,step);
+        double sine = 0;
+        if (sineEnabled) {
+            const double c = stiCoupling;
+            sine = wscSine(conditioned-c);
+            if (resetPhase < step || resetPhase > 1-step) {
+                const bool foldAfterPlateau = recharge < .5;
+                const double plateauEnd = (foldAfterPlateau ? 1-4*recharge : 4*recharge-3)-c;
+                sine += .5*(wscSine(plateauEnd)-wscSine(1-c))*blep(resetPhase,step)
+                    + .5*(foldAfterPlateau ? -4 : 4)*wscSineSlope(plateauEnd)*blamp(resetPhase,step);
+            }
+            if (phase < step || phase > 1-step) sine -= 2*wscSineSlope(1-c)*blamp(phase,step);
+            const double fold = wrap(phase-.5);
+            if (recharge < .5 && (fold < step || fold > 1-step))
+                sine += 4*wscSineSlope(-1-c)*blamp(fold,step);
         }
-        if (phase < step || phase > 1-step) sine -= 2*wscSineSlope(1-c)*blamp(phase,step);
-        const double fold = wrap(phase-.5);
-        if (recharge < .5 && (fold < step || fold > 1-step))
-            sine += 4*wscSineSlope(-1-c)*blamp(fold,step);
+        // Keep the physical TO-STI capacitor and free oscillator running
+        // while its output is muted, ready for a live sine-level edit.
         stiCoupling += (conditioned-stiCoupling)*stiCoefficient;
         phase = wrap(phase + step);
         // Audio polarity: the completed pulse is negated, including its BLEP,
@@ -1517,6 +1568,11 @@ struct Synth::Impl {
         OutputCoupling filteredCoupling, commonCoupling;
         Envelope amp, filter;
         BoardTolerance board;
+        // The board's pitch residual excludes free-running drift/vibrato.
+        // Reuse it only while the exact key/bend/PITCH expression is equal;
+        // patch changes and board redraws invalidate it in updateBoardScales.
+        double boardPitchExponent=0, boardPitchCents=0;
+        bool boardPitchReady=false;
 #if !defined(CERES_EMBEDDED_TARGET)
         double oscillatorFrequency=0, hpFrequency=0, lpFrequency=0;
 #endif
@@ -1533,6 +1589,7 @@ struct Synth::Impl {
     double pressureCoefficient = 0, velocityCoefficient = 0, driftCoefficient = 0;
     std::array<double,4> ampCoefficients{}, filterCoefficients{};
     double hpSourceBranches = 3, lastSub = 0;
+    OtaNetwork hpFilterNetwork, lpFilterNetwork;
     // Eight equal pin7 networks reduce exactly to one common delta state
     // for stiff sources, equal pin inputs and equal initial delta.
     // Existing per-stage effective Q anchors are NOT raw chip voltages.
@@ -1623,6 +1680,8 @@ struct Synth::Impl {
         // branch per enabled waveform gate. Ideal low-Z WSC/noise outputs,
         // negligible enabled-FET resistance; disabled gates are open.
         hpSourceBranches=2+(patch.saw>0 ? 1:0)+(patch.pulse>0 ? 1:0);
+        hpFilterNetwork.configure(internalFs,hpSourceBranches/150e3,3/150e3);
+        lpFilterNetwork.configure(internalFs);
         ampCoefficients = envelopeCoefficients(internalFs,patch.ampAttack,
             patch.ampDecay,effectiveRelease(patch.ampRelease,patch.globalRelease),
             patch.ampAttackHeadroom,patch.ampAttackSaturation);
@@ -1649,6 +1708,7 @@ struct Synth::Impl {
         const double hpAligned=hpfLeverHz(.5)-filterFrequencyFloor;
         const double lpAligned=lpfLeverHz(.5)-filterFrequencyFloor;
         for (auto& voice : voices) {
+            voice.boardPitchReady=false;
             auto& board=voice.board;
             board.hpScale=std::exp2(patch.boardFilterTolerance*board.hpOctaves);
             board.lpScale=std::exp2(patch.boardFilterTolerance*board.lpOctaves);
@@ -1844,6 +1904,10 @@ struct Synth::Impl {
         // law to the sum.
         effectiveHpResonance=clamp(hpResonanceAnchor-qVoltageOffset*.1,0,1);
         effectiveLpResonance=clamp(lpResonanceAnchor-qVoltageOffset*.1,0,1);
+        // All boards see the same smoothed Q buses. Keep the original
+        // exponential and multiplication order, evaluated once per bus.
+        hpFilterNetwork.setResonance(effectiveHpResonance);
+        lpFilterNetwork.setResonance(effectiveLpResonance);
         // R7 LC sums LEVEL(270k) and SUB(120k) currents before common VCA2.
         // PN3 VCF/VCA depth pots share SUO and ground; their passive R7
         // paths do not invert. Positive LI raises VCA gain (Guide pp.40–41),
@@ -1886,12 +1950,18 @@ struct Synth::Impl {
             // Trim residual and thermal drift of this board's linear VCO (see
             // BoardTolerance): its key voltage is the NORMAL frequency of key,
             // bend and PITCH.
-            if (patch.boardPitchTolerance>0 || patch.boardTemperatureRise!=0)
-                cents+=v.board.pitchCents(patch,
-                    440*std::exp2((key-69+bend+patch.tuneCents*.01)/12));
+            if (patch.boardPitchTolerance>0 || patch.boardTemperatureRise!=0) {
+                const double exponent=(key-69+bend+patch.tuneCents*.01)/12;
+                if (!v.boardPitchReady || exponent!=v.boardPitchExponent) {
+                    v.boardPitchCents=v.board.pitchCents(patch,440*std::exp2(exponent));
+                    v.boardPitchExponent=exponent;
+                    v.boardPitchReady=true;
+                }
+                cents+=v.boardPitchCents;
+            }
             const double frequency = 440 * std::exp2((key-69 + bend + 12*patch.octave + cents*.01)/12);
             const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
-                                            patch.resetMicroseconds*1e-6,internalFs,stiCoefficient);
+                                            patch.resetMicroseconds*1e-6,internalFs,stiCoefficient,patch.sine!=0);
             // Each board's EG times, VCA-EG peak and floor (see BoardTolerance;
             // the shared values when the envelope tolerance is off).
             const auto& egf=v.board.filterCoefficients;
@@ -1943,7 +2013,7 @@ struct Synth::Impl {
             v.oscillatorFrequency=frequency; v.hpFrequency=hpFrequency; v.lpFrequency=lpFrequency;
 #endif
             const double low=v.filters.process(source,hpSourceBranches,hpFrequency,lpFrequency,
-                effectiveHpResonance,effectiveLpResonance,patch.drive,internalFs);
+                patch.drive,hpFilterNetwork,lpFilterNetwork);
             // CP3 coupling precedes filtered level; CP4 coupling acts on
             // the filtered/sine sum before common level and envelope VCAs.
             const double filtered=v.filteredCoupling.process(low,outputCouplingTau[0],internalFs);

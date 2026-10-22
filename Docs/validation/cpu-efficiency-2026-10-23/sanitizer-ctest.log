@@ -1,0 +1,71 @@
+Test project /Users/vojta/Dev/virtual-instrument-ceres/build-cpu-sanitize
+      Start  1: Ceres.configuration_contracts
+      Start  2: Ceres.noise_quality_contracts
+      Start  3: Ceres.oscillator_circuit_contracts
+      Start  4: Ceres.native_dsp_contracts
+ 1/31 Test  #1: Ceres.configuration_contracts ...................   Passed    0.73 sec
+      Start  5: Ceres.sound_path_circuit_contracts
+ 2/31 Test  #3: Ceres.oscillator_circuit_contracts ..............   Passed    2.42 sec
+      Start  6: Ceres.panel_lever_contracts
+ 3/31 Test  #6: Ceres.panel_lever_contracts .....................   Passed    0.65 sec
+      Start  7: Ceres.capacitor_continuity_contracts
+ 4/31 Test  #7: Ceres.capacitor_continuity_contracts ............   Passed    0.95 sec
+      Start  8: Ceres.ring_depth_continuity_contracts
+ 5/31 Test  #8: Ceres.ring_depth_continuity_contracts ...........   Passed    1.32 sec
+      Start  9: Ceres.ring_carrier_circuit_contracts
+ 6/31 Test  #2: Ceres.noise_quality_contracts ...................   Passed    5.63 sec
+      Start 10: Ceres.ring_switching_circuit_contracts
+ 7/31 Test  #9: Ceres.ring_carrier_circuit_contracts ............   Passed    1.34 sec
+      Start 11: Ceres.voice_expression_contracts
+ 8/31 Test #11: Ceres.voice_expression_contracts ................   Passed    0.59 sec
+      Start 12: Ceres.note_reuse_contracts
+ 9/31 Test #10: Ceres.ring_switching_circuit_contracts ..........   Passed    1.68 sec
+      Start 13: Ceres.fast_note_envelope_contracts
+10/31 Test #12: Ceres.note_reuse_contracts ......................   Passed    0.48 sec
+      Start 14: Ceres.hardware_realism_contracts
+11/31 Test #14: Ceres.hardware_realism_contracts ................   Passed    1.11 sec
+      Start 15: Ceres.sub_oscillator_contracts
+12/31 Test  #5: Ceres.sound_path_circuit_contracts ..............   Passed   10.90 sec
+      Start 16: Ceres.output_stage_contracts
+13/31 Test #16: Ceres.output_stage_contracts ....................   Passed    1.76 sec
+      Start 17: Ceres.vcf_key_voltage_contracts
+14/31 Test #15: Ceres.sub_oscillator_contracts ..................   Passed    4.78 sec
+      Start 18: Ceres.envelope_circuit_contracts
+15/31 Test #13: Ceres.fast_note_envelope_contracts ..............   Passed    6.55 sec
+      Start 19: Ceres.board_tolerance_contracts
+16/31 Test #17: Ceres.vcf_key_voltage_contracts .................   Passed    1.63 sec
+      Start 20: Ceres.embedded_allocation_contract
+17/31 Test #18: Ceres.envelope_circuit_contracts ................   Passed    3.66 sec
+      Start 21: Ceres.parameter_descriptor_contracts
+18/31 Test  #4: Ceres.native_dsp_contracts ......................   Passed   19.62 sec
+      Start 22: Ceres.embedded_parameter_descriptor_contracts
+19/31 Test #22: Ceres.embedded_parameter_descriptor_contracts ...   Passed    3.53 sec
+      Start 23: Ceres.configuration_cli_contract
+20/31 Test #20: Ceres.embedded_allocation_contract ..............   Passed    8.27 sec
+      Start 24: Ceres.configuration_native_embedded_parity
+21/31 Test #23: Ceres.configuration_cli_contract ................   Passed    1.46 sec
+      Start 25: Ceres.native_embedded_audio_parity
+22/31 Test #21: Ceres.parameter_descriptor_contracts ............   Passed    8.59 sec
+      Start 26: Ceres.active_sound_path_audio_parity
+23/31 Test #24: Ceres.configuration_native_embedded_parity ......   Passed    4.66 sec
+      Start 27: Ceres.expression_audio_parity
+24/31 Test #25: Ceres.native_embedded_audio_parity ..............   Passed    8.06 sec
+      Start 28: Ceres.board_tolerance_audio_parity
+25/31 Test #26: Ceres.active_sound_path_audio_parity ............   Passed    6.90 sec
+      Start 29: Ceres.capacitor_native_embedded_parity
+26/31 Test #27: Ceres.expression_audio_parity ...................   Passed    6.53 sec
+      Start 30: Ceres.external_input_audio_parity
+27/31 Test #29: Ceres.capacitor_native_embedded_parity ..........   Passed    7.55 sec
+      Start 31: Ceres.DspFuzz
+28/31 Test #31: Ceres.DspFuzz ...................................   Passed    2.66 sec
+29/31 Test #28: Ceres.board_tolerance_audio_parity ..............   Passed   11.75 sec
+30/31 Test #30: Ceres.external_input_audio_parity ...............   Passed   14.74 sec
+31/31 Test #19: Ceres.board_tolerance_contracts .................   Passed   45.31 sec
+
+100% tests passed, 0 tests failed out of 31
+
+Label Time Summary:
+fuzz    =   2.66 sec*proc (1 test)
+unit    = 193.11 sec*proc (30 tests)
+
+Total Test time (real) =  59.19 sec

@@ -1,0 +1,26 @@
+{
+  "protocol": "ceres-cpu-parity-v1",
+  "byte_order": "little",
+  "comparison": "byte-exact IEEE float32",
+  "variants": {
+    "baseline": {
+      "executable": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/before/cpu-parity-no-builtin",
+      "binary_sha256": "5a28a7a2dc2ae2e7e7ae8926c4c656431ea60a2e3b7620201bbe37bf654706a1",
+      "audio_sha256": "6039d981aaf29c4846cc7400e51091c1ac44db8ce25b5d4c1791884c70a24012",
+      "sample_count": 439296,
+      "elapsed_seconds": 6.037534
+    },
+    "candidate": {
+      "executable": "/Users/vojta/Dev/virtual-instrument-ceres/build-cpu-evidence/after/cpu-parity-no-builtin",
+      "binary_sha256": "c3020507bd8c5fc96b8797b09c17b8b3e5e94491acfe4e0c47799714a11d8f03",
+      "audio_sha256": "6039d981aaf29c4846cc7400e51091c1ac44db8ce25b5d4c1791884c70a24012",
+      "sample_count": 439296,
+      "elapsed_seconds": 4.744147
+    }
+  },
+  "status": "pass",
+  "sample_count": 439296,
+  "compared_sample_count": 439296,
+  "first_mismatch": null,
+  "maximum_absolute_difference": 0.0
+}

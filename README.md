@@ -31,6 +31,10 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 
 ## Version history
 
+### Unreleased — 0.6.6 — lower CPU cost
+
+- Shares filter setup across voices, reuses unchanged filter/pitch calculations and skips muted sine shaping while retaining its capacitor history. Before/after audio matches byte for byte across 439,296 regression samples. Native benchmarks measured 17.7% lower median CPU for four-voice/4x Init and 10–12% lower mean CPU in the unchanged Rack callback at its four-voice/1x default; these are development-machine measurements, not Reason host results. [Protocol, complete timings and validation](Docs/benchmarks/cpu-efficiency-2026-10-23.md).
+
 ### Unreleased — 0.6.5 — the filter's Q pin and the sine's coupling
 
 - RESONANCE is heard as the lever moves: a change of RESONANCE, or of a preset's Q, settles in about 17 ms instead of 1.1 s. The filter chip's Q pin takes current into a low impedance: the CS-30, CS-15 and CS-40M drive it through 22 kΩ into a 390–470 Ω shunt, the CS-50 and CS-80 through a pair of 220 kΩ, and Yamaha prints the same Q at 10 V for both, which only a current input allows. Its 1.72 kΩ is inferred from that; no document prints it. Because a preset's Q row no longer leans on the RESONANCE bus, factory Q rises by up to 10 % (Guitar 2 and Funky 2: 1.44 → 1.58), and the RESONANCE lever law (`resonanceLeverVolts`) sags up to 0.5 V near a third of its travel. The sources decide this; it was not chosen by ear.
