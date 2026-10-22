@@ -263,3 +263,46 @@ the same unit.
   the four physical boards' trim, so a further board keeps its own sine
   error. `voice_spread_cents`, a fixed engineering spread, was centred only
   at four voices and is now centred on the voices in use.
+
+## 2026-10-22: the schematics settle two circuit readings
+
+Not a listening choice: the sources decide both. Each refines a direction
+chosen by ear on 2026-10-20 without changing what was chosen.
+
+### Preset Q through the pin-7 divider, re-read (`2026-10-20-brilliance-resonance-preset-q-divider`)
+
+- **Decided earlier, by ear:** B, the divider with RESONANCE at MIN,
+  r = (10 − P)/20, on a pin 7 taken to draw no current.
+- **What the sources say:** the CS-30 drives the same IG00156's VQ through
+  22k into a 390–470 Ω rank shunt (CS-30 SM pp.8–9) and prints Q 0.5 at
+  10 V, as the CS-50 does through its 220k pair. A pin that read voltage
+  would see at most 0.2 V on the CS-30 against 10 V on the CS-50, so it
+  takes current. The CS-15's CPB board (CS-15 SM printed p.10) and the
+  CS-40M's FA board (overall circuit diagram) wire VQ as the CS-30 does,
+  and the CS-80's R51·52 board (SM printed p.39) feeds its pins through the
+  CS-50's 220k pair. Equal current at the two printed 10 V points puts the
+  input at four times the shunt, 1.72 kΩ at rank B: an inference, not a
+  datum.
+- **Result:** the pin current is (P + R)/2 through 110k plus the input, so
+  B's law reads exactly as before. What changes is the network around it
+  (Ceres 0.6.5): the RESONANCE lag is 17 ms instead of 1.1 s, each preset Q
+  row sees 55.4k returning to 0.78 % of RES instead of 110k to RES, so a
+  zero column sits at 0.012 V instead of 0.83 V and factory Q rises by up
+  to 10 %, and the RESONANCE lever sees 27.7k instead of 55k. The inferred
+  value mostly sets the lag: an input anywhere from 0.5 to 5 kΩ would put it
+  between 5 and 48 ms.
+
+### VCO sine shaper, coupled (`2026-10-20-vco-sine-shaper`)
+
+- **Decided earlier, by ear:** B, the differential-pair shaper
+  tanh(k·tri)/tanh(k) at k = 1.4020, auditioned on the triangle as TO
+  delivers it.
+- **What the source says:** the CS-50's M board couples TO into STI through
+  4.7 µF NP with 22k to ground (SM2 p.16), so STI is the triangle less its
+  mean, a 1.54 Hz high-pass into the pair's base, which the 22k biases.
+- **Result:** the coupling now sits in front of B's shaper, which is
+  unchanged (Ceres 0.6.5). The set omitted it. It matters where the reset
+  plateau makes the triangle lopsided, a mean of 2r² of peak: 3 % at C6 on
+  8', 29 % at the 6.33 kHz top. The sine's second harmonic moves by up to
+  5 dB, and a large pitch jump re-centres STI over about 0.3 s. The shaper
+  stays chosen by ear and unmeasured.

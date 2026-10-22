@@ -457,7 +457,9 @@ no number to corroborate. Three findings:
   pin 7, so its boards' Q would part away from the RES positions they were
   matched at, as the cutoff does. The pin-7 law is unresolved
   (`sibling-evidence-2026-10-21.md`, lead 1), so there is no number to scale;
-  not implemented.
+  not implemented. **2026-10-22:** pin 7 is now taken as a current input
+  (lead 1, Ceres 0.6.5), but what the ranks compensate, the chip's input or
+  its Q per unit current, is still unprinted, so the spread stays out.
 
 ## What would close the gap
 

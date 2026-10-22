@@ -45,15 +45,20 @@ void brillianceLever() {
     require(std::isnan(ceres::brillianceLeverVolts(std::nan(""))),"nonfinite travel is rejected");
 }
 
-// The eight pin-7 networks solved directly: each pin q settles at the mean of
-// its preset bus and RES, so RES feeds (r-p)/440k into each. Fixed point on r.
+// The eight pin-7 networks solved directly. Pin 7 is a current input, taken
+// as 1.72k to ground (four times the CS-30's rank-B VQ shunt, the inference
+// beside qControlTau in ceres.cpp). Fixed point on r.
 double resonanceByNodes(double upper,double lower,double hpPreset,double lpPreset) {
     // KCL at the wiper: (10-r)/upper - r/lower - sum_j (r-q_j)/220k = 0,
-    // with each settled pin q_j=(P_j+r)/2 (C dq/dt=(P-q)/220k+(r-q)/220k=0).
+    // with each settled pin node from C dq/dt=(P-q)/220k+(r-q)/220k-q/Rin=0.
     // Gauss-Seidel on the pins: a contraction, so it converges to the root.
+    constexpr double pin=1720;
+    const auto settled=[](double preset,double r) {
+        return (preset/220e3+r/220e3)/(2/220e3+1/pin);
+    };
     double r=5;
     for(int i=0;i<400;++i) {
-        const double qh=(hpPreset+r)/2, ql=(lpPreset+r)/2;
+        const double qh=settled(hpPreset,r), ql=settled(lpPreset,r);
         r=(10/upper+(4*qh+4*ql)/220e3)/(1/upper+1/lower+8/220e3);
     }
     return r;
@@ -67,12 +72,14 @@ void resonanceLever() {
     // B-10K: terminal 1 (+10 V) to wiper is 10k*t, wiper to ground 10k*(1-t).
     for(double t:{.1,.3,.5,.8}) for(double hp:{0.,2.,9.}) for(double lp:{1.,6.,10.}) {
         const double expected=resonanceByNodes(10e3*t,10e3*(1-t),hp,lp);
-        near(ceres::resonanceLeverVolts(t,(hp+lp)/2),expected,1e-9,"55k to the mean preset bus is exact");
+        near(ceres::resonanceLeverVolts(t,(hp+lp)/2),expected,1e-9,"27.7k to .78% of the mean preset bus is exact");
     }
-    // Stiff enough that the B-10K never sags more than .26 V from linear (worst near a third of travel).
+    // Eight 220k into current inputs load the B-10K harder than the old
+    // zero-current pins did: it sags up to .50 V from linear (near a third of
+    // travel), where 55k held it to .26 V.
     for(int i=0;i<=100;++i) {
         const double t=i/100.;
-        require(std::abs(ceres::resonanceLeverVolts(t,0)-10*(1-t))<.26,"B-10K stays near linear");
+        require(std::abs(ceres::resonanceLeverVolts(t,0)-10*(1-t))<.50,"B-10K stays near linear");
     }
     double last=11;
     for(int i=0;i<=100;++i) {

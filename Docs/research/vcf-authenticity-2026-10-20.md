@@ -461,7 +461,14 @@ wiring lists settle it for the four filter rows.
 - **Q load.** QH and QL feed four 220k into pin-7 nodes that return through
   220k to RES: 110k to the RES bus, +10 V at the presets' RESONANCE MIN.
   A zero Q column, which has no matrix path, sits at 10/12 = 0.83 V, not at
-  ground.
+  ground. **Re-read 2026-10-22 (Ceres 0.6.5):** pin 7 takes current
+  ([sibling evidence](sibling-evidence-2026-10-21.md#addendum-the-research-cross-check),
+  [decision log](../decisions.md)), so each branch is 220k on to a node that
+  the other 220k and the pin's inferred 1.72k hold near ground: 55.4k per Q
+  row, returning to 0.78 % of RES, 0.078 V at MIN. A zero column now sits at
+  0.012 V, factory Q is up to 10 % higher than in the table below, and away
+  from MIN a pin moves at most 0.12 % more than half of each RES volt, not the
+  13/24 of point (2) under Not modelled.
 - **Solve.** `preset()` now solves each filter row with its 1S1555 (the same
   estimated curve) against the 10k and its R7 load, recovering the column
   resistor from the printed bare divider, `Rs = 10k · (10/V − 1)`. The printed

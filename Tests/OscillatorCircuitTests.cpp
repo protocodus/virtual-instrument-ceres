@@ -20,29 +20,61 @@ C rawSawCoefficient(int n,double r) {
 }
 // WSC sine shaper, recomputed here from its definition rather than read from
 // the engine: an undegenerated bipolar differential pair at unit peak,
-// tanh(k*tri)/tanh(k), on the folded conditioned ramp tri=2|p|-1 with
-// p=1 on the one-shot plateau (phase<r) and 1-2*phase after it.
+// tanh(k*u)/tanh(k), on STI, u=tri-c: the folded conditioned ramp tri=2|p|-1,
+// with p=1 on the one-shot plateau (phase<r) and 1-2*phase after it, less the
+// voltage c of its coupling capacitor.
 constexpr double shaperDrive=1.4020;
-double shaped(double tri,double k=shaperDrive) {return std::tanh(k*tri)/std::tanh(k);}
-double shapedSlope(double tri) {
-    const double t=std::tanh(shaperDrive*tri);
+double shaped(double u,double k=shaperDrive) {return std::tanh(k*u)/std::tanh(k);}
+double shapedSlope(double u) {
+    const double t=std::tanh(shaperDrive*u);
     return shaperDrive*(1-t*t)/std::tanh(shaperDrive);
 }
 double foldedRamp(double phase,double r) {return phase<r ? 1 : 2*std::abs(1-2*phase)-1;}
+// TO reaches STI through 4.7uF NP with 22k to ground (SM2 p.16), so c is the
+// 103ms RC low-pass of the triangle, in units of its peak. A probe starts it
+// precharged to the triangle's mean, plateau included: integral_0^r 4*phase
+// over the zero-mean fold, 2r^2, or for r>=.5, where the plateau covers the
+// fold, r plus the rising 4*phase-3 from r to 1. Each probe sample holds the
+// triangle for one exact RC step (states[i], before sample i's step); between
+// samples c relaxes toward that held value, which makes the continuous
+// waveform the checks below integrate. Positions count probe samples from a
+// start at phase 0.
+struct Coupling {
+    static constexpr double tau=22e3*4.7e-6;
+    double fs,f,r;
+    std::vector<double> states;
+    Coupling(double sampleRate,double frequency,double plateau,std::size_t length)
+        : fs(sampleRate),f(frequency),r(plateau),states(length+1) {
+        states[0]=r<.5 ? 2*r*r : 4*r-1-2*r*r;
+        const double step=-std::expm1(-1/(fs*tau));
+        for(std::size_t i=0;i<length;++i)states[i+1]=states[i]+step*(triangle(i)-states[i]);
+    }
+    double triangle(double position) const {
+        const double phase=position*f/fs;
+        return foldedRamp(phase-std::floor(phase),r);
+    }
+    double at(double position) const {
+        const auto i=std::size_t(position);
+        const double held=triangle(i);
+        return held+(states[i]-held)*std::exp(-(position-i)/(fs*tau));
+    }
+    double sine(double position) const {return shaped(triangle(position)-at(position));}
+};
 template<class F> C simpson(F f,double a,double b,int intervals) {
     const double h=(b-a)/intervals;
     C sum=f(a)+f(b);
     for(int i=1;i<intervals;++i)sum+=(i%2 ? 4.:2.)*f(a+i*h);
     return sum*(h/3);
 }
-// Continuous Fourier coefficient of the shaped sine with plateau r<.5, by
-// Simpson quadrature on each smooth piece (no closed form exists).
-C shapedCoefficient(int n,double r) {
-    const auto piece=[n,r](double phase){
-        return shaped(foldedRamp(phase,r))*std::polar(1.0,-2*pi*n*phase);
-    };
-    return simpson([n](double phase){return std::polar(1.0,-2*pi*n*phase);},0,r,64)
-        +simpson(piece,r,.5,1<<14)+simpson(piece,.5,1,1<<14);
+// Continuous Fourier coefficient over the probe's first period of the shaped
+// sine with plateau r<.5, by Simpson quadrature on each smooth piece (no
+// closed form exists).
+C shapedCoefficient(int n,const Coupling& c) {
+    const auto coupling=[&c](double phase){return c.at(phase*c.fs/c.f);};
+    const auto basis=[n](double phase){return std::polar(1.0,-2*pi*n*phase);};
+    const auto plateau=[&](double phase){return shaped(1-coupling(phase))*basis(phase);};
+    const auto piece=[&](double phase){return shaped(foldedRamp(phase,c.r)-coupling(phase))*basis(phase);};
+    return simpson(plateau,0,c.r,64)+simpson(piece,c.r,.5,1<<14)+simpson(piece,.5,1,1<<14);
 }
 C measured(const std::vector<ceres::OscillatorFrame>& data,int harmonic,bool sine) {
     C result=0;
@@ -65,30 +97,29 @@ void conditionedWaveforms() {
         const auto length=std::size_t(fs/f);
         const double dt=f/fs,r=f*p.resetMicroseconds*1e-6;
         const auto wave=ceres::oscillatorTrace(fs,f,p,length);
+        const Coupling coupling(fs,f,r,length);
         for(std::size_t i=0;i<length;++i) {
-            const double phase=double(i)/length;
+            const double phase=double(i)/length,c=coupling.states[i];
             if(phase>dt && phase<r-dt) {
-                check(wave[i].saw==-1 && wave[i].sine==1,"Shared conditioned plateau before WSC inversion/folding");
+                check(wave[i].saw==-1,"Shared conditioned plateau before WSC inversion");
+                check(std::abs(wave[i].sine-shaped(1-c))<2e-12,"Shared conditioned plateau before WSC folding and coupling");
             }
             if(phase>r+dt && phase<1-dt) {
                 check(std::abs(wave[i].saw-(2*phase-1))<2e-12,"Descending current-balance slope must not stretch with reset duration");
                 if(std::abs(phase-.5)>dt)
-                    check(std::abs(wave[i].sine-shaped(foldedRamp(phase,r)))<2e-12,"Sine must shape the fold of the same conditioned branch");
+                    check(std::abs(wave[i].sine-shaped(foldedRamp(phase,r)-c))<2e-12,"Sine must shape the fold of the same conditioned branch through its coupling");
             }
             check(std::isfinite(wave[i].saw) && std::abs(wave[i].saw)<1.1,"Bounded conditioned saw");
             check(std::isfinite(wave[i].sine) && std::abs(wave[i].sine)<1.1,"Bounded folded sine");
         }
         check(std::abs(measured(wave,0,false).real()+r*r)<2e-6,"Conditioned saw DC must agree with independent piecewise integral");
-        // Shaped sine mean: r on the plateau plus the integral of tanh, whose
-        // antiderivative is log(cosh(k*u))/k; the descending half from 1-4r
-        // to -1 and the rising half (an odd function over [-1,1]) leave
-        // r-(log cosh k-log cosh(k(1-4r)))/(4k tanh k). Each BLAMP leaves
-        // its slope change times dt^2/12: -4g'(1) at the reset corner, +8g'(1)
-        // at the fold and -4g'(1-4r) at the plateau step.
-        const double k=shaperDrive;
-        const double cornerSum=4*shapedSlope(1)-4*shapedSlope(1-4*r);
-        const double mean=r-(std::log(std::cosh(k))-std::log(std::cosh(k*(1-4*r))))/(4*k*std::tanh(k))
-            +cornerSum*dt*dt/12;
+        // Shaped sine mean: the continuous waveform's, by quadrature through
+        // the coupling, plus each BLAMP's slope change times dt^2/12:
+        // -4g'(1-c) at the reset corner, +8g'(-1-c) at the fold and
+        // -4g'(1-4r-c) at the plateau step.
+        const double cornerSum=-4*shapedSlope(1-coupling.at(0))+8*shapedSlope(-1-coupling.at(.5*length))
+            -4*shapedSlope(1-4*r-coupling.at(r*length));
+        const double mean=shapedCoefficient(0,coupling).real()+cornerSum*dt*dt/12;
         check(std::abs(measured(wave,0,true).real()-mean)<2e-6,"Shaped sine DC including finite BLAMP areas");
         for(int n=1;n<=16;++n) {
             C expectedSaw=0;
@@ -159,14 +190,16 @@ void extrapolationAndRate() {
         const double r=f*q.resetMicroseconds*1e-6,dt=f/fs;
         check(r>.35&&r<.9,"High-pitch probe must exceed the former reset clamp");
         const auto wave=ceres::oscillatorTrace(fs,f,q,std::size_t(fs/f));
+        const Coupling coupling(fs,f,r,wave.size());
         std::size_t plateau=0,ramp=0;
         for(std::size_t i=0;i<wave.size();++i) {
-            const double phase=i*dt;
-            if(phase>2*dt&&phase<r-2*dt){++plateau;check(wave[i].saw==-1&&wave[i].sine==1,"Plateau lasts the physical one-shot fraction f*tau");}
+            const double phase=i*dt,c=coupling.states[i];
+            if(phase>2*dt&&phase<r-2*dt){++plateau;
+                check(wave[i].saw==-1&&std::abs(wave[i].sine-shaped(1-c))<1e-12,"Plateau lasts the physical one-shot fraction f*tau");}
             if(phase>r+2*dt&&phase<1-2*dt){++ramp;check(std::abs(wave[i].saw-(2*phase-1))<1e-12,"Ramp after the physical one-shot keeps its fixed slope");
                 // At 10kHz (r>.5) the plateau covers the fold: no fold corner.
                 if(std::abs(phase-.5)>2*dt)
-                    check(std::abs(wave[i].sine-shaped(foldedRamp(phase,r)))<1e-12,"Shaped sine follows the folded ramp after the one-shot");
+                    check(std::abs(wave[i].sine-shaped(foldedRamp(phase,r)-c))<1e-12,"Shaped sine follows the folded ramp after the one-shot");
 }
             const double edge=std::max(.5,r);
             if(phase>2*dt&&phase<1-2*dt&&std::abs(phase-edge)>2*dt)
@@ -218,17 +251,66 @@ void wscSineShaper() {
     const double best=thd(shaperDrive);
     check(std::abs(best-.0135943)<5e-7,"Documented 1.36% THD for the ideal triangle");
     check(best<thd(shaperDrive-.001)&&best<thd(shaperDrive+.001),"k=1.4020 is the topology's own minimum-THD drive");
-    // Engine rendering, plateau included: over a 20480-sample period the
-    // BLEP/BLAMP kernels and aliasing move harmonics n<=9 by O((n/N)^2) of
-    // each edge term, about 1e-9.
+    // Engine rendering, plateau and coupling included: over a 20480-sample
+    // period the BLEP/BLAMP kernels and aliasing move harmonics n<=9 by
+    // O((n/N)^2) of each edge term, about 1e-9.
     ceres::Patch p;p.pwmDepth=0;
     constexpr double fs=1024000,f=50;
     const auto length=std::size_t(fs/f);
     const double r=f*p.resetMicroseconds*1e-6;
     const auto wave=ceres::oscillatorTrace(fs,f,p,length);
+    const Coupling coupling(fs,f,r,length);
     for(int n=1;n<=9;++n)
-        check(std::abs(measured(wave,n,true)-shapedCoefficient(n,r))<1e-8,
+        check(std::abs(measured(wave,n,true)-shapedCoefficient(n,coupling))<1e-8,
               "Rendered shaped sine harmonics must match quadrature of the continuous waveform");
+}
+
+// Beside each edge the 2-point BLEP and BLAMP make a sample equal the
+// continuous waveform convolved with the unit triangle kernel one sample wide
+// each side, whose spectrum is the sinc^2 of the saw check above; that is
+// exact on straight pieces. The sine's curved pieces stay unsmoothed, at most
+// max|w''|/12 from that convolution: 16*1.709/12/N^2 per sample^2, 3.9e-5 at
+// the CS-50's top (N=242.6), where the coupling sets STI 29% of a peak below
+// the triangle and so moves every edge's jump and corner slopes.
+void wscSineEdges() {
+    ceres::Patch p;p.pwmDepth=0;
+    constexpr double fs=1536000;
+    const double f=4186.*1.5*std::exp2(14/1200.); // C6 on 4', PITCH at 6V, +14 cents
+    const double r=f*p.resetMicroseconds*1e-6,period=fs/f;
+    const auto length=std::size_t(2*period)+2;
+    const auto wave=ceres::oscillatorTrace(fs,f,p,length);
+    const Coupling coupling(fs,f,r,length);
+    std::vector<double> edges;
+    for(double k:{0.,1.})for(double at:{k,k+r,k+.5})edges.push_back(at*period);
+    // The kernel's own corner at s=0 and each edge cut the integral into
+    // smooth pieces; their ends are pulled in by 1e-9 sample so that a jump is
+    // read from the correct side, which costs below 1e-8.
+    const auto convolved=[&](double n) {
+        std::vector<double> cuts{n-1,n,n+1};
+        for(double e:edges)if(e>n-1&&e<n+1)cuts.push_back(e);
+        std::sort(cuts.begin(),cuts.end());
+        double sum=0;
+        for(std::size_t j=1;j<cuts.size();++j)
+            sum+=simpson([&](double x){return (1-std::abs(x-n))*coupling.sine(x);},
+                         cuts[j-1]+1e-9,cuts[j]-1e-9,64).real();
+        return sum;
+    };
+    std::size_t checked=0;
+    double worst=0;
+    for(double e:edges) {
+        if(e<1||e+2>length)continue;
+        double correction=0;
+        for(double n:{std::floor(e),std::floor(e)+1}) {
+            const double smooth=convolved(n);
+            worst=std::max(worst,std::abs(wave[std::size_t(n)].sine-smooth));
+            correction=std::max(correction,std::abs(coupling.sine(n)-smooth));
+            ++checked;
+        }
+        check(correction>2e-4,"Each checked edge must move a sample well beyond the tolerance");
+    }
+    std::cout<<"WSC sine edges: "<<checked<<" samples within "<<worst<<" of the kernel-smoothed waveform\n";
+    check(checked==10,"Reset, plateau-step and fold edges of the second period and the first period's step and fold");
+    check(worst<5e-5,"Sine BLEP/BLAMP corrections must follow the coupled shaper's jump and corner slopes");
 }
 
 // Public CS-50 oscillator demonstration: AutomaticGainsay, d2u1QrIYvnw.
@@ -345,11 +427,11 @@ void productionMixtureRelationship() {
 }
 }
 int main() {
-    try {nominalTiming();conditionedWaveforms();extrapolationAndRate();wscSineShaper();
+    try {nominalTiming();conditionedWaveforms();extrapolationAndRate();wscSineShaper();wscSineEdges();
         bool failed=false;
         for(const auto run:std::array<void(*)(),3>{{recordedMixtureRelationship,recordedEdgeRelationship,productionMixtureRelationship}})
             try {run();}catch(const std::exception& e){std::cerr<<e.what()<<'\n';failed=true;}
         if(failed)return 1;
-        std::cout<<"PASS nominal VCO timing, conditioned current slope, WSC shared fold and differential-pair sine, Fourier/DC/edge, public mixture and CS-80 edge relationships and high-CV bounds\n";return 0;
+        std::cout<<"PASS nominal VCO timing, conditioned current slope, WSC shared fold, coupling and differential-pair sine, Fourier/DC/edge, public mixture and CS-80 edge relationships and high-CV bounds\n";return 0;
     }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }

@@ -90,30 +90,33 @@ void brillianceAndSubKcl() {
 }
 
 void resonanceControlCircuit() {
-    constexpr double rPreset=220000,rShared=220000,c=10e-6;
-    const double conductance=1/rPreset+1/rShared;
-    const double tau=c/conductance;
+    // Pin 7 is a current input, taken as 1.72k (ceres.cpp, beside qControlTau).
+    // VQ is its current times 110k+Rin, so it reads (P+RES)/2 at any Rin.
+    constexpr double rPreset=220000,rShared=220000,rPin=1720,c=10e-6;
+    const double conductance=1/rPreset+1/rShared+1/rPin;
+    const double tau=c/conductance, vqPerPinVolt=(110e3+rPin)/rPin;
     for(double fs:{8000.,44100.,192000.}) {
         ceres::Patch p;p.hpResonance=.8;p.lpResonance=.55;p.resonanceOffset=8;
         ceres::Synth s(fs,9);s.setPatch(p);s.noteOn(60);
         std::array<double,8> nodal{};
         // Eight independent physical capacitor KCL equations, solved by RK4
-        // at HOST rate, independent of production's scalar exact RC update.
-        auto derivative=[&](double q,double source){return ((0-q)/rPreset+(source-q)/rShared)/c;};
+        // at 16 steps per HOST sample (the 17ms pole needs them to stay this
+        // close), independent of production's scalar exact RC update.
+        auto derivative=[&](double v,double source){return ((0-v)/rPreset+(source-v)/rShared-v/rPin)/c;};
         const unsigned count=static_cast<unsigned>(fs*.12);
         for(unsigned n=0;n<count;++n) {
-            for(double& q:nodal) {
-                const double h=1/fs,k1=derivative(q,8),k2=derivative(q+h*k1/2,8);
-                const double k3=derivative(q+h*k2/2,8),k4=derivative(q+h*k3,8);
-                q+=h*(k1+2*k2+2*k3+k4)/6;
+            for(double& v:nodal) for(int step=0;step<16;++step) {
+                const double h=1/(16*fs),k1=derivative(v,8),k2=derivative(v+h*k1/2,8);
+                const double k3=derivative(v+h*k2/2,8),k4=derivative(v+h*k3,8);
+                v+=h*(k1+2*k2+2*k3+k4)/6;
             }
             s.process();const auto state=s.soundPathState();
-            for(double q:nodal)near(state.resonanceVoltageOffset,q,3e-12,"Eight pin7 capacitor KCL versus exact production reduction");
-            near(state.hpResonance,.8-nodal[0]/10,3e-13,"HP provisional d(Vq) slope/sign");
-            near(state.lpResonance,.55-nodal[4]/10,3e-13,"LP independent baseline with same global delta");
+            for(double v:nodal)near(state.resonanceVoltageOffset,v*vqPerPinVolt,3e-12,"Eight pin7 capacitor KCL versus exact production reduction");
+            near(state.hpResonance,.8-nodal[0]*vqPerPinVolt/10,3e-13,"HP provisional d(Vq) slope/sign");
+            near(state.lpResonance,.55-nodal[4]*vqPerPinVolt/10,3e-13,"LP independent baseline with same global delta");
         }
         const double before=s.soundPathState().resonanceVoltageOffset;
-        near(before,(8/rShared)/conductance*(1-std::exp(-(count/fs)/tau)),3e-12,"Physical RC closed form across rates");
+        near(before,(8/rShared)/conductance*vqPerPinVolt*(1-std::exp(-(count/fs)/tau)),3e-12,"Physical RC closed form across rates");
         s.noteOn(64);s.noteOff(60);s.sustain(true);s.allNotesOff();s.allSoundOff();
         near(s.soundPathState().resonanceVoltageOffset,before,0,"Notes, stealing/pedal/panic must not reset Q capacitor");
         p.resonanceOffset=0;p.hpResonance=.2;s.setPatch(p);

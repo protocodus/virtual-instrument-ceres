@@ -201,3 +201,29 @@ What blocks 9:
    through. Section 5 shows the HP and LP lever slopes should be equal.
 3. The IG00156 pin-7 input current, which sets how far the 55k load and the
    1.1 s pole are from the stiff-source figures.
+
+## Addendum 2026-10-22: pin 7 takes current
+
+Item 3 above is answered as far as the documents go. The CS-30, CS-15 and
+CS-40M drive the same chip's pin 7 through 22k into a 390–470 Ω rank shunt,
+and the CS-30 prints Q 0.5 at 10 V there as the CS-50 does through its 220k
+pair, which only a current input allows
+([sibling evidence](sibling-evidence-2026-10-21.md#addendum-the-research-cross-check),
+[decision log](../decisions.md)). Equal current at both printed points puts
+the input at 1.72 kΩ, an inference. Ceres 0.6.5 uses it:
+
+- **RC timing.** Each node's 10 µF sees 220k, 220k and the input:
+  τ = 10 µF/(2/220k + 1/1.72k) = 16.9 ms instead of 1.1 s. A source
+  resistance on the RES wiper now matters even less than in section 3.
+- **RESONANCE load.** Each pin-7 branch, seen from RES, is 220k on to a node
+  that the other 220k and the input hold near ground: 221.7k returning to
+  0.78 % of its preset bus. The eight make 27.7k returning to 0.78 % of P̄,
+  so the B-10K sags up to 0.50 V near a third of travel, almost whatever
+  P̄ is (the table in section 3 is the 55k reading). These are
+  `ceres::resonanceLeverVolts`.
+- **Preset Q load.** Each Q row sees 55.4k returning to 0.78 % of RES, so a
+  zero column sits at 0.012 V and factory Q rises by up to 10 %; see the
+  [VCF research](vcf-authenticity-2026-10-20.md).
+
+The steady-state pin current is still (P + R)/2 through 110k plus the input,
+so section 4's divider and `resonance_offset`'s meaning are unchanged.
