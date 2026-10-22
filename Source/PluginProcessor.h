@@ -25,11 +25,14 @@ class CeresAudioProcessor final : public juce::AudioProcessor
 #endif
 {
 public:
-    // Every instance is the same unit: the seed fixes each board's
-    // tolerances, oscillator phases and noise. It is the README demos' seed,
-    // so a program is the instrument its demo plays (parameters hold floats,
-    // so a program's values match the preset's to float precision).
-    static constexpr std::uint64_t kSeed = 20261017u;
+    // Each instance is its own unit: the engine's seed fixes each board's
+    // tolerances, oscillator phases and noise. A new instance draws one at
+    // random and its state keeps it, so a saved session reopens as the same
+    // unit.
+    std::uint64_t unitSeed() const noexcept { return unit; }
+    // The one unit every instance was before 0.6.4, and the README demos'
+    // seed: a state that names no unit was saved by it, so opens as it.
+    static constexpr std::uint64_t kFixedUnit = 20261017u;
     // MIDI pitch bend reaches the engine as +/-2 semitones, as in the demos.
     static constexpr double kBendSemitones = 2.0;
     // The circuit's slowest coupling time constant, the output bus: the four
@@ -139,6 +142,7 @@ private:
     std::vector<Program> programs;
     std::atomic<int> currentProgram { 0 };
 
+    std::uint64_t unit;
     std::unique_ptr<ceres::Synth> engine;
     ceres::Patch patch {};
     double expressionLever = 1.0; // the parameter

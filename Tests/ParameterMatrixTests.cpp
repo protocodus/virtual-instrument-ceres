@@ -48,6 +48,16 @@ class CeresDevice final : public protocodus::matrix::JuceDevice
 public:
     CeresDevice() : JuceDevice (std::make_unique<CeresAudioProcessor>())
     {
+        // A new instance draws its own unit; every case plays the fixed one,
+        // so a failing case replays.
+        juce::MemoryBlock state;
+        processor->getStateInformation (state);
+        if (auto xml = juce::AudioProcessor::getXmlFromBinary (state.getData(), static_cast<int> (state.getSize())))
+        {
+            xml->setAttribute ("unit", juce::String (static_cast<juce::int64> (CeresAudioProcessor::kFixedUnit)));
+            juce::AudioProcessor::copyXmlToBinary (*xml, state);
+            processor->setStateInformation (state.getData(), static_cast<int> (state.getSize()));
+        }
         for (auto* parameter : processor->getParameters())
             if (parameter->isAutomatable())
                 if (auto* ranged = dynamic_cast<juce::RangedAudioParameter*> (parameter))

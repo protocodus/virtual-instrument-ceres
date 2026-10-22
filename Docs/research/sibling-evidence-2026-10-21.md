@@ -150,12 +150,17 @@ no document prints.
    drawing (SM p.41) puts 0.047 µF from the IG00158 SIO to ground. Its corner
    depends on SIO's output impedance, which is not printed (about 34 kHz at
    100 Ω, 3.4 kHz at 1 kΩ). The CS-50's own drawing (SM2 p.16) should be
-   checked first.
+   checked first. **Checked 2026-10-22:** the CS-50's M board (SM2 printed
+   p.16) draws the same 0.047 µF from IC9 SIO (pin 2) to ground, so the part
+   is the CS-50's own; what it does still waits on SIO's output impedance.
 3. **The IG00150 sine output may be high-impedance.** The CS-80 PRA drives the
    µA796's 100 Ω-terminated carrier port straight from SIO (CS-80 SM p.53),
    which a stiff 3.2 Vpp source could not do. Ceres treats SIO as an ideal
    source into the CS-50's 100 µF and 33k; that holds only if SIO's impedance
-   is well below 33k.
+   is well below 33k. The CS-50's PRA (SM2 printed p.22) also puts 0.047 µF
+   from IC5 pin 6 to ground (the ring note's open item 3): inert from a stiff
+   source, but from a high-impedance one it would also low-pass the carrier,
+   by an amount that impedance sets.
 
 E-46's temperature ranks and the factory trim bands came up again; the drift
 and board-tolerance models already use them.

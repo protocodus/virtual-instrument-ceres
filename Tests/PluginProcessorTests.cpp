@@ -1,7 +1,7 @@
 // Processor contracts: parameters built from the engine's descriptors,
-// programs, state, MIDI and EXT IN rendering against a directly driven
-// ceres::Synth, block-partition invariance, deferred voice and quality
-// changes, an allocation-free audio callback, buses and the editor.
+// programs, state, each instance's unit, MIDI and EXT IN rendering against a
+// directly driven ceres::Synth, block-partition invariance, deferred voice and
+// quality changes, an allocation-free audio callback, buses and the editor.
 // CERES_EDITOR_SNAPSHOT=<file.png> also writes the editor screenshot the
 // render tier checks and the main build commits, tagged with the editor
 // source it was rendered from (CERES_EDITOR_SOURCE_ID, see EditorRenderTests.py).
@@ -195,7 +195,7 @@ void prepare (CeresAudioProcessor& p, int block, double rate = kRate)
 // The engine driven directly with the documented mapping: MIDI velocity and
 // pressure /127, bend +/-2 semitones over +/-8192, CC64 at 64 and above, CC11
 // scaling the expression parameter, CC120/121/123 as MIDI defines them, the
-// same seed, configuration, patch and EXT IN samples. An independent
+// same unit, configuration, patch and EXT IN samples. An independent
 // statement of what the plug-in promises, not a call into it.
 std::vector<float> reference (CeresAudioProcessor& p, int total, const std::vector<Timed>& events,
                               const std::vector<float>& ext = {}, double rate = kRate)
@@ -219,7 +219,7 @@ std::vector<float> reference (CeresAudioProcessor& p, int total, const std::vect
         parameter (p, ceres_plugin::kOversamplingId).getValue())));
     const auto factor = static_cast<unsigned> (ceres_plugin::kOversamplingFactors[quality]);
 
-    ceres::Synth synth (rate, CeresAudioProcessor::kSeed);
+    ceres::Synth synth (rate, p.unitSeed());
     synth.reset();
     check (synth.configure (voices, factor), "the reference engine takes the plug-in's configuration");
     synth.setPatch (patch);
@@ -442,6 +442,29 @@ juce::MemoryBlock save (CeresAudioProcessor& p)
     return block;
 }
 
+// A new instance draws its own unit; restoring another instance's state makes
+// it that unit, with that instance's parameters.
+void restore (CeresAudioProcessor& p, const juce::MemoryBlock& state)
+{
+    p.setStateInformation (state.getData(), static_cast<int> (state.getSize()));
+}
+
+// A saved state as XML, with or without its unit.
+std::unique_ptr<juce::XmlElement> stateXml (const juce::MemoryBlock& state, bool keepUnit = true)
+{
+    auto xml = juce::AudioProcessor::getXmlFromBinary (state.getData(), static_cast<int> (state.getSize()));
+    if (xml != nullptr && ! keepUnit)
+        xml->removeAttribute ("unit");
+    return xml;
+}
+
+juce::MemoryBlock binary (const juce::XmlElement& xml)
+{
+    juce::MemoryBlock block;
+    juce::AudioProcessor::copyXmlToBinary (xml, block);
+    return block;
+}
+
 void stateContract()
 {
     CeresAudioProcessor a;
@@ -454,8 +477,10 @@ void stateContract()
     check (saved.getSize() > 0, "state is written");
 
     CeresAudioProcessor b;
-    b.setStateInformation (saved.getData(), static_cast<int> (saved.getSize()));
+    check (b.unitSeed() != a.unitSeed(), "each new instance draws its own unit");
+    restore (b, saved);
     check (save (b) == saved, "a restored state saves the same bytes");
+    check (b.unitSeed() == a.unitSeed(), "a restored state reopens as the unit it was saved with");
     check (b.getCurrentProgram() == 3, "the program number is restored");
     bool same = true;
     for (int i = 0; i < a.getParameters().size(); ++i)
@@ -467,24 +492,28 @@ void stateContract()
     b.setStateInformation (nullptr, 0);
     check (save (b) == saved, "a foreign or empty chunk changes nothing");
 
-    // The silent scaffold saved <Ceres stateVersion="1"/>: it opens as a new instance.
-    juce::MemoryBlock scaffold;
-    juce::AudioProcessor::copyXmlToBinary (*juce::parseXML ("<Ceres stateVersion=\"1\"/>"), scaffold);
-    b.setStateInformation (scaffold.getData(), static_cast<int> (scaffold.getSize()));
+    // The silent scaffold saved <Ceres stateVersion="1"/>: it opens as a new
+    // instance, and the instance keeps its unit.
+    restore (b, binary (*juce::parseXML ("<Ceres stateVersion=\"1\"/>")));
     CeresAudioProcessor fresh;
-    check (save (b) == save (fresh), "a scaffold chunk restores a new instance's state");
+    check (stateXml (save (b), false)->isEquivalentTo (stateXml (save (fresh), false).get(), false),
+           "a scaffold chunk restores a new instance's state");
+    check (b.unitSeed() == a.unitSeed(), "a scaffold chunk leaves the unit alone");
+
+    // A state saved before 0.6.4 names no unit: every instance was then the fixed one.
+    CeresAudioProcessor old;
+    restore (old, binary (*stateXml (saved, false)));
+    check (old.unitSeed() == CeresAudioProcessor::kFixedUnit, "a state that names no unit opens as the fixed unit");
 
     // A parameter the chunk leaves out takes its default, whatever was there.
-    auto xml = juce::AudioProcessor::getXmlFromBinary (saved.getData(), static_cast<int> (saved.getSize()));
+    auto xml = stateXml (saved);
     auto* cutoff = xml != nullptr ? xml->getChildByAttribute ("id", "lp_cutoff") : nullptr;
     check (cutoff != nullptr, "the state holds lp_cutoff");
     if (cutoff != nullptr)
         xml->removeChildElement (cutoff, true);
-    juce::MemoryBlock partial;
-    juce::AudioProcessor::copyXmlToBinary (*xml, partial);
     CeresAudioProcessor c;
     setEngineValue (c, "lp_cutoff", 300.0);
-    c.setStateInformation (partial.getData(), static_cast<int> (partial.getSize()));
+    restore (c, binary (*xml));
     auto& lp = parameter (c, "lp_cutoff");
     check (juce::exactlyEqual (lp.getValue(), lp.getDefaultValue()), "a parameter missing from the chunk takes its default");
     bool rest = c.getCurrentProgram() == 3;
@@ -520,19 +549,21 @@ void renderContract()
     check (played.left == played.right, "both output channels carry the mono engine");
     check (played.allocations == 0, "the audio callback allocates nothing (" + juce::String ((int) played.allocations) + ")");
     check (played.left == reference (whole, total, events),
-           "the plug-in renders what the engine renders from the same MIDI, parameters and seed");
+           "the plug-in renders what the engine renders from the same MIDI, parameters and unit");
 
+    // The instances below restore whole's state, so they are its unit.
+    const auto setup = save (whole);
     for (const int block : { 64, 37, 1 })
     {
         CeresAudioProcessor pieces;
-        configure (pieces);
+        restore (pieces, setup);
         prepare (pieces, block);
         check (play (pieces, total, block, events).left == played.left,
                juce::String (block) + "-frame blocks render the same samples as 512");
     }
 
     CeresAudioProcessor mono;
-    configure (mono);
+    restore (mono, setup);
     auto layout = mono.getBusesLayout();
     layout.getChannelSet (false, 0) = juce::AudioChannelSet::mono();
     check (mono.setBusesLayout (layout), "a mono output is accepted");
@@ -541,7 +572,7 @@ void renderContract()
 
     // Garbage left in the host's buffers is not EXT IN while the bus is off.
     CeresAudioProcessor noisy;
-    configure (noisy);
+    restore (noisy, setup);
     prepare (noisy, 512);
     check (play (noisy, total, 512, events, {}, {}, true).left == played.left,
            "with EXT IN off, the buffer's previous contents are ignored");
@@ -579,10 +610,14 @@ void extInContract()
     check (played.left == reference (p, total, events, sine), "EXT IN reaches the engine sample for sample");
     check (played.left != reference (p, total, events), "the EXT IN signal changes the sound under FUNCTION EXT");
 
+    // The bus layout is the host's, not the state's: these instances set
+    // their own, then restore p's state to be its unit.
+    const auto setup = save (p);
     for (const int block : { 61, 1 })
     {
         CeresAudioProcessor pieces;
         configure (pieces, juce::AudioChannelSet::mono());
+        restore (pieces, setup);
         prepare (pieces, block);
         check (play (pieces, total, block, events, sine).left == played.left,
                "EXT IN renders the same in " + juce::String (block) + "-frame blocks");
@@ -590,6 +625,7 @@ void extInContract()
 
     CeresAudioProcessor stereo;
     configure (stereo, juce::AudioChannelSet::stereo());
+    restore (stereo, setup);
     prepare (stereo, 256);
     check (play (stereo, total, 256, events, sine, other).left == played.left,
            "a stereo EXT IN feeds the jack its first channel");
@@ -607,6 +643,25 @@ void extInContract()
     prepare (internal, 256);
     check (play (internal, total, 256, events, sine).left == reference (internal, total, events),
            "FUNCTION's internal waveforms ignore EXT IN");
+}
+
+void unitContract()
+{
+    constexpr int total = 24000;
+    const std::vector<Timed> chord { noteOn (0, 48, 100), noteOn (0, 55, 100), noteOn (0, 60, 100),
+                                     noteOn (0, 64, 100), noteOff (12000, 48), noteOff (12000, 55),
+                                     noteOff (12000, 60), noteOff (12000, 64) };
+    CeresAudioProcessor a, b;
+    prepare (a, 512);
+    prepare (b, 512);
+    const auto first = play (a, total, 512, chord);
+    check (play (b, total, 512, chord).left != first.left, "two new instances are two different units");
+
+    // A state restored while the engine runs rebuilds it as the saved unit.
+    restore (b, save (a));
+    const auto replay = play (b, total, 512, chord);
+    check (replay.left == first.left, "a state restored while the engine runs plays the saved unit");
+    check (replay.allocations == 0, "the rebuilt engine's audio callback allocates nothing");
 }
 
 void busContract()
@@ -803,6 +858,7 @@ int main()
     stateContract();
     renderContract();
     extInContract();
+    unitContract();
     busContract();
     sampleRateContract();
     configurationContract();

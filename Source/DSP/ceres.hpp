@@ -118,7 +118,8 @@ struct Patch {
     double tuneCents = 0.0;
     // These modeled oscillator variations, like vibrato below, are VCO-only.
     // voiceSpreadCents is a fixed engineering spread, not a tolerance (see
-    // the board tolerances below). driftCents is the peak excursion of each
+    // the board tolerances below): neighbouring boards differ by it, centred
+    // on the voices in use. driftCents is the peak excursion of each
     // board's free-running wander about its tuned pitch: a new random target
     // every 0.2-0.7s, followed with a .3s time constant (.41 cents RMS per
     // cent). Default 1: an OWNER-REQUESTED ENGINEERING VALUE, not a
@@ -131,7 +132,9 @@ struct Patch {
     // slower than this wander, whose time constants have no source.
     double voiceSpreadCents = 0.0, driftCents = 1.0;
     // Board-to-board tolerance of the four M boards, each 0..1 of the
-    // documented spread; 0 keeps the boards identical. Pitch, filter and
+    // documented spread; 0 keeps the boards identical. Every voice beyond
+    // the four is a further board with residuals of its own from the same
+    // bands, so each voice up to the voice count differs. Pitch, filter and
     // envelope ship at 1 (owner's listening verdict B, 2026-10-20, set
     // 2026-10-20-voice-variation-board-tolerance). Envelope time and VCA
     // ship at 1 too: the owner took every candidate of set
