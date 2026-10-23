@@ -737,8 +737,11 @@ struct OtaSvf {
         const double linear = network.linear;
         const double nonlinear = cutoff<=filterFrequencyFloor ? 0.0 : std::max(0.0,g-linear);
         double b = previousB;
+        // The last tanh(b) the iterations evaluated, and its argument.
+        double tanhArgument = previousB, tanhValue = previousTanhB;
         for (int iteration = 0; iteration < 7; ++iteration) {
             const double tb = iteration == 0 ? previousTanhB : std::tanh(b);
+            tanhArgument = b; tanhValue = tb;
             const double l = sl + nonlinear*tb + linear*b;
             const double h = qConstant - effectiveDamping * b - l;
             const double th = std::tanh(h);
@@ -749,7 +752,9 @@ struct OtaSvf {
             b -= delta;
             if (std::abs(delta) < 1e-12) break;
         }
-        const double tanhB = std::tanh(b);
+        // A converged final step is often below half an ulp of b and leaves
+        // it bit-for-bit unchanged; its tanh is then the one just evaluated.
+        const double tanhB = std::memcmp(&b,&tanhArgument,sizeof b) == 0 ? tanhValue : std::tanh(b);
         const double l = sl + nonlinear*tanhB + linear*b;
         const double z = qConstant+qBand*b;
         const double h = z - 2*b - l;
