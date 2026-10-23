@@ -469,6 +469,10 @@ struct Random {
     }
     double unit() { return static_cast<double>(next() >> 11) * 0x1.0p-53; }
     double bipolar() { return 2 * unit() - 1; }
+    // Move past n draws without producing them. The state advances by a
+    // fixed increment per draw, so a skipped stretch leaves the sequence
+    // exactly where the draws would have: the next value is unchanged.
+    void skip(std::uint64_t n) { state += n * UINT64_C(0x9e3779b97f4a7c15); }
 };
 
 // Board-to-board tolerance: what the four M boards keep after Yamaha's own
@@ -1999,18 +2003,35 @@ struct Synth::Impl {
         // trims it to 3Vpp, the WSC waveforms' 3Vpp. So the one shared source
         // is the slew-limited sign of the band-limited pick-up signal, in
         // units of the rails (see limiterSlew).
-        double limiterSum=0;
-        for (unsigned step=0; step<limiterSteps; ++step) {
-            const double draw=step ? limiterRandom.unit() : random.unit();
-            limiterInput=limiterPole*limiterInput+limiterInnovation*inverseNormal(draw+0x1.0p-54);
-            const double pickup=pickupCoupling.process(limiterInput,pickupCoefficients);
-            limiterOutput=pickup<0 ? std::max(-1.0,limiterOutput-limiterStep)
-                : std::min(1.0,limiterOutput+limiterStep);
-            limiterSum+=limiterOutput;
+        // With NOISE at zero and FUNCTION off N nothing audible depends on
+        // the source, so it is not computed: the limiter, its pick-up
+        // coupling and the SUB-N filter hold their state, and both streams
+        // skip the draws they would have taken (Random::skip), so the drift
+        // that shares the first stream keeps its chronology exactly. Audio
+        // is unchanged while the source stays unused or stays in use; when
+        // it comes back into use the held states resume, and the pick-up
+        // coupling's settling (about 25 ms) is a different realisation of
+        // the same noise than an always-running limiter would have given.
+        // At 1x the source alone was a quarter of a voice's cost.
+        const bool noiseUsed=patch.noise!=0 || patch.lfoWaveform==4;
+        double noise=0, subNoise=0;
+        if (noiseUsed) {
+            double limiterSum=0;
+            for (unsigned step=0; step<limiterSteps; ++step) {
+                const double draw=step ? limiterRandom.unit() : random.unit();
+                limiterInput=limiterPole*limiterInput+limiterInnovation*inverseNormal(draw+0x1.0p-54);
+                const double pickup=pickupCoupling.process(limiterInput,pickupCoefficients);
+                limiterOutput=pickup<0 ? std::max(-1.0,limiterOutput-limiterStep)
+                    : std::min(1.0,limiterOutput+limiterStep);
+                limiterSum+=limiterOutput;
+            }
+            noise=limiterSum/limiterSteps;
+            subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
+            subNoiseMemory=2*subNoise-subNoiseMemory;
+        } else {
+            random.skip(1);
+            limiterRandom.skip(limiterSteps-1);
         }
-        const double noise=limiterSum/limiterSteps;
-        const double subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
-        subNoiseMemory=2*subNoise-subNoiseMemory;
         // SUB-EXT (see externalPreampRail): LEVEL, the preamp's swing, the
         // switch-loaded coupling capacitor, then the IC1-1 follower's swing.
         // The preamp and capacitor run whatever FUNCTION selects.
