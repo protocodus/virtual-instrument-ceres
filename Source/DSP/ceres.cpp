@@ -13,6 +13,41 @@
 namespace ceres {
 namespace {
 constexpr double pi = 3.141592653589793238462643383279502884;
+// tanh is the engine's most frequent transcendental: the OTA filters solve
+// one per Newton iteration per stage, the WSC shaper one per sample and the
+// ring carrier one per sample. glibc's tanh reaches expm1 and costs about
+// 2.6 times this rational form in a dependent chain (measured here; see
+// Docs/benchmarks/cpu-approximations-2026-10-23.md). Cephes tanh.c (Moshier):
+// for |x| < .625, x + x^3 P(x^2)/Q(x^2); beyond, the identity
+// 1 - 2/(exp(2|x|)+1). Swept against glibc over 1e-9..30 at 14 million
+// points: at most 2 ulp (4.2e-16 relative). Not bit-identical to std::tanh,
+// so this and everything after it differ from 1.0.3 at the last bit.
+double fastTanh(double x) {
+    const double ax=std::abs(x);
+    if (ax<.625) {
+        const double s=x*x;
+        const double p=(-9.64399179425052238628e-1*s-9.92877231001918586564e1)*s
+            -1.61468768441708447952e3;
+        const double q=((s+1.12811678491632931402e2)*s+2.23548839060100448583e3)*s
+            +4.84406305325125486048e3;
+        return x+x*s*(p/q);
+    }
+    const double y=1-2/(std::exp(2*ax)+1);
+    return x<0 ? -y : y;
+}
+// The filters' TPT prewarp, tan(pi*fc/fs), is evaluated whenever a cutoff
+// moves (every sample under envelope, SUB or glide). The argument is at most
+// .22 pi (the cutoff clamp), inside Cephes tan.c's |x| <= pi/4 rational,
+// x + x^3 P(x^2)/Q(x^2): at most 1 ulp (2.2e-16 relative) against glibc over
+// 1e-7..0.22 pi, at about a third of glibc's instructions.
+double prewarpTan(double x) {
+    const double z=x*x;
+    const double p=(-1.30936939181383777646e4*z+1.15351664838587416140e6)*z
+        -1.79565251976484877988e7;
+    const double q=(((z+1.36812963470692954678e4)*z-1.32089234440210967447e6)*z
+        +2.50083801823357915839e7)*z-5.38695755929454629881e7;
+    return x+x*z*(p/q);
+}
 constexpr double filterCapacitance = 1.5e-9, filterFeedResistance = 4.7e6;
 constexpr double filterFrequencyFloor = 1/(2*pi*filterCapacitance*filterFeedResistance);
 // Cutoff lever law: the printed IG00156 law fc=125*Kv*2^Vfc (guide printed
@@ -164,7 +199,7 @@ constexpr double ringCollectorSource=1/(1/2700.+1/40e3);
 constexpr double ringCollectorLoad=1/(1/ringCollectorSource+1/10e3);
 constexpr double ringWetCouplingTau=10e-6*(ringCollectorSource+10e3);
 constexpr double ringModulatorGain=ringSignalDivider*ringCollectorLoad/ringSignalDegeneration;
-double ringSteering(double volts) { return std::tanh(volts/(2*ringThermalVoltage)); }
+double ringSteering(double volts) { return fastTanh(volts/(2*ringThermalVoltage)); }
 // Volts at O1 per unit of the engine's voice bus. The M-board alignment sets
 // the sine at CP4 to 1Vpp (CS-60 manual p.38, VI.1), the engine's +/-1, so a
 // unit is .5V at CP4. VI.4 sets a CS-50 voice output O to "0.6V" (its figure
@@ -718,7 +753,7 @@ struct OtaSvf {
         if (cutoff!=cachedCutoff || network.fs!=cachedRate) {
             // Exact input equality only: moving cutoff CVs retain the same
             // capacitor TPT prewarp, with no control-rate approximation.
-            cachedG=std::tan(pi * cutoff / network.fs);
+            cachedG=prewarpTan(pi * cutoff / network.fs);
             cachedCutoff=cutoff;
             cachedRate=network.fs;
         }
@@ -740,11 +775,11 @@ struct OtaSvf {
         // The last tanh(b) the iterations evaluated, and its argument.
         double tanhArgument = previousB, tanhValue = previousTanhB;
         for (int iteration = 0; iteration < 7; ++iteration) {
-            const double tb = iteration == 0 ? previousTanhB : std::tanh(b);
+            const double tb = iteration == 0 ? previousTanhB : fastTanh(b);
             tanhArgument = b; tanhValue = tb;
             const double l = sl + nonlinear*tb + linear*b;
             const double h = qConstant - effectiveDamping * b - l;
-            const double th = std::tanh(h);
+            const double th = fastTanh(h);
             const double residual = b - sb - nonlinear*th - linear*h;
             const double dl = nonlinear*(1-tb*tb) + linear;
             const double derivative = 1 + (nonlinear*(1-th*th)+linear)*(effectiveDamping+dl);
@@ -754,7 +789,7 @@ struct OtaSvf {
         }
         // A converged final step is often below half an ulp of b and leaves
         // it bit-for-bit unchanged; its tanh is then the one just evaluated.
-        const double tanhB = std::memcmp(&b,&tanhArgument,sizeof b) == 0 ? tanhValue : std::tanh(b);
+        const double tanhB = std::memcmp(&b,&tanhArgument,sizeof b) == 0 ? tanhValue : fastTanh(b);
         const double l = sl + nonlinear*tanhB + linear*b;
         const double z = qConstant+qBand*b;
         const double h = z - 2*b - l;
@@ -846,9 +881,9 @@ constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
 // tanh is not constexpr in C++17, so tanh(k) is written out (std::tanh(1.4020)).
 constexpr double wscSineDrive=1.4020;
 constexpr double wscSineTanhDrive=0.8857831884152492;
-double wscSine(double input) {return std::tanh(wscSineDrive*input)/wscSineTanhDrive;}
+double wscSine(double input) {return fastTanh(wscSineDrive*input)/wscSineTanhDrive;}
 double wscSineSlope(double input) {
-    const double t=std::tanh(wscSineDrive*input);
+    const double t=fastTanh(wscSineDrive*input);
     return wscSineDrive*(1-t*t)/wscSineTanhDrive;
 }
 // TO reaches STI through 4.7uF NP with 22k to ground (SM2 p.16): see Oscillator.
