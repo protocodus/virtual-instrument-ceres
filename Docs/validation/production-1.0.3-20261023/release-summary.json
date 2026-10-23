@@ -1,0 +1,56 @@
+{
+  "commands": [
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023",
+        "-B",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-release-20261023",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCERES_BUILD_PLUGIN=OFF",
+        "-DCERES_BUILD_CLAP=OFF",
+        "-DCERES_BUILD_TOOLS=ON",
+        "-DCERES_BUILD_UNIVERSAL=OFF"
+      ],
+      "exit_code": 0,
+      "log": "release-configure.log",
+      "log_sha256": "5347d9e7e2d0a729a760a4f0d2d2b52d99d966049df9b0ede855b665517e8d8a"
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-release-20261023",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "log": "release-build.log",
+      "log_sha256": "7cb6bd4eee444326cd1c2adf9e3cde09dcb3d79fb052b8b3e0e3b3ca35f2c59b"
+    },
+    {
+      "command": [
+        "ctest",
+        "--test-dir",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-release-20261023",
+        "--output-on-failure",
+        "-j",
+        "2",
+        "--output-junit",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/Docs/validation/production-1.0.3-20261023/release-tests.xml"
+      ],
+      "exit_code": 0,
+      "log": "release-tests.log",
+      "log_sha256": "fe661b52158068f864cbc1d4b2d0236b4e8731f6bd4971d6d14789b6a243dd41"
+    }
+  ],
+  "fresh_build_directory": "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-release-20261023",
+  "results": {
+    "disabled": "0",
+    "failures": "0",
+    "tests": "33"
+  },
+  "scope": "Native canonical contracts; no plugin/CLAP build, Rack SDK build, host test or timing.",
+  "status": "pass"
+}

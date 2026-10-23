@@ -1,0 +1,314 @@
+{
+  "baseline_commit": "7733a4053b23a9f10cd86d0f0353154ec115687a",
+  "candidate_source_commit": "820fb631338626aecc11af28d42840d62ebb3240",
+  "commands": [
+    {
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-I",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/Tests/FilterCpuParityDriver.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-filter-normal"
+      ],
+      "exit_code": 0,
+      "log": "baseline-filter-normal-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-filter-normal",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-filter-normal.f64"
+      ],
+      "exit_code": 0,
+      "log": "baseline-filter-normal-run.log",
+      "log_sha256": "6943d478039d8c1d640676c90fc7cff0c6cc3ca89216796837673c85478bb29b"
+    },
+    {
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-I",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/Tests/CpuParityDriver.cpp",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline/ceres.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-core-normal"
+      ],
+      "exit_code": 0,
+      "log": "baseline-core-normal-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-core-normal",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-core-normal.f32"
+      ],
+      "exit_code": 0,
+      "log": "baseline-core-normal-run.log",
+      "log_sha256": "8447f10c2ff17b540a9dd0121b20ced6af3c86b0423b58d9d732578971a749a0"
+    },
+    {
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-I",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/Tests/FilterCpuParityDriver.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-filter-normal"
+      ],
+      "exit_code": 0,
+      "log": "candidate-filter-normal-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-filter-normal",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-filter-normal.f64"
+      ],
+      "exit_code": 0,
+      "log": "candidate-filter-normal-run.log",
+      "log_sha256": "6943d478039d8c1d640676c90fc7cff0c6cc3ca89216796837673c85478bb29b"
+    },
+    {
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-I",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/Tests/CpuParityDriver.cpp",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate/ceres.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-core-normal"
+      ],
+      "exit_code": 0,
+      "log": "candidate-core-normal-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-core-normal",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-core-normal.f32"
+      ],
+      "exit_code": 0,
+      "log": "candidate-core-normal-run.log",
+      "log_sha256": "8447f10c2ff17b540a9dd0121b20ced6af3c86b0423b58d9d732578971a749a0"
+    },
+    {
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-fno-builtin",
+        "-I",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/Tests/FilterCpuParityDriver.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-filter-no-builtin"
+      ],
+      "exit_code": 0,
+      "log": "baseline-filter-no-builtin-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-filter-no-builtin",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-filter-no-builtin.f64"
+      ],
+      "exit_code": 0,
+      "log": "baseline-filter-no-builtin-run.log",
+      "log_sha256": "6943d478039d8c1d640676c90fc7cff0c6cc3ca89216796837673c85478bb29b"
+    },
+    {
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-fno-builtin",
+        "-I",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/Tests/CpuParityDriver.cpp",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline/ceres.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-core-no-builtin"
+      ],
+      "exit_code": 0,
+      "log": "baseline-core-no-builtin-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-core-no-builtin",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-core-no-builtin.f32"
+      ],
+      "exit_code": 0,
+      "log": "baseline-core-no-builtin-run.log",
+      "log_sha256": "8447f10c2ff17b540a9dd0121b20ced6af3c86b0423b58d9d732578971a749a0"
+    },
+    {
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-fno-builtin",
+        "-I",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/Tests/FilterCpuParityDriver.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-filter-no-builtin"
+      ],
+      "exit_code": 0,
+      "log": "candidate-filter-no-builtin-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-filter-no-builtin",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-filter-no-builtin.f64"
+      ],
+      "exit_code": 0,
+      "log": "candidate-filter-no-builtin-run.log",
+      "log_sha256": "6943d478039d8c1d640676c90fc7cff0c6cc3ca89216796837673c85478bb29b"
+    },
+    {
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-fno-builtin",
+        "-I",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/Tests/CpuParityDriver.cpp",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate/ceres.cpp",
+        "-o",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-core-no-builtin"
+      ],
+      "exit_code": 0,
+      "log": "candidate-core-no-builtin-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-core-no-builtin",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-core-no-builtin.f32"
+      ],
+      "exit_code": 0,
+      "log": "candidate-core-no-builtin-run.log",
+      "log_sha256": "8447f10c2ff17b540a9dd0121b20ced6af3c86b0423b58d9d732578971a749a0"
+    }
+  ],
+  "comparisons": [
+    {
+      "byte_identical": true,
+      "core_float32_samples": 439296,
+      "filter_float64_values": 1253376,
+      "filter_frames": 208896,
+      "mode": "normal"
+    },
+    {
+      "byte_identical": true,
+      "core_float32_samples": 439296,
+      "filter_float64_values": 1253376,
+      "filter_frames": 208896,
+      "mode": "no-builtin"
+    }
+  ],
+  "scope": "Exact raw stream comparison under identical compiler/flags, including signed zero; no performance timing.",
+  "status": "pass",
+  "streams": [
+    {
+      "all_finite": true,
+      "bytes": 10027008,
+      "kind": "filter",
+      "mode": "normal",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-filter-normal.f64",
+      "sha256": "aff69220e393524ac8dc720944e6d90f3548d5f4bffd38562f9a9fe658439ad4",
+      "source": "baseline",
+      "values": 1253376
+    },
+    {
+      "all_finite": true,
+      "bytes": 1757184,
+      "kind": "core",
+      "mode": "normal",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-core-normal.f32",
+      "sha256": "6039d981aaf29c4846cc7400e51091c1ac44db8ce25b5d4c1791884c70a24012",
+      "source": "baseline",
+      "values": 439296
+    },
+    {
+      "all_finite": true,
+      "bytes": 10027008,
+      "kind": "filter",
+      "mode": "normal",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-filter-normal.f64",
+      "sha256": "aff69220e393524ac8dc720944e6d90f3548d5f4bffd38562f9a9fe658439ad4",
+      "source": "candidate",
+      "values": 1253376
+    },
+    {
+      "all_finite": true,
+      "bytes": 1757184,
+      "kind": "core",
+      "mode": "normal",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-core-normal.f32",
+      "sha256": "6039d981aaf29c4846cc7400e51091c1ac44db8ce25b5d4c1791884c70a24012",
+      "source": "candidate",
+      "values": 439296
+    },
+    {
+      "all_finite": true,
+      "bytes": 10027008,
+      "kind": "filter",
+      "mode": "no-builtin",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-filter-no-builtin.f64",
+      "sha256": "aff69220e393524ac8dc720944e6d90f3548d5f4bffd38562f9a9fe658439ad4",
+      "source": "baseline",
+      "values": 1253376
+    },
+    {
+      "all_finite": true,
+      "bytes": 1757184,
+      "kind": "core",
+      "mode": "no-builtin",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/baseline-core-no-builtin.f32",
+      "sha256": "6039d981aaf29c4846cc7400e51091c1ac44db8ce25b5d4c1791884c70a24012",
+      "source": "baseline",
+      "values": 439296
+    },
+    {
+      "all_finite": true,
+      "bytes": 10027008,
+      "kind": "filter",
+      "mode": "no-builtin",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-filter-no-builtin.f64",
+      "sha256": "aff69220e393524ac8dc720944e6d90f3548d5f4bffd38562f9a9fe658439ad4",
+      "source": "candidate",
+      "values": 1253376
+    },
+    {
+      "all_finite": true,
+      "bytes": 1757184,
+      "kind": "core",
+      "mode": "no-builtin",
+      "path": "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-audit-20261023/candidate-core-no-builtin.f32",
+      "sha256": "6039d981aaf29c4846cc7400e51091c1ac44db8ce25b5d4c1791884c70a24012",
+      "source": "candidate",
+      "values": 439296
+    }
+  ]
+}

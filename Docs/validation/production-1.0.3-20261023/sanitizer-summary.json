@@ -1,0 +1,60 @@
+{
+  "commands": [
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023",
+        "-B",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-sanitizer-20261023",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCERES_BUILD_PLUGIN=OFF",
+        "-DCERES_BUILD_CLAP=OFF",
+        "-DCERES_BUILD_TOOLS=ON",
+        "-DCERES_BUILD_UNIVERSAL=OFF",
+        "-DCERES_ENABLE_SANITIZERS=ON",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g -DNDEBUG"
+      ],
+      "exit_code": 0,
+      "log": "sanitizer-configure.log",
+      "log_sha256": "76575072e354a06dc4c30fefdd889b20a95c88c553990b2515895e5850812fe0"
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-sanitizer-20261023",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "log": "sanitizer-build.log",
+      "log_sha256": "83bc5086b8511cd5916d4ed4eff61f2198eaf5a7a4ca42ed634086953bf11871"
+    },
+    {
+      "command": [
+        "ctest",
+        "--test-dir",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-sanitizer-20261023",
+        "--output-on-failure",
+        "-j",
+        "2",
+        "-E",
+        "^Ceres.AudioDemos$",
+        "--output-junit",
+        "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/Docs/validation/production-1.0.3-20261023/sanitizer-tests.xml"
+      ],
+      "exit_code": 0,
+      "log": "sanitizer-tests.log",
+      "log_sha256": "50b992f36396097342e43fb6bc719baf279926a1c302cf6046766ffc790fa6ce"
+    }
+  ],
+  "fresh_build_directory": "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-production-sanitizer-20261023",
+  "results": {
+    "disabled": "0",
+    "failures": "0",
+    "tests": "32"
+  },
+  "scope": "Native canonical contracts; no plugin/CLAP build, Rack SDK build, host test or timing.",
+  "status": "pass"
+}

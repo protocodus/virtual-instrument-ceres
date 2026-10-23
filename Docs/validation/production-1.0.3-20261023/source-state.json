@@ -1,0 +1,37 @@
+{
+  "baseline_commit": "7733a4053b23a9f10cd86d0f0353154ec115687a",
+  "candidate_source_commit": "820fb631338626aecc11af28d42840d62ebb3240",
+  "compiler_version": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin\n",
+  "completed_utc": "2026-10-23T08:23:57.587309+00:00",
+  "old_validation_evidence_unchanged": true,
+  "pr7_head": "f8f7d3df7b2183e1cbf02833b29680ca3e77713c",
+  "results": {
+    "exact_parity": "pass",
+    "release": {
+      "disabled": "0",
+      "failures": "0",
+      "tests": "33"
+    },
+    "sanitizer": {
+      "disabled": "0",
+      "failures": "0",
+      "tests": "32"
+    }
+  },
+  "sdk_version": "JukeboxSDK_500_028\nTargetVersion=5.0\n",
+  "source_hashes_unchanged_after_validation": true,
+  "source_tree": "b755cec732f2de742e52e473227b3e59554aebf1",
+  "sources": {
+    "CMakeLists.txt": "db285769e4cbb7d96346c66fd7df60e3f5ed5382e0adfe66cb5c8a95a7440971",
+    "Source/DSP/ceres.cpp": "2361ab9aa5713f2efa5d83029f82894237929afb768ae1dbcf99c7c51f0ff587",
+    "Source/DSP/ceres.hpp": "29733a0d6a46d249e8ffb37317acec4a6555b3f3a49a656b79e53dcdf72e926a",
+    "Source/PluginControls.h": "e4ae555c203414bce15a514ff90cf59bb284a8a509d7aa32f9494d32f9f405ac",
+    "Source/PluginEditor.cpp": "000d4ff0835d5c14e7b6db33c36541b3f106affba3ed5a111b2988b89757ac17",
+    "Source/PluginEditor.h": "b433e9a452fe66325aba6472cc46f728dfc45bf8ef762649eadd520b32a498fa",
+    "Source/PluginProcessor.cpp": "816e688bccc0789fb97030398d8fa7bbcf0e5212407a4e6bc7671787e0e3b089",
+    "Source/PluginProcessor.h": "62b4ab5aa1aa3954eda78b6a26c76e049a8832359569c2244bd3ded2344199c4",
+    "Tests/CpuParityDriver.cpp": "4e3c74d534b6e271df9af7a5bd48edc0ba69ebbfa814e3b6f56b9dfdd6fb6cd9",
+    "Tests/FilterCpuParityDriver.cpp": "cb7d821b82c5f9b969c44530a9937bdb32eb88fe0e65fea6c175374196b968dd"
+  },
+  "status": "pass"
+}

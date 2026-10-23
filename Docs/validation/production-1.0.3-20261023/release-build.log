@@ -1,0 +1,104 @@
+[  1%] Building CXX object CMakeFiles/ceres_native.dir/Source/DSP/ceres.cpp.o
+[  2%] Building CXX object CMakeFiles/ceres_embedded.dir/Source/DSP/ceres.cpp.o
+[  4%] Linking CXX static library libceres_embedded.a
+[  4%] Built target ceres_embedded
+[  5%] Building CXX object CMakeFiles/CeresDSPCxx17.dir/Source/DSP/ceres.cpp.o
+[  7%] Linking CXX static library libceres.a
+[  7%] Built target ceres_native
+[  8%] Building CXX object CMakeFiles/ceres_embedded_contract.dir/Tests/EmbeddedContract.cpp.o
+[ 10%] Linking CXX executable ceres_embedded_contract
+[ 10%] Built target CeresDSPCxx17
+[ 10%] Built target ceres_embedded_contract
+[ 11%] Building CXX object CMakeFiles/ceres_parameter_descriptor_tests.dir/Tests/ParameterDescriptorTests.cpp.o
+[ 13%] Building CXX object CMakeFiles/ceres_embedded_parameter_descriptor_tests.dir/Tests/ParameterDescriptorTests.cpp.o
+[ 14%] Linking CXX executable ceres_parameter_descriptor_tests
+[ 15%] Linking CXX executable ceres_embedded_parameter_descriptor_tests
+[ 15%] Built target ceres_parameter_descriptor_tests
+[ 17%] Building CXX object CMakeFiles/ceres_native_parity.dir/Tests/ParityDriver.cpp.o
+[ 17%] Built target ceres_embedded_parameter_descriptor_tests
+[ 18%] Building CXX object CMakeFiles/ceres_cpu_parity.dir/Tests/CpuParityDriver.cpp.o
+[ 20%] Linking CXX executable ceres_cpu_parity
+[ 20%] Built target ceres_cpu_parity
+[ 21%] Linking CXX executable ceres_native_parity
+[ 23%] Building CXX object CMakeFiles/ceres_embedded_parity.dir/Tests/ParityDriver.cpp.o
+[ 23%] Built target ceres_native_parity
+[ 24%] Building CXX object CMakeFiles/ceres_native_configuration_parity.dir/Tests/ConfigurationParityDriver.cpp.o
+[ 26%] Linking CXX executable ceres_native_configuration_parity
+[ 26%] Built target ceres_native_configuration_parity
+[ 27%] Linking CXX executable ceres_embedded_parity
+[ 28%] Building CXX object CMakeFiles/ceres_embedded_configuration_parity.dir/Tests/ConfigurationParityDriver.cpp.o
+[ 28%] Built target ceres_embedded_parity
+[ 30%] Building CXX object CMakeFiles/ceres_native_external_parity.dir/Tests/ExternalParityDriver.cpp.o
+[ 31%] Linking CXX executable ceres_embedded_configuration_parity
+[ 31%] Built target ceres_embedded_configuration_parity
+[ 33%] Building CXX object CMakeFiles/ceres_embedded_external_parity.dir/Tests/ExternalParityDriver.cpp.o
+[ 34%] Linking CXX executable ceres_native_external_parity
+[ 36%] Linking CXX executable ceres_embedded_external_parity
+[ 36%] Built target ceres_native_external_parity
+[ 37%] Building CXX object CMakeFiles/CeresDspFuzz.dir/Tests/DspFuzz.cpp.o
+[ 37%] Built target ceres_embedded_external_parity
+[ 39%] Building CXX object CMakeFiles/ceres_render.dir/Tools/render_main.cpp.o
+[ 40%] Linking CXX executable CeresDspFuzz
+[ 40%] Built target CeresDspFuzz
+[ 42%] Building CXX object CMakeFiles/RenderCeresPresetDemos.dir/Tools/RenderPresetDemos.cpp.o
+[ 43%] Linking CXX executable ceres_render
+[ 43%] Built target ceres_render
+[ 44%] Building CXX object CMakeFiles/ceres_configuration_tests.dir/Tests/ConfigurationTests.cpp.o
+[ 46%] Linking CXX executable ceres_configuration_tests
+[ 46%] Built target ceres_configuration_tests
+[ 47%] Building CXX object CMakeFiles/ceres_noise_quality_tests.dir/Tests/NoiseQualityTests.cpp.o
+[ 49%] Linking CXX executable RenderCeresPresetDemos
+[ 49%] Built target RenderCeresPresetDemos
+[ 50%] Linking CXX executable ceres_noise_quality_tests
+[ 52%] Building CXX object CMakeFiles/ceres_oscillator_circuit_tests.dir/Tests/OscillatorCircuitTests.cpp.o
+[ 52%] Built target ceres_noise_quality_tests
+[ 53%] Building CXX object CMakeFiles/ceres_tests.dir/Tests/dsp_tests.cpp.o
+[ 55%] Linking CXX executable ceres_oscillator_circuit_tests
+[ 55%] Built target ceres_oscillator_circuit_tests
+[ 56%] Building CXX object CMakeFiles/ceres_sound_path_tests.dir/Tests/SoundPathTests.cpp.o
+[ 57%] Linking CXX executable ceres_sound_path_tests
+[ 57%] Built target ceres_sound_path_tests
+[ 59%] Building CXX object CMakeFiles/ceres_panel_lever_tests.dir/Tests/PanelLeverTests.cpp.o
+[ 60%] Linking CXX executable ceres_tests
+[ 60%] Built target ceres_tests
+[ 62%] Building CXX object CMakeFiles/ceres_capacitor_tests.dir/Tests/CapacitorContinuityTests.cpp.o
+[ 63%] Linking CXX executable ceres_panel_lever_tests
+[ 63%] Built target ceres_panel_lever_tests
+[ 65%] Building CXX object CMakeFiles/ceres_ring_depth_tests.dir/Tests/RingDepthContinuityTests.cpp.o
+[ 66%] Linking CXX executable ceres_capacitor_tests
+[ 66%] Built target ceres_capacitor_tests
+[ 68%] Building CXX object CMakeFiles/ceres_ring_carrier_tests.dir/Tests/RingCarrierTests.cpp.o
+[ 69%] Linking CXX executable ceres_ring_depth_tests
+[ 69%] Built target ceres_ring_depth_tests
+[ 71%] Building CXX object CMakeFiles/ceres_ring_switching_tests.dir/Tests/RingSwitchingTests.cpp.o
+[ 72%] Linking CXX executable ceres_ring_carrier_tests
+[ 72%] Built target ceres_ring_carrier_tests
+[ 73%] Building CXX object CMakeFiles/ceres_expression_tests.dir/Tests/ExpressionTests.cpp.o
+[ 75%] Linking CXX executable ceres_ring_switching_tests
+[ 75%] Built target ceres_ring_switching_tests
+[ 76%] Building CXX object CMakeFiles/ceres_note_reuse_tests.dir/Tests/NoteReuseTests.cpp.o
+[ 78%] Linking CXX executable ceres_expression_tests
+[ 78%] Built target ceres_expression_tests
+[ 79%] Building CXX object CMakeFiles/ceres_fast_note_envelope_tests.dir/Tests/FastNoteEnvelopeTests.cpp.o
+[ 81%] Linking CXX executable ceres_note_reuse_tests
+[ 81%] Built target ceres_note_reuse_tests
+[ 82%] Building CXX object CMakeFiles/ceres_hardware_realism_tests.dir/Tests/HardwareRealismTests.cpp.o
+[ 84%] Linking CXX executable ceres_fast_note_envelope_tests
+[ 84%] Built target ceres_fast_note_envelope_tests
+[ 85%] Building CXX object CMakeFiles/ceres_sub_oscillator_tests.dir/Tests/SubOscillatorTests.cpp.o
+[ 86%] Linking CXX executable ceres_hardware_realism_tests
+[ 86%] Built target ceres_hardware_realism_tests
+[ 88%] Building CXX object CMakeFiles/ceres_output_stage_tests.dir/Tests/OutputStageTests.cpp.o
+[ 89%] Linking CXX executable ceres_output_stage_tests
+[ 91%] Linking CXX executable ceres_sub_oscillator_tests
+[ 91%] Built target ceres_output_stage_tests
+[ 91%] Built target ceres_sub_oscillator_tests
+[ 94%] Building CXX object CMakeFiles/ceres_envelope_circuit_tests.dir/Tests/EnvelopeCircuitTests.cpp.o
+[ 94%] Building CXX object CMakeFiles/ceres_vcf_key_voltage_tests.dir/Tests/VcfKeyVoltageTests.cpp.o
+[ 95%] Linking CXX executable ceres_envelope_circuit_tests
+[ 95%] Built target ceres_envelope_circuit_tests
+[ 97%] Building CXX object CMakeFiles/ceres_board_tolerance_tests.dir/Tests/BoardToleranceTests.cpp.o
+[ 98%] Linking CXX executable ceres_vcf_key_voltage_tests
+[ 98%] Built target ceres_vcf_key_voltage_tests
+[100%] Linking CXX executable ceres_board_tolerance_tests
+[100%] Built target ceres_board_tolerance_tests
