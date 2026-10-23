@@ -13,6 +13,24 @@
 namespace ceres {
 namespace {
 constexpr double pi = 3.141592653589793238462643383279502884;
+// The Rack's toolchain compiles this file with -fno-builtin against the
+// SDK's own libc++, where std::abs, std::isfinite, std::copysign and
+// std::sqrt become out-of-line library calls (and sqrt a bit-serial
+// software one); Acustra measured about a fifth of its batch in them. The
+// __builtin_ forms are the same IEEE operations, inlined whatever the
+// flags, so the results are bit for bit the same. MSVC has no builtins of
+// these names and inlines the std:: forms itself.
+#if defined(__GNUC__) || defined(__clang__)
+inline double inlineAbs(double x) { return __builtin_fabs(x); }
+inline double inlineCopysign(double x, double sign) { return __builtin_copysign(x, sign); }
+inline double inlineSqrt(double x) { return __builtin_sqrt(x); }
+inline bool inlineFinite(double x) { return __builtin_isfinite(x); }
+#else
+inline double inlineAbs(double x) { return std::abs(x); }
+inline double inlineCopysign(double x, double sign) { return std::copysign(x, sign); }
+inline double inlineSqrt(double x) { return std::sqrt(x); }
+inline bool inlineFinite(double x) { return std::isfinite(x); }
+#endif
 // tanh is the engine's most frequent transcendental: the OTA filters solve
 // one per Newton iteration per stage, the WSC shaper one per sample and the
 // ring carrier's steering one per sample. glibc's tanh reaches expm1 and
@@ -24,7 +42,7 @@ constexpr double pi = 3.141592653589793238462643383279502884;
 // std::tanh, so this and everything after it differ from 1.0.3 at the last
 // bit.
 double fastTanh(double x) {
-    const double ax=std::abs(x);
+    const double ax=inlineAbs(x);
     if (ax<.625) {
         const double s=x*x;
         const double p=(-9.64399179425052238628e-1*s-9.92877231001918586564e1)*s
@@ -230,17 +248,17 @@ double ringSignalPair(double signal) {
     constexpr double a=2*ringThermalVoltage, b=ringBiasCurrent*470, c=a+b;
     const double volts=ringPinOneVolts*signal, w=volts/c;
     double u=w*(1+b/(3*c)*w*w);
-    const double limiting=(std::abs(volts)-b)/a;
-    if (limiting>std::abs(u) || !std::isfinite(u)) u=std::copysign(limiting,volts);
+    const double limiting=(inlineAbs(volts)-b)/a;
+    if (limiting>inlineAbs(u) || !inlineFinite(u)) u=inlineCopysign(limiting,volts);
     double split=0;
     for (int i=0;i<8;++i) {
         // tanh(u) = -m/(2+m) and 1-tanh(u)^2 = 4(1+m)/(2+m)^2 from one
         // m = expm1(-2|u|), exact down to the smallest signals.
-        const double m=std::expm1(-2*std::abs(u)), t=std::copysign(-m/(2+m),u);
+        const double m=std::expm1(-2*inlineAbs(u)), t=inlineCopysign(-m/(2+m),u);
         const double d=4*(1+m)/((2+m)*(2+m)), f=a*u+b*t-volts, slope=a+b*d;
         const double step=f/(slope+f*b*t*d/slope);   // f'' = -2b*t*d
         split=t-d*step*(1+t*step);                   // tanh(u-step), 2nd order
-        if (std::abs(step)<=1e-5*std::abs(u)) break;
+        if (inlineAbs(step)<=1e-5*inlineAbs(u)) break;
         u-=step;
     }
     return split*c/ringPinOneVolts;
@@ -825,12 +843,12 @@ struct OtaSvf {
             // earlier 1e-12 bought a further pair of tanh evaluations about a
             // third of the time (2.34 to 2.02 iterations per solve, measured
             // on the factory presets) and no change at the float output.
-            if (std::abs(delta) < 1e-9) break;
+            if (inlineAbs(delta) < 1e-9) break;
         }
         // tanh(b) is the last evaluation carried along its tangent over that
         // final sub-ulp step; only an unconverged loop recomputes it.
         const double step = b - tanhArgument;
-        const double tanhB = std::abs(step) < 1e-9
+        const double tanhB = inlineAbs(step) < 1e-9
             ? tanhValue + (1 - tanhValue*tanhValue)*step : fastTanh(b);
         const double l = sl + nonlinear*tanhB + linear*b;
         const double z = qConstant+qBand*b;
@@ -1167,7 +1185,7 @@ struct Envelope {
         // bookkeeping state. The physical post-settling rate is unmeasured.
         double target = initial, coefficient = 0;
         if (stage == Attack) {
-            const double span = std::max(1e-9, std::abs(peak - initial));
+            const double span = std::max(1e-9, inlineAbs(peak - initial));
             target = peak + headroom * span;
             if (saturation>0 && voltage<peak) {
                 // Optional differential-pair/current-limit approximation:
@@ -1192,11 +1210,11 @@ struct Envelope {
             target = sustained;
             coefficient = decayCoefficient;
             voltage = target + (voltage - target) * coefficient;
-            if (std::abs(voltage - target) < 1e-7) { voltage = target; stage = Sustain; }
+            if (inlineAbs(voltage - target) < 1e-7) { voltage = target; stage = Sustain; }
         } else {
             coefficient = releaseCoefficient;
             voltage = target + (voltage - target) * coefficient;
-            if (std::abs(voltage - target) < 1e-7) { voltage = target; stage = Idle; }
+            if (inlineAbs(voltage - target) < 1e-7) { voltage = target; stage = Idle; }
         }
         return voltage;
     }
@@ -1276,8 +1294,8 @@ double inverseNormal(double p) {
     const auto tail=[](double q) {
         return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
     };
-    if (p<.02425) return tail(std::sqrt(-2*std::log(p)));
-    if (p>1-.02425) return -tail(std::sqrt(-2*std::log(1-p)));
+    if (p<.02425) return tail(inlineSqrt(-2*std::log(p)));
+    if (p>1-.02425) return -tail(inlineSqrt(-2*std::log(1-p)));
     const double q=p-.5, r=q*q;
     return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
 }
@@ -2409,7 +2427,7 @@ double Synth::sampleRate() const { return impl_->fs; }
 void Synth::externalInput(double sample) noexcept {
     // Numerical guard only: 1e9 units overdrives the preamp at any LEVEL
     // above 1e-8, and keeps the interpolation below overflow.
-    impl_->externalTarget=std::isfinite(sample) ? clamp(sample,-1e9,1e9) : 0.;
+    impl_->externalTarget=inlineFinite(sample) ? clamp(sample,-1e9,1e9) : 0.;
 }
 float Synth::process() {
     ++impl_->hostSamples;
