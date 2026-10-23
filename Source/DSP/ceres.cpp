@@ -287,6 +287,31 @@ double boardCutoff(double referenceHz, double alignedGm, double scale) {
     return filterFrequencyFloor+alignedGm*std::pow(gm/alignedGm,scale);
 }
 double clamp(double x, double lo, double hi) { return std::max(lo, std::min(x, hi)); }
+// sin(2 pi p) for a phase p in [0,1): the PWM clock and the SUB sine each
+// take one per internal sample. Reduce the turn to its nearest quarter, then
+// the Cephes sin.c and cos.c kernels on |x| <= pi/4. The reduction is exact
+// in turns, where glibc's sin(2*pi*p) first rounds its argument: swept at
+// 1e-7 steps, this is within 7.3e-16 of glibc's result and within 1.7e-16 of
+// the long double sin (glibc: 6.9e-16). The ring carrier keeps std::sin:
+// Ceres.ring_carrier_circuit_contracts recomputes it bit for bit.
+double sinTurn(double p) {
+    const double r=4*p;
+    const int quarter=static_cast<int>(r+.5);
+    const double x=(r-quarter)*1.5707963267948966192313216916397514421;
+    const double z=x*x;
+    const double sine=((((((1.58962301576546568060e-10*z-2.50507477628578072866e-8)*z
+        +2.75573136213857245213e-6)*z-1.98412698295895385996e-4)*z
+        +8.33333333332211858878e-3)*z-1.66666666666666307295e-1)*z)*x+x;
+    const double cosine=((((((-1.13585365213876817300e-11*z+2.08757008419747316778e-9)*z
+        -2.75573141792967388112e-7)*z+2.48015872888517045348e-5)*z
+        -1.38888888888730564116e-3)*z+4.16666666666665929218e-2)*z*z)-.5*z+1;
+    switch (quarter&3) {
+        case 0: return sine;
+        case 1: return cosine;
+        case 2: return -sine;
+        default: return -cosine;
+    }
+}
 double wrap(double x) { return x - std::floor(x); }
 // wrap for a phase that has left [0,1) by less than one turn, which is all
 // the phase arithmetic below ever does (steps are clamped under .18, the
@@ -1260,7 +1285,7 @@ double subWaveform(double phase,double step,double waveform,double noise) {
     if (waveform==2) return -(1-2*phase+blep(phase,step));
     if (waveform==3) return (phase<.5 ? 1.:-1.)+blep(phase,step)-blep(wrapUnit(phase-.5),step);
     if (waveform==4) return noise;
-    return std::sin(2*pi*phase);
+    return sinTurn(phase);
 }
 
 struct Oscillator {
@@ -2021,7 +2046,7 @@ struct Synth::Impl {
         const double levelControl=patch.ampLevel
             +tremoloScale*leverFraction(patch.tremolo,tremoloLeverRatio)*lfo;
         commonVcaGain=std::max(0.0,levelControl);
-        const double pwm = std::sin(2*pi*(pwmPhase+patch.pwmPhase));
+        const double pwm = sinTurn(pwmPhase+patch.pwmPhase);
         lfoPhase = wrapUnit(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrapUnit(pwmPhase + patch.pwmRate*dt);
         double mixed = 0;
@@ -2525,7 +2550,7 @@ std::vector<OscillatorFrame> oscillatorTrace(double fs,double frequency,
     std::vector<OscillatorFrame> result(frames);
     double pwmPhase=0;
     for (auto& frame : result) {
-        const double pwm=std::sin(2*pi*(pwmPhase+patch.pwmPhase));
+        const double pwm=sinTurn(pwmPhase+patch.pwmPhase);
         frame=oscillator.process(frequency,patch.pulseWidth+patch.pwmDepth*pwm,
             patch.resetMicroseconds*1e-6,fs,stiCoefficient);
         pwmPhase=wrap(pwmPhase+patch.pwmRate/fs);
