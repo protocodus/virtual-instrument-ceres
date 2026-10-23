@@ -1462,7 +1462,12 @@ double besselI0(double x) {
 }
 struct Decimator {
     static constexpr unsigned maxTaps = 249;
-    std::array<double,maxTaps> h{}, history{};
+    // Coefficients oldest tap first (h is symmetric, this is its mirror
+    // image stored explicitly) and a mirrored ring: every sample is written
+    // at [cursor] and [cursor+taps], so the newest `taps` samples are always
+    // one contiguous ascending run, oldest first, starting at [cursor].
+    std::array<double,maxTaps> h{}, oldestFirst{};
+    std::array<double,2*maxTaps> history{};
     const unsigned taps;
     unsigned cursor = 0;
     explicit Decimator(unsigned factor=4) : taps(62*factor+1) {
@@ -1479,29 +1484,34 @@ struct Decimator {
             sum += h[i];
         }
         for (unsigned i=0;i<taps;++i) h[i] /= sum;
+        for (unsigned i=0;i<taps;++i) oldestFirst[i] = h[taps-1-i];
     }
-    void push(double x) { history[cursor] = x; cursor = cursor+1 == taps ? 0 : cursor+1; }
-    // Newest sample first: history[cursor-1] down to [0], then wrap from
-    // [taps-1], as two straight runs. Four interleaved partial sums: one
-    // running sum serialises 249 additions behind each other's latency,
-    // about a tenth of the 4x cost; four run in parallel. The order of the
-    // additions changes, so the sum differs from a single run at its last
-    // bit (1e-16 relative), not at the float output.
+    void push(double x) {
+        history[cursor] = history[cursor+taps] = x;
+        cursor = cursor+1 == taps ? 0 : cursor+1;
+    }
+    // One contiguous window instead of two runs around the wrap. Four
+    // interleaved partial sums keep the additions off each other's latency
+    // (one running sum was about a tenth of the 4x cost); the lanes are
+    // fixed to the tap index, where the two runs restarted them at the
+    // wrap, so the grouping of the additions differs from 1.0.4 at the last
+    // bit (1e-16 relative), not at the float output. The window is read
+    // oldest first against the mirrored coefficients; lane j therefore
+    // holds the taps i = 3-j mod 4 and the final sum pairs them as the
+    // tap-ordered lanes would.
     double output() const {
+        const double* window = history.data() + cursor;
+        const double* coefficient = oldestFirst.data();
         double s0 = 0, s1 = 0, s2 = 0, s3 = 0;
-        unsigned i = 0;
-        const auto run = [&](unsigned at, unsigned end) {
-            for (; at - end >= 4; at -= 4, i += 4) {
-                s0 += h[i] * history[at-1];
-                s1 += h[i+1] * history[at-2];
-                s2 += h[i+2] * history[at-3];
-                s3 += h[i+3] * history[at-4];
-            }
-            while (at > end) s0 += h[i++] * history[--at];
-        };
-        run(cursor, 0);
-        run(taps, cursor);
-        return (s0 + s1) + (s2 + s3);
+        unsigned k = 0;
+        for (; k + 4 <= taps; k += 4) {
+            s0 += coefficient[k] * window[k];
+            s1 += coefficient[k+1] * window[k+1];
+            s2 += coefficient[k+2] * window[k+2];
+            s3 += coefficient[k+3] * window[k+3];
+        }
+        for (; k < taps; ++k) s3 += coefficient[k] * window[k];
+        return (s3 + s2) + (s1 + s0);
     }
     void clear() { history.fill(0); cursor = 0; }
 };
