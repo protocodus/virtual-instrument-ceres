@@ -965,12 +965,25 @@ double outputPreamp(double volts,double volume) {
 
 struct OutputCoupling {
     double memory=0;
-    double process(double x,double tau,double fs) {
-        const double g=1/(2*fs*tau);
-        const double high=(x-memory)/(1+g);
-        memory+=2*g*high;
+    // The trapezoid's g = 1/(2 fs tau) and the input's share 1/(1+g) depend
+    // on the rate and the part alone: fixed once per configuration, so the
+    // sample loop multiplies where it divided twice (two divisions on each
+    // coupling's recursion were a measurable share of the 1x cost; the
+    // reciprocal differs from the division by at most an ulp).
+    struct Coefficients {
+        double feedback=0, share=1;
+        Coefficients() = default;
+        Coefficients(double tau,double fs) {
+            const double g=1/(2*fs*tau);
+            feedback=2*g; share=1/(1+g);
+        }
+    };
+    double process(double x,const Coefficients& c) {
+        const double high=(x-memory)*c.share;
+        memory+=c.feedback*high;
         return high;
     }
+    double process(double x,double tau,double fs) { return process(x,Coefficients(tau,fs)); }
 };
 
 // CS-50 expression network (PRA, SM2 p.22; guide printed pp.45-46). The foot
@@ -1653,6 +1666,8 @@ struct Synth::Impl {
     OutputRate decimator;
     double lfoPhase = 0, pwmPhase = 0, pressureTarget = 0, pressureValue = 0, bend = 0;
     OutputCoupling busCoupling, lineCoupling;
+    // outputCouplingTau at the internal rate: CP3, CP4, bus, line.
+    std::array<OutputCoupling::Coefficients,4> couplingCoefficients{};
     double pressureCoefficient = 0, velocityCoefficient = 0, driftCoefficient = 0;
     std::array<double,4> ampCoefficients{}, filterCoefficients{};
     double hpSourceBranches = 3, lastSub = 0;
@@ -1675,6 +1690,7 @@ struct Synth::Impl {
     // stream keeps one draw per sample and drift is unchanged.
     Random limiterRandom{1};
     OutputCoupling pickupCoupling;
+    OutputCoupling::Coefficients pickupCoefficients;
     // Guide printed32: SUB-N is the limiter output N through22k/.1uF,
     // independent of audio NO level: the documented single low-pass (called
     // pink in the prose), not an invented ideal1/f filter. SM2 p.8 (PN3):
@@ -1686,6 +1702,7 @@ struct Synth::Impl {
     // capacitor between the EXT preamp and EXO/SUI.
     double externalTarget = 0, externalPrevious = 0, externalNow = 0;
     OutputCoupling externalCoupling;
+    OutputCoupling::Coefficients externalSelectedCoefficients, externalOpenCoefficients;
     Envelope ringEnvelope;
     std::array<double,4> ringCoefficients{};
     double ringPhase = 0, ringCarrier = 0, ringFrequency = 30;
@@ -1696,6 +1713,7 @@ struct Synth::Impl {
     double ringSignalInput=0, ringSignalOutput=0;
     RingCarrierCoupling ringCarrierCoupling;
     OutputCoupling ringSignalCoupling, ringWetCoupling;
+    OutputCoupling::Coefficients ringSignalCoefficients, ringWetCoefficients;
     double ringWetGain=ringModulatorGain*ringWetBufferGain();
     int lastAssignedKey = 60;
     bool pedal = false;
@@ -1737,6 +1755,13 @@ struct Synth::Impl {
         qControlCoefficient=-std::expm1(-1/(internalFs*qControlTau));
         stiCoefficient=-std::expm1(-1/(internalFs*wscSineInputTau));
         subNoiseG=1/(2*internalFs*subNoiseResistance*.1e-6);
+        for (unsigned i=0;i<4;++i)
+            couplingCoefficients[i]=OutputCoupling::Coefficients(outputCouplingTau[i],internalFs);
+        pickupCoefficients=OutputCoupling::Coefficients(pickupCouplingTau,limiterRate);
+        externalSelectedCoefficients=OutputCoupling::Coefficients(externalCouplingTauSelected,internalFs);
+        externalOpenCoefficients=OutputCoupling::Coefficients(externalCouplingTauOpen,internalFs);
+        ringSignalCoefficients=OutputCoupling::Coefficients(ringSignalCouplingTau,internalFs);
+        ringWetCoefficients=OutputCoupling::Coefficients(ringWetCouplingTau,internalFs);
         ringCarrierCoupling.configure(internalFs);
         updateCoefficients();
     }
@@ -1941,7 +1966,7 @@ struct Synth::Impl {
         for (unsigned step=0; step<limiterSteps; ++step) {
             const double draw=step ? limiterRandom.unit() : random.unit();
             limiterInput=limiterPole*limiterInput+limiterInnovation*inverseNormal(draw+0x1.0p-54);
-            const double pickup=pickupCoupling.process(limiterInput,pickupCouplingTau,limiterRate);
+            const double pickup=pickupCoupling.process(limiterInput,pickupCoefficients);
             limiterOutput=pickup<0 ? std::max(-1.0,limiterOutput-limiterStep)
                 : std::min(1.0,limiterOutput+limiterStep);
             limiterSum+=limiterOutput;
@@ -1955,7 +1980,7 @@ struct Synth::Impl {
         const bool external=patch.lfoWaveform==5;
         const double externalSub=clamp(externalCoupling.process(
             clamp(patch.extLevel*externalNow,-externalPreampRail,externalPreampRail),
-            external ? externalCouplingTauSelected : externalCouplingTauOpen,internalFs),
+            external ? externalSelectedCoefficients : externalOpenCoefficients),
             -externalBufferRail,externalBufferRail);
         const double lfo = external ? externalSub : subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
             patch.lfoWaveform==4 ? subNoise*subNoiseRail:0.);
@@ -2084,11 +2109,11 @@ struct Synth::Impl {
                 patch.drive,hpFilterNetwork,lpFilterNetwork);
             // CP3 coupling precedes filtered level; CP4 coupling acts on
             // the filtered/sine sum before common level and envelope VCAs.
-            const double filtered=v.filteredCoupling.process(low,outputCouplingTau[0],internalFs);
+            const double filtered=v.filteredCoupling.process(low,couplingCoefficients[0]);
             // The sine's VR11/VR12 balance against the filtered path (VCA
             // amount); exactly 1 when off.
             const double summed=filtered*patch.filterLevel + waves.sine*patch.sine*board.sineGain;
-            const double beforeVca=v.commonCoupling.process(summed,outputCouplingTau[1],internalFs);
+            const double beforeVca=v.commonCoupling.process(summed,couplingCoefficients[1]);
             // IG00151 gain is LINEAR in envelope CV (guide pp.40–41). The
             // optional velocity term is zero in factory-derived presets.
             // Each chip's EI trim sets zero output at 0V LI (guide p.41), so
@@ -2113,7 +2138,7 @@ struct Synth::Impl {
         // More simultaneous voices can therefore increase rail saturation.
         // Common-bus transfer,
         // with previous overall midband gain retained as a calibration choice.
-        const double bus=busCoupling.process(mixed,outputCouplingTau[2],internalFs);
+        const double bus=busCoupling.process(mixed,couplingCoefficients[2]);
         // One global processor, after the voice bus and before expression/
         // output. The carrier uses the physical matched upper-BJT steering
         // law at the pins 7-8 carrier, and the degenerated signal pair its
@@ -2141,9 +2166,9 @@ struct Synth::Impl {
         // Pin 1 sees the bus through 10uF into 330+463 ohm (20Hz); pin 6 and
         // the wet buffer are coupled through 10uF into 2.5k+10k (1.27Hz).
         // Both run even at mix 0, like the carrier network.
-        ringSignalInput=ringSignalCoupling.process(bus,ringSignalCouplingTau,internalFs);
+        ringSignalInput=ringSignalCoupling.process(bus,ringSignalCoefficients);
         ringSignalOutput=ringSignalPair(ringSignalInput);
-        const double wet=ringWetGain*ringWetCoupling.process(ringSignalOutput*ringSwitchGain,ringWetCouplingTau,internalFs);
+        const double wet=ringWetGain*ringWetCoupling.process(ringSignalOutput*ringSwitchGain,ringWetCoefficients);
         // Explicit bypass avoids even a rounding change for old patches.
         const double ringed=patch.ringMix==0 ? bus
             : (bus+patch.ringMix*(wet-bus))/(1+patch.ringMix*(1-patch.ringMix)*ringMixLeverRatio);
@@ -2153,7 +2178,7 @@ struct Synth::Impl {
         const double rail=outputPreamp(expressed,patch.volume);
         // HIGH output, 33uF into its LO divider and the 10k-loaded HO, after
         // the documented inverting preamp. No recording EQ.
-        return -lineCoupling.process(rail,outputCouplingTau[3],internalFs);
+        return -lineCoupling.process(rail,couplingCoefficients[3]);
     }
 };
 
