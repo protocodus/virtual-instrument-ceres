@@ -13,6 +13,24 @@
 namespace ceres {
 namespace {
 constexpr double pi = 3.141592653589793238462643383279502884;
+// The Rack's toolchain compiles this file with -fno-builtin against the
+// SDK's own libc++, where std::abs, std::isfinite, std::copysign and
+// std::sqrt become out-of-line library calls (and sqrt a bit-serial
+// software one); Acustra measured about a fifth of its batch in them. The
+// __builtin_ forms are the same IEEE operations, inlined whatever the
+// flags, so the results are bit for bit the same. MSVC has no builtins of
+// these names and inlines the std:: forms itself.
+#if defined(__GNUC__) || defined(__clang__)
+inline double inlineAbs(double x) { return __builtin_fabs(x); }
+inline double inlineCopysign(double x, double sign) { return __builtin_copysign(x, sign); }
+inline double inlineSqrt(double x) { return __builtin_sqrt(x); }
+inline bool inlineFinite(double x) { return __builtin_isfinite(x); }
+#else
+inline double inlineAbs(double x) { return std::abs(x); }
+inline double inlineCopysign(double x, double sign) { return std::copysign(x, sign); }
+inline double inlineSqrt(double x) { return std::sqrt(x); }
+inline bool inlineFinite(double x) { return std::isfinite(x); }
+#endif
 // tanh is the engine's most frequent transcendental: the OTA filters solve
 // one per Newton iteration per stage, the WSC shaper one per sample and the
 // ring carrier's steering one per sample. glibc's tanh reaches expm1 and
@@ -24,7 +42,7 @@ constexpr double pi = 3.141592653589793238462643383279502884;
 // std::tanh, so this and everything after it differ from 1.0.3 at the last
 // bit.
 double fastTanh(double x) {
-    const double ax=std::abs(x);
+    const double ax=inlineAbs(x);
     if (ax<.625) {
         const double s=x*x;
         const double p=(-9.64399179425052238628e-1*s-9.92877231001918586564e1)*s
@@ -230,17 +248,17 @@ double ringSignalPair(double signal) {
     constexpr double a=2*ringThermalVoltage, b=ringBiasCurrent*470, c=a+b;
     const double volts=ringPinOneVolts*signal, w=volts/c;
     double u=w*(1+b/(3*c)*w*w);
-    const double limiting=(std::abs(volts)-b)/a;
-    if (limiting>std::abs(u) || !std::isfinite(u)) u=std::copysign(limiting,volts);
+    const double limiting=(inlineAbs(volts)-b)/a;
+    if (limiting>inlineAbs(u) || !inlineFinite(u)) u=inlineCopysign(limiting,volts);
     double split=0;
     for (int i=0;i<8;++i) {
         // tanh(u) = -m/(2+m) and 1-tanh(u)^2 = 4(1+m)/(2+m)^2 from one
         // m = expm1(-2|u|), exact down to the smallest signals.
-        const double m=std::expm1(-2*std::abs(u)), t=std::copysign(-m/(2+m),u);
+        const double m=std::expm1(-2*inlineAbs(u)), t=inlineCopysign(-m/(2+m),u);
         const double d=4*(1+m)/((2+m)*(2+m)), f=a*u+b*t-volts, slope=a+b*d;
         const double step=f/(slope+f*b*t*d/slope);   // f'' = -2b*t*d
         split=t-d*step*(1+t*step);                   // tanh(u-step), 2nd order
-        if (std::abs(step)<=1e-5*std::abs(u)) break;
+        if (inlineAbs(step)<=1e-5*inlineAbs(u)) break;
         u-=step;
     }
     return split*c/ringPinOneVolts;
@@ -825,12 +843,12 @@ struct OtaSvf {
             // earlier 1e-12 bought a further pair of tanh evaluations about a
             // third of the time (2.34 to 2.02 iterations per solve, measured
             // on the factory presets) and no change at the float output.
-            if (std::abs(delta) < 1e-9) break;
+            if (inlineAbs(delta) < 1e-9) break;
         }
         // tanh(b) is the last evaluation carried along its tangent over that
         // final sub-ulp step; only an unconverged loop recomputes it.
         const double step = b - tanhArgument;
-        const double tanhB = std::abs(step) < 1e-9
+        const double tanhB = inlineAbs(step) < 1e-9
             ? tanhValue + (1 - tanhValue*tanhValue)*step : fastTanh(b);
         const double l = sl + nonlinear*tanhB + linear*b;
         const double z = qConstant+qBand*b;
@@ -1114,8 +1132,13 @@ struct RingCarrierCoupling {
     void clear() {memory.fill(0);}
     double process(double source) {
         auto rhs=memory;rhs[0]+=source;
-        std::array<double,4> nodes{};
-        for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j)nodes[i]+=inverse[i][j]*rhs[j];
+        // Each node starts from its first product rather than from a zero
+        // it is added to: 0 + x is x, so the sums are the same.
+        std::array<double,4> nodes;
+        for(unsigned i=0;i<4;++i) {
+            nodes[i]=inverse[i][0]*rhs[0];
+            for(unsigned j=1;j<4;++j)nodes[i]+=inverse[i][j]*rhs[j];
+        }
         for(unsigned i=0;i<4;++i)memory[i]=2*(nodes[i]-(i==0?source:0.))-memory[i];
         // Actual pin7-pin8 carrier per volt of source; no gain normalization.
         return (nodes[0]-nodes[1])*ringCarrierPortShunt/(33000+ringCarrierPortShunt);
@@ -1158,46 +1181,49 @@ struct Envelope {
     bool gate = false;
     void on() { gate = true; stage = Attack; }
     void off() { gate = false; if (stage != Idle) stage = Release; }
+    // The attack, with its optional saturation law, stays out of line so
+    // that the path every held or released board takes each sample, one
+    // multiply-add and a settle test, inlines into the voice loop (the
+    // nine-argument function did not, and its call cost more than its body).
     double advance(double initial, double peak, double sustained,
                    double headroom, double saturation, double attackIncrement, double currentStep,
                    double decayCoefficient, double releaseCoefficient) {
+        if (stage == Attack)
+            return attack(initial, peak, headroom, saturation, attackIncrement, currentStep);
         // Key-off keeps IL/RT selected (Guide pp.43–44): an idle board is
         // still a connected capacitor, not a reset switch. Continue the
         // existing release law if its target moves; Idle remains an audio
         // bookkeeping state. The physical post-settling rate is unmeasured.
-        double target = initial, coefficient = 0;
-        if (stage == Attack) {
-            const double span = std::max(1e-9, std::abs(peak - initial));
-            target = peak + headroom * span;
-            if (saturation>0 && voltage<peak) {
-                // Optional differential-pair/current-limit approximation:
-                // dv/dt = k*Vs*tanh((target-v)/Vs). Integrating gives
-                // log(sinh(y_next)) = log(sinh(y)) - k*dt, y=(target-v)/Vs.
-                // k is normalized so a full IL->peak attack retains its
-                // requested duration. This is a model experiment, not an
-                // identified IG00151 transistor/current-limit parameter.
-                const double vs=saturation*span;
-                const double y=(target-voltage)/vs;
-                const double nextLog=logSinh(y)-currentStep;
-                const double increment=(y>20 && nextLog>20)
-                    ? currentStep : y-asinhExp(nextLog);
-                voltage+=vs*increment;
-            } else {
-                voltage += (target - voltage) * attackIncrement;
-            }
-            if (voltage >= peak) { voltage = peak; stage = gate ? Decay : Release; }
-            return voltage;
-        }
         if (stage == Decay || stage == Sustain) {
-            target = sustained;
-            coefficient = decayCoefficient;
-            voltage = target + (voltage - target) * coefficient;
-            if (std::abs(voltage - target) < 1e-7) { voltage = target; stage = Sustain; }
+            voltage = sustained + (voltage - sustained) * decayCoefficient;
+            if (inlineAbs(voltage - sustained) < 1e-7) { voltage = sustained; stage = Sustain; }
         } else {
-            coefficient = releaseCoefficient;
-            voltage = target + (voltage - target) * coefficient;
-            if (std::abs(voltage - target) < 1e-7) { voltage = target; stage = Idle; }
+            voltage = initial + (voltage - initial) * releaseCoefficient;
+            if (inlineAbs(voltage - initial) < 1e-7) { voltage = initial; stage = Idle; }
         }
+        return voltage;
+    }
+    double attack(double initial, double peak, double headroom, double saturation,
+                  double attackIncrement, double currentStep) {
+        const double span = std::max(1e-9, inlineAbs(peak - initial));
+        const double target = peak + headroom * span;
+        if (saturation>0 && voltage<peak) {
+            // Optional differential-pair/current-limit approximation:
+            // dv/dt = k*Vs*tanh((target-v)/Vs). Integrating gives
+            // log(sinh(y_next)) = log(sinh(y)) - k*dt, y=(target-v)/Vs.
+            // k is normalized so a full IL->peak attack retains its
+            // requested duration. This is a model experiment, not an
+            // identified IG00151 transistor/current-limit parameter.
+            const double vs=saturation*span;
+            const double y=(target-voltage)/vs;
+            const double nextLog=logSinh(y)-currentStep;
+            const double increment=(y>20 && nextLog>20)
+                ? currentStep : y-asinhExp(nextLog);
+            voltage+=vs*increment;
+        } else {
+            voltage += (target - voltage) * attackIncrement;
+        }
+        if (voltage >= peak) { voltage = peak; stage = gate ? Decay : Release; }
         return voltage;
     }
 };
@@ -1276,8 +1302,8 @@ double inverseNormal(double p) {
     const auto tail=[](double q) {
         return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
     };
-    if (p<.02425) return tail(std::sqrt(-2*std::log(p)));
-    if (p>1-.02425) return -tail(std::sqrt(-2*std::log(1-p)));
+    if (p<.02425) return tail(inlineSqrt(-2*std::log(p)));
+    if (p>1-.02425) return -tail(inlineSqrt(-2*std::log(1-p)));
     const double q=p-.5, r=q*q;
     return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
 }
@@ -1331,10 +1357,12 @@ struct Oscillator {
         // voltage jumps and both slope changes analytically, without tables.
         // A muted waveform is a pure function of the phase (no state of its
         // own), so its gate open or closed costs nothing later: skip it.
+        // The reset edge's BLEP is the same term in the saw and the pulse.
+        const double resetBlep = sawEnabled || pulseEnabled ? blep(phase,step) : 0;
         double saw = 0;
         if (sawEnabled) {
             const double sawBase = phase < recharge ? -1 : 2*phase-1;
-            saw = sawBase - blep(phase,step)
+            saw = sawBase - resetBlep
                 + recharge*blep(resetPhase,step)
                 + blamp(resetPhase,step)-blamp(phase,step);
         }
@@ -1357,7 +1385,7 @@ struct Oscillator {
         if (pulseEnabled) {
             const double fall = std::max(duty, recharge);
             square = phase < fall ? 1 : -1;
-            square += blep(phase,step) - blep(wrapUnit(phase-fall),step);
+            square += resetBlep - blep(wrapUnit(phase-fall),step);
         }
         // WSC pin14 -> pin3 folds the SAME conditioned ramp into the
         // triangle tri=2|p|-1 (TO, 3.2Vpp, SL pin 4 open; SM2 p.21): 1 on the
@@ -1444,7 +1472,12 @@ double besselI0(double x) {
 }
 struct Decimator {
     static constexpr unsigned maxTaps = 249;
-    std::array<double,maxTaps> h{}, history{};
+    // Coefficients oldest tap first (h is symmetric, this is its mirror
+    // image stored explicitly) and a mirrored ring: every sample is written
+    // at [cursor] and [cursor+taps], so the newest `taps` samples are always
+    // one contiguous ascending run, oldest first, starting at [cursor].
+    std::array<double,maxTaps> h{}, oldestFirst{};
+    std::array<double,2*maxTaps> history{};
     const unsigned taps;
     unsigned cursor = 0;
     explicit Decimator(unsigned factor=4) : taps(62*factor+1) {
@@ -1461,29 +1494,55 @@ struct Decimator {
             sum += h[i];
         }
         for (unsigned i=0;i<taps;++i) h[i] /= sum;
+        for (unsigned i=0;i<taps;++i) oldestFirst[i] = h[taps-1-i];
     }
-    void push(double x) { history[cursor] = x; cursor = cursor+1 == taps ? 0 : cursor+1; }
-    // Newest sample first: history[cursor-1] down to [0], then wrap from
-    // [taps-1], as two straight runs. Four interleaved partial sums: one
-    // running sum serialises 249 additions behind each other's latency,
-    // about a tenth of the 4x cost; four run in parallel. The order of the
-    // additions changes, so the sum differs from a single run at its last
-    // bit (1e-16 relative), not at the float output.
+    void push(double x) {
+        history[cursor] = history[cursor+taps] = x;
+        cursor = cursor+1 == taps ? 0 : cursor+1;
+    }
+    // One contiguous window instead of two runs around the wrap. Four
+    // interleaved partial sums keep the additions off each other's latency
+    // (one running sum was about a tenth of the 4x cost); the lanes are
+    // fixed to the tap index, where the two runs restarted them at the
+    // wrap, so the grouping of the additions differs from 1.0.4 at the last
+    // bit (1e-16 relative), not at the float output. The window is read
+    // oldest first against the mirrored coefficients; lane j therefore
+    // holds the taps i = 3-j mod 4 and the final sum pairs them as the
+    // tap-ordered lanes would.
     double output() const {
+        const double* window = history.data() + cursor;
+        const double* coefficient = oldestFirst.data();
+        unsigned k = 0;
+#if defined(__GNUC__) || defined(__clang__)
+        // The Rack's SDK does not auto-vectorise, so the four lanes are
+        // spelt out with the GCC/clang vector extension, which its clang
+        // keeps: two pairs of doubles (the width SSE2 and NEON carry; a
+        // four-wide type costs GCC more instructions on SSE2 than the
+        // scalar lanes), the same IEEE multiply and add per lane and each
+        // lane's additions in the same order, so bit for bit the scalar
+        // lanes below. The loads are declared unaligned (aligned(8)) and
+        // may_alias: they read double storage, and the attribute keeps
+        // strict aliasing from ordering them before the ring's writes.
+        typedef double Pair __attribute__((vector_size(16), aligned(8), may_alias));
+        Pair low = {0, 0}, high = {0, 0};
+        for (; k + 4 <= taps; k += 4) {
+            low += *reinterpret_cast<const Pair*>(coefficient + k)
+                 * *reinterpret_cast<const Pair*>(window + k);
+            high += *reinterpret_cast<const Pair*>(coefficient + k + 2)
+                  * *reinterpret_cast<const Pair*>(window + k + 2);
+        }
+        double s0 = low[0], s1 = low[1], s2 = high[0], s3 = high[1];
+#else
         double s0 = 0, s1 = 0, s2 = 0, s3 = 0;
-        unsigned i = 0;
-        const auto run = [&](unsigned at, unsigned end) {
-            for (; at - end >= 4; at -= 4, i += 4) {
-                s0 += h[i] * history[at-1];
-                s1 += h[i+1] * history[at-2];
-                s2 += h[i+2] * history[at-3];
-                s3 += h[i+3] * history[at-4];
-            }
-            while (at > end) s0 += h[i++] * history[--at];
-        };
-        run(cursor, 0);
-        run(taps, cursor);
-        return (s0 + s1) + (s2 + s3);
+        for (; k + 4 <= taps; k += 4) {
+            s0 += coefficient[k] * window[k];
+            s1 += coefficient[k+1] * window[k+1];
+            s2 += coefficient[k+2] * window[k+2];
+            s3 += coefficient[k+3] * window[k+3];
+        }
+#endif
+        for (; k < taps; ++k) s3 += coefficient[k] * window[k];
+        return (s3 + s2) + (s1 + s0);
     }
     void clear() { history.fill(0); cursor = 0; }
 };
@@ -2071,6 +2130,11 @@ struct Synth::Impl {
         const double pwm = sinTurn(pwmPhase+patch.pwmPhase);
         lfoPhase = wrapUnit(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrapUnit(pwmPhase + patch.pwmRate*dt);
+        // The same for every board this sample.
+        const double pulseWidth = patch.pulseWidth+pwm*patch.pwmDepth;
+        const double resetSeconds = patch.resetMicroseconds*1e-6;
+        const bool sineOn = patch.sine!=0, sawOn = patch.saw!=0, pulseOn = patch.pulse!=0;
+        const double spreadCentre = .5*(voiceLimit-1);
         double mixed = 0;
         for (unsigned i = 0; i < voiceLimit; ++i) {
             auto& v = voices[i];
@@ -2094,10 +2158,17 @@ struct Synth::Impl {
             v.drift += (v.driftTarget-v.drift) * driftCoefficient;
             // The fixed spread steps from board to board, centred on the
             // voices in use (i-1.5 at the default four).
-            double cents = patch.tuneCents + (static_cast<double>(i)-.5*(voiceLimit-1))*patch.voiceSpreadCents
+            double cents = patch.tuneCents + (static_cast<double>(i)-spreadCentre)*patch.voiceSpreadCents
                 + v.drift*patch.driftCents + lfo*(patch.vibratoCents + expression*patch.pressureVibrato)
                 + expression*patch.pressureVibrato*touchVibratoBias;
-            const double key=advanceGlide(v,dt);
+            // Without PORTAMENTO the key voltage is the board's key, and the
+            // counter is parked (advanceGlide's first branch), inline here.
+            double key;
+            if (patch.glideMode==0) {
+                v.glideCode=v.held || v.pedalHeld ? v.note : lastAssignedKey;
+                v.glideSteps=0; v.glideReady=false;
+                key=v.keyPitch=v.keyNote;
+            } else key=advanceGlide(v,dt);
             // Trim residual and thermal drift of this board's linear VCO (see
             // BoardTolerance): its key voltage is the NORMAL frequency of key,
             // bend and PITCH.
@@ -2111,9 +2182,8 @@ struct Synth::Impl {
                 cents+=v.boardPitchCents;
             }
             const double frequency = 440 * std::exp2((key-69 + bend + 12*patch.octave + cents*.01)/12);
-            const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
-                                            patch.resetMicroseconds*1e-6,internalFs,stiCoefficient,
-                                            patch.sine!=0,patch.saw!=0,patch.pulse!=0);
+            const auto waves = v.osc.process(frequency, pulseWidth, resetSeconds, internalFs,
+                                            stiCoefficient, sineOn, sawOn, pulseOn);
             // Each board's EG times, VCA-EG peak and floor (see BoardTolerance;
             // the shared values when the envelope tolerance is off).
             const auto& egf=v.board.filterCoefficients;
@@ -2409,7 +2479,7 @@ double Synth::sampleRate() const { return impl_->fs; }
 void Synth::externalInput(double sample) noexcept {
     // Numerical guard only: 1e9 units overdrives the preamp at any LEVEL
     // above 1e-8, and keeps the interpolation below overflow.
-    impl_->externalTarget=std::isfinite(sample) ? clamp(sample,-1e9,1e9) : 0.;
+    impl_->externalTarget=inlineFinite(sample) ? clamp(sample,-1e9,1e9) : 0.;
 }
 float Synth::process() {
     ++impl_->hostSamples;
