@@ -288,6 +288,11 @@ double boardCutoff(double referenceHz, double alignedGm, double scale) {
 }
 double clamp(double x, double lo, double hi) { return std::max(lo, std::min(x, hi)); }
 double wrap(double x) { return x - std::floor(x); }
+// wrap for a phase that has left [0,1) by less than one turn, which is all
+// the phase arithmetic below ever does (steps are clamped under .18, the
+// subtracted fractions are under 1): the same subtraction, with the floor
+// replaced by a sign test, so the result is bit for bit wrap's.
+double wrapUnit(double x) { return x<0 ? x+1 : x>=1 ? x-1 : x; }
 
 struct Parameter { const char* key; double Patch::*member; double low, high; };
 const Parameter parameters[] = {
@@ -1240,7 +1245,7 @@ double inverseNormal(double p) {
 double subWaveform(double phase,double step,double waveform,double noise) {
     if (waveform==1) return 1-2*phase+blep(phase,step);
     if (waveform==2) return -(1-2*phase+blep(phase,step));
-    if (waveform==3) return (phase<.5 ? 1.:-1.)+blep(phase,step)-blep(wrap(phase-.5),step);
+    if (waveform==3) return (phase<.5 ? 1.:-1.)+blep(phase,step)-blep(wrapUnit(phase-.5),step);
     if (waveform==4) return noise;
     return std::sin(2*pi*phase);
 }
@@ -1254,7 +1259,8 @@ struct Oscillator {
     bool stiPrecharged = false;
     // stiCoefficient: -expm1(-1/(fs*wscSineInputTau)).
     OscillatorFrame process(double frequency, double pulseWidth, double resetSeconds, double fs,
-                            double stiCoefficient, bool sineEnabled = true) {
+                            double stiCoefficient, bool sineEnabled = true,
+                            bool sawEnabled = true, bool pulseEnabled = true) {
         // Guide pp.28-31: OUT7 conditions the integrating-capacitor signal
         // with the monostable pulse before the WSC. It is not the exposed raw
         // recharge triangle. In the nominal current law r=f*tau, fixed A0
@@ -1277,13 +1283,18 @@ struct Oscillator {
         // 59.73us at the guide's nominal 800uA; only Iref's own tolerance
         // (unpublished) moves r.
         const double recharge = clamp(frequency * resetSeconds, 1e-7, .9);
-        const double resetPhase = wrap(phase-recharge);
+        const double resetPhase = wrapUnit(phase-recharge);
         // WSC pin5 inverts the conditioned downward ramp. Correct both
         // voltage jumps and both slope changes analytically, without tables.
-        const double sawBase = phase < recharge ? -1 : 2*phase-1;
-        const double saw = sawBase - blep(phase,step)
-            + recharge*blep(resetPhase,step)
-            + blamp(resetPhase,step)-blamp(phase,step);
+        // A muted waveform is a pure function of the phase (no state of its
+        // own), so its gate open or closed costs nothing later: skip it.
+        double saw = 0;
+        if (sawEnabled) {
+            const double sawBase = phase < recharge ? -1 : 2*phase-1;
+            saw = sawBase - blep(phase,step)
+                + recharge*blep(resetPhase,step)
+                + blamp(resetPhase,step)-blamp(phase,step);
+        }
         const double duty = clamp(pulseWidth, .01, .99);
         // WSC guide p.31 explicitly states that PWM moves only the falling
         // edge. Its rising edge stays locked to the VCO period. Applying a
@@ -1299,9 +1310,12 @@ struct Oscillator {
         // plateau no crossing exists, and a level above the ramp's start
         // 1-2r (d<r, deep PWM at upper notes) is crossed at the plateau's
         // step instead. The falling edge is therefore at max(d,r).
-        const double fall = std::max(duty, recharge);
-        double square = phase < fall ? 1 : -1;
-        square += blep(phase,step) - blep(wrap(phase-fall),step);
+        double square = 0;
+        if (pulseEnabled) {
+            const double fall = std::max(duty, recharge);
+            square = phase < fall ? 1 : -1;
+            square += blep(phase,step) - blep(wrapUnit(phase-fall),step);
+        }
         // WSC pin14 -> pin3 folds the SAME conditioned ramp into the
         // triangle tri=2|p|-1 (TO, 3.2Vpp, SL pin 4 open; SM2 p.21): 1 on the
         // plateau, then 1-4*phase down to the fold at phase .5 and 4*phase-3
@@ -1340,14 +1354,14 @@ struct Oscillator {
                     + .5*(foldAfterPlateau ? -4 : 4)*wscSineSlope(plateauEnd)*blamp(resetPhase,step);
             }
             if (phase < step || phase > 1-step) sine -= 2*wscSineSlope(1-c)*blamp(phase,step);
-            const double fold = wrap(phase-.5);
+            const double fold = wrapUnit(phase-.5);
             if (recharge < .5 && (fold < step || fold > 1-step))
                 sine += 4*wscSineSlope(-1-c)*blamp(fold,step);
         }
         // Keep the physical TO-STI capacitor and free oscillator running
         // while its output is muted, ready for a live sine-level edit.
         stiCoupling += (conditioned-stiCoupling)*stiCoefficient;
-        phase = wrap(phase + step);
+        phase = wrapUnit(phase + step);
         // Audio polarity: the completed pulse is negated, including its BLEP,
         // without moving either comparator edge, changing PW/PWM timing or
         // introducing another oscillator, so saw and pulse fall together at
@@ -1630,7 +1644,7 @@ struct Synth::Impl {
         double oscillatorFrequency=0, hpFrequency=0, lpFrequency=0;
 #endif
     };
-    double fs, internalFs;
+    double fs, internalFs, rateScale=1/double(Synth::oversampling);
     std::uint64_t seed, age = 0, hostSamples = 0;
     Random random;
     Patch patch;
@@ -1708,7 +1722,7 @@ struct Synth::Impl {
         reset();
     }
     void configureRate() {
-        internalFs=fs*rateFactor;
+        internalFs=fs*rateFactor; rateScale=1/double(rateFactor);
         limiterSteps=static_cast<unsigned>(std::ceil(limiterSubstepRate/internalFs));
         limiterRate=internalFs*limiterSteps;
         limiterPole=std::exp(-1/(limiterRate*limiterTau));
@@ -1971,8 +1985,8 @@ struct Synth::Impl {
             +tremoloScale*leverFraction(patch.tremolo,tremoloLeverRatio)*lfo;
         commonVcaGain=std::max(0.0,levelControl);
         const double pwm = std::sin(2*pi*(pwmPhase+patch.pwmPhase));
-        lfoPhase = wrap(lfoPhase + patch.lfoRate*dt);
-        pwmPhase = wrap(pwmPhase + patch.pwmRate*dt);
+        lfoPhase = wrapUnit(lfoPhase + patch.lfoRate*dt);
+        pwmPhase = wrapUnit(pwmPhase + patch.pwmRate*dt);
         double mixed = 0;
         for (unsigned i = 0; i < voiceLimit; ++i) {
             auto& v = voices[i];
@@ -2014,7 +2028,8 @@ struct Synth::Impl {
             }
             const double frequency = 440 * std::exp2((key-69 + bend + 12*patch.octave + cents*.01)/12);
             const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
-                                            patch.resetMicroseconds*1e-6,internalFs,stiCoefficient,patch.sine!=0);
+                                            patch.resetMicroseconds*1e-6,internalFs,stiCoefficient,
+                                            patch.sine!=0,patch.saw!=0,patch.pulse!=0);
             // Each board's EG times, VCA-EG peak and floor (see BoardTolerance;
             // the shared values when the envelope tolerance is off).
             const auto& egf=v.board.filterCoefficients;
@@ -2116,7 +2131,7 @@ struct Synth::Impl {
         }
         ringFrequency=clamp(patch.ringRate*std::exp2(ringDepthValue*ringControl),.2,220);
         ringCarrier=std::sin(2*pi*ringPhase);
-        ringPhase=wrap(ringPhase+ringFrequency*dt);
+        ringPhase=wrapUnit(ringPhase+ringFrequency*dt);
         // Keep this free-running passive network connected even at mix0.
         ringCoupledCarrier=ringCarrierCoupling.process(ringCarrier);
         // No mean removal or gain normalization: the typical-part carrier-
@@ -2320,7 +2335,7 @@ float Synth::process() {
     auto& state=*impl_;
     const double from=state.externalPrevious, to=state.externalTarget;
     for (unsigned i = 0; i < state.rateFactor; ++i) {
-        state.externalNow=i+1==state.rateFactor ? to : from+(to-from)*(i+1)/state.rateFactor;
+        state.externalNow=i+1==state.rateFactor ? to : from+(to-from)*(i+1)*state.rateScale;
         state.decimator.push(state.sample(),state.rateFactor);
     }
     state.externalPrevious=to;
