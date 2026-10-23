@@ -701,6 +701,9 @@ struct OtaNetwork {
 
 struct OtaSvf {
     double sb = 0, sl = 0, sz = 0, sy = 0, previousB = 0;
+    // tanh(previousB), kept from the previous sample's final evaluation so
+    // the Newton warm start does not recompute it: same argument, same bits.
+    double previousTanhB = 0;
     double cachedCutoff=0, cachedRate=0, cachedG=0;
     double process(double sourceVoltage, double frequency, double resonance,
                    double fs, bool highPass, double sourceConductance = 1/150e3,
@@ -735,7 +738,7 @@ struct OtaSvf {
         const double nonlinear = cutoff<=filterFrequencyFloor ? 0.0 : std::max(0.0,g-linear);
         double b = previousB;
         for (int iteration = 0; iteration < 7; ++iteration) {
-            const double tb = std::tanh(b);
+            const double tb = iteration == 0 ? previousTanhB : std::tanh(b);
             const double l = sl + nonlinear*tb + linear*b;
             const double h = qConstant - effectiveDamping * b - l;
             const double th = std::tanh(h);
@@ -746,7 +749,8 @@ struct OtaSvf {
             b -= delta;
             if (std::abs(delta) < 1e-12) break;
         }
-        const double l = sl + nonlinear*std::tanh(b) + linear*b;
+        const double tanhB = std::tanh(b);
+        const double l = sl + nonlinear*tanhB + linear*b;
         const double z = qConstant+qBand*b;
         const double h = z - 2*b - l;
         // Expand sourceBlend/ratio analytically so tiny positive diagnostic
@@ -757,6 +761,7 @@ struct OtaSvf {
         sz = 2 * z - sz;
         sy = 2 * y - sy;
         previousB = b;
+        previousTanhB = tanhB;
         return highPass ? h : l;
     }
 };
