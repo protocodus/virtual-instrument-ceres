@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Darwin-c++"
+	tests="32"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="MacBookPro.home"
+	time="67"
+	timestamp="2026-10-23T08:49:23"
+	>
+	<testcase name="Ceres.configuration_contracts" classname="Ceres.configuration_contracts" time="2.03061" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS configuration: 1/4/16 voices, centred spread, real1/2/4x clocks, lifecycle and independent output-filter delay/response
+</system-out>
+	</testcase>
+	<testcase name="Ceres.noise_quality_contracts" classname="Ceres.noise_quality_contracts" time="5.66022" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>NOISE_POWER,48000,1,0,2.8888198640540554e-06
+NOISE_POWER,48000,1,1,5.392732547041068e-06
+NOISE_POWER,48000,1,2,5.3519523084256865e-06
+NOISE_POWER,48000,2,0,2.8706943181699489e-06
+NOISE_POWER,48000,2,1,5.4198072489623025e-06
+NOISE_POWER,48000,2,2,5.3045820100252278e-06
+NOISE_POWER,48000,4,0,2.8579824257238554e-06
+NOISE_POWER,48000,4,1,5.3443589269247299e-06
+NOISE_POWER,48000,4,2,5.4262001019253505e-06
+NOISE_DELTA_DB,48000,1,0,0.046609078133733613
+NOISE_DELTA_DB,48000,1,1,0.039132643097288117
+NOISE_DELTA_DB,48000,1,2,-0.059835704417056795
+NOISE_DELTA_DB,48000,2,0,0.019273958199801013
+NOISE_DELTA_DB,48000,2,1,0.060882238364992736
+NOISE_DELTA_DB,48000,2,2,-0.098446371058615853
+NOISE_POWER,96000,1,0,2.965888351313866e-06
+NOISE_POWER,96000,1,1,5.3356138980094728e-06
+NOISE_POWER,96000,1,2,5.3448211800816339e-06
+NOISE_POWER,96000,2,0,2.8525995039020075e-06
+NOISE_POWER,96000,2,1,5.3239859949856812e-06
+NOISE_POWER,96000,2,2,5.3798750053528365e-06
+NOISE_POWER,96000,4,0,2.9279926540153724e-06
+NOISE_POWER,96000,4,1,5.2492...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="Ceres.oscillator_circuit_contracts" classname="Ceres.oscillator_circuit_contracts" time="2.6076" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>WSC shaper k=1.402: H3 -54.0943 dB, H5 -39.0128 dB, H7 -45.1324 dB, THD 1.35942%
+WSC sine edges: 10 samples within 3.23454e-05 of the kernel-smoothed waveform
+Raw mixture: pulse/saw H1=1.99991, H2/H1=-15.5615dB, H3/H1=-9.54136dB, centered RMS ratio=2.64471
+CS-80 edge relationship: fall-to-reset 0.000451765 samples, fall spread 2.6429e-05, rise spread 15.4366
+Production mixture: solo saw=0.00802908, solo pulse=0.0139483, both=0.0188669, centered both/saw RMS=2.34982
+PASS nominal VCO timing, conditioned current slope, WSC shared fold, coupling and differential-pair sine, Fourier/DC/edge, public mixture and CS-80 edge relationships and high-CV bounds
+</system-out>
+	</testcase>
+	<testcase name="Ceres.native_dsp_contracts" classname="Ceres.native_dsp_contracts" time="13.6009" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS ring/SUB/Sustain mode ranges and validation
+PASS SUB shapes, sourced noise pole, destinations and separate PWM
+PASS ring RC timing, key ledger, legato/retrigger, bounds and panic
+PASS global ring sidebands, dry bypass, free carrier and reset
+PASS ring signal pair large-signal law at the aligned bus scale
+PASS Sustain I/II live key CV, shared VCO/filters, state continuity and MIDI pedal adaptation
+PASS parameter ranges and constructor validation
+PASS physical source/Q capacitor transfer, four source loads, DC rejection, Q and slope
+PASS production cascade physical voltages, passive mixer, fixed Q current and VCA calibration
+PASS keyboard/envelope gm scaling with fixed feed conductance
+PASS shared master PITCH, independent oscillator routes, fixed feed floor and nominal range
+PASS deterministic seed and reset
+PASS four output coupling RC transfers, decay and diagnostic validation
+PASS output capacitor allocation/idle/panic lifecycle and dry-line polarity
+PASS four voices, stealing, repeated notes and relea...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="Ceres.sound_path_circuit_contracts" classname="Ceres.sound_path_circuit_contracts" time="6.55125" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS new control ranges/neutral/invalid-input contract
+PASS BR/SUB nodal ratios, shared key modulation, fixed-gm floor and audio equivalence
+PASS eight-node Q capacitor KCL, exact RC dynamics, lifecycle and audio routing
+PASS additive common VCA, sine path, downstream bus/ring state and factory LEVEL
+PASS all five shared SUB polarities, continuous clock, lifecycle and reset
+PASS post-FIR utility trim linearity, neutral bypass and state/latency independence
+PASS expression photo-coupler bypass, printed level curve and its tone shaping
+</system-out>
+	</testcase>
+	<testcase name="Ceres.panel_lever_contracts" classname="Ceres.panel_lever_contracts" time="1.42083" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS R7 matrix matches Yamaha's 1k-load fH and QH references
+PASS BRILLIANCE centre-tapped B-10K lever, loaded by 41.6k
+PASS RESONANCE B-10K lever into eight pin-7 networks
+</system-out>
+	</testcase>
+	<testcase name="Ceres.capacitor_continuity_contracts" classname="Ceres.capacitor_continuity_contracts" time="1.91585" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS Q steps/reversal/absolute KCL and lifecycle
+PASS stage independence, preset continuity and audio connection
+PASS idle IL RC/reversal, retrigger and initialization
+PASS retired-board capacitor return
+</system-out>
+	</testcase>
+	<testcase name="Ceres.ring_depth_continuity_contracts" classname="Ceres.ring_depth_continuity_contracts" time="0.97683" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>rate 44100 factor 1
+rate 44100 factor 2
+rate 44100 factor 4
+rate 48000 factor 1
+rate 48000 factor 2
+rate 48000 factor 4
+rate 96000 factor 1
+rate 96000 factor 2
+rate 96000 factor 4
+rate 192000 factor 1
+rate 192000 factor 2
+rate 192000 factor 4
+PASS ring Depth:12 rate/quality paths,20ms closed-form ramp/reversal, identical target immunity, startup/reset/panic, unchanged EG/free phase/cap, reduced discrete frequency jump
+</system-out>
+	</testcase>
+	<testcase name="Ceres.ring_carrier_circuit_contracts" classname="Ceres.ring_carrier_circuit_contracts" time="1.29056" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>response fs=8000 f=0.2 dB=-51.0694 phase=13.3926
+response fs=8000 f=1 dB=-50.7738 phase=3.3474
+response fs=8000 f=6.66922 dB=-50.6354 phase=0.738221
+response fs=8000 f=30 dB=-50.6164 phase=0.182047
+response fs=8000 f=220 dB=-50.6149 phase=0.0249804
+response fs=32000 f=0.2 dB=-51.0694 phase=13.3926
+response fs=32000 f=1 dB=-50.7738 phase=3.3474
+response fs=32000 f=6.66922 dB=-50.6354 phase=0.738222
+response fs=32000 f=30 dB=-50.6164 phase=0.182054
+response fs=32000 f=220 dB=-50.6149 phase=0.0250388
+PASS complex carrier frequency response
+PASS independent physical-state trapezoids/KCL
+PASS native connection, mix bypass history, notes/live edits/panic/reset
+PASS flat 33k/100 carrier divider in the linear region
+PASS SPEED/DEPTH/ATTACK/DECAY lever laws and fixed release
+PASS native diagnostic validation
+</system-out>
+	</testcase>
+	<testcase name="Ceres.ring_switching_circuit_contracts" classname="Ceres.ring_switching_circuit_contracts" time="1.21368" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS physical BJT current law,units,factor2VT,limits
+PASS independent DC operating point,production wiring/lifecycle/no DC removal
+slow0.2Hz steering min=-0.113694 max=0.0581356 mean=-0.0278062
+PASS slow carrier crosses zero in the linear region
+</system-out>
+	</testcase>
+	<testcase name="Ceres.voice_expression_contracts" classname="Ceres.voice_expression_contracts" time="0.72479" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS expression enum/default/nonfinite contract
+PASS mixed-velocity polyphony oscillator/filter/audio isolation
+PASS expression release, repeated notes, pedal, Sustain II, steal, panic and reset
+PASS pressure isolation and state-preserving live source selection
+PASS touch follows the 10ms pre-amplifier RC
+PASS independent expression audio laws, zero-depth parity and legacy velocity gain
+</system-out>
+	</testcase>
+	<testcase name="Ceres.note_reuse_contracts" classname="Ceres.note_reuse_contracts" time="0.696122" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS audible held/released velocity reuse, retarget, fresh/zero/idle gates and all quality clocks
+PASS legacy/selected velocity audio equivalence and reset
+PASS repeated-note ownership beyond polyphony, FIFO/pedal/panic/reset across 1/4/16 voices
+</system-out>
+	</testcase>
+	<testcase name="Ceres.fast_note_envelope_contracts" classname="Ceres.fast_note_envelope_contracts" time="5.2249" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS 54 short/ordinary RC-envelope cases, 162 closed-form points and one-sample interrupted re-gates
+PASS 72 rapid same/different-pitch velocity/re-gate cases across rates/quality/ring
+PASS 432 rapid single/chord cases across 1/4/16 voices, all qualities, envelope ranges, ring and velocities
+</system-out>
+	</testcase>
+	<testcase name="Ceres.hardware_realism_contracts" classname="Ceres.hardware_realism_contracts" time="1.39065" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS glide, same-key reuse and touch-route contracts
+</system-out>
+	</testcase>
+	<testcase name="Ceres.sub_oscillator_contracts" classname="Ceres.sub_oscillator_contracts" time="4.26194" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>SUB oscillator contracts passed
+</system-out>
+	</testcase>
+	<testcase name="Ceres.output_stage_contracts" classname="Ceres.output_stage_contracts" time="1.69205" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS output preamp contracts
+</system-out>
+	</testcase>
+	<testcase name="Ceres.vcf_key_voltage_contracts" classname="Ceres.vcf_key_voltage_contracts" time="0.888722" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>VCF key-voltage contracts passed
+</system-out>
+	</testcase>
+	<testcase name="Ceres.envelope_circuit_contracts" classname="Ceres.envelope_circuit_contracts" time="0.593943" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS factory release CVs through the sustain-control follower
+PASS factory IL/AL levels and attack law against the M-board alignment
+PASS VCA-EG -.2V floor closes the VCA in finite time
+</system-out>
+	</testcase>
+	<testcase name="Ceres.board_tolerance_contracts" classname="Ceres.board_tolerance_contracts" time="24.7688" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS board tolerance contracts
+</system-out>
+	</testcase>
+	<testcase name="Ceres.embedded_allocation_contract" classname="Ceres.embedded_allocation_contract" time="0.983533" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS embedded: no exceptions, numeric Patch, active expression, 9 render configurations, EXT IN at 3 qualities, 68 control keys, zero post-construction new/new[] allocations
+</system-out>
+	</testcase>
+	<testcase name="Ceres.parameter_descriptor_contracts" classname="Ceres.parameter_descriptor_contracts" time="1.85804" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>Ceres parameter descriptors (68 keys): 0 failure(s)
+</system-out>
+	</testcase>
+	<testcase name="Ceres.embedded_parameter_descriptor_contracts" classname="Ceres.embedded_parameter_descriptor_contracts" time="0.610701" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>Ceres parameter descriptors (68 keys): 0 failure(s)
+</system-out>
+	</testcase>
+	<testcase name="Ceres.benchmark_cpu_provenance" classname="Ceres.benchmark_cpu_provenance" time="1.14507" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>warning: in the working copy of 'Source/DSP/ceres.cpp', LF will be replaced by CRLF the next time Git touches it
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 1.024s
+
+OK
+</system-out>
+	</testcase>
+	<testcase name="Ceres.configuration_cli_contract" classname="Ceres.configuration_cli_contract" time="2.62979" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>{
+  "status": "pass",
+  "cases": [
+    {
+      "voices": 1,
+      "factor": 1,
+      "sha256": "cd5fd3b622ff7c71430a897a9228263ac643ae75915ef220a3c5204ecf3740bf",
+      "peak": 0.077424377203
+    },
+    {
+      "voices": 1,
+      "factor": 2,
+      "sha256": "bcfe3c0ba14955a3db0ad1d9de3203d16858acf421565479ca15a723e23c24cb",
+      "peak": 0.0848662853241
+    },
+    {
+      "voices": 1,
+      "factor": 4,
+      "sha256": "f5cd4c23d5f4d382ec7243f6aa22fd5e83167e10a5609dc08ee5f13ea222a8f8",
+      "peak": 0.0895701944828
+    },
+    {
+      "voices": 4,
+      "factor": 1,
+      "sha256": "fe598cadeda45995e00d13efdbef66951b0117c3c5f22e5c6ad58f18b339cd2b",
+      "peak": 0.224897116423
+    },
+    {
+      "voices": 4,
+      "factor": 2,
+      "sha256": "2b0f55781b1ce25b59d91d948c9f6c918bc138f1a05c43ca61795272389a480b",
+      "peak": 0.236029267311
+    },
+    {
+      "voices": 4,
+      "factor": 4,
+      "sha256": "1f12726288fc41f147732560ff558d35fa313c15b11298effd53309cfc643a00",
+      "peak": 0.236775800586
+    },
+   ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="Ceres.configuration_native_embedded_parity" classname="Ceres.configuration_native_embedded_parity" time="4.37059" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>{
+  "status": "pass",
+  "sample_count": 184320,
+  "rates": [
+    44100,
+    48000,
+    88200,
+    96000,
+    192000
+  ],
+  "polyphony": [
+    1,
+    4,
+    16
+  ],
+  "oversampling": [
+    1,
+    2,
+    4
+  ],
+  "variants": {
+    "native": {
+      "binary_sha256": "7c5768e46f423c99c9b931a82fa3adcbaf2a37f91b823c38c295c77218e8fd76",
+      "audio_sha256": "20e7cd88c625daa36a9870b847c398a5f991240df2511f48c96b3699eabf3c8e"
+    },
+    "embedded": {
+      "binary_sha256": "09429c7fdcedb9c99d67ad418e8b32ff83a5e3141b67e9d83e7aaf692f4a89f3",
+      "audio_sha256": "20e7cd88c625daa36a9870b847c398a5f991240df2511f48c96b3699eabf3c8e"
+    }
+  }
+}
+</system-out>
+	</testcase>
+	<testcase name="Ceres.native_embedded_audio_parity" classname="Ceres.native_embedded_audio_parity" time="5.10331" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>{
+  "status": "pass",
+  "comparison": "byte-exact float32 stream on this compiler/math-library build",
+  "rates": [
+    44100,
+    48000,
+    96000,
+    192000
+  ],
+  "scenes_per_rate": 8,
+  "frames_per_scene": 12000,
+  "samples_per_variant": 384000,
+  "variants": {
+    "native": {
+      "audio_sha256": "9d580d74f0fa00e0068c4b359c02333f009ad45feffd817672f6ef75c1584d36",
+      "bytes": 1536000,
+      "binary_sha256": "8ecb158960221f696e4711c78d9f4caf2fe801e8e51f4ec001d312fbfb2eb198"
+    },
+    "embedded": {
+      "audio_sha256": "9d580d74f0fa00e0068c4b359c02333f009ad45feffd817672f6ef75c1584d36",
+      "bytes": 1536000,
+      "binary_sha256": "73351d2fd7db7663df8ba6577102621b3b48b168b90808d8a2f20d10cf918f5c"
+    }
+  },
+  "input_sha256": {
+    "Source/DSP/ceres.hpp": "29733a0d6a46d249e8ffb37317acec4a6555b3f3a49a656b79e53dcdf72e926a",
+    "Source/DSP/ceres.cpp": "2a923c8e1e0a0021a4c8957680d4ac30b04193681a3295d76a2d9d6d8497dcd2",
+    "Tests/ParityDriver.cpp": "1a011395bbe58c3394519584f477672ed45b9048c9a94520f15968...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="Ceres.active_sound_path_audio_parity" classname="Ceres.active_sound_path_audio_parity" time="4.40176" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS active sound-path parity: 384000 float32 samples, 4 rates, 8 scenes; SHA256 ca02a18609ff133203c5d7cc21353e7405ca49f11e47640f86a0026a504ee51a
+</system-out>
+	</testcase>
+	<testcase name="Ceres.expression_audio_parity" classname="Ceres.expression_audio_parity" time="5.82732" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS active expression parity: 384000 float32 samples, 4 rates, 8 scenes; SHA256 9c060cd4567e9e9cbc08579eb3e37251b096c9b47c6587b1e88f776eb6208d85
+</system-out>
+	</testcase>
+	<testcase name="Ceres.board_tolerance_audio_parity" classname="Ceres.board_tolerance_audio_parity" time="8.12967" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS board tolerance parity: 384000 float32 samples, 4 rates, 8 scenes; SHA256 b19e94ad8fac9032340edc28ec01ce7371ef66b2e41f46a863301f4c2ebe0896
+</system-out>
+	</testcase>
+	<testcase name="Ceres.capacitor_native_embedded_parity" classname="Ceres.capacitor_native_embedded_parity" time="5.39989" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS 384000 samples, 4 rates x8 scenes, live Q/IL, panic/reset; SHA256 650af209d11103e959705097299b1b3b1c79a3fed12e8a64ba1a842fcd57d1cd
+</system-out>
+	</testcase>
+	<testcase name="Ceres.external_input_audio_parity" classname="Ceres.external_input_audio_parity" time="8.96525" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS SUB-EXT parity: 270000 float32 samples, 3 rates x 3 qualities x 5 scenes; SHA256 fc994dbcfe5e82367ba5edf00852ee4d59e78fc7c530f44399d16bb90a5787ac
+</system-out>
+	</testcase>
+	<testcase name="Ceres.DspFuzz" classname="Ceres.DspFuzz" time="2.18307" status="run">
+		<properties>
+			<property name="cmake_labels" value="fuzz"/>
+		</properties>
+		<system-out>300 random inputs from seed 1 passed
+</system-out>
+	</testcase>
+</testsuite>

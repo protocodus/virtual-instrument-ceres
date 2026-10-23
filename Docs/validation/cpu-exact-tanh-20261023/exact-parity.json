@@ -1,0 +1,63 @@
+{
+  "baseline_revision": "9c292b76c892483991092c278be499a1910f0fec",
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin\n",
+  "comparisons": [
+    {
+      "mode": "normal",
+      "driver": "filter",
+      "status": "pass",
+      "bytes": 10027008,
+      "scalar_count": 1253376,
+      "scalar_type": "float64",
+      "audio_sha256": "aff69220e393524ac8dc720944e6d90f3548d5f4bffd38562f9a9fe658439ad4",
+      "binary_sha256": {
+        "baseline": "c4166f8a08b9a5a6ac4b09b3722011720189d0383c53a203eda84ec014f896ad",
+        "candidate": "46edb9f968527ddbe7af55437eb880083746bb6c719810cf25b3a688a6913fae"
+      },
+      "finite": true
+    },
+    {
+      "mode": "normal",
+      "driver": "core",
+      "status": "pass",
+      "bytes": 1757184,
+      "scalar_count": 439296,
+      "scalar_type": "float32",
+      "audio_sha256": "6039d981aaf29c4846cc7400e51091c1ac44db8ce25b5d4c1791884c70a24012",
+      "binary_sha256": {
+        "baseline": "9121d993adb68d1985ad3944188ca4a3c1f0d0d8f4be7853a2a24781670f6e1d",
+        "candidate": "26007d5d54161e62e6cfcf251a940480e5c9a403dc97ca0ddcd342c6957a693f"
+      },
+      "finite": true
+    },
+    {
+      "mode": "no-builtin",
+      "driver": "filter",
+      "status": "pass",
+      "bytes": 10027008,
+      "scalar_count": 1253376,
+      "scalar_type": "float64",
+      "audio_sha256": "aff69220e393524ac8dc720944e6d90f3548d5f4bffd38562f9a9fe658439ad4",
+      "binary_sha256": {
+        "baseline": "46e0d8c1900e4d4c886e248b5374b4adfee4951b5b71d8522fd3bf8db7302b85",
+        "candidate": "26e913ed9b94a60341696406e9921f87d7cfc34a241eb491939f9c60b48d892c"
+      },
+      "finite": true
+    },
+    {
+      "mode": "no-builtin",
+      "driver": "core",
+      "status": "pass",
+      "bytes": 1757184,
+      "scalar_count": 439296,
+      "scalar_type": "float32",
+      "audio_sha256": "6039d981aaf29c4846cc7400e51091c1ac44db8ce25b5d4c1791884c70a24012",
+      "binary_sha256": {
+        "baseline": "96edfd4bbdc6d422f2053b5aa24761f67660ee9bc19b02b826cd2d846046f06b",
+        "candidate": "720d422bab43cf58553f0a3a9249ca8b3ba6bc0a3af92d5568dd462c0217a391"
+      },
+      "finite": true
+    }
+  ],
+  "status": "pass"
+}

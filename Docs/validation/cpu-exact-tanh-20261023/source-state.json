@@ -1,0 +1,86 @@
+{
+  "revision": "9c292b76c892483991092c278be499a1910f0fec",
+  "sources": {
+    "Source/DSP/ceres.cpp": "2a923c8e1e0a0021a4c8957680d4ac30b04193681a3295d76a2d9d6d8497dcd2",
+    "Source/DSP/ceres.hpp": "29733a0d6a46d249e8ffb37317acec4a6555b3f3a49a656b79e53dcdf72e926a",
+    "CMakeLists.txt": "70762f201e08f2fc6cc16d144914a5da1f9ce3e450041e01d0d3551ed1b8b43c"
+  },
+  "sdk_version": "JukeboxSDK_500_028\nTargetVersion=5.0\n",
+  "commands": [
+    [
+      "cmake",
+      "-S",
+      "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023",
+      "-B",
+      "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-cpu-exact-release-20261023",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCERES_BUILD_PLUGIN=OFF",
+      "-DCERES_BUILD_CLAP=OFF",
+      "-DCERES_BUILD_TOOLS=ON",
+      "-DCERES_BUILD_UNIVERSAL=OFF"
+    ],
+    [
+      "cmake",
+      "-S",
+      "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023",
+      "-B",
+      "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-cpu-exact-sanitizer-20261023",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCERES_BUILD_PLUGIN=OFF",
+      "-DCERES_BUILD_CLAP=OFF",
+      "-DCERES_BUILD_TOOLS=ON",
+      "-DCERES_BUILD_UNIVERSAL=OFF",
+      "-DCERES_ENABLE_SANITIZERS=ON",
+      "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g -DNDEBUG"
+    ],
+    [
+      "cmake",
+      "--build",
+      "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-cpu-exact-release-20261023",
+      "-j",
+      "3"
+    ],
+    [
+      "ctest",
+      "--test-dir",
+      "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-cpu-exact-release-20261023",
+      "--output-on-failure",
+      "-j",
+      "2",
+      "--output-junit",
+      "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/Docs/validation/cpu-exact-tanh-20261023/release-tests.xml"
+    ],
+    [
+      "cmake",
+      "--build",
+      "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-cpu-exact-sanitizer-20261023",
+      "-j",
+      "3"
+    ],
+    [
+      "ctest",
+      "--test-dir",
+      "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/build-cpu-exact-sanitizer-20261023",
+      "--output-on-failure",
+      "-j",
+      "2",
+      "-E",
+      "^Ceres.AudioDemos$",
+      "--output-junit",
+      "/Users/vojta/Dev/virtual-instrument-ceres-cpu-20261023/Docs/validation/cpu-exact-tanh-20261023/sanitizer-tests.xml"
+    ]
+  ],
+  "results": {
+    "release": {
+      "tests": "33",
+      "failures": "0",
+      "disabled": "0"
+    },
+    "sanitizer": {
+      "tests": "32",
+      "failures": "0",
+      "disabled": "0"
+    }
+  },
+  "source_hashes_unchanged_after_validation": true
+}
