@@ -31,6 +31,10 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 
 ## Version history
 
+### Unreleased — 1.0.2 — exact filter CPU reduction
+
+Reuse the previous sample's exact final `tanh` value at the next filter solve. Core and Rack audio match byte for byte at identical settings; measured SDK-module thread CPU improves by roughly 1–2% median. The circuit solver, quality and latency are unchanged. This version also aligns the canonical project metadata with the Ceres 1.0.2f1 Rack release; its spread and preset trim changes belong to the Rack adapter.
+
 ### Unreleased — 1.0.1 — lower CPU cost
 
 - The OTA filters' Newton solver reuses tanh values it has already evaluated, and the output decimator reads its history without a per-tap wrap test. Audio is unchanged: the 439,296-sample CPU regression stream matches the 1.0.0 engine byte for byte (GCC -O2/-O3, Clang -O3). On the 14 factory presets at four voices/4x, 48 kHz, this measured 14% fewer instructions and 13% lower median CPU time on a development machine; not a Reason host result.
