@@ -47,7 +47,9 @@ Both channels are compared byte for byte, including the sign of zero. The
 report identifies the first mismatching scene/frame/channel, the maximum
 absolute difference, the scene offsets and activation peaks, source hashes,
 compiler command lines, executable hashes and complete audio hashes. Raw
-audio and logs remain in the output directory. A finite, audible scene
+audio and logs remain in the output directory. Nonempty output directories
+are rejected, and input hashes must remain unchanged before/after compilation,
+rendering and the final comparison. A finite, audible scene
 witness prevents a silent renderer from passing by producing equal zeros.
 
 The check establishes native callback equivalence for this matrix. It is not
