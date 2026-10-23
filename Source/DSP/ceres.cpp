@@ -13,6 +13,42 @@
 namespace ceres {
 namespace {
 constexpr double pi = 3.141592653589793238462643383279502884;
+// tanh is the engine's most frequent transcendental: the OTA filters solve
+// one per Newton iteration per stage, the WSC shaper one per sample and the
+// ring carrier's steering one per sample. glibc's tanh reaches expm1 and
+// costs about 2.6 times this rational form in a dependent chain (measured
+// here; see Docs/benchmarks/cpu-approximations-2026-10-23.md). Cephes
+// tanh.c (Moshier): for |x| < .625, x + x^3 P(x^2)/Q(x^2); beyond, the
+// identity 1 - 2/(exp(2|x|)+1). Swept against glibc over 1e-9..30 at 14
+// million points: at most 2 ulp (4.2e-16 relative). Not bit-identical to
+// std::tanh, so this and everything after it differ from 1.0.3 at the last
+// bit.
+double fastTanh(double x) {
+    const double ax=std::abs(x);
+    if (ax<.625) {
+        const double s=x*x;
+        const double p=(-9.64399179425052238628e-1*s-9.92877231001918586564e1)*s
+            -1.61468768441708447952e3;
+        const double q=((s+1.12811678491632931402e2)*s+2.23548839060100448583e3)*s
+            +4.84406305325125486048e3;
+        return x+x*s*(p/q);
+    }
+    const double y=1-2/(std::exp(2*ax)+1);
+    return x<0 ? -y : y;
+}
+// The filters' TPT prewarp, tan(pi*fc/fs), is evaluated whenever a cutoff
+// moves (every sample under envelope, SUB or glide). The argument is at most
+// .22 pi (the cutoff clamp), inside Cephes tan.c's |x| <= pi/4 rational,
+// x + x^3 P(x^2)/Q(x^2): at most 1 ulp (2.2e-16 relative) against glibc over
+// 1e-7..0.22 pi, at about a third of glibc's instructions.
+double prewarpTan(double x) {
+    const double z=x*x;
+    const double p=(-1.30936939181383777646e4*z+1.15351664838587416140e6)*z
+        -1.79565251976484877988e7;
+    const double q=(((z+1.36812963470692954678e4)*z-1.32089234440210967447e6)*z
+        +2.50083801823357915839e7)*z-5.38695755929454629881e7;
+    return x+x*z*(p/q);
+}
 constexpr double filterCapacitance = 1.5e-9, filterFeedResistance = 4.7e6;
 constexpr double filterFrequencyFloor = 1/(2*pi*filterCapacitance*filterFeedResistance);
 // Cutoff lever law: the printed IG00156 law fc=125*Kv*2^Vfc (guide printed
@@ -164,7 +200,7 @@ constexpr double ringCollectorSource=1/(1/2700.+1/40e3);
 constexpr double ringCollectorLoad=1/(1/ringCollectorSource+1/10e3);
 constexpr double ringWetCouplingTau=10e-6*(ringCollectorSource+10e3);
 constexpr double ringModulatorGain=ringSignalDivider*ringCollectorLoad/ringSignalDegeneration;
-double ringSteering(double volts) { return std::tanh(volts/(2*ringThermalVoltage)); }
+double ringSteering(double volts) { return fastTanh(volts/(2*ringThermalVoltage)); }
 // Volts at O1 per unit of the engine's voice bus. The M-board alignment sets
 // the sine at CP4 to 1Vpp (CS-60 manual p.38, VI.1), the engine's +/-1, so a
 // unit is .5V at CP4. VI.4 sets a CS-50 voice output O to "0.6V" (its figure
@@ -252,7 +288,37 @@ double boardCutoff(double referenceHz, double alignedGm, double scale) {
     return filterFrequencyFloor+alignedGm*std::pow(gm/alignedGm,scale);
 }
 double clamp(double x, double lo, double hi) { return std::max(lo, std::min(x, hi)); }
+// sin(2 pi p) for a phase p in [0,1): the PWM clock and the SUB sine each
+// take one per internal sample. Reduce the turn to its nearest quarter, then
+// the Cephes sin.c and cos.c kernels on |x| <= pi/4. The reduction is exact
+// in turns, where glibc's sin(2*pi*p) first rounds its argument: swept at
+// 1e-7 steps, this is within 7.3e-16 of glibc's result and within 1.7e-16 of
+// the long double sin (glibc: 6.9e-16). The ring carrier keeps std::sin:
+// Ceres.ring_carrier_circuit_contracts recomputes it bit for bit.
+double sinTurn(double p) {
+    const double r=4*p;
+    const int quarter=static_cast<int>(r+.5);
+    const double x=(r-quarter)*1.5707963267948966192313216916397514421;
+    const double z=x*x;
+    const double sine=((((((1.58962301576546568060e-10*z-2.50507477628578072866e-8)*z
+        +2.75573136213857245213e-6)*z-1.98412698295895385996e-4)*z
+        +8.33333333332211858878e-3)*z-1.66666666666666307295e-1)*z)*x+x;
+    const double cosine=((((((-1.13585365213876817300e-11*z+2.08757008419747316778e-9)*z
+        -2.75573141792967388112e-7)*z+2.48015872888517045348e-5)*z
+        -1.38888888888730564116e-3)*z+4.16666666666665929218e-2)*z*z)-.5*z+1;
+    switch (quarter&3) {
+        case 0: return sine;
+        case 1: return cosine;
+        case 2: return -sine;
+        default: return -cosine;
+    }
+}
 double wrap(double x) { return x - std::floor(x); }
+// wrap for a phase that has left [0,1) by less than one turn, which is all
+// the phase arithmetic below ever does (steps are clamped under .18, the
+// subtracted fractions are under 1): the same subtraction, with the floor
+// replaced by a sign test, so the result is bit for bit wrap's.
+double wrapUnit(double x) { return x<0 ? x+1 : x>=1 ? x-1 : x; }
 
 struct Parameter { const char* key; double Patch::*member; double low, high; };
 const Parameter parameters[] = {
@@ -404,6 +470,10 @@ struct Random {
     }
     double unit() { return static_cast<double>(next() >> 11) * 0x1.0p-53; }
     double bipolar() { return 2 * unit() - 1; }
+    // Move past n draws without producing them. The state advances by a
+    // fixed increment per draw, so a skipped stretch leaves the sequence
+    // exactly where the draws would have: the next value is unchanged.
+    void skip(std::uint64_t n) { state += n * UINT64_C(0x9e3779b97f4a7c15); }
 };
 
 // Board-to-board tolerance: what the four M boards keep after Yamaha's own
@@ -718,7 +788,7 @@ struct OtaSvf {
         if (cutoff!=cachedCutoff || network.fs!=cachedRate) {
             // Exact input equality only: moving cutoff CVs retain the same
             // capacitor TPT prewarp, with no control-rate approximation.
-            cachedG=std::tan(pi * cutoff / network.fs);
+            cachedG=prewarpTan(pi * cutoff / network.fs);
             cachedCutoff=cutoff;
             cachedRate=network.fs;
         }
@@ -740,21 +810,28 @@ struct OtaSvf {
         // The last tanh(b) the iterations evaluated, and its argument.
         double tanhArgument = previousB, tanhValue = previousTanhB;
         for (int iteration = 0; iteration < 7; ++iteration) {
-            const double tb = iteration == 0 ? previousTanhB : std::tanh(b);
+            const double tb = iteration == 0 ? previousTanhB : fastTanh(b);
             tanhArgument = b; tanhValue = tb;
             const double l = sl + nonlinear*tb + linear*b;
             const double h = qConstant - effectiveDamping * b - l;
-            const double th = std::tanh(h);
+            const double th = fastTanh(h);
             const double residual = b - sb - nonlinear*th - linear*h;
             const double dl = nonlinear*(1-tb*tb) + linear;
             const double derivative = 1 + (nonlinear*(1-th*th)+linear)*(effectiveDamping+dl);
             const double delta = residual / derivative;
             b -= delta;
-            if (std::abs(delta) < 1e-12) break;
+            // Newton converges quadratically, so once a step is under 1e-9
+            // the error left in b is of order its square, under b's ulp. The
+            // earlier 1e-12 bought a further pair of tanh evaluations about a
+            // third of the time (2.34 to 2.02 iterations per solve, measured
+            // on the factory presets) and no change at the float output.
+            if (std::abs(delta) < 1e-9) break;
         }
-        // A converged final step is often below half an ulp of b and leaves
-        // it bit-for-bit unchanged; its tanh is then the one just evaluated.
-        const double tanhB = std::memcmp(&b,&tanhArgument,sizeof b) == 0 ? tanhValue : std::tanh(b);
+        // tanh(b) is the last evaluation carried along its tangent over that
+        // final sub-ulp step; only an unconverged loop recomputes it.
+        const double step = b - tanhArgument;
+        const double tanhB = std::abs(step) < 1e-9
+            ? tanhValue + (1 - tanhValue*tanhValue)*step : fastTanh(b);
         const double l = sl + nonlinear*tanhB + linear*b;
         const double z = qConstant+qBand*b;
         const double h = z - 2*b - l;
@@ -846,9 +923,9 @@ constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
 // tanh is not constexpr in C++17, so tanh(k) is written out (std::tanh(1.4020)).
 constexpr double wscSineDrive=1.4020;
 constexpr double wscSineTanhDrive=0.8857831884152492;
-double wscSine(double input) {return std::tanh(wscSineDrive*input)/wscSineTanhDrive;}
+double wscSine(double input) {return fastTanh(wscSineDrive*input)/wscSineTanhDrive;}
 double wscSineSlope(double input) {
-    const double t=std::tanh(wscSineDrive*input);
+    const double t=fastTanh(wscSineDrive*input);
     return wscSineDrive*(1-t*t)/wscSineTanhDrive;
 }
 // TO reaches STI through 4.7uF NP with 22k to ground (SM2 p.16): see Oscillator.
@@ -918,12 +995,25 @@ double outputPreamp(double volts,double volume) {
 
 struct OutputCoupling {
     double memory=0;
-    double process(double x,double tau,double fs) {
-        const double g=1/(2*fs*tau);
-        const double high=(x-memory)/(1+g);
-        memory+=2*g*high;
+    // The trapezoid's g = 1/(2 fs tau) and the input's share 1/(1+g) depend
+    // on the rate and the part alone: fixed once per configuration, so the
+    // sample loop multiplies where it divided twice (two divisions on each
+    // coupling's recursion were a measurable share of the 1x cost; the
+    // reciprocal differs from the division by at most an ulp).
+    struct Coefficients {
+        double feedback=0, share=1;
+        Coefficients() = default;
+        Coefficients(double tau,double fs) {
+            const double g=1/(2*fs*tau);
+            feedback=2*g; share=1/(1+g);
+        }
+    };
+    double process(double x,const Coefficients& c) {
+        const double high=(x-memory)*c.share;
+        memory+=c.feedback*high;
         return high;
     }
+    double process(double x,double tau,double fs) { return process(x,Coefficients(tau,fs)); }
 };
 
 // CS-50 expression network (PRA, SM2 p.22; guide printed pp.45-46). The foot
@@ -1198,9 +1288,9 @@ double inverseNormal(double p) {
 double subWaveform(double phase,double step,double waveform,double noise) {
     if (waveform==1) return 1-2*phase+blep(phase,step);
     if (waveform==2) return -(1-2*phase+blep(phase,step));
-    if (waveform==3) return (phase<.5 ? 1.:-1.)+blep(phase,step)-blep(wrap(phase-.5),step);
+    if (waveform==3) return (phase<.5 ? 1.:-1.)+blep(phase,step)-blep(wrapUnit(phase-.5),step);
     if (waveform==4) return noise;
-    return std::sin(2*pi*phase);
+    return sinTurn(phase);
 }
 
 struct Oscillator {
@@ -1212,7 +1302,8 @@ struct Oscillator {
     bool stiPrecharged = false;
     // stiCoefficient: -expm1(-1/(fs*wscSineInputTau)).
     OscillatorFrame process(double frequency, double pulseWidth, double resetSeconds, double fs,
-                            double stiCoefficient, bool sineEnabled = true) {
+                            double stiCoefficient, bool sineEnabled = true,
+                            bool sawEnabled = true, bool pulseEnabled = true) {
         // Guide pp.28-31: OUT7 conditions the integrating-capacitor signal
         // with the monostable pulse before the WSC. It is not the exposed raw
         // recharge triangle. In the nominal current law r=f*tau, fixed A0
@@ -1235,13 +1326,18 @@ struct Oscillator {
         // 59.73us at the guide's nominal 800uA; only Iref's own tolerance
         // (unpublished) moves r.
         const double recharge = clamp(frequency * resetSeconds, 1e-7, .9);
-        const double resetPhase = wrap(phase-recharge);
+        const double resetPhase = wrapUnit(phase-recharge);
         // WSC pin5 inverts the conditioned downward ramp. Correct both
         // voltage jumps and both slope changes analytically, without tables.
-        const double sawBase = phase < recharge ? -1 : 2*phase-1;
-        const double saw = sawBase - blep(phase,step)
-            + recharge*blep(resetPhase,step)
-            + blamp(resetPhase,step)-blamp(phase,step);
+        // A muted waveform is a pure function of the phase (no state of its
+        // own), so its gate open or closed costs nothing later: skip it.
+        double saw = 0;
+        if (sawEnabled) {
+            const double sawBase = phase < recharge ? -1 : 2*phase-1;
+            saw = sawBase - blep(phase,step)
+                + recharge*blep(resetPhase,step)
+                + blamp(resetPhase,step)-blamp(phase,step);
+        }
         const double duty = clamp(pulseWidth, .01, .99);
         // WSC guide p.31 explicitly states that PWM moves only the falling
         // edge. Its rising edge stays locked to the VCO period. Applying a
@@ -1257,9 +1353,12 @@ struct Oscillator {
         // plateau no crossing exists, and a level above the ramp's start
         // 1-2r (d<r, deep PWM at upper notes) is crossed at the plateau's
         // step instead. The falling edge is therefore at max(d,r).
-        const double fall = std::max(duty, recharge);
-        double square = phase < fall ? 1 : -1;
-        square += blep(phase,step) - blep(wrap(phase-fall),step);
+        double square = 0;
+        if (pulseEnabled) {
+            const double fall = std::max(duty, recharge);
+            square = phase < fall ? 1 : -1;
+            square += blep(phase,step) - blep(wrapUnit(phase-fall),step);
+        }
         // WSC pin14 -> pin3 folds the SAME conditioned ramp into the
         // triangle tri=2|p|-1 (TO, 3.2Vpp, SL pin 4 open; SM2 p.21): 1 on the
         // plateau, then 1-4*phase down to the fold at phase .5 and 4*phase-3
@@ -1298,14 +1397,14 @@ struct Oscillator {
                     + .5*(foldAfterPlateau ? -4 : 4)*wscSineSlope(plateauEnd)*blamp(resetPhase,step);
             }
             if (phase < step || phase > 1-step) sine -= 2*wscSineSlope(1-c)*blamp(phase,step);
-            const double fold = wrap(phase-.5);
+            const double fold = wrapUnit(phase-.5);
             if (recharge < .5 && (fold < step || fold > 1-step))
                 sine += 4*wscSineSlope(-1-c)*blamp(fold,step);
         }
         // Keep the physical TO-STI capacitor and free oscillator running
         // while its output is muted, ready for a live sine-level edit.
         stiCoupling += (conditioned-stiCoupling)*stiCoefficient;
-        phase = wrap(phase + step);
+        phase = wrapUnit(phase + step);
         // Audio polarity: the completed pulse is negated, including its BLEP,
         // without moving either comparator edge, changing PW/PWM timing or
         // introducing another oscillator, so saw and pulse fall together at
@@ -1365,14 +1464,26 @@ struct Decimator {
     }
     void push(double x) { history[cursor] = x; cursor = cursor+1 == taps ? 0 : cursor+1; }
     // Newest sample first: history[cursor-1] down to [0], then wrap from
-    // [taps-1]. Two straight runs instead of a per-tap wrap test; the taps
-    // are summed in the same order, so the output keeps every bit.
+    // [taps-1], as two straight runs. Four interleaved partial sums: one
+    // running sum serialises 249 additions behind each other's latency,
+    // about a tenth of the 4x cost; four run in parallel. The order of the
+    // additions changes, so the sum differs from a single run at its last
+    // bit (1e-16 relative), not at the float output.
     double output() const {
-        double y = 0;
+        double s0 = 0, s1 = 0, s2 = 0, s3 = 0;
         unsigned i = 0;
-        for (unsigned at = cursor; at > 0;) y += h[i++] * history[--at];
-        for (unsigned at = taps; i < taps;) y += h[i++] * history[--at];
-        return y;
+        const auto run = [&](unsigned at, unsigned end) {
+            for (; at - end >= 4; at -= 4, i += 4) {
+                s0 += h[i] * history[at-1];
+                s1 += h[i+1] * history[at-2];
+                s2 += h[i+2] * history[at-3];
+                s3 += h[i+3] * history[at-4];
+            }
+            while (at > end) s0 += h[i++] * history[--at];
+        };
+        run(cursor, 0);
+        run(taps, cursor);
+        return (s0 + s1) + (s2 + s3);
     }
     void clear() { history.fill(0); cursor = 0; }
 };
@@ -1588,7 +1699,7 @@ struct Synth::Impl {
         double oscillatorFrequency=0, hpFrequency=0, lpFrequency=0;
 #endif
     };
-    double fs, internalFs;
+    double fs, internalFs, rateScale=1/double(Synth::oversampling);
     std::uint64_t seed, age = 0, hostSamples = 0;
     Random random;
     Patch patch;
@@ -1597,6 +1708,8 @@ struct Synth::Impl {
     OutputRate decimator;
     double lfoPhase = 0, pwmPhase = 0, pressureTarget = 0, pressureValue = 0, bend = 0;
     OutputCoupling busCoupling, lineCoupling;
+    // outputCouplingTau at the internal rate: CP3, CP4, bus, line.
+    std::array<OutputCoupling::Coefficients,4> couplingCoefficients{};
     double pressureCoefficient = 0, velocityCoefficient = 0, driftCoefficient = 0;
     std::array<double,4> ampCoefficients{}, filterCoefficients{};
     double hpSourceBranches = 3, lastSub = 0;
@@ -1619,6 +1732,7 @@ struct Synth::Impl {
     // stream keeps one draw per sample and drift is unchanged.
     Random limiterRandom{1};
     OutputCoupling pickupCoupling;
+    OutputCoupling::Coefficients pickupCoefficients;
     // Guide printed32: SUB-N is the limiter output N through22k/.1uF,
     // independent of audio NO level: the documented single low-pass (called
     // pink in the prose), not an invented ideal1/f filter. SM2 p.8 (PN3):
@@ -1630,6 +1744,7 @@ struct Synth::Impl {
     // capacitor between the EXT preamp and EXO/SUI.
     double externalTarget = 0, externalPrevious = 0, externalNow = 0;
     OutputCoupling externalCoupling;
+    OutputCoupling::Coefficients externalSelectedCoefficients, externalOpenCoefficients;
     Envelope ringEnvelope;
     std::array<double,4> ringCoefficients{};
     double ringPhase = 0, ringCarrier = 0, ringFrequency = 30;
@@ -1640,6 +1755,7 @@ struct Synth::Impl {
     double ringSignalInput=0, ringSignalOutput=0;
     RingCarrierCoupling ringCarrierCoupling;
     OutputCoupling ringSignalCoupling, ringWetCoupling;
+    OutputCoupling::Coefficients ringSignalCoefficients, ringWetCoefficients;
     double ringWetGain=ringModulatorGain*ringWetBufferGain();
     int lastAssignedKey = 60;
     bool pedal = false;
@@ -1666,7 +1782,7 @@ struct Synth::Impl {
         reset();
     }
     void configureRate() {
-        internalFs=fs*rateFactor;
+        internalFs=fs*rateFactor; rateScale=1/double(rateFactor);
         limiterSteps=static_cast<unsigned>(std::ceil(limiterSubstepRate/internalFs));
         limiterRate=internalFs*limiterSteps;
         limiterPole=std::exp(-1/(limiterRate*limiterTau));
@@ -1681,6 +1797,13 @@ struct Synth::Impl {
         qControlCoefficient=-std::expm1(-1/(internalFs*qControlTau));
         stiCoefficient=-std::expm1(-1/(internalFs*wscSineInputTau));
         subNoiseG=1/(2*internalFs*subNoiseResistance*.1e-6);
+        for (unsigned i=0;i<4;++i)
+            couplingCoefficients[i]=OutputCoupling::Coefficients(outputCouplingTau[i],internalFs);
+        pickupCoefficients=OutputCoupling::Coefficients(pickupCouplingTau,limiterRate);
+        externalSelectedCoefficients=OutputCoupling::Coefficients(externalCouplingTauSelected,internalFs);
+        externalOpenCoefficients=OutputCoupling::Coefficients(externalCouplingTauOpen,internalFs);
+        ringSignalCoefficients=OutputCoupling::Coefficients(ringSignalCouplingTau,internalFs);
+        ringWetCoefficients=OutputCoupling::Coefficients(ringWetCouplingTau,internalFs);
         ringCarrierCoupling.configure(internalFs);
         updateCoefficients();
     }
@@ -1881,25 +2004,42 @@ struct Synth::Impl {
         // trims it to 3Vpp, the WSC waveforms' 3Vpp. So the one shared source
         // is the slew-limited sign of the band-limited pick-up signal, in
         // units of the rails (see limiterSlew).
-        double limiterSum=0;
-        for (unsigned step=0; step<limiterSteps; ++step) {
-            const double draw=step ? limiterRandom.unit() : random.unit();
-            limiterInput=limiterPole*limiterInput+limiterInnovation*inverseNormal(draw+0x1.0p-54);
-            const double pickup=pickupCoupling.process(limiterInput,pickupCouplingTau,limiterRate);
-            limiterOutput=pickup<0 ? std::max(-1.0,limiterOutput-limiterStep)
-                : std::min(1.0,limiterOutput+limiterStep);
-            limiterSum+=limiterOutput;
+        // With NOISE at zero and FUNCTION off N nothing audible depends on
+        // the source, so it is not computed: the limiter, its pick-up
+        // coupling and the SUB-N filter hold their state, and both streams
+        // skip the draws they would have taken (Random::skip), so the drift
+        // that shares the first stream keeps its chronology exactly. Audio
+        // is unchanged while the source stays unused or stays in use; when
+        // it comes back into use the held states resume, and the pick-up
+        // coupling's settling (about 25 ms) is a different realisation of
+        // the same noise than an always-running limiter would have given.
+        // At 1x the source alone was a quarter of a voice's cost.
+        const bool noiseUsed=patch.noise!=0 || patch.lfoWaveform==4;
+        double noise=0, subNoise=0;
+        if (noiseUsed) {
+            double limiterSum=0;
+            for (unsigned step=0; step<limiterSteps; ++step) {
+                const double draw=step ? limiterRandom.unit() : random.unit();
+                limiterInput=limiterPole*limiterInput+limiterInnovation*inverseNormal(draw+0x1.0p-54);
+                const double pickup=pickupCoupling.process(limiterInput,pickupCoefficients);
+                limiterOutput=pickup<0 ? std::max(-1.0,limiterOutput-limiterStep)
+                    : std::min(1.0,limiterOutput+limiterStep);
+                limiterSum+=limiterOutput;
+            }
+            noise=limiterSum/limiterSteps;
+            subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
+            subNoiseMemory=2*subNoise-subNoiseMemory;
+        } else {
+            random.skip(1);
+            limiterRandom.skip(limiterSteps-1);
         }
-        const double noise=limiterSum/limiterSteps;
-        const double subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
-        subNoiseMemory=2*subNoise-subNoiseMemory;
         // SUB-EXT (see externalPreampRail): LEVEL, the preamp's swing, the
         // switch-loaded coupling capacitor, then the IC1-1 follower's swing.
         // The preamp and capacitor run whatever FUNCTION selects.
         const bool external=patch.lfoWaveform==5;
         const double externalSub=clamp(externalCoupling.process(
             clamp(patch.extLevel*externalNow,-externalPreampRail,externalPreampRail),
-            external ? externalCouplingTauSelected : externalCouplingTauOpen,internalFs),
+            external ? externalSelectedCoefficients : externalOpenCoefficients),
             -externalBufferRail,externalBufferRail);
         const double lfo = external ? externalSub : subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
             patch.lfoWaveform==4 ? subNoise*subNoiseRail:0.);
@@ -1928,9 +2068,9 @@ struct Synth::Impl {
         const double levelControl=patch.ampLevel
             +tremoloScale*leverFraction(patch.tremolo,tremoloLeverRatio)*lfo;
         commonVcaGain=std::max(0.0,levelControl);
-        const double pwm = std::sin(2*pi*(pwmPhase+patch.pwmPhase));
-        lfoPhase = wrap(lfoPhase + patch.lfoRate*dt);
-        pwmPhase = wrap(pwmPhase + patch.pwmRate*dt);
+        const double pwm = sinTurn(pwmPhase+patch.pwmPhase);
+        lfoPhase = wrapUnit(lfoPhase + patch.lfoRate*dt);
+        pwmPhase = wrapUnit(pwmPhase + patch.pwmRate*dt);
         double mixed = 0;
         for (unsigned i = 0; i < voiceLimit; ++i) {
             auto& v = voices[i];
@@ -1972,7 +2112,8 @@ struct Synth::Impl {
             }
             const double frequency = 440 * std::exp2((key-69 + bend + 12*patch.octave + cents*.01)/12);
             const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
-                                            patch.resetMicroseconds*1e-6,internalFs,stiCoefficient,patch.sine!=0);
+                                            patch.resetMicroseconds*1e-6,internalFs,stiCoefficient,
+                                            patch.sine!=0,patch.saw!=0,patch.pulse!=0);
             // Each board's EG times, VCA-EG peak and floor (see BoardTolerance;
             // the shared values when the envelope tolerance is off).
             const auto& egf=v.board.filterCoefficients;
@@ -2027,11 +2168,11 @@ struct Synth::Impl {
                 patch.drive,hpFilterNetwork,lpFilterNetwork);
             // CP3 coupling precedes filtered level; CP4 coupling acts on
             // the filtered/sine sum before common level and envelope VCAs.
-            const double filtered=v.filteredCoupling.process(low,outputCouplingTau[0],internalFs);
+            const double filtered=v.filteredCoupling.process(low,couplingCoefficients[0]);
             // The sine's VR11/VR12 balance against the filtered path (VCA
             // amount); exactly 1 when off.
             const double summed=filtered*patch.filterLevel + waves.sine*patch.sine*board.sineGain;
-            const double beforeVca=v.commonCoupling.process(summed,outputCouplingTau[1],internalFs);
+            const double beforeVca=v.commonCoupling.process(summed,couplingCoefficients[1]);
             // IG00151 gain is LINEAR in envelope CV (guide pp.40–41). The
             // optional velocity term is zero in factory-derived presets.
             // Each chip's EI trim sets zero output at 0V LI (guide p.41), so
@@ -2056,7 +2197,7 @@ struct Synth::Impl {
         // More simultaneous voices can therefore increase rail saturation.
         // Common-bus transfer,
         // with previous overall midband gain retained as a calibration choice.
-        const double bus=busCoupling.process(mixed,outputCouplingTau[2],internalFs);
+        const double bus=busCoupling.process(mixed,couplingCoefficients[2]);
         // One global processor, after the voice bus and before expression/
         // output. The carrier uses the physical matched upper-BJT steering
         // law at the pins 7-8 carrier, and the degenerated signal pair its
@@ -2074,7 +2215,7 @@ struct Synth::Impl {
         }
         ringFrequency=clamp(patch.ringRate*std::exp2(ringDepthValue*ringControl),.2,220);
         ringCarrier=std::sin(2*pi*ringPhase);
-        ringPhase=wrap(ringPhase+ringFrequency*dt);
+        ringPhase=wrapUnit(ringPhase+ringFrequency*dt);
         // Keep this free-running passive network connected even at mix0.
         ringCoupledCarrier=ringCarrierCoupling.process(ringCarrier);
         // No mean removal or gain normalization: the typical-part carrier-
@@ -2084,9 +2225,9 @@ struct Synth::Impl {
         // Pin 1 sees the bus through 10uF into 330+463 ohm (20Hz); pin 6 and
         // the wet buffer are coupled through 10uF into 2.5k+10k (1.27Hz).
         // Both run even at mix 0, like the carrier network.
-        ringSignalInput=ringSignalCoupling.process(bus,ringSignalCouplingTau,internalFs);
+        ringSignalInput=ringSignalCoupling.process(bus,ringSignalCoefficients);
         ringSignalOutput=ringSignalPair(ringSignalInput);
-        const double wet=ringWetGain*ringWetCoupling.process(ringSignalOutput*ringSwitchGain,ringWetCouplingTau,internalFs);
+        const double wet=ringWetGain*ringWetCoupling.process(ringSignalOutput*ringSwitchGain,ringWetCoefficients);
         // Explicit bypass avoids even a rounding change for old patches.
         const double ringed=patch.ringMix==0 ? bus
             : (bus+patch.ringMix*(wet-bus))/(1+patch.ringMix*(1-patch.ringMix)*ringMixLeverRatio);
@@ -2096,7 +2237,7 @@ struct Synth::Impl {
         const double rail=outputPreamp(expressed,patch.volume);
         // HIGH output, 33uF into its LO divider and the 10k-loaded HO, after
         // the documented inverting preamp. No recording EQ.
-        return -lineCoupling.process(rail,outputCouplingTau[3],internalFs);
+        return -lineCoupling.process(rail,couplingCoefficients[3]);
     }
 };
 
@@ -2278,7 +2419,7 @@ float Synth::process() {
     auto& state=*impl_;
     const double from=state.externalPrevious, to=state.externalTarget;
     for (unsigned i = 0; i < state.rateFactor; ++i) {
-        state.externalNow=i+1==state.rateFactor ? to : from+(to-from)*(i+1)/state.rateFactor;
+        state.externalNow=i+1==state.rateFactor ? to : from+(to-from)*(i+1)*state.rateScale;
         state.decimator.push(state.sample(),state.rateFactor);
     }
     state.externalPrevious=to;
@@ -2431,7 +2572,7 @@ std::vector<OscillatorFrame> oscillatorTrace(double fs,double frequency,
     std::vector<OscillatorFrame> result(frames);
     double pwmPhase=0;
     for (auto& frame : result) {
-        const double pwm=std::sin(2*pi*(pwmPhase+patch.pwmPhase));
+        const double pwm=sinTurn(pwmPhase+patch.pwmPhase);
         frame=oscillator.process(frequency,patch.pulseWidth+patch.pwmDepth*pwm,
             patch.resetMicroseconds*1e-6,fs,stiCoefficient);
         pwmPhase=wrap(pwmPhase+patch.pwmRate/fs);

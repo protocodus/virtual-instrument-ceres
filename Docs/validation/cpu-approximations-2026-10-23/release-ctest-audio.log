@@ -1,0 +1,12 @@
+Internal ctest changing into directory: /home/user/virtual-instrument-ceres/build-dsp
+Test project /home/user/virtual-instrument-ceres/build-dsp
+    Start 33: Ceres.AudioDemos
+1/1 Test #33: Ceres.AudioDemos .................   Passed   51.31 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+audio    =  51.31 sec*proc (1 test)
+
+Total Test time (real) =  51.32 sec
+exit 0

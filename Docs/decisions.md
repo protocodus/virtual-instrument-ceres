@@ -306,3 +306,36 @@ chosen by ear on 2026-10-20 without changing what was chosen.
   8', 29 % at the 6.33 kHz top. The sine's second harmonic moves by up to
   5 dB, and a large pitch jump re-centres STI over about 0.3 s. The shaper
   stays chosen by ear and unmeasured.
+
+## 2026-10-23: the noise source may stand idle
+
+The owner listened to the one set the 1.0.4 CPU round could not close by
+measurement and kept the candidate ("B sounds the same as A, keep the noise
+commit"). A choice made by ear, not a measurement. The set was not committed;
+its `key.md` held the rendering details summarised here.
+
+### Noise source idle while unused (`2026-10-23-noise-skip`)
+
+- **Decided:** whether the shared noise source (the 768 kHz limiter, its
+  pick-up coupling and the SUB-N filter) may hold its state while NOISE is 0
+  and FUNCTION is off N instead of running on every sample. Both random
+  streams skip exactly the draws they would have taken, so audio is identical
+  while the source stays unused or stays in use; the open question was the
+  transition, where the held state resumes and the first ~10 ms of noise are
+  a different realisation of the same process, decaying through the output
+  couplings (1x: −30 dB re signal at 0–10 ms, −69 dB at 20–25 ms, below
+  −90 dB after 50 ms). A null test cannot grade a different realisation of
+  the same noise.
+- **A:** the 1.0.3 engine, limiter always running.
+- **B:** the candidate with the source idle while unused (commit `520c39d`).
+- **Material:** Brass 1, four voices/1x, 48 kHz, seed 11, C3 and G3 from
+  0.5 s; NOISE 0 until 1.5 s, then NOISE 1 with FUNCTION N at VCF depth .5
+  until 3.0 s. Whole-file RMS identical to 1e-4 dB, no trim; bit-identical
+  up to 1.5 s.
+- **Chosen:** B.
+- **Licensed:** the idle noise source ships in 1.0.4
+  ([benchmark document](benchmarks/cpu-approximations-2026-10-23.md)): the
+  limiter, pick-up and SUB-N states freeze while unused and resume on use.
+  It does not license changing the noise model's density, slew, substep rate
+  or draw order, which are unchanged, nor other state-freezing optimisations
+  (idle voices, decaying filters), each of which would need its own set.
