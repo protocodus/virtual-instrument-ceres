@@ -1132,8 +1132,13 @@ struct RingCarrierCoupling {
     void clear() {memory.fill(0);}
     double process(double source) {
         auto rhs=memory;rhs[0]+=source;
-        std::array<double,4> nodes{};
-        for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j)nodes[i]+=inverse[i][j]*rhs[j];
+        // Each node starts from its first product rather than from a zero
+        // it is added to: 0 + x is x, so the sums are the same.
+        std::array<double,4> nodes;
+        for(unsigned i=0;i<4;++i) {
+            nodes[i]=inverse[i][0]*rhs[0];
+            for(unsigned j=1;j<4;++j)nodes[i]+=inverse[i][j]*rhs[j];
+        }
         for(unsigned i=0;i<4;++i)memory[i]=2*(nodes[i]-(i==0?source:0.))-memory[i];
         // Actual pin7-pin8 carrier per volt of source; no gain normalization.
         return (nodes[0]-nodes[1])*ringCarrierPortShunt/(33000+ringCarrierPortShunt);
@@ -1176,46 +1181,49 @@ struct Envelope {
     bool gate = false;
     void on() { gate = true; stage = Attack; }
     void off() { gate = false; if (stage != Idle) stage = Release; }
+    // The attack, with its optional saturation law, stays out of line so
+    // that the path every held or released board takes each sample, one
+    // multiply-add and a settle test, inlines into the voice loop (the
+    // nine-argument function did not, and its call cost more than its body).
     double advance(double initial, double peak, double sustained,
                    double headroom, double saturation, double attackIncrement, double currentStep,
                    double decayCoefficient, double releaseCoefficient) {
+        if (stage == Attack)
+            return attack(initial, peak, headroom, saturation, attackIncrement, currentStep);
         // Key-off keeps IL/RT selected (Guide pp.43–44): an idle board is
         // still a connected capacitor, not a reset switch. Continue the
         // existing release law if its target moves; Idle remains an audio
         // bookkeeping state. The physical post-settling rate is unmeasured.
-        double target = initial, coefficient = 0;
-        if (stage == Attack) {
-            const double span = std::max(1e-9, inlineAbs(peak - initial));
-            target = peak + headroom * span;
-            if (saturation>0 && voltage<peak) {
-                // Optional differential-pair/current-limit approximation:
-                // dv/dt = k*Vs*tanh((target-v)/Vs). Integrating gives
-                // log(sinh(y_next)) = log(sinh(y)) - k*dt, y=(target-v)/Vs.
-                // k is normalized so a full IL->peak attack retains its
-                // requested duration. This is a model experiment, not an
-                // identified IG00151 transistor/current-limit parameter.
-                const double vs=saturation*span;
-                const double y=(target-voltage)/vs;
-                const double nextLog=logSinh(y)-currentStep;
-                const double increment=(y>20 && nextLog>20)
-                    ? currentStep : y-asinhExp(nextLog);
-                voltage+=vs*increment;
-            } else {
-                voltage += (target - voltage) * attackIncrement;
-            }
-            if (voltage >= peak) { voltage = peak; stage = gate ? Decay : Release; }
-            return voltage;
-        }
         if (stage == Decay || stage == Sustain) {
-            target = sustained;
-            coefficient = decayCoefficient;
-            voltage = target + (voltage - target) * coefficient;
-            if (inlineAbs(voltage - target) < 1e-7) { voltage = target; stage = Sustain; }
+            voltage = sustained + (voltage - sustained) * decayCoefficient;
+            if (inlineAbs(voltage - sustained) < 1e-7) { voltage = sustained; stage = Sustain; }
         } else {
-            coefficient = releaseCoefficient;
-            voltage = target + (voltage - target) * coefficient;
-            if (inlineAbs(voltage - target) < 1e-7) { voltage = target; stage = Idle; }
+            voltage = initial + (voltage - initial) * releaseCoefficient;
+            if (inlineAbs(voltage - initial) < 1e-7) { voltage = initial; stage = Idle; }
         }
+        return voltage;
+    }
+    double attack(double initial, double peak, double headroom, double saturation,
+                  double attackIncrement, double currentStep) {
+        const double span = std::max(1e-9, inlineAbs(peak - initial));
+        const double target = peak + headroom * span;
+        if (saturation>0 && voltage<peak) {
+            // Optional differential-pair/current-limit approximation:
+            // dv/dt = k*Vs*tanh((target-v)/Vs). Integrating gives
+            // log(sinh(y_next)) = log(sinh(y)) - k*dt, y=(target-v)/Vs.
+            // k is normalized so a full IL->peak attack retains its
+            // requested duration. This is a model experiment, not an
+            // identified IG00151 transistor/current-limit parameter.
+            const double vs=saturation*span;
+            const double y=(target-voltage)/vs;
+            const double nextLog=logSinh(y)-currentStep;
+            const double increment=(y>20 && nextLog>20)
+                ? currentStep : y-asinhExp(nextLog);
+            voltage+=vs*increment;
+        } else {
+            voltage += (target - voltage) * attackIncrement;
+        }
+        if (voltage >= peak) { voltage = peak; stage = gate ? Decay : Release; }
         return voltage;
     }
 };
@@ -1349,10 +1357,12 @@ struct Oscillator {
         // voltage jumps and both slope changes analytically, without tables.
         // A muted waveform is a pure function of the phase (no state of its
         // own), so its gate open or closed costs nothing later: skip it.
+        // The reset edge's BLEP is the same term in the saw and the pulse.
+        const double resetBlep = sawEnabled || pulseEnabled ? blep(phase,step) : 0;
         double saw = 0;
         if (sawEnabled) {
             const double sawBase = phase < recharge ? -1 : 2*phase-1;
-            saw = sawBase - blep(phase,step)
+            saw = sawBase - resetBlep
                 + recharge*blep(resetPhase,step)
                 + blamp(resetPhase,step)-blamp(phase,step);
         }
@@ -1375,7 +1385,7 @@ struct Oscillator {
         if (pulseEnabled) {
             const double fall = std::max(duty, recharge);
             square = phase < fall ? 1 : -1;
-            square += blep(phase,step) - blep(wrapUnit(phase-fall),step);
+            square += resetBlep - blep(wrapUnit(phase-fall),step);
         }
         // WSC pin14 -> pin3 folds the SAME conditioned ramp into the
         // triangle tri=2|p|-1 (TO, 3.2Vpp, SL pin 4 open; SM2 p.21): 1 on the
@@ -2118,6 +2128,11 @@ struct Synth::Impl {
         const double pwm = sinTurn(pwmPhase+patch.pwmPhase);
         lfoPhase = wrapUnit(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrapUnit(pwmPhase + patch.pwmRate*dt);
+        // The same for every board this sample.
+        const double pulseWidth = patch.pulseWidth+pwm*patch.pwmDepth;
+        const double resetSeconds = patch.resetMicroseconds*1e-6;
+        const bool sineOn = patch.sine!=0, sawOn = patch.saw!=0, pulseOn = patch.pulse!=0;
+        const double spreadCentre = .5*(voiceLimit-1);
         double mixed = 0;
         for (unsigned i = 0; i < voiceLimit; ++i) {
             auto& v = voices[i];
@@ -2141,10 +2156,17 @@ struct Synth::Impl {
             v.drift += (v.driftTarget-v.drift) * driftCoefficient;
             // The fixed spread steps from board to board, centred on the
             // voices in use (i-1.5 at the default four).
-            double cents = patch.tuneCents + (static_cast<double>(i)-.5*(voiceLimit-1))*patch.voiceSpreadCents
+            double cents = patch.tuneCents + (static_cast<double>(i)-spreadCentre)*patch.voiceSpreadCents
                 + v.drift*patch.driftCents + lfo*(patch.vibratoCents + expression*patch.pressureVibrato)
                 + expression*patch.pressureVibrato*touchVibratoBias;
-            const double key=advanceGlide(v,dt);
+            // Without PORTAMENTO the key voltage is the board's key, and the
+            // counter is parked (advanceGlide's first branch), inline here.
+            double key;
+            if (patch.glideMode==0) {
+                v.glideCode=v.held || v.pedalHeld ? v.note : lastAssignedKey;
+                v.glideSteps=0; v.glideReady=false;
+                key=v.keyPitch=v.keyNote;
+            } else key=advanceGlide(v,dt);
             // Trim residual and thermal drift of this board's linear VCO (see
             // BoardTolerance): its key voltage is the NORMAL frequency of key,
             // bend and PITCH.
@@ -2158,9 +2180,8 @@ struct Synth::Impl {
                 cents+=v.boardPitchCents;
             }
             const double frequency = 440 * std::exp2((key-69 + bend + 12*patch.octave + cents*.01)/12);
-            const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
-                                            patch.resetMicroseconds*1e-6,internalFs,stiCoefficient,
-                                            patch.sine!=0,patch.saw!=0,patch.pulse!=0);
+            const auto waves = v.osc.process(frequency, pulseWidth, resetSeconds, internalFs,
+                                            stiCoefficient, sineOn, sawOn, pulseOn);
             // Each board's EG times, VCA-EG peak and floor (see BoardTolerance;
             // the shared values when the envelope tolerance is off).
             const auto& egf=v.board.filterCoefficients;
