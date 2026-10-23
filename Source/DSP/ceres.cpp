@@ -1520,8 +1520,10 @@ struct Decimator {
         // four-wide type costs GCC more instructions on SSE2 than the
         // scalar lanes), the same IEEE multiply and add per lane and each
         // lane's additions in the same order, so bit for bit the scalar
-        // lanes below. The loads are declared unaligned (aligned(8)).
-        typedef double Pair __attribute__((vector_size(16), aligned(8)));
+        // lanes below. The loads are declared unaligned (aligned(8)) and
+        // may_alias: they read double storage, and the attribute keeps
+        // strict aliasing from ordering them before the ring's writes.
+        typedef double Pair __attribute__((vector_size(16), aligned(8), may_alias));
         Pair low = {0, 0}, high = {0, 0};
         for (; k + 4 <= taps; k += 4) {
             low += *reinterpret_cast<const Pair*>(coefficient + k)
