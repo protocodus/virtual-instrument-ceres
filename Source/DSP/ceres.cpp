@@ -1502,14 +1502,33 @@ struct Decimator {
     double output() const {
         const double* window = history.data() + cursor;
         const double* coefficient = oldestFirst.data();
-        double s0 = 0, s1 = 0, s2 = 0, s3 = 0;
         unsigned k = 0;
+#if defined(__GNUC__) || defined(__clang__)
+        // The Rack's SDK does not auto-vectorise, so the four lanes are
+        // spelt out with the GCC/clang vector extension, which its clang
+        // keeps: two pairs of doubles (the width SSE2 and NEON carry; a
+        // four-wide type costs GCC more instructions on SSE2 than the
+        // scalar lanes), the same IEEE multiply and add per lane and each
+        // lane's additions in the same order, so bit for bit the scalar
+        // lanes below. The loads are declared unaligned (aligned(8)).
+        typedef double Pair __attribute__((vector_size(16), aligned(8)));
+        Pair low = {0, 0}, high = {0, 0};
+        for (; k + 4 <= taps; k += 4) {
+            low += *reinterpret_cast<const Pair*>(coefficient + k)
+                 * *reinterpret_cast<const Pair*>(window + k);
+            high += *reinterpret_cast<const Pair*>(coefficient + k + 2)
+                  * *reinterpret_cast<const Pair*>(window + k + 2);
+        }
+        double s0 = low[0], s1 = low[1], s2 = high[0], s3 = high[1];
+#else
+        double s0 = 0, s1 = 0, s2 = 0, s3 = 0;
         for (; k + 4 <= taps; k += 4) {
             s0 += coefficient[k] * window[k];
             s1 += coefficient[k+1] * window[k+1];
             s2 += coefficient[k+2] * window[k+2];
             s3 += coefficient[k+3] * window[k+3];
         }
+#endif
         for (; k < taps; ++k) s3 += coefficient[k] * window[k];
         return (s3 + s2) + (s1 + s0);
     }
