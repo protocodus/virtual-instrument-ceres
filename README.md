@@ -31,6 +31,10 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 
 ## Version history
 
+### Unreleased — 1.0.4 — a third to a half less CPU, the same samples
+
+- The engine does 38–56% fewer instructions for the same sound (32–54% less median thread CPU on the development container, not a Reason host result): the filters' `tanh` and prewarp `tan`, the PWM clock and the SUB sine are full-precision rationals, the filter solver stops at a 1e-9 Newton step, muted saw and pulse shaping is skipped, the output couplings and the decimator reuse their constants, and the noise source stands idle while NOISE is zero and FUNCTION is off N. The 439,296-sample CPU regression stream is byte-identical to 1.0.3 at the float32 output on every preset, voice count, quality and rate; the engine's internal double arithmetic differs at its last bit. One consequence is audible in principle though not in practice: when NOISE leaves zero after an idle stretch, the first ~10 ms of noise are a different realisation of the same noise than before, which no measurement of the running noise can tell apart. [Protocol, instruction counts, timings and validation](Docs/benchmarks/cpu-approximations-2026-10-23.md).
+
 ### 1.0.3 — first production release
 
 Combines the exact OTA filter warm-start cache with reuse of the final `tanh` result when its argument is bit-identical, and reads the decimator history in two ordered runs. The Newton solver, circuit state, quality modes, latency and preset parameters are preserved. Includes the Rack parity drivers and retained validation history. Rack-specific presets, release packaging and host measurements are maintained in the Rack Extension repository; the earlier development-machine CPU measurements are not Rack performance claims.

@@ -15,13 +15,14 @@ namespace {
 constexpr double pi = 3.141592653589793238462643383279502884;
 // tanh is the engine's most frequent transcendental: the OTA filters solve
 // one per Newton iteration per stage, the WSC shaper one per sample and the
-// ring carrier one per sample. glibc's tanh reaches expm1 and costs about
-// 2.6 times this rational form in a dependent chain (measured here; see
-// Docs/benchmarks/cpu-approximations-2026-10-23.md). Cephes tanh.c (Moshier):
-// for |x| < .625, x + x^3 P(x^2)/Q(x^2); beyond, the identity
-// 1 - 2/(exp(2|x|)+1). Swept against glibc over 1e-9..30 at 14 million
-// points: at most 2 ulp (4.2e-16 relative). Not bit-identical to std::tanh,
-// so this and everything after it differ from 1.0.3 at the last bit.
+// ring carrier's steering one per sample. glibc's tanh reaches expm1 and
+// costs about 2.6 times this rational form in a dependent chain (measured
+// here; see Docs/benchmarks/cpu-approximations-2026-10-23.md). Cephes
+// tanh.c (Moshier): for |x| < .625, x + x^3 P(x^2)/Q(x^2); beyond, the
+// identity 1 - 2/(exp(2|x|)+1). Swept against glibc over 1e-9..30 at 14
+// million points: at most 2 ulp (4.2e-16 relative). Not bit-identical to
+// std::tanh, so this and everything after it differ from 1.0.3 at the last
+// bit.
 double fastTanh(double x) {
     const double ax=std::abs(x);
     if (ax<.625) {
