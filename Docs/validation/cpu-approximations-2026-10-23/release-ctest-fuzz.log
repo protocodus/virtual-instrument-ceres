@@ -1,0 +1,12 @@
+Internal ctest changing into directory: /home/user/virtual-instrument-ceres/build-dsp
+Test project /home/user/virtual-instrument-ceres/build-dsp
+    Start 32: Ceres.DspFuzz
+1/1 Test #32: Ceres.DspFuzz ....................   Passed    0.91 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+fuzz    =   0.91 sec*proc (1 test)
+
+Total Test time (real) =   0.91 sec
+exit 0

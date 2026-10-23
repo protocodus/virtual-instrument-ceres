@@ -1,0 +1,155 @@
+{
+  "tool": "Tools/callgrind_presets.cpp",
+  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "flags": "-std=c++17 -O3 -DNDEBUG (x86-64 baseline ISA)",
+  "valgrind": "callgrind-3.22.0, total Ir",
+  "baseline_commit": "8655ab16795eb6f550965b96f4d5765931013915",
+  "configurations": [
+    {
+      "configuration": "4 voices / 4x",
+      "arguments": "4 4 60",
+      "baseline_instructions": 2118942151,
+      "candidate_instructions": 1242372422,
+      "reduction_percent": 41.37
+    },
+    {
+      "configuration": "4 voices / 1x (the Rack's default)",
+      "arguments": "4 1 240",
+      "baseline_instructions": 2339352754,
+      "candidate_instructions": 1195110420,
+      "reduction_percent": 48.91
+    },
+    {
+      "configuration": "1 voice / 1x",
+      "arguments": "1 1 240",
+      "baseline_instructions": 982452816,
+      "candidate_instructions": 432924396,
+      "reduction_percent": 55.93
+    },
+    {
+      "configuration": "16 voices / 4x",
+      "arguments": "16 4 15",
+      "baseline_instructions": 1897109831,
+      "candidate_instructions": 1080979985,
+      "reduction_percent": 43.02
+    },
+    {
+      "configuration": "4 voices / 4x, NOISE .3",
+      "arguments": "4 4 60 noise",
+      "baseline_instructions": 2213501370,
+      "candidate_instructions": 1323075137,
+      "reduction_percent": 40.23
+    },
+    {
+      "configuration": "4 voices / 1x, NOISE .3",
+      "arguments": "4 1 240 noise",
+      "baseline_instructions": 2432856119,
+      "candidate_instructions": 1503483474,
+      "reduction_percent": 38.2
+    }
+  ],
+  "per_commit_cumulative": [
+    {
+      "commit": "8655ab16795eb6f550965b96f4d5765931013915",
+      "change": "1.0.3 baseline",
+      "instructions": {
+        "4v4x": 2118942151,
+        "4v1x": 2339352754,
+        "1v1x": 982452816
+      }
+    },
+    {
+      "commit": "b3c92b7ff155a0f3a006f0e9ee87238cc692161a",
+      "change": "tanh and prewarp tan rationals",
+      "instructions": {
+        "4v4x": 1520704997,
+        "4v1x": 1701340815,
+        "1v1x": 815056327
+      }
+    },
+    {
+      "commit": "6328de542435",
+      "change": "Newton stops at a 1e-9 step",
+      "instructions": {
+        "4v4x": 1452482975,
+        "4v1x": 1625439417,
+        "1v1x": 795465904
+      }
+    },
+    {
+      "commit": "1a237478d844",
+      "change": "muted saw/pulse skipped, wrapUnit, EXT reciprocal",
+      "instructions": {
+        "4v4x": 1364127020,
+        "4v1x": 1542736085,
+        "1v1x": 771737496
+      }
+    },
+    {
+      "commit": "b78b229f22da",
+      "change": "coupling coefficients",
+      "instructions": {
+        "4v4x": 1339591732,
+        "4v1x": 1492393771,
+        "1v1x": 727224878
+      }
+    },
+    {
+      "commit": "b4318c42d7c6",
+      "change": "decimator partial sums",
+      "instructions": {
+        "4v4x": 1325841744,
+        "4v1x": 1492393771,
+        "1v1x": 727224878
+      }
+    },
+    {
+      "commit": "fa66f6d4aea3",
+      "change": "PWM and SUB sines in the phase domain",
+      "instructions": {
+        "4v4x": 1314415876,
+        "4v1x": 1475091330,
+        "1v1x": 711638543
+      }
+    },
+    {
+      "commit": "520c39d57f1b",
+      "change": "noise source idle while unused",
+      "instructions": {
+        "4v4x": 1242372422,
+        "4v1x": 1195110420,
+        "1v1x": 432924396
+      }
+    }
+  ],
+  "float_checksums": {
+    "4v4x": -9.307036948945465,
+    "16v4x": -11.047048867074661,
+    "4v4x-noise": -9.696828495279805,
+    "4v1x-noise": -0.7923357464858993,
+    "note": "identical from baseline and candidate for every configuration"
+  },
+  "newton_iterations_4v4x": {
+    "tolerance_1e-12": {
+      "mean": 2.338,
+      "histogram": {
+        "1": 5635,
+        "2": 1128369,
+        "3": 586316
+      },
+      "final_tanh_recomputed": 1056386,
+      "solves": 1720320
+    },
+    "tolerance_1e-9": {
+      "mean": 2.021,
+      "histogram": {
+        "1": 19852,
+        "2": 1643783,
+        "3": 56685
+      },
+      "final_tanh_recomputed_before_tangent_carry": 1567596,
+      "solves": 1720320
+    }
+  },
+  "scope": "Deterministic instruction counts of the native engine on one container; not timings, not a Rack, host or SDK-target measurement."
+}
