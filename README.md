@@ -31,6 +31,10 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 
 ## Version history
 
+### 1.0.3 — first production release
+
+Combines the exact OTA filter warm-start cache with reuse of the final `tanh` result when its argument is bit-identical, and reads the decimator history in two ordered runs. The Newton solver, circuit state, quality modes, latency and preset parameters are preserved. Includes the Rack parity drivers and retained validation history. Rack-specific presets, release packaging and host measurements are maintained in the Rack Extension repository; the earlier development-machine CPU measurements are not Rack performance claims.
+
 ### Unreleased — 1.0.2 — exact filter CPU reduction
 
 Reuse the previous sample's exact final `tanh` value at the next filter solve. Core and Rack audio match byte for byte at identical settings; measured SDK-module thread CPU improves by roughly 1–2% median. The circuit solver, quality and latency are unchanged. This version also aligns the canonical project metadata with the Ceres 1.0.2f1 Rack release; its spread and preset trim changes belong to the Rack adapter.
