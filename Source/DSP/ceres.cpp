@@ -1434,14 +1434,26 @@ struct Decimator {
     }
     void push(double x) { history[cursor] = x; cursor = cursor+1 == taps ? 0 : cursor+1; }
     // Newest sample first: history[cursor-1] down to [0], then wrap from
-    // [taps-1]. Two straight runs instead of a per-tap wrap test; the taps
-    // are summed in the same order, so the output keeps every bit.
+    // [taps-1], as two straight runs. Four interleaved partial sums: one
+    // running sum serialises 249 additions behind each other's latency,
+    // about a tenth of the 4x cost; four run in parallel. The order of the
+    // additions changes, so the sum differs from a single run at its last
+    // bit (1e-16 relative), not at the float output.
     double output() const {
-        double y = 0;
+        double s0 = 0, s1 = 0, s2 = 0, s3 = 0;
         unsigned i = 0;
-        for (unsigned at = cursor; at > 0;) y += h[i++] * history[--at];
-        for (unsigned at = taps; i < taps;) y += h[i++] * history[--at];
-        return y;
+        const auto run = [&](unsigned at, unsigned end) {
+            for (; at - end >= 4; at -= 4, i += 4) {
+                s0 += h[i] * history[at-1];
+                s1 += h[i+1] * history[at-2];
+                s2 += h[i+2] * history[at-3];
+                s3 += h[i+3] * history[at-4];
+            }
+            while (at > end) s0 += h[i++] * history[--at];
+        };
+        run(cursor, 0);
+        run(taps, cursor);
+        return (s0 + s1) + (s2 + s3);
     }
     void clear() { history.fill(0); cursor = 0; }
 };
