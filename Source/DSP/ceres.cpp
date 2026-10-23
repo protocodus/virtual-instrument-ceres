@@ -1358,14 +1358,15 @@ struct Decimator {
         }
         for (unsigned i=0;i<taps;++i) h[i] /= sum;
     }
-    void push(double x) { history[cursor] = x; cursor = (cursor+1)%taps; }
+    void push(double x) { history[cursor] = x; cursor = cursor+1 == taps ? 0 : cursor+1; }
+    // Newest sample first: history[cursor-1] down to [0], then wrap from
+    // [taps-1]. Two straight runs instead of a per-tap wrap test; the taps
+    // are summed in the same order, so the output keeps every bit.
     double output() const {
         double y = 0;
-        unsigned at = cursor;
-        for (unsigned i = 0; i < taps; ++i) {
-            at = at ? at-1 : taps-1;
-            y += h[i] * history[at];
-        }
+        unsigned i = 0;
+        for (unsigned at = cursor; at > 0;) y += h[i++] * history[--at];
+        for (unsigned at = taps; i < taps;) y += h[i++] * history[--at];
         return y;
     }
     void clear() { history.fill(0); cursor = 0; }
