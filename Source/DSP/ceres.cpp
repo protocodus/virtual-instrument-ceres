@@ -31,6 +31,16 @@ inline double inlineCopysign(double x, double sign) { return std::copysign(x, si
 inline double inlineSqrt(double x) { return std::sqrt(x); }
 inline bool inlineFinite(double x) { return std::isfinite(x); }
 #endif
+// Inlined whatever the compiler's own estimate: the filter solve's pieces,
+// whose call boundaries would otherwise pass every working value through
+// memory. Inlining never changes an IEEE result.
+#if defined(__GNUC__) || defined(__clang__)
+#define CERES_FORCE_INLINE inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#define CERES_FORCE_INLINE __forceinline
+#else
+#define CERES_FORCE_INLINE inline
+#endif
 // tanh is the engine's most frequent transcendental: the OTA filters solve
 // one per Newton iteration per stage, the WSC shaper one per sample and the
 // ring carrier's steering one per sample. glibc's tanh reaches expm1 and
@@ -801,7 +811,22 @@ struct OtaSvf {
         network.setResonance(resonance);
         return process(sourceVoltage,frequency,highPass,network);
     }
-    double process(double sourceVoltage, double frequency, bool highPass, const OtaNetwork& network) {
+    // One solve's working values. The solve is split into begin, Newton
+    // steps and end so that the voice loop can step several boards' solves
+    // in lockstep: their dependency chains (two rationals and a division per
+    // step) are independent, and interleaved they overlap in the processor
+    // instead of waiting on each other. Each board still performs exactly
+    // the operations, in exactly the order, of its own sequential solve.
+    struct Solve {
+        // begin() sets every field; no initialisers, so the voice loop's
+        // array of them costs nothing to declare each sample.
+        double cutoff, input, qConstant, nonlinear, b;
+        // The last tanh(b) the iterations evaluated, and its argument.
+        double tanhArgument, tanhValue;
+        bool converged;
+    };
+    static constexpr int maxIterations = 7;
+    CERES_FORCE_INLINE void begin(Solve& solve, double sourceVoltage, double frequency, const OtaNetwork& network) {
         const double cutoff = clamp(frequency, filterFrequencyFloor, .22 * network.fs);
         if (cutoff!=cachedCutoff || network.fs!=cachedRate) {
             // Exact input equality only: moving cutoff CVs retain the same
@@ -819,35 +844,48 @@ struct OtaSvf {
         const double input=2*ratio*sourceVoltage;
         // Eliminate both linear capacitor nodes simultaneously. The remaining
         // OTA equation has positive derivative because effectiveDamping>0.
-        const double qConstant=((1-qBlend)*sz+
+        solve.qConstant=((1-qBlend)*sz+
             qBlend*(1-sourceBlend)*(input-ratio*sy))/divisor;
-        const double qBand=network.qBand, effectiveDamping=network.effectiveDamping;
         const double linear = network.linear;
-        const double nonlinear = cutoff<=filterFrequencyFloor ? 0.0 : std::max(0.0,g-linear);
-        double b = previousB;
-        // The last tanh(b) the iterations evaluated, and its argument.
-        double tanhArgument = previousB, tanhValue = previousTanhB;
-        for (int iteration = 0; iteration < 7; ++iteration) {
-            const double tb = iteration == 0 ? previousTanhB : fastTanh(b);
-            tanhArgument = b; tanhValue = tb;
-            const double l = sl + nonlinear*tb + linear*b;
-            const double h = qConstant - effectiveDamping * b - l;
-            const double th = fastTanh(h);
-            const double residual = b - sb - nonlinear*th - linear*h;
-            const double dl = nonlinear*(1-tb*tb) + linear;
-            const double derivative = 1 + (nonlinear*(1-th*th)+linear)*(effectiveDamping+dl);
-            const double delta = residual / derivative;
-            b -= delta;
-            // Newton converges quadratically, so once a step is under 1e-9
-            // the error left in b is of order its square, under b's ulp. The
-            // earlier 1e-12 bought a further pair of tanh evaluations about a
-            // third of the time (2.34 to 2.02 iterations per solve, measured
-            // on the factory presets) and no change at the float output.
-            if (inlineAbs(delta) < 1e-9) break;
-        }
+        solve.nonlinear = cutoff<=filterFrequencyFloor ? 0.0 : std::max(0.0,g-linear);
+        solve.cutoff = cutoff;
+        solve.input = input;
+        solve.b = previousB;
+        solve.tanhArgument = previousB;
+        solve.tanhValue = previousTanhB;
+        solve.converged = false;
+    }
+    // Newton iteration `iteration` (0-based) of an unconverged solve.
+    CERES_FORCE_INLINE void step(Solve& solve, int iteration, const OtaNetwork& network) const {
+        const double effectiveDamping=network.effectiveDamping, linear=network.linear;
+        const double nonlinear=solve.nonlinear, qConstant=solve.qConstant;
+        double b = solve.b;
+        const double tb = iteration == 0 ? previousTanhB : fastTanh(b);
+        solve.tanhArgument = b; solve.tanhValue = tb;
+        const double l = sl + nonlinear*tb + linear*b;
+        const double h = qConstant - effectiveDamping * b - l;
+        const double th = fastTanh(h);
+        const double residual = b - sb - nonlinear*th - linear*h;
+        const double dl = nonlinear*(1-tb*tb) + linear;
+        const double derivative = 1 + (nonlinear*(1-th*th)+linear)*(effectiveDamping+dl);
+        const double delta = residual / derivative;
+        b -= delta;
+        solve.b = b;
+        // Newton converges quadratically, so once a step is under 1e-9
+        // the error left in b is of order its square, under b's ulp. The
+        // earlier 1e-12 bought a further pair of tanh evaluations about a
+        // third of the time (2.34 to 2.02 iterations per solve, measured
+        // on the factory presets) and no change at the float output.
+        solve.converged = inlineAbs(delta) < 1e-9;
+    }
+    CERES_FORCE_INLINE double end(const Solve& solve, bool highPass, const OtaNetwork& network) {
+        const double sourceBlend=network.sourceBlend, qBand=network.qBand;
+        const double linear=network.linear, nonlinear=solve.nonlinear;
+        const double qConstant=solve.qConstant, input=solve.input, b=solve.b;
         // tanh(b) is the last evaluation carried along its tangent over that
         // final sub-ulp step; only an unconverged loop recomputes it.
-        const double step = b - tanhArgument;
+        const double step = b - solve.tanhArgument;
+        const double tanhValue = solve.tanhValue;
         const double tanhB = inlineAbs(step) < 1e-9
             ? tanhValue + (1 - tanhValue*tanhValue)*step : fastTanh(b);
         const double l = sl + nonlinear*tanhB + linear*b;
@@ -863,6 +901,15 @@ struct OtaSvf {
         previousB = b;
         previousTanhB = tanhB;
         return highPass ? h : l;
+    }
+    double process(double sourceVoltage, double frequency, bool highPass, const OtaNetwork& network) {
+        Solve solve;
+        begin(solve,sourceVoltage,frequency,network);
+        for (int iteration = 0; iteration < maxIterations; ++iteration) {
+            step(solve,iteration,network);
+            if (solve.converged) break;
+        }
+        return end(solve,highPass,network);
     }
 };
 
@@ -891,14 +938,6 @@ struct FilterChain {
         const double high=hp.process(inputScale*waveSum/branches,hpFrequency,hpResonance,
                                      fs,true,branches/150e3,3/150e3);
         const double low=lp.process(high,lpFrequency,lpResonance,fs,false);
-        return low*filteredVcaCalibration/inputScale;
-    }
-    double process(double waveSum, double branches, double hpFrequency, double lpFrequency,
-                   double drive,
-                   const OtaNetwork& hpNetwork, const OtaNetwork& lpNetwork) {
-        const double inputScale=.3*drive;
-        const double high=hp.process(inputScale*waveSum/branches,hpFrequency,true,hpNetwork);
-        const double low=lp.process(high,lpFrequency,false,lpNetwork);
         return low*filteredVcaCalibration/inputScale;
     }
 };
@@ -2054,6 +2093,21 @@ struct Synth::Impl {
             v.keyPitch=60+12*std::log2(v.glideVoltage);
         return v.keyPitch;
     }
+    // Newton steps of every board's solve at one filter stage, iteration by
+    // iteration, each board stopping where its own solve converges.
+    void solveFilters(std::array<OtaSvf::Solve,Synth::maxVoiceCount>& solves, bool highPass,
+                      const OtaNetwork& network) {
+        for (int iteration = 0; iteration < OtaSvf::maxIterations; ++iteration) {
+            bool pending = false;
+            for (unsigned i = 0; i < voiceLimit; ++i) {
+                if (solves[i].converged) continue;
+                const OtaSvf& filter = highPass ? voices[i].filters.hp : voices[i].filters.lp;
+                filter.step(solves[i],iteration,network);
+                pending = pending || !solves[i].converged;
+            }
+            if (!pending) break;
+        }
+    }
     double sample() {
         hasProcessed=true;
         const double dt = 1 / internalFs;
@@ -2135,7 +2189,15 @@ struct Synth::Impl {
         const double resetSeconds = patch.resetMicroseconds*1e-6;
         const bool sineOn = patch.sine!=0, sawOn = patch.saw!=0, pulseOn = patch.pulse!=0;
         const double spreadCentre = .5*(voiceLimit-1);
-        double mixed = 0;
+        // The voice loop runs in three passes: each board's sources, EGs and
+        // cutoffs; then both filter stages of every board, their Newton
+        // solves stepped in lockstep across the boards (see OtaSvf::Solve);
+        // then each board's couplings and VCAs, summed in board order. Every
+        // board performs the same operations in the same order as in one
+        // pass, and the shared random stream is drawn in the same order.
+        const double inputScale=.3*patch.drive; // shared, uncalibrated WSC/OTA voltage scale
+        std::array<double,Synth::maxVoiceCount> filterInput, hpFrequencies, lpFrequencies;
+        std::array<double,Synth::maxVoiceCount> sines, ampEnvelopes, velocityGains, touchLevels;
         for (unsigned i = 0; i < voiceLimit; ++i) {
             auto& v = voices[i];
             // Velocity is stored per physical board on note assignment. Do
@@ -2234,14 +2296,43 @@ struct Synth::Impl {
 #if !defined(CERES_EMBEDDED_TARGET)
             v.oscillatorFrequency=frequency; v.hpFrequency=hpFrequency; v.lpFrequency=lpFrequency;
 #endif
-            const double low=v.filters.process(source,hpSourceBranches,hpFrequency,lpFrequency,
-                patch.drive,hpFilterNetwork,lpFilterNetwork);
+            filterInput[i]=inputScale*source/hpSourceBranches;
+            hpFrequencies[i]=hpFrequency; lpFrequencies[i]=lpFrequency;
+            sines[i]=waves.sine; ampEnvelopes[i]=ampEnvelope;
+            velocityGains[i] = 1-patch.velocitySensitivity*(1-v.velocityValue);
+            touchLevels[i]=patch.pressureVolume*expression*touchLevelScale;
+        }
+        // FilterChain::process, HP then LP, for every board at once.
+        if (voiceLimit==1) {
+            // Nothing to interleave: one board's solves, one after the other.
+            auto& filters=voices[0].filters;
+            filterInput[0]=filters.lp.process(filters.hp.process(filterInput[0],hpFrequencies[0],true,
+                hpFilterNetwork),lpFrequencies[0],false,lpFilterNetwork)*filteredVcaCalibration/inputScale;
+        } else {
+            std::array<OtaSvf::Solve,Synth::maxVoiceCount> solves;
+            for (unsigned i = 0; i < voiceLimit; ++i)
+                voices[i].filters.hp.begin(solves[i],filterInput[i],hpFrequencies[i],hpFilterNetwork);
+            solveFilters(solves,true,hpFilterNetwork);
+            for (unsigned i = 0; i < voiceLimit; ++i)
+                filterInput[i]=voices[i].filters.hp.end(solves[i],true,hpFilterNetwork);
+            for (unsigned i = 0; i < voiceLimit; ++i)
+                voices[i].filters.lp.begin(solves[i],filterInput[i],lpFrequencies[i],lpFilterNetwork);
+            solveFilters(solves,false,lpFilterNetwork);
+            for (unsigned i = 0; i < voiceLimit; ++i)
+                filterInput[i]=voices[i].filters.lp.end(solves[i],false,lpFilterNetwork)
+                    *filteredVcaCalibration/inputScale;
+        }
+        double mixed = 0;
+        for (unsigned i = 0; i < voiceLimit; ++i) {
+            auto& v = voices[i];
+            const auto& board=v.board;
+            const double low=filterInput[i];
             // CP3 coupling precedes filtered level; CP4 coupling acts on
             // the filtered/sine sum before common level and envelope VCAs.
             const double filtered=v.filteredCoupling.process(low,couplingCoefficients[0]);
             // The sine's VR11/VR12 balance against the filtered path (VCA
             // amount); exactly 1 when off.
-            const double summed=filtered*patch.filterLevel + waves.sine*patch.sine*board.sineGain;
+            const double summed=filtered*patch.filterLevel + sines[i]*patch.sine*board.sineGain;
             const double beforeVca=v.commonCoupling.process(summed,couplingCoefficients[1]);
             // IG00151 gain is LINEAR in envelope CV (guide pp.40–41). The
             // optional velocity term is zero in factory-derived presets.
@@ -2255,9 +2346,8 @@ struct Synth::Impl {
             // up to 1.08 of full LEVEL, tremolo .3375) is unpublished too, so
             // it stays linear. The LEVEL levers' 100k/.01uF at LI (1ms with a
             // high-impedance pin) is not modelled: LI's impedance is unknown.
-            const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocityValue);
-            const double touchLevel=patch.pressureVolume*expression*touchLevelScale;
-            mixed += beforeVca * ampEnvelope * board.ampEnvelopeGain * velocityGain * std::max(0.0,levelControl+touchLevel);
+            mixed += beforeVca * ampEnvelopes[i] * board.ampEnvelopeGain * velocityGains[i]
+                * std::max(0.0,levelControl+touchLevels[i]);
         }
         // The PRA output preamp (outputPreamp) is linear up to its derived
         // op-amp rails; no hidden peak normalization or dynamics processor.
