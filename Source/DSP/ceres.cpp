@@ -31,6 +31,23 @@ inline double inlineCopysign(double x, double sign) { return std::copysign(x, si
 inline double inlineSqrt(double x) { return std::sqrt(x); }
 inline bool inlineFinite(double x) { return std::isfinite(x); }
 #endif
+// clang, the Rack SDK's compiler, leaves the per-voice-sample calls below
+// (the oscillator, both filter solves and both envelopes, 3.4 million calls a
+// second at four voices) out of line, and their call, spill and reload cost
+// about 7% of the 1x instructions under clang -O3 -fno-builtin (measured with
+// Tools/callgrind_presets.cpp; Docs/benchmarks/cpu-inlining-2026-10-25.md).
+// Inlining changes no arithmetic: the same IEEE operations in the same order,
+// with no FP contraction under the Rack's flags. GCC inlines them already;
+// forcing it there only moves its register allocation (+1% measured), so the
+// hint is clang's alone. CERES_NOINLINE keeps rare paths (the envelope
+// attack) out of the voice loop that inlines.
+#if defined(__clang__)
+#define CERES_ALWAYS_INLINE inline __attribute__((always_inline))
+#define CERES_NOINLINE __attribute__((noinline))
+#else
+#define CERES_ALWAYS_INLINE inline
+#define CERES_NOINLINE
+#endif
 // tanh is the engine's most frequent transcendental: the OTA filters solve
 // one per Newton iteration per stage, the WSC shaper one per sample and the
 // ring carrier's steering one per sample. glibc's tanh reaches expm1 and
@@ -801,7 +818,7 @@ struct OtaSvf {
         network.setResonance(resonance);
         return process(sourceVoltage,frequency,highPass,network);
     }
-    double process(double sourceVoltage, double frequency, bool highPass, const OtaNetwork& network) {
+    CERES_ALWAYS_INLINE double process(double sourceVoltage, double frequency, bool highPass, const OtaNetwork& network) {
         const double cutoff = clamp(frequency, filterFrequencyFloor, .22 * network.fs);
         if (cutoff!=cachedCutoff || network.fs!=cachedRate) {
             // Exact input equality only: moving cutoff CVs retain the same
@@ -1185,7 +1202,7 @@ struct Envelope {
     // that the path every held or released board takes each sample, one
     // multiply-add and a settle test, inlines into the voice loop (the
     // nine-argument function did not, and its call cost more than its body).
-    double advance(double initial, double peak, double sustained,
+    CERES_ALWAYS_INLINE double advance(double initial, double peak, double sustained,
                    double headroom, double saturation, double attackIncrement, double currentStep,
                    double decayCoefficient, double releaseCoefficient) {
         if (stage == Attack)
@@ -1203,7 +1220,7 @@ struct Envelope {
         }
         return voltage;
     }
-    double attack(double initial, double peak, double headroom, double saturation,
+    CERES_NOINLINE double attack(double initial, double peak, double headroom, double saturation,
                   double attackIncrement, double currentStep) {
         const double span = std::max(1e-9, inlineAbs(peak - initial));
         const double target = peak + headroom * span;
@@ -1327,7 +1344,7 @@ struct Oscillator {
     double stiCoupling = 0;
     bool stiPrecharged = false;
     // stiCoefficient: -expm1(-1/(fs*wscSineInputTau)).
-    OscillatorFrame process(double frequency, double pulseWidth, double resetSeconds, double fs,
+    CERES_ALWAYS_INLINE OscillatorFrame process(double frequency, double pulseWidth, double resetSeconds, double fs,
                             double stiCoefficient, bool sineEnabled = true,
                             bool sawEnabled = true, bool pulseEnabled = true) {
         // Guide pp.28-31: OUT7 conditions the integrating-capacitor signal
