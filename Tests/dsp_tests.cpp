@@ -1280,8 +1280,36 @@ void sustainKeyCvModes() {
 
 }
 
+void engineExp2Accuracy() {
+    // The pitch and cutoff exp2 is Arm's optimized-routines exp2, the one
+    // glibc ships: bit for bit std::exp2 there, within one ulp of any other
+    // libm's (the routine's bound is .52 ulp, a libm's usually under one).
+    std::mt19937_64 random(20261025);
+    std::uniform_real_distribution<double> playing(-40,40), wide(-1100,1100);
+    std::vector<double> arguments={0.,-0.,1e-300,-1e-300,0x1p-54,-0x1p-54,0x1p-55,511.99,-511.99,512.,-512.,
+        1023.5,1024.,-1074.,-1075.5,-1080.,std::numeric_limits<double>::infinity(),
+        -std::numeric_limits<double>::infinity()};
+    for (int k=-128*48;k<=128*48;++k) {
+        const double x=k/128.;
+        arguments.insert(arguments.end(),{x,std::nextafter(x,1e9),std::nextafter(x,-1e9),(k+.5)/128});
+    }
+    for (int i=0;i<2000000;++i) arguments.push_back(i%10 ? playing(random) : wide(random));
+    for (double x : arguments) {
+        const double engine=ceres::engineExp2(x), library=std::exp2(x);
+#if defined(__GLIBC__)
+        require(engine==library && std::signbit(engine)==std::signbit(library),
+                "engine exp2 is glibc's exp2 bit for bit");
+#else
+        const double ulp=std::max(std::abs(std::nextafter(library,0.)-library),
+            std::abs(std::nextafter(library,std::numeric_limits<double>::infinity())-library));
+        require(engine==library || std::abs(engine-library)<=ulp,"engine exp2 within one ulp of std::exp2");
+#endif
+    }
+    require(std::isnan(ceres::engineExp2(std::numeric_limits<double>::quiet_NaN())),"engine exp2 keeps NaN");
+}
 int main() {
     try {
+        engineExp2Accuracy(); std::cout<<"PASS engine exp2 against std::exp2 over 2.05 million arguments\n";
         panelParameterRanges(); std::cout<<"PASS ring/SUB/Sustain mode ranges and validation\n";
         subOscillatorRoutes(); std::cout<<"PASS SUB shapes, sourced noise pole, destinations and separate PWM\n";
         ringEnvelopeAndKeyLedger(); std::cout<<"PASS ring RC timing, key ledger, legato/retrigger, bounds and panic\n";

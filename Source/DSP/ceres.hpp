@@ -530,6 +530,10 @@ struct EnvelopeGate { std::size_t frame; bool on; };
 std::vector<double> envelopeTrace(double sampleRate, const Patch&, bool filter,
     std::size_t frames, const std::vector<EnvelopeGate>& gates);
 
+// The engine's inline exp2 (board pitch and both cutoff factors), exposed
+// for its accuracy contract in Tests/dsp_tests.cpp.
+double engineExp2(double x);
+
 // Raw source generator, before voice filters/VCA/decimation. sampleRate is
 // its actual processing rate (use 4*hostRate to match the synth core). The
 // sine's input coupling starts precharged to the triangle's mean at this
