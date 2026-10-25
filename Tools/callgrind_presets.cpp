@@ -8,6 +8,21 @@
 // `noise` sets NOISE to .3 on every preset (all factory presets leave it at 0).
 // Instruction counts are deterministic on a shared machine where timings are
 // not; they are not a Reason host or target measurement.
+//
+// Protocol (Docs/benchmarks/cpu-inlining-2026-10-25.md). The primary workload
+// imitates the Rack's build as nearly as a container without the SDK allows:
+//   clang++ -std=c++17 -O3 -fno-builtin -DNDEBUG -I Source/DSP \
+//       Tools/callgrind_presets.cpp Source/DSP/ceres.cpp -o callgrind_presets
+//   valgrind --tool=callgrind ./callgrind_presets 4 1 240   (the Rack's 4 voices/1x)
+//   valgrind --tool=callgrind ./callgrind_presets 4 4 240   (the heaviest quality)
+//   valgrind --tool=callgrind ./callgrind_presets 1 1 240
+// and the same three with g++ -std=c++17 -O3 -DNDEBUG for the host build.
+// CERES_EMBEDDED_TARGET is left off because it removes preset() and
+// presetNames(); it changes no audio-path code. Baseline and candidate are
+// compiled fresh with identical flags; the printed checksum must match, and
+// Tests/check_cpu_null.py --baseline-ref <sha> (also with
+// CXX="clang++ -fno-builtin") must report a byte-identical float32 stream
+// before a change counts as exact or last bit.
 #include "ceres.hpp"
 #include <cmath>
 #include <cstdio>
