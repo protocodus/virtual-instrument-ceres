@@ -2283,6 +2283,9 @@ struct Synth::Impl {
         const double resetSeconds = patch.resetMicroseconds*1e-6;
         const bool sineOn = patch.sine!=0, sawOn = patch.saw!=0, pulseOn = patch.pulse!=0;
         const double spreadCentre = .5*(voiceLimit-1);
+        const double octaveSemitones = 12*patch.octave, tuneOctaves = patch.tuneCents/1200;
+        const double touchCutoffBus = patch.pressureFilter+lfo*patch.pressureWah;
+        const double hpLfoShare = patch.filterLfo*hpSubRelativeScale;
         double mixed = 0;
         for (unsigned i = 0; i < voiceLimit; ++i) {
             auto& v = voices[i];
@@ -2329,7 +2332,7 @@ struct Synth::Impl {
                 }
                 cents+=v.boardPitchCents;
             }
-            const double frequency = 440 * tableExp2((key-69 + bend + 12*patch.octave + cents*.01)/12);
+            const double frequency = 440 * tableExp2((key-69 + bend + octaveSemitones + cents*.01)/12);
             const auto waves = v.osc.process(frequency, pulseWidth, resetSeconds, internalFs,
                                             stiCoefficient, sineOn, sawOn, pulseOn);
             // Each board's EG times, VCA-EG peak and floor (see BoardTolerance;
@@ -2358,17 +2361,17 @@ struct Synth::Impl {
             // -5..+7 semitones. It remains a shared master offset even when
             // the engineering-only keyTrack slope is changed. TRANSPOSE FT,
             // VIB15 and the modeled oscillator drift/spread remain VCO-only.
-            const double keyOctaves=(key-60+bend)*patch.keyTrack/12+patch.tuneCents/1200;
+            const double keyOctaves=(key-60+bend)*patch.keyTrack/12+tuneOctaves;
             // R7 TBR and VCF (touch SUB) enter each cutoff node through 47k LP
             // and 150k HP, like SUB: the HP coupling is hpSubRelativeScale.
-            const double touchOctaves=expression*(patch.pressureFilter+lfo*patch.pressureWah);
+            const double touchOctaves=expression*touchCutoffBus;
             // Board tolerance (see BoardTolerance): each Vfc input's octaves
             // scale with this board's rank residual, the static cutoff's from
             // the lever centre; the EG also with its output-level residual.
             // Every factor is exactly 1, and each cutoff the patch's, when off.
             const auto& board=v.board;
             const double hpFactor=tableExp2(keyOctaves+filterEnvelope*board.hpEnvelopeGain*patch.hpEnvelopeScale
-                + touchOctaves*board.hpScale*hpSubRelativeScale+lfo*board.hpScale*(patch.filterLfo*hpSubRelativeScale)
+                + touchOctaves*board.hpScale*hpSubRelativeScale+lfo*board.hpScale*hpLfoShare
                 + patch.brilliance*board.hpScale*hpBrillianceScale);
             const double lpFactor=patch.lpEnvelopeScale==patch.hpEnvelopeScale &&
                 patch.filterLfo==0 && patch.brilliance==0 && touchOctaves==0 &&
