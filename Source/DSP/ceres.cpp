@@ -778,6 +778,11 @@ struct OtaNetwork {
     double fs=0, conductance=0, referenceConductance=0, ratio=0;
     double qBlend=0, sourceBlend=0, divisor=0, linear=0, sourceInput=0;
     double resonance=0, qBand=0, effectiveDamping=0;
+    // Factors of the per-sample solve that depend on the network alone,
+    // formed here once instead of in every voice's every sample. Each is the
+    // leading product or difference of its expression in OtaSvf::process,
+    // which C++ evaluates left to right, so the bits are the same.
+    double twoRatio=0, heldQ=0, sourceQ=0, heldSource=0;
     bool resonanceReady=false;
     void configure(double rate, double sourceConductance=1/150e3,
                    double referenceSourceConductance=1/150e3) {
@@ -791,6 +796,10 @@ struct OtaNetwork {
         divisor=1-qBlend*ratio*sourceBlend;
         linear=1/(2*fs*filterCapacitance*filterFeedResistance);
         sourceInput=conductance/(sourceConductance+2*fs*sourceCapacitance);
+        twoRatio=2*ratio;
+        heldQ=1-qBlend;
+        sourceQ=qBlend*(1-sourceBlend);
+        heldSource=1-sourceBlend;
         resonanceReady=false;
     }
     void setResonance(double value) {
@@ -828,16 +837,16 @@ struct OtaSvf {
             cachedRate=network.fs;
         }
         const double g = cachedG;
-        const double ratio=network.ratio, qBlend=network.qBlend;
+        const double ratio=network.ratio;
         const double sourceBlend=network.sourceBlend, divisor=network.divisor;
         // X is the physical Thevenin source voltage, in the SAME OTA voltage
         // unit at both stages. Canonical u=2*Gs*X/D0 is a local algebraic
         // coordinate, not a separate per-stage signal normalization.
-        const double input=2*ratio*sourceVoltage;
+        const double input=network.twoRatio*sourceVoltage;
         // Eliminate both linear capacitor nodes simultaneously. The remaining
         // OTA equation has positive derivative because effectiveDamping>0.
-        const double qConstant=((1-qBlend)*sz+
-            qBlend*(1-sourceBlend)*(input-ratio*sy))/divisor;
+        const double qConstant=(network.heldQ*sz+
+            network.sourceQ*(input-ratio*sy))/divisor;
         const double qBand=network.qBand, effectiveDamping=network.effectiveDamping;
         const double linear = network.linear;
         const double nonlinear = cutoff<=filterFrequencyFloor ? 0.0 : std::max(0.0,g-linear);
@@ -872,7 +881,7 @@ struct OtaSvf {
         const double h = z - 2*b - l;
         // Expand sourceBlend/ratio analytically so tiny positive diagnostic
         // conductances cannot overflow at the intermediate input/ratio.
-        const double y=(1-sourceBlend)*sy+sourceBlend*(-z+2*b)+network.sourceInput*input;
+        const double y=network.heldSource*sy+sourceBlend*(-z+2*b)+network.sourceInput*input;
         sb = 2 * b - sb;
         sl = 2 * l - sl;
         sz = 2 * z - sz;
