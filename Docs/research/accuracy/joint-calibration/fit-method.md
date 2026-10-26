@@ -1,6 +1,6 @@
 # Conditional joint-fit method (implementation, not executed)
 
-[joint_fit.py](../../../Tools/accuracy/joint_fit.py) is a separate tool. The
+[joint_fit.py](../../../../Tools/accuracy/joint_fit.py) is a separate tool. The
 qualified DC helper, its driver and its declaration remain unchanged. This tool
 requires a new controller-owned `fit-plan.json` before any execution. It never
 renders audio, and only its gated `fit` command reads hardware target values.

@@ -20,7 +20,7 @@ later, separately declared conditional calibration. It does not identify a
 physical hardware bias, chip calibration, or factory preset map. It does not
 use source recordings to synthesize audio.
 
-The helper is [joint_calibration.py](../../../Tools/accuracy/joint_calibration.py).
+The helper is [joint_calibration.py](../../../../Tools/accuracy/joint_calibration.py).
 Its only executable commands are `oracles`, `qualify`, and `check`; it contains
 no parameter optimizer. The only eligible clips are raw high Flute and Brass
 history20. Qualification evaluates all 12 loaded and four stiff conditions per

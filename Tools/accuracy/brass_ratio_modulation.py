@@ -20,7 +20,7 @@ from scipy import linalg, signal
 from scipy.io import wavfile
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / 'Docs/accuracy/brass-ratio-modulation'
+OUT = ROOT / 'Docs/research/accuracy/brass-ratio-modulation'
 ARC = Path('/tmp/ceres-cs50-1x8LGd')
 PLAN = OUT / 'plan.json'
 SCRIPT = Path(__file__).resolve()

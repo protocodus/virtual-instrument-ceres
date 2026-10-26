@@ -29,7 +29,7 @@ def main():
         temp=Path(name)
         if args.baseline_source:
             baseline=args.baseline_source.resolve()
-            imported=json.loads((ROOT/'Docs/EXPERIMENT_IMPORT.json').read_text())
+            imported=json.loads((ROOT/'Docs/validation/experiment-import.json').read_text())
             for filename in ['ceres.hpp','ceres.cpp']:
                 expected=imported['files']['Source/DSP/'+filename]['original_sha256']
                 assert sha(baseline/filename)==expected,filename
@@ -53,7 +53,7 @@ def main():
             'samples_per_variant':384000,'variants':fingerprints,
             'input_sha256':{str(p.relative_to(ROOT)):sha(p) for p in
                 [ROOT/'Source/DSP/ceres.hpp',ROOT/'Source/DSP/ceres.cpp',ROOT/'Tests/ParityDriver.cpp',
-                 ROOT/'Tools/check_embedded.py',ROOT/'Docs/EXPERIMENT_IMPORT.json']}}
+                 ROOT/'Tools/check_embedded.py',ROOT/'Docs/validation/experiment-import.json']}}
     if args.report:
         args.report.parent.mkdir(parents=True,exist_ok=True)
         args.report.write_text(json.dumps(evidence,indent=2)+'\n')

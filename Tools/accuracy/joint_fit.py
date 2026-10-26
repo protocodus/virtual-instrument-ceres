@@ -24,13 +24,13 @@ from scipy.optimize import least_squares
 from scipy.io import wavfile
 
 ROOT=Path(__file__).resolve().parents[2]
-OUT=ROOT/'Docs/accuracy/joint-calibration'
+OUT=ROOT/'Docs/research/accuracy/joint-calibration'
 QUALIFIER=ROOT/'Tools/accuracy/joint_calibration.py'
 QUALIFIER_SHA='5c4b5aabafc28cc5d8dcaf502a2956e03899f0dd8977d8f7d94410a4a06d7114'
 assert hashlib.sha256(QUALIFIER.read_bytes()).hexdigest()==QUALIFIER_SHA
 spec=importlib.util.spec_from_file_location('pinned_dc_qualification',QUALIFIER)
 q=importlib.util.module_from_spec(spec);spec.loader.exec_module(q)
-NETWORK=ROOT/'Docs/accuracy/preset-dc-loading/network.py'
+NETWORK=ROOT/'Docs/research/accuracy/preset-dc-loading/network.py'
 spec=importlib.util.spec_from_file_location('frozen_network',NETWORK)
 net=importlib.util.module_from_spec(spec);spec.loader.exec_module(net)
 TRAIN=q.TRAIN
@@ -86,7 +86,7 @@ def training_cases():
 def bindings(cases,include_targets=False):
     paths=[Path(__file__).resolve(),QUALIFIER,NETWORK,OUT/'fit-plan.json',OUT/'plan.json',
         OUT/'attempt-001/report.json',ROOT/'Tools/accuracy/metrics.py',
-        ROOT/'Docs/accuracy/inputs/research/brass1-release-spectra-160.json']
+        ROOT/'Docs/research/accuracy/inputs/research/brass1-release-spectra-160.json']
     old=q.read(OUT/'attempt-001/report.json')
     for name in TRAIN:
         meta=old['trace_metadata'][name]
@@ -450,7 +450,7 @@ def targets(cache):
         if data.ndim==2:data=data.mean(axis=1)
         rows=[q.m.measure_frame(data,rate,float(t),clip['expected_f0'],count=16,duration=.128) for t in cache.times]
         return np.asarray([r['relative_db'][1:7] for r in rows]),20*np.log10(np.maximum([r['rms'] for r in rows],1e-15))[:,None]
-    source=q.read(ROOT/'Docs/accuracy/inputs/research/brass1-release-spectra-160.json')['source']
+    source=q.read(ROOT/'Docs/research/accuracy/inputs/research/brass1-release-spectra-160.json')['source']
     ratios=np.asarray(source['ratio_db'])
     levels=np.asarray([[q.m.band(row,note,1)['band_dbFS'] for note in q.m.NOTES] for row in source['rows']])
     assert ratios.shape==cache.valid.shape

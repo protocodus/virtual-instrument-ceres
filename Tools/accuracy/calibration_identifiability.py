@@ -13,12 +13,12 @@ import numpy as np
 
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT/'Docs/accuracy/calibration-identifiability'
-NETWORK = ROOT/'Docs/accuracy/preset-dc-loading/network.py'
-EVIDENCE = ROOT/'Docs/accuracy/preset-dc-loading/source-evidence.json'
+OUT = ROOT/'Docs/research/accuracy/calibration-identifiability'
+NETWORK = ROOT/'Docs/research/accuracy/preset-dc-loading/network.py'
+EVIDENCE = ROOT/'Docs/research/accuracy/preset-dc-loading/source-evidence.json'
 PINS = {
-    'Docs/accuracy/preset-dc-loading/network.py': 'b03cdb48f68c73cc70312cb2c8061d69a1d81fea1f6e0330464f8e052f631297',
-    'Docs/accuracy/preset-dc-loading/source-evidence.json': '3e4965c2a3cf6b0e0252d48439578b38f58e11274138f143d5fb9b40f70a98c3',
+    'Docs/research/accuracy/preset-dc-loading/network.py': 'b03cdb48f68c73cc70312cb2c8061d69a1d81fea1f6e0330464f8e052f631297',
+    'Docs/research/accuracy/preset-dc-loading/source-evidence.json': '3e4965c2a3cf6b0e0252d48439578b38f58e11274138f143d5fb9b40f70a98c3',
     'Source/DSP/ceres.cpp': '3478c02cc7c134a698bf0a32b708b2bda8e7eb0e38f97d27ee458a98c481baaa',
     'Source/DSP/ceres.hpp': '577cbd5909705d7db3a1522edbbfc71ec056d03751bbb97390413cf8cd6375f8',
 }
@@ -49,7 +49,7 @@ def inputs():
         assert sha(path) == digest, 'Original source evidence changed: '+name
         external[name] = digest
     local = {name: sha(ROOT/name) for name in (*PINS,
-        'Docs/accuracy/preset-dc-loading/source-review.md',
+        'Docs/research/accuracy/preset-dc-loading/source-review.md',
         'Tools/accuracy/calibration_identifiability.py')}
     return {'repository_files_sha256': local, 'inherited_source_files_sha256': external,
             'source_evidence_sha256': sha(EVIDENCE)}

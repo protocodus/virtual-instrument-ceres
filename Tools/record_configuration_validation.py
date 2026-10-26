@@ -24,7 +24,7 @@ inputs=['CMakeLists.txt','Source/DSP/ceres.cpp','Source/DSP/ceres.hpp','Tools/re
  'Tests/ConfigurationTests.cpp','Tests/ConfigurationParityDriver.cpp','Tests/EmbeddedContract.cpp','Tests/RingDepthContinuityTests.cpp',
  'Tests/check_configuration_cli.py','Tests/check_configuration_parity.py',
  'Tools/check_legacy_configuration.py','Tools/benchmark_configuration.py','Tools/benchmark_configuration.cpp',
- 'Tools/record_configuration_validation.py','README.md','Docs/DSP_SOURCE.md']
+ 'Tools/record_configuration_validation.py','README.md','Docs/research/dsp-source.md']
 inputs += [str(f.relative_to(ROOT)) for f in D.iterdir() if f.is_file() and f.name!='validation.json']
 report={'status':'pass','product_version':'0.2.0','parent_commit':'2ee6cf22deead7358d6b4ee7c294da955225af56',
  'release_ctest_passed':19,'targeted_asan_ubsan_passed':5,'legacy_exact_samples':768000,

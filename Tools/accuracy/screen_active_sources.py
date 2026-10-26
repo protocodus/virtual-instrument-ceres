@@ -9,7 +9,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from PIL import Image,ImageDraw
-ROOT=Path(__file__).resolve().parents[2];BASE=ROOT/'Docs/accuracy';ASSETS=BASE/'active-source'
+ROOT=Path(__file__).resolve().parents[2];BASE=ROOT/'Docs/research/accuracy';ASSETS=BASE/'active-source'
 SOURCE=Path('/tmp/ceres-cs50-1x8LGd/references/whitmore-original.wav')
 META=BASE/'inputs/references/whitmore-original.info.json'
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()

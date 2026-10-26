@@ -1787,7 +1787,7 @@ constexpr double presetDiodeIs=2.52e-9, presetDiodeVt=1.75*25.85e-3;
 // board holds near ground (SM2 printed p.16: R6 2.2k HP, R7 2.4k LP at rank
 // B, beside the trim's 330k plus its centred B-100k's 25k; BR 680k/220k,
 // SUB/TBR/VCF 150k/47k each, EG 220k/47k on Overall): about 10.3k in all, as
-// much as the T-board's own 10k. (Docs/accuracy/preset-dc-loading solved the
+// much as the T-board's own 10k. (Docs/research/accuracy/preset-dc-loading solved the
 // same network under the earlier, unsourced anchors and slopes.) ESTIMATE:
 // pin 4 is taken as a high-impedance input and the VR7/VR9 trims as centred;
 // a virtual-ground pin 4 (bare 39k branches) or a trim at either rail moves

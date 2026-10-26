@@ -123,7 +123,7 @@ Later the same day:
 
 The engine negates the pulse so equal-level saw and pulse reinforce. In
 round 1 that rested on one public recording (Marc Doty, AutomaticGainsay,
-2013; see `Docs/accuracy/waveform-mixing-20261019/`), where both-on/saw RMS
+2013; see `Docs/research/accuracy/waveform-mixing-20261019/`), where both-on/saw RMS
 is 2.35-2.47 against 0.89 for the cancelling sign.
 
 Yamaha's documents, read literally, say the opposite:

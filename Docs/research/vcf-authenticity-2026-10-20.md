@@ -449,7 +449,7 @@ wiring lists settle it for the four filter rows.
   Overall): 2.07k and 1.96k. Each cutoff row therefore carries
   (39k + 2.07k)/4 = 10.27k (HP) or 10.24k (LP) beside its own 10k, 5.07k in
   all: half the load the printed table was computed for.
-- **Earlier work.** `Docs/accuracy/preset-dc-loading/` (2026-10-19) solved
+- **Earlier work.** `Docs/research/accuracy/preset-dc-loading/` (2026-10-19) solved
   this same five-node network, as a hypothesis for the old 12/180 Hz
   anchors and .7/.65 slopes reinterpreted on the actual bus, and compared
   it with four public recordings: loading at BR −15 V improved the Flute
