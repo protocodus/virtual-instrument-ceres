@@ -1,0 +1,102 @@
+{
+  "tool": "Tools/callgrind_presets.cpp",
+  "workloads": {
+    "4v1x": "4 1 240",
+    "4v4x": "4 4 60",
+    "1v1x": "1 1 240"
+  },
+  "compilers": {
+    "gccnb": "g++ 13.3 -std=c++17 -O3 -fno-builtin -DNDEBUG",
+    "clangnb": "clang++ 18.1 (libstdc++) -std=c++17 -O3 -fno-builtin -DNDEBUG",
+    "gcc": "g++ 13.3 -std=c++17 -O3 -DNDEBUG"
+  },
+  "baseline_commit": "492d93b36d9584826c2d0cd4017ddba7cc19bd89",
+  "commits": [
+    {
+      "commit": "492d93b36d9584826c2d0cd4017ddba7cc19bd89",
+      "change": "1.0.4 baseline",
+      "subject": "Merge pull request #9 from protocodus/claude/vibrant-bardeen-joloa1",
+      "instructions": {
+        "gccnb-4v1x": 1171235678,
+        "gccnb-4v4x": 1217801782,
+        "gccnb-1v1x": 428242650,
+        "clangnb-4v1x": 1301061661,
+        "clangnb-4v4x": 1340606531,
+        "clangnb-1v1x": 449453709,
+        "gcc-4v1x": 1195110430,
+        "gcc-4v4x": 1242372520,
+        "gcc-1v1x": 432924406
+      },
+      "checksum_4v4x_gcc": "-0.79647378410472447"
+    },
+    {
+      "commit": "e03ca5178a0e0009cb2eb437efe0c2ef8c875226",
+      "change": "1. builtins",
+      "subject": "Use builtin abs, copysign, sqrt and isfinite on the audio path",
+      "instructions": {
+        "gccnb-4v1x": 1167948284,
+        "gccnb-4v4x": 1214466430,
+        "gccnb-1v1x": 425172584,
+        "clangnb-4v1x": 1300143472,
+        "clangnb-4v4x": 1339638404,
+        "clangnb-1v1x": 448750700,
+        "gcc-4v1x": 1195110430,
+        "gcc-4v4x": 1242372520,
+        "gcc-1v1x": 432924406
+      },
+      "checksum_4v4x_gcc": "-0.79647378410472447"
+    },
+    {
+      "commit": "aebae6def416fde186db8ba82578fa4e2f6244fd",
+      "change": "2. mirrored ring",
+      "subject": "Keep the decimator history as a mirrored ring read through one window",
+      "instructions": {
+        "gccnb-4v1x": 1168009618,
+        "gccnb-4v4x": 1205256922,
+        "gccnb-1v1x": 425233918,
+        "clangnb-4v1x": 1300928844,
+        "clangnb-4v4x": 1327357352,
+        "clangnb-1v1x": 449536072,
+        "gcc-4v1x": 1195161040,
+        "gcc-4v4x": 1233150622,
+        "gcc-1v1x": 432975016
+      },
+      "checksum_4v4x_gcc": "-0.79647378410472447"
+    },
+    {
+      "commit": "664f510a8f4c7b170d9c1c0d51c2ae0f9eb54421",
+      "change": "3. vector lanes",
+      "subject": "Sum the decimator's four lanes with the GCC/clang vector extension",
+      "instructions": {
+        "gccnb-4v1x": 1168009618,
+        "gccnb-4v4x": 1185419482,
+        "gccnb-1v1x": 425233918,
+        "clangnb-4v1x": 1300713804,
+        "clangnb-4v4x": 1302681512,
+        "clangnb-1v1x": 449321032,
+        "gcc-4v1x": 1195161040,
+        "gcc-4v4x": 1213259422,
+        "gcc-1v1x": 432975016
+      },
+      "checksum_4v4x_gcc": "-0.79647378410472447"
+    },
+    {
+      "commit": "c685de6cb44b48ee98eeb2cbdf21895d41991a1f",
+      "change": "4. hoisting",
+      "subject": "Hoist the voice loop's per-sample overhead",
+      "instructions": {
+        "gccnb-4v1x": 1168422041,
+        "gccnb-4v4x": 1186424319,
+        "gccnb-1v1x": 430193419,
+        "clangnb-4v1x": 1279898568,
+        "clangnb-4v4x": 1281827324,
+        "clangnb-1v1x": 448139378,
+        "gcc-4v1x": 1189236830,
+        "gcc-4v4x": 1207378912,
+        "gcc-1v1x": 435688562
+      },
+      "checksum_4v4x_gcc": "-0.79647378410472447"
+    }
+  ],
+  "scope": "Deterministic instruction counts of the native engine on one container; not timings, not a Rack, host or SDK-target measurement."
+}

@@ -13,16 +13,24 @@
 namespace ceres {
 namespace {
 constexpr double pi = 3.141592653589793238462643383279502884;
-// tanh is the engine's most frequent transcendental: the OTA filters solve
-// one per Newton iteration per stage, the WSC shaper one per sample and the
-// ring carrier's steering one per sample. glibc's tanh reaches expm1 and
-// costs about 2.6 times this rational form in a dependent chain (measured
-// here; see Docs/benchmarks/cpu-approximations-2026-10-23.md). Cephes
-// tanh.c (Moshier): for |x| < .625, x + x^3 P(x^2)/Q(x^2); beyond, the
-// identity 1 - 2/(exp(2|x|)+1). Swept against glibc over 1e-9..30 at 14
-// million points: at most 2 ulp (4.2e-16 relative). Not bit-identical to
-// std::tanh, so this and everything after it differ from 1.0.3 at the last
-// bit.
+// The Rack's toolchain compiles this file with -fno-builtin against the
+// SDK's own libc++, where std::abs, std::isfinite, std::copysign and
+// std::sqrt become out-of-line library calls (and sqrt a bit-serial
+// software one); Acustra measured about a fifth of its batch in them. The
+// __builtin_ forms are the same IEEE operations, inlined whatever the
+// flags, so the results are bit for bit the same. MSVC has no builtins of
+// these names and inlines the std:: forms itself.
+#if defined(__GNUC__) || defined(__clang__)
+inline double inlineAbs(double x) { return __builtin_fabs(x); }
+inline double inlineCopysign(double x, double sign) { return __builtin_copysign(x, sign); }
+inline double inlineSqrt(double x) { return __builtin_sqrt(x); }
+inline bool inlineFinite(double x) { return __builtin_isfinite(x); }
+#else
+inline double inlineAbs(double x) { return std::abs(x); }
+inline double inlineCopysign(double x, double sign) { return std::copysign(x, sign); }
+inline double inlineSqrt(double x) { return std::sqrt(x); }
+inline bool inlineFinite(double x) { return std::isfinite(x); }
+#endif
 #if defined(__GNUC__) || defined(__clang__)
 #define CERES_ALWAYS_INLINE __attribute__((always_inline)) inline
 #define CERES_NOINLINE __attribute__((noinline))
@@ -40,13 +48,20 @@ constexpr double pi = 3.141592653589793238462643383279502884;
 #define CERES_UNLIKELY(x) (x)
 #endif
 
+// tanh is the engine's most frequent transcendental: the OTA filters solve
+// one per Newton iteration per stage, the WSC shaper one per sample and the
+// ring carrier's steering one per sample. For |x| < .625, evaluate
+// x + x^3 P(x^2), with a degree-10 polynomial in x^2 and Estrin grouping.
+// This replaces the Cephes rational's division; the large-argument identity
+// 1 - 2/(exp(2|x|)+1) stays out of line. The last double bits can differ from
+// the rational and std::tanh; the CPU parity drivers check float32 audio.
 CERES_NOINLINE double fastTanhLarge(double x, double ax) {
     const double y=1-2/(std::exp(2*ax)+1);
     return x<0 ? -y : y;
 }
 
 CERES_ALWAYS_INLINE double fastTanh(double x) {
-    const double ax=std::abs(x);
+    const double ax=inlineAbs(x);
     if (CERES_LIKELY(ax<.625)) {
         const double s=x*x;
         constexpr double t0 = -3.33333333333333148e-01;
@@ -71,12 +86,19 @@ CERES_ALWAYS_INLINE double fastTanh(double x) {
 }
 // 2^x evaluation for filter cutoff factors: 32-entry double-double table
 // (exp2TabHi/Lo) on [0, 1) reduced by k = rint(32 * x), followed by a degree-6
-// polynomial on r in [-1/64, 1/64]. Matches std::exp2 to within 1 ulp across
-// all audible cutoff octave spans, with zero transcendental calls on the hot path.
+// polynomial on r in [-1/64, 1/64] under round-to-nearest. The callers pass
+// validated, finite cutoff exponents, well inside the normal double range;
+// this is not a general exp2 implementation for overflow or subnormals.
+// Builtins keep the rounding and fixed-size bit copy inline under the
+// Rack toolchain's -fno-builtin flag.
 constexpr double exp2TabHi[32] = {1.00000000000000000e+00, 1.02189714865411663e+00, 1.04427378242741379e+00, 1.06714040067682368e+00, 1.09050773266525768e+00, 1.11438674259589242e+00, 1.13878863475669156e+00, 1.16372485877757747e+00, 1.18920711500272103e+00, 1.21524735998046894e+00, 1.24185781207348404e+00, 1.26905095719173317e+00, 1.29683955465100964e+00, 1.32523664315974130e+00, 1.35425554693689268e+00, 1.38390988196383205e+00, 1.41421356237309515e+00, 1.44518080697704665e+00, 1.47682614593949931e+00, 1.50916442759342279e+00, 1.54221082540794074e+00, 1.57598084510788647e+00, 1.61049033194925429e+00, 1.64575547815396490e+00, 1.68179283050742900e+00, 1.71861929812247806e+00, 1.75625216037329949e+00, 1.79470907500310715e+00, 1.83400808640934243e+00, 1.87416763411030005e+00, 1.91520656139714740e+00, 1.95714412417540018e+00};
 constexpr double exp2TabLo[32] = {0.00000000000000000e+00, 2.40085662350966549e-17, 2.66838236996032277e-17, -1.66064015318499807e-17, -2.06097723615335870e-17, -4.19736207807476444e-17, 7.64855404992710924e-17, 6.26546847818661717e-17, 2.55795384873636067e-17, 9.60756758038859150e-17, -2.41126273923632419e-17, 1.24295843597149986e-17, 2.55769000738126065e-17, -3.57555112000371186e-17, 3.01241131426630106e-17, -2.43757964720678440e-17, -9.66729331345291323e-17, 4.96003212759161804e-17, -1.36667401190669412e-18, 9.01958235613757415e-17, 9.21162201465055090e-17, 5.47936172409614424e-17, 2.75242429137881693e-17, -9.12055430833845112e-18, 1.07855698233088047e-16, -2.35742996390691032e-17, 1.62235403284926386e-17, 2.91229237949761977e-17, 5.27471770778709338e-18, -5.66444278582811408e-17, -9.97280197254614873e-17, 7.64883698878772936e-18};
 CERES_ALWAYS_INLINE double fastExp2(double x) {
+#if defined(__GNUC__) || defined(__clang__)
+    const double kf = __builtin_rint(x * 32.0);
+#else
     const double kf = std::rint(x * 32.0);
+#endif
     const std::int64_t k = static_cast<std::int64_t>(kf);
     const double r = x - kf * 0.03125;
     constexpr double c1 = 6.93147180559945309417e-01;
@@ -89,7 +111,11 @@ CERES_ALWAYS_INLINE double fastExp2(double x) {
     const std::size_t idx = static_cast<std::size_t>(k) & 31u;
     const std::int64_t expBits = ((k >> 5) + 1023) << 52;
     double scale;
+#if defined(__GNUC__) || defined(__clang__)
+    __builtin_memcpy(&scale, &expBits, sizeof(scale));
+#else
     std::memcpy(&scale, &expBits, sizeof(scale));
+#endif
     const double tHi = exp2TabHi[idx];
     const double tLo = exp2TabLo[idx];
     return (tHi + (tHi * p + tLo)) * scale;
@@ -290,26 +316,26 @@ inline double ringSignalPair(double signal) {
     constexpr double k3=b/(3*c), k5=b*(3*b-2*a)/(15*c*c);
     const double volts=ringPinOneVolts*signal, w=volts/c, w2=w*w;
     double u=w*(1+w2*(k3+w2*k5));
-    const double limiting=(std::abs(volts)-b)/a;
-    if (limiting>std::abs(u) || !std::isfinite(u)) u=std::copysign(limiting,volts);
+    const double limiting=(inlineAbs(volts)-b)/a;
+    if (limiting>inlineAbs(u) || !inlineFinite(u)) u=inlineCopysign(limiting,volts);
     double split=0;
     for (int i=0;i<8;++i) {
         // tanh(u) = -m/(2+m) and 1-tanh(u)^2 = 4(1+m)/(2+m)^2 from one
         // m = expm1(-2|u|), exact down to the smallest signals.
-        const double au=std::abs(u);
+        const double au=inlineAbs(u);
         double t, d;
         if (au<.625) {
             t=fastTanh(u);
             d=1-t*t;
         } else {
             const double m=std::expm1(-2*au);
-            t=std::copysign(-m/(2+m),u);
+            t=inlineCopysign(-m/(2+m),u);
             d=4*(1+m)/((2+m)*(2+m));
         }
         const double f=a*u+b*t-volts, slope=a+b*d;
         const double step=f/(slope+f*b*t*d/slope);   // f'' = -2b*t*d
         split=t-d*step*(1+t*step);                   // tanh(u-step), 2nd order
-        if (std::abs(step)<=1e-5*au) break;
+        if (inlineAbs(step)<=1e-5*au) break;
         u-=step;
     }
     return split*c/ringPinOneVolts;
@@ -877,7 +903,7 @@ struct OtaSvf {
                 const double residual = b - sb - linear * h;
                 const double delta = residual / derivative;
                 b -= delta;
-                if (std::abs(delta) < 1e-9) break;
+                if (inlineAbs(delta) < 1e-9) break;
             }
             l = sl + linear * b;
             previousTanhReady = false;
@@ -914,12 +940,12 @@ struct OtaSvf {
                 // earlier 1e-12 bought a further pair of tanh evaluations about a
                 // third of the time (2.34 to 2.02 iterations per solve, measured
                 // on the factory presets) and no change at the float output.
-                if (std::abs(delta) < 1e-9) break;
+                if (inlineAbs(delta) < 1e-9) break;
             }
             // tanh(b) is the last evaluation carried along its tangent over that
             // final sub-ulp step; only an unconverged loop recomputes it.
             const double step = b - tanhArgument;
-            const double tanhB = std::abs(step) < 1e-9
+            const double tanhB = inlineAbs(step) < 1e-9
                 ? tanhValue + (1 - tanhValue*tanhValue)*step : fastTanh(b);
             l = sl + nonlinear*tanhB + linear*b;
             previousTanhB = tanhB;
@@ -1253,46 +1279,51 @@ struct Envelope {
     bool gate = false;
     void on() { gate = true; stage = Attack; }
     void off() { gate = false; if (stage != Idle) stage = Release; }
-    static double saturatedStep(double target, double voltage, double vs, double currentStep) {
-        const double y=(target-voltage)/vs;
-        const double nextLog=logSinh(y)-currentStep;
-        const double increment=(y>20 && nextLog>20)
-            ? currentStep : y-asinhExp(nextLog);
-        return vs*increment;
-    }
+    // The attack, with its optional saturation law, stays out of line so
+    // that the path every held or released board takes each sample, one
+    // multiply-add and a settle test, inlines into the voice loop (the
+    // nine-argument function did not, and its call cost more than its body).
     CERES_ALWAYS_INLINE double advance(double initial, double peak, double sustained,
-                                       double headroom, double saturation, double attackIncrement, double currentStep,
-                                       double decayCoefficient, double releaseCoefficient) {
+                   double headroom, double saturation, double attackIncrement, double currentStep,
+                   double decayCoefficient, double releaseCoefficient) {
+        if (stage == Attack)
+            return attack(initial, peak, headroom, saturation, attackIncrement, currentStep);
         // Key-off keeps IL/RT selected (Guide pp.43–44): an idle board is
         // still a connected capacitor, not a reset switch. Continue the
         // existing release law if its target moves; Idle remains an audio
         // bookkeeping state. The physical post-settling rate is unmeasured.
-        if (stage == Attack) {
-            const double span = std::max(1e-9, std::abs(peak - initial));
-            const double target = peak + headroom * span;
-            if (saturation>0 && voltage<peak) {
-                // Optional differential-pair/current-limit approximation:
-                // dv/dt = k*Vs*tanh((target-v)/Vs). Integrating gives
-                // log(sinh(y_next)) = log(sinh(y)) - k*dt, y=(target-v)/Vs.
-                // k is normalized so a full IL->peak attack retains its
-                // requested duration. This is a model experiment, not an
-                // identified IG00151 transistor/current-limit parameter.
-                voltage += saturatedStep(target, voltage, saturation*span, currentStep);
-            } else {
-                voltage += (target - voltage) * attackIncrement;
-            }
-            if (voltage >= peak) { voltage = peak; stage = gate ? Decay : Release; }
-            return voltage;
-        }
         if (stage == Decay || stage == Sustain) {
             if (voltage == sustained) { stage = Sustain; return voltage; }
             voltage = sustained + (voltage - sustained) * decayCoefficient;
-            if (std::abs(voltage - sustained) < 1e-7) { voltage = sustained; stage = Sustain; }
+            if (inlineAbs(voltage - sustained) < 1e-7) { voltage = sustained; stage = Sustain; }
         } else {
             if (voltage == initial) { stage = Idle; return voltage; }
             voltage = initial + (voltage - initial) * releaseCoefficient;
-            if (std::abs(voltage - initial) < 1e-7) { voltage = initial; stage = Idle; }
+            if (inlineAbs(voltage - initial) < 1e-7) { voltage = initial; stage = Idle; }
         }
+        return voltage;
+    }
+    CERES_NOINLINE double attack(double initial, double peak, double headroom, double saturation,
+                  double attackIncrement, double currentStep) {
+        const double span = std::max(1e-9, inlineAbs(peak - initial));
+        const double target = peak + headroom * span;
+        if (saturation>0 && voltage<peak) {
+            // Optional differential-pair/current-limit approximation:
+            // dv/dt = k*Vs*tanh((target-v)/Vs). Integrating gives
+            // log(sinh(y_next)) = log(sinh(y)) - k*dt, y=(target-v)/Vs.
+            // k is normalized so a full IL->peak attack retains its
+            // requested duration. This is a model experiment, not an
+            // identified IG00151 transistor/current-limit parameter.
+            const double vs=saturation*span;
+            const double y=(target-voltage)/vs;
+            const double nextLog=logSinh(y)-currentStep;
+            const double increment=(y>20 && nextLog>20)
+                ? currentStep : y-asinhExp(nextLog);
+            voltage+=vs*increment;
+        } else {
+            voltage += (target - voltage) * attackIncrement;
+        }
+        if (voltage >= peak) { voltage = peak; stage = gate ? Decay : Release; }
         return voltage;
     }
 };
@@ -1371,8 +1402,8 @@ double inverseNormal(double p) {
     const auto tail=[](double q) {
         return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
     };
-    if (p<.02425) return tail(std::sqrt(-2*std::log(p)));
-    if (p>1-.02425) return -tail(std::sqrt(-2*std::log(1-p)));
+    if (p<.02425) return tail(inlineSqrt(-2*std::log(p)));
+    if (p>1-.02425) return -tail(inlineSqrt(-2*std::log(1-p)));
     const double q=p-.5, r=q*q;
     return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
 }
@@ -1569,7 +1600,7 @@ struct Decimator {
     explicit Decimator(unsigned factor=4) : taps(62*factor+1) {
         const double cutoff = factor==4 ? .1125 : .225;
         // 90% of output Nyquist; same31-host-sample group delay at2x/4x.
-        // The4x coefficient generation and summation order stay unchanged.
+        // Coefficient generation and normalization retain their original order.
         const double norm = besselI0(10);
         double sum = 0;
         for (unsigned i = 0; i < taps; ++i) {
@@ -1586,23 +1617,39 @@ struct Decimator {
         history[cursor] = x;
         history[cursor + taps] = x;
     }
-    // Newest sample first: history[cursor-1] down to [0], then wrap from
-    // [taps-1], as two straight runs. Four interleaved partial sums: one
-    // running sum serialises 249 additions behind each other's latency,
-    // about a tenth of the 4x cost; four run in parallel. The order of the
-    // additions changes, so the sum differs from a single run at its last
-    // bit (1e-16 relative), not at the float output.
+    // Mirroring makes [cursor, cursor+taps) one contiguous window, newest
+    // first. Symmetric taps share a multiply after adding opposite samples;
+    // four partial sums keep their additions independent. Folding changes
+    // the final double bits, checked at float32 output by the parity drivers.
     CERES_ALWAYS_INLINE double output() const {
         const double* p = history.data() + cursor;
         const unsigned half = taps >> 1;
-        double s0 = 0, s1 = 0, s2 = 0, s3 = 0;
         unsigned i = 0;
+#if defined(__GNUC__) || defined(__clang__)
+        // Keep explicit two-double lanes for the Rack SDK, which does not
+        // auto-vectorise. Each lane uses the scalar fallback's operations
+        // and addition order. aligned(8)/may_alias permit double storage
+        // at odd offsets without alignment or strict-aliasing assumptions.
+        typedef double Pair __attribute__((vector_size(16), aligned(8), may_alias));
+        Pair low = {0, 0}, high = {0, 0};
+        for (; i + 4 <= half; i += 4) {
+            const Pair reverseLow = {p[taps - 1 - i], p[taps - 2 - i]};
+            const Pair reverseHigh = {p[taps - 3 - i], p[taps - 4 - i]};
+            low += *reinterpret_cast<const Pair*>(h.data() + i)
+                * (*reinterpret_cast<const Pair*>(p + i) + reverseLow);
+            high += *reinterpret_cast<const Pair*>(h.data() + i + 2)
+                * (*reinterpret_cast<const Pair*>(p + i + 2) + reverseHigh);
+        }
+        double s0 = low[0], s1 = low[1], s2 = high[0], s3 = high[1];
+#else
+        double s0 = 0, s1 = 0, s2 = 0, s3 = 0;
         for (; i + 4 <= half; i += 4) {
             s0 += h[i] * (p[i] + p[taps - 1 - i]);
             s1 += h[i+1] * (p[i+1] + p[taps - 2 - i]);
             s2 += h[i+2] * (p[i+2] + p[taps - 3 - i]);
             s3 += h[i+3] * (p[i+3] + p[taps - 4 - i]);
         }
+#endif
         for (; i < half; ++i) s0 += h[i] * (p[i] + p[taps - 1 - i]);
         s0 += h[half] * p[half];
         return (s0 + s1) + (s2 + s3);
@@ -2613,7 +2660,7 @@ double Synth::sampleRate() const { return impl_->fs; }
 void Synth::externalInput(double sample) noexcept {
     // Numerical guard only: 1e9 units overdrives the preamp at any LEVEL
     // above 1e-8, and keeps the interpolation below overflow.
-    impl_->externalTarget=std::isfinite(sample) ? clamp(sample,-1e9,1e9) : 0.;
+    impl_->externalTarget=inlineFinite(sample) ? clamp(sample,-1e9,1e9) : 0.;
 }
 float Synth::process() {
     ++impl_->hostSamples;

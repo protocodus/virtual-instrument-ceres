@@ -31,6 +31,10 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 
 ## Version history
 
+### Unreleased — 1.0.5 — built the way the Rack builds it
+
+- Four changes, three exact and one at the last bit, for the Rack's toolchain, which compiles the engine with `-fno-builtin` against its own libc++ and does not auto-vectorise: the audio path's `abs`, `copysign`, `sqrt` and `isfinite` are the builtin forms (library calls there), the decimator history is a mirrored ring read through one window and summed in two vector pairs, and the voice loop's envelope, glide and oscillator calls shed their per-sample overhead. Nothing changes about the sound: the 439,296-sample CPU regression stream is byte-identical to 1.0.4 after every commit, and a one-float-ulp perturbation of any cutoff or resonance on every factory preset stays at least 127 dB below the signal without growing, which is why last-bit arithmetic changes in Ceres can be graded by that null test at all. 1.6% fewer instructions at the Rack's four voices/1x and 4.4% at 4x under clang `-O3 -fno-builtin` on this container; the Rack's own object code, where the library calls are real, is where the first change counts. [Protocol, rankings, probe and validation](Docs/benchmarks/cpu-rack-flags-2026-10-23.md).
+
 ### Unreleased — 1.0.4 — a third to a half less CPU, the same samples
 
 - The engine does 38–56% fewer instructions for the same sound (32–54% less median thread CPU on the development container, not a Reason host result): the filters' `tanh` and prewarp `tan`, the PWM clock and the SUB sine are full-precision rationals, the filter solver stops at a 1e-9 Newton step, muted saw and pulse shaping is skipped, the output couplings and the decimator reuse their constants, and the noise source stands idle while NOISE is zero and FUNCTION is off N. The 439,296-sample CPU regression stream is byte-identical to 1.0.3 at the float32 output on every preset, voice count, quality and rate; the engine's internal double arithmetic differs at its last bit. One consequence no null test can grade: when NOISE leaves zero after an idle stretch, the first ~10 ms of noise are a different realisation of the same noise than before. The owner compared it with 1.0.3 by ear and heard no difference, so it ships as chosen by ear ([decision log](Docs/decisions.md)). [Protocol, instruction counts, timings and validation](Docs/benchmarks/cpu-approximations-2026-10-23.md).
@@ -165,7 +169,7 @@ Reuse the previous sample's exact final `tanh` value at the next filter solve. C
 ## Downloads
 
 <!-- build-download-begin -->
-**[Download main build 36](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/39985873266/artifacts/12515264897)**, built from [`492d93b36d95`](https://github.com/protocodus/virtual-instrument-ceres/commit/492d93b36d9584826c2d0cd4017ddba7cc19bd89). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
+**[Download main build 40](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/40293190566/artifacts/12642862514)**, built from [`9a55702434b7`](https://github.com/protocodus/virtual-instrument-ceres/commit/9a55702434b7151d56e6d2fc68b7467a7a5c23e3). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
 <!-- build-download-end -->
 
 ---

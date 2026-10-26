@@ -1,0 +1,1593 @@
+{
+  "protocol": "ceres-cpu-null-v1",
+  "baseline_commit": "492d93b36d9584826c2d0cd4017ddba7cc19bd89",
+  "compiler_flags": [
+    "-std=c++17",
+    "-O3",
+    "-DNDEBUG"
+  ],
+  "compile_commands": {
+    "baseline": [
+      "c++",
+      "-std=c++17",
+      "-O3",
+      "-DNDEBUG",
+      "-I",
+      "/tmp/ceres-cpu-null-3if8btmc/baseline",
+      "/home/user/virtual-instrument-ceres/Tests/CpuParityDriver.cpp",
+      "/tmp/ceres-cpu-null-3if8btmc/baseline/ceres.cpp",
+      "-o",
+      "/tmp/ceres-cpu-null-3if8btmc/baseline/driver"
+    ],
+    "candidate": [
+      "c++",
+      "-std=c++17",
+      "-O3",
+      "-DNDEBUG",
+      "-I",
+      "/tmp/ceres-cpu-null-3if8btmc/candidate",
+      "/home/user/virtual-instrument-ceres/Tests/CpuParityDriver.cpp",
+      "/tmp/ceres-cpu-null-3if8btmc/candidate/ceres.cpp",
+      "-o",
+      "/tmp/ceres-cpu-null-3if8btmc/candidate/driver"
+    ]
+  },
+  "sample_count": 439296,
+  "identical_samples": 439296,
+  "byte_identical": true,
+  "residual_rms_db_re_signal": -Infinity,
+  "residual_peak_dbfs": -Infinity,
+  "groups": {
+    "init": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "string1": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "string2": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "brass1": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "brass2": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "flute": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "electric_piano": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "clavichord": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "harpsichord": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "guitar1": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "guitar2": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "funky1": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "funky2": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "funky3": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "controller": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    },
+    "long": {
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity
+    }
+  },
+  "scenes": [
+    {
+      "scene": "factory/init/1v/1x",
+      "group": "init",
+      "samples": 1536,
+      "baseline_rms_dbfs": -27.908946472054332,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/init/1v/2x",
+      "group": "init",
+      "samples": 1536,
+      "baseline_rms_dbfs": -27.879039861583266,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/init/1v/4x",
+      "group": "init",
+      "samples": 1536,
+      "baseline_rms_dbfs": -27.873324704118115,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/init/4v/1x",
+      "group": "init",
+      "samples": 1536,
+      "baseline_rms_dbfs": -22.801419303019344,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/init/4v/2x",
+      "group": "init",
+      "samples": 1536,
+      "baseline_rms_dbfs": -22.798081217412737,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/init/4v/4x",
+      "group": "init",
+      "samples": 1536,
+      "baseline_rms_dbfs": -22.797371139696967,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/init/16v/1x",
+      "group": "init",
+      "samples": 1536,
+      "baseline_rms_dbfs": -15.505004913015348,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/init/16v/2x",
+      "group": "init",
+      "samples": 1536,
+      "baseline_rms_dbfs": -15.4781916588292,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/init/16v/4x",
+      "group": "init",
+      "samples": 1536,
+      "baseline_rms_dbfs": -15.467219888449325,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string1/1v/1x",
+      "group": "string1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -50.64641220322902,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string1/1v/2x",
+      "group": "string1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -50.55374390202199,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string1/1v/4x",
+      "group": "string1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -50.536225731647455,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string1/4v/1x",
+      "group": "string1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -45.29934751248533,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string1/4v/2x",
+      "group": "string1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -45.27345766056627,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string1/4v/4x",
+      "group": "string1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -45.26695874636531,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string1/16v/1x",
+      "group": "string1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -38.753540895333394,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string1/16v/2x",
+      "group": "string1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -38.52075086019879,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string1/16v/4x",
+      "group": "string1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -38.49418864630605,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string2/1v/1x",
+      "group": "string2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -36.71342873445908,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string2/1v/2x",
+      "group": "string2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -36.71218462489765,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string2/1v/4x",
+      "group": "string2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -36.71193078271445,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string2/4v/1x",
+      "group": "string2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -30.082979866565992,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string2/4v/2x",
+      "group": "string2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -30.08044371483317,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string2/4v/4x",
+      "group": "string2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -30.079938960060417,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string2/16v/1x",
+      "group": "string2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -25.99983658151733,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string2/16v/2x",
+      "group": "string2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -25.991949963346485,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/string2/16v/4x",
+      "group": "string2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -25.989009233657548,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass1/1v/1x",
+      "group": "brass1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -33.225526363584464,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass1/1v/2x",
+      "group": "brass1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -33.222146194772144,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass1/1v/4x",
+      "group": "brass1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -33.22087896881869,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass1/4v/1x",
+      "group": "brass1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.8260016588044,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass1/4v/2x",
+      "group": "brass1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.823904108275762,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass1/4v/4x",
+      "group": "brass1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.823171822026318,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass1/16v/1x",
+      "group": "brass1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -21.68989110865636,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass1/16v/2x",
+      "group": "brass1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -21.68670521643419,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass1/16v/4x",
+      "group": "brass1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -21.686346456846564,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass2/1v/1x",
+      "group": "brass2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -32.03707106140012,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass2/1v/2x",
+      "group": "brass2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -32.037207165735346,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass2/1v/4x",
+      "group": "brass2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -32.037959197190546,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass2/4v/1x",
+      "group": "brass2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -29.096505116528085,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass2/4v/2x",
+      "group": "brass2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -29.097304885813134,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass2/4v/4x",
+      "group": "brass2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -29.09829804605375,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass2/16v/1x",
+      "group": "brass2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -19.858802295969657,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass2/16v/2x",
+      "group": "brass2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -19.855174168418543,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/brass2/16v/4x",
+      "group": "brass2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -19.854245686495332,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/flute/1v/1x",
+      "group": "flute",
+      "samples": 1536,
+      "baseline_rms_dbfs": -34.62541845971603,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/flute/1v/2x",
+      "group": "flute",
+      "samples": 1536,
+      "baseline_rms_dbfs": -34.62194359860824,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/flute/1v/4x",
+      "group": "flute",
+      "samples": 1536,
+      "baseline_rms_dbfs": -34.621001059186945,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/flute/4v/1x",
+      "group": "flute",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.677299339350206,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/flute/4v/2x",
+      "group": "flute",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.678026218851016,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/flute/4v/4x",
+      "group": "flute",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.67855564174656,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/flute/16v/1x",
+      "group": "flute",
+      "samples": 1536,
+      "baseline_rms_dbfs": -23.399847403274563,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/flute/16v/2x",
+      "group": "flute",
+      "samples": 1536,
+      "baseline_rms_dbfs": -23.397625053195696,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/flute/16v/4x",
+      "group": "flute",
+      "samples": 1536,
+      "baseline_rms_dbfs": -23.39736246929007,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/electric_piano/1v/1x",
+      "group": "electric_piano",
+      "samples": 1536,
+      "baseline_rms_dbfs": -22.17726823208336,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/electric_piano/1v/2x",
+      "group": "electric_piano",
+      "samples": 1536,
+      "baseline_rms_dbfs": -22.178484129904792,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/electric_piano/1v/4x",
+      "group": "electric_piano",
+      "samples": 1536,
+      "baseline_rms_dbfs": -22.179377291685228,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/electric_piano/4v/1x",
+      "group": "electric_piano",
+      "samples": 1536,
+      "baseline_rms_dbfs": -14.115503723899398,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/electric_piano/4v/2x",
+      "group": "electric_piano",
+      "samples": 1536,
+      "baseline_rms_dbfs": -14.11551826096218,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/electric_piano/4v/4x",
+      "group": "electric_piano",
+      "samples": 1536,
+      "baseline_rms_dbfs": -14.115671916715735,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/electric_piano/16v/1x",
+      "group": "electric_piano",
+      "samples": 1536,
+      "baseline_rms_dbfs": -9.92134430975012,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/electric_piano/16v/2x",
+      "group": "electric_piano",
+      "samples": 1536,
+      "baseline_rms_dbfs": -9.917183384318427,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/electric_piano/16v/4x",
+      "group": "electric_piano",
+      "samples": 1536,
+      "baseline_rms_dbfs": -9.915706036863476,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/clavichord/1v/1x",
+      "group": "clavichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -32.34113647405417,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/clavichord/1v/2x",
+      "group": "clavichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -32.29043457320144,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/clavichord/1v/4x",
+      "group": "clavichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -32.27418108793692,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/clavichord/4v/1x",
+      "group": "clavichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -26.218089495820042,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/clavichord/4v/2x",
+      "group": "clavichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -26.18990533186451,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/clavichord/4v/4x",
+      "group": "clavichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -26.18102012884058,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/clavichord/16v/1x",
+      "group": "clavichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -20.98378221614871,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/clavichord/16v/2x",
+      "group": "clavichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -20.904730374354692,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/clavichord/16v/4x",
+      "group": "clavichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -20.88332100665154,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/harpsichord/1v/1x",
+      "group": "harpsichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -38.946720176650665,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/harpsichord/1v/2x",
+      "group": "harpsichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -38.90723171840285,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/harpsichord/1v/4x",
+      "group": "harpsichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -38.89708431611684,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/harpsichord/4v/1x",
+      "group": "harpsichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -33.66712109608797,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/harpsichord/4v/2x",
+      "group": "harpsichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -33.64223166553876,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/harpsichord/4v/4x",
+      "group": "harpsichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -33.6362461498366,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/harpsichord/16v/1x",
+      "group": "harpsichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -27.438796309060084,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/harpsichord/16v/2x",
+      "group": "harpsichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -27.31183248320907,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/harpsichord/16v/4x",
+      "group": "harpsichord",
+      "samples": 1536,
+      "baseline_rms_dbfs": -27.281064874233365,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar1/1v/1x",
+      "group": "guitar1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -29.421742647965967,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar1/1v/2x",
+      "group": "guitar1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -29.40670276967134,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar1/1v/4x",
+      "group": "guitar1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -29.402969117780685,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar1/4v/1x",
+      "group": "guitar1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -22.755604466777164,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar1/4v/2x",
+      "group": "guitar1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -22.748914372417538,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar1/4v/4x",
+      "group": "guitar1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -22.747188865510267,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar1/16v/1x",
+      "group": "guitar1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -16.15833708225967,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar1/16v/2x",
+      "group": "guitar1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -16.13663449928606,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar1/16v/4x",
+      "group": "guitar1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -16.131304802287968,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar2/1v/1x",
+      "group": "guitar2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -33.34345358473123,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar2/1v/2x",
+      "group": "guitar2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -33.32635754929624,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar2/1v/4x",
+      "group": "guitar2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -33.32173510155289,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar2/4v/1x",
+      "group": "guitar2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.733897906688316,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar2/4v/2x",
+      "group": "guitar2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.725051396079373,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar2/4v/4x",
+      "group": "guitar2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.722605674969834,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar2/16v/1x",
+      "group": "guitar2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -21.121029446610535,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar2/16v/2x",
+      "group": "guitar2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -21.09489840867731,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/guitar2/16v/4x",
+      "group": "guitar2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -21.088200535515888,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky1/1v/1x",
+      "group": "funky1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -35.16910085370222,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky1/1v/2x",
+      "group": "funky1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -35.186250383472675,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky1/1v/4x",
+      "group": "funky1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -35.151434973045085,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky1/4v/1x",
+      "group": "funky1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -29.999774994802813,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky1/4v/2x",
+      "group": "funky1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -29.987456385818845,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky1/4v/4x",
+      "group": "funky1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -29.972067687669515,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky1/16v/1x",
+      "group": "funky1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -24.404533499432212,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky1/16v/2x",
+      "group": "funky1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -24.273747894784034,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky1/16v/4x",
+      "group": "funky1",
+      "samples": 1536,
+      "baseline_rms_dbfs": -24.22924999003247,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky2/1v/1x",
+      "group": "funky2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -32.83138925384839,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky2/1v/2x",
+      "group": "funky2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -32.85285390706116,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky2/1v/4x",
+      "group": "funky2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -32.85274849826965,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky2/4v/1x",
+      "group": "funky2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.722836843097454,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky2/4v/2x",
+      "group": "funky2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.737276945448652,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky2/4v/4x",
+      "group": "funky2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.733323614636284,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky2/16v/1x",
+      "group": "funky2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -21.53073577571451,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky2/16v/2x",
+      "group": "funky2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -21.56189923628598,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky2/16v/4x",
+      "group": "funky2",
+      "samples": 1536,
+      "baseline_rms_dbfs": -21.57808148485474,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky3/1v/1x",
+      "group": "funky3",
+      "samples": 1536,
+      "baseline_rms_dbfs": -34.21400843198593,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky3/1v/2x",
+      "group": "funky3",
+      "samples": 1536,
+      "baseline_rms_dbfs": -34.1830351047491,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky3/1v/4x",
+      "group": "funky3",
+      "samples": 1536,
+      "baseline_rms_dbfs": -34.17237695858156,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky3/4v/1x",
+      "group": "funky3",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.358203633612224,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky3/4v/2x",
+      "group": "funky3",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.33515939450567,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky3/4v/4x",
+      "group": "funky3",
+      "samples": 1536,
+      "baseline_rms_dbfs": -28.327618289392884,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky3/16v/1x",
+      "group": "funky3",
+      "samples": 1536,
+      "baseline_rms_dbfs": -23.125068850174134,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky3/16v/2x",
+      "group": "funky3",
+      "samples": 1536,
+      "baseline_rms_dbfs": -23.058892341125453,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "factory/funky3/16v/4x",
+      "group": "funky3",
+      "samples": 1536,
+      "baseline_rms_dbfs": -23.033716816364862,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 1536
+    },
+    {
+      "scene": "controller/44100Hz/1v/1x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -25.666396755244257,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/44100Hz/1v/2x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -28.53746906656451,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/44100Hz/1v/4x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -24.9114419321969,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/44100Hz/4v/1x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -25.73183440268791,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/44100Hz/4v/2x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -27.341373992761756,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/44100Hz/4v/4x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -27.546075306811908,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/44100Hz/16v/1x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -28.131258407252623,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/44100Hz/16v/2x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -25.539875229769557,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/44100Hz/16v/4x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -25.58116730022043,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/48000Hz/1v/1x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -28.899568316432543,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/48000Hz/1v/2x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -26.95936725159958,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/48000Hz/1v/4x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -24.6393127802962,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/48000Hz/4v/1x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -26.06342817920073,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/48000Hz/4v/2x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -23.936266262720576,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/48000Hz/4v/4x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -28.238325410548015,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/48000Hz/16v/1x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -28.213020596415134,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/48000Hz/16v/2x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -25.535601410703674,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/48000Hz/16v/4x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -24.621195293713775,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/96000Hz/1v/1x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -27.94429892582889,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/96000Hz/1v/2x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -27.60970078069761,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/96000Hz/1v/4x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -25.48721569821501,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/96000Hz/4v/1x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -25.17955306679458,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/96000Hz/4v/2x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -26.551566366332615,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/96000Hz/4v/4x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -26.829026500449018,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/96000Hz/16v/1x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -28.127754108049782,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/96000Hz/16v/2x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -26.919207887083516,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/96000Hz/16v/4x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -26.35755544498302,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/192000Hz/1v/1x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -32.21432882404028,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/192000Hz/1v/2x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -34.127064983178464,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/192000Hz/1v/4x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -31.788021961517487,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/192000Hz/4v/1x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -29.171535376102025,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/192000Hz/4v/2x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -30.159018965669325,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/192000Hz/4v/4x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -30.65416113108531,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/192000Hz/16v/1x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -26.947209630950223,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/192000Hz/16v/2x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -21.082700249160744,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "controller/192000Hz/16v/4x",
+      "group": "controller",
+      "samples": 4096,
+      "baseline_rms_dbfs": -23.524086452299326,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 4096
+    },
+    {
+      "scene": "long/1v/1x",
+      "group": "long",
+      "samples": 32768,
+      "baseline_rms_dbfs": -28.314070709552695,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 32768
+    },
+    {
+      "scene": "long/4v/2x",
+      "group": "long",
+      "samples": 32768,
+      "baseline_rms_dbfs": -22.069499433986742,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 32768
+    },
+    {
+      "scene": "long/16v/4x",
+      "group": "long",
+      "samples": 32768,
+      "baseline_rms_dbfs": -16.120983791614314,
+      "residual_rms_db_re_signal": -Infinity,
+      "residual_peak_dbfs": -Infinity,
+      "identical_samples": 32768
+    }
+  ]
+}
