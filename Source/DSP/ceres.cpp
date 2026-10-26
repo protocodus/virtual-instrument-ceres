@@ -23,25 +23,74 @@ constexpr double pi = 3.141592653589793238462643383279502884;
 // million points: at most 2 ulp (4.2e-16 relative). Not bit-identical to
 // std::tanh, so this and everything after it differ from 1.0.3 at the last
 // bit.
-double fastTanh(double x) {
-    const double ax=std::abs(x);
-    if (ax<.625) {
-        const double s=x*x;
-        const double p=(-9.64399179425052238628e-1*s-9.92877231001918586564e1)*s
-            -1.61468768441708447952e3;
-        const double q=((s+1.12811678491632931402e2)*s+2.23548839060100448583e3)*s
-            +4.84406305325125486048e3;
-        return x+x*s*(p/q);
-    }
+#if defined(__GNUC__) || defined(__clang__)
+#define CERES_ALWAYS_INLINE __attribute__((always_inline)) inline
+#define CERES_NOINLINE __attribute__((noinline))
+#define CERES_LIKELY(x) __builtin_expect(!!(x), 1)
+#define CERES_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#define CERES_ALWAYS_INLINE inline
+#define CERES_NOINLINE
+#define CERES_LIKELY(x) (x)
+#define CERES_UNLIKELY(x) (x)
+#endif
+
+CERES_NOINLINE double fastTanhLarge(double x, double ax) {
     const double y=1-2/(std::exp(2*ax)+1);
     return x<0 ? -y : y;
+}
+
+CERES_ALWAYS_INLINE double fastTanh(double x) {
+    const double ax=std::abs(x);
+    if (CERES_LIKELY(ax<.625)) {
+        const double s=x*x;
+        constexpr double t0 = -3.33333333333333148e-01;
+        constexpr double t1 = 1.33333333333261500e-01;
+        constexpr double t2 = -5.39682539613069168e-02;
+        constexpr double t3 = 2.18694882598293727e-02;
+        constexpr double t4 = -8.86322982774347123e-03;
+        constexpr double t5 = 3.59205896987225019e-03;
+        constexpr double t6 = -1.45530928769224970e-03;
+        constexpr double t7 = 5.87437278861239988e-04;
+        constexpr double t8 = -2.30776158678562397e-04;
+        constexpr double t9 = 7.95995556195767229e-05;
+        constexpr double t10 = -1.72448740671528368e-05;
+        const double s2 = s * s;
+        const double s4 = s2 * s2;
+        const double r = ((t0 + s * t1) + s2 * (t2 + s * t3))
+            + s4 * ((t4 + s * t5) + s2 * (t6 + s * t7))
+            + (s4 * s4) * ((t8 + s * t9) + s2 * t10);
+        return x+x*s*r;
+    }
+    return fastTanhLarge(x, ax);
+}
+constexpr double exp2TabHi[32] = {1.00000000000000000e+00, 1.02189714865411663e+00, 1.04427378242741379e+00, 1.06714040067682368e+00, 1.09050773266525768e+00, 1.11438674259589242e+00, 1.13878863475669156e+00, 1.16372485877757747e+00, 1.18920711500272103e+00, 1.21524735998046894e+00, 1.24185781207348404e+00, 1.26905095719173317e+00, 1.29683955465100964e+00, 1.32523664315974130e+00, 1.35425554693689268e+00, 1.38390988196383205e+00, 1.41421356237309515e+00, 1.44518080697704665e+00, 1.47682614593949931e+00, 1.50916442759342279e+00, 1.54221082540794074e+00, 1.57598084510788647e+00, 1.61049033194925429e+00, 1.64575547815396490e+00, 1.68179283050742900e+00, 1.71861929812247806e+00, 1.75625216037329949e+00, 1.79470907500310715e+00, 1.83400808640934243e+00, 1.87416763411030005e+00, 1.91520656139714740e+00, 1.95714412417540018e+00};
+constexpr double exp2TabLo[32] = {0.00000000000000000e+00, 2.40085662350966549e-17, 2.66838236996032277e-17, -1.66064015318499807e-17, -2.06097723615335870e-17, -4.19736207807476444e-17, 7.64855404992710924e-17, 6.26546847818661717e-17, 2.55795384873636067e-17, 9.60756758038859150e-17, -2.41126273923632419e-17, 1.24295843597149986e-17, 2.55769000738126065e-17, -3.57555112000371186e-17, 3.01241131426630106e-17, -2.43757964720678440e-17, -9.66729331345291323e-17, 4.96003212759161804e-17, -1.36667401190669412e-18, 9.01958235613757415e-17, 9.21162201465055090e-17, 5.47936172409614424e-17, 2.75242429137881693e-17, -9.12055430833845112e-18, 1.07855698233088047e-16, -2.35742996390691032e-17, 1.62235403284926386e-17, 2.91229237949761977e-17, 5.27471770778709338e-18, -5.66444278582811408e-17, -9.97280197254614873e-17, 7.64883698878772936e-18};
+CERES_ALWAYS_INLINE double fastExp2(double x) {
+    const double kf = std::rint(x * 32.0);
+    const std::int64_t k = static_cast<std::int64_t>(kf);
+    const double r = x - kf * 0.03125;
+    constexpr double c1 = 6.93147180559945309417e-01;
+    constexpr double c2 = 2.40226506959100710066e-01;
+    constexpr double c3 = 5.55041086648215799531e-02;
+    constexpr double c4 = 9.61812910762847723198e-03;
+    constexpr double c5 = 1.33335581464284434234e-03;
+    constexpr double c6 = 1.54035303933816099544e-04;
+    const double p = (((((c6 * r + c5) * r + c4) * r + c3) * r + c2) * r + c1) * r;
+    const std::size_t idx = static_cast<std::size_t>(k) & 31u;
+    const std::int64_t expBits = ((k >> 5) + 1023) << 52;
+    double scale;
+    std::memcpy(&scale, &expBits, sizeof(scale));
+    const double tHi = exp2TabHi[idx];
+    const double tLo = exp2TabLo[idx];
+    return (tHi + (tHi * p + tLo)) * scale;
 }
 // The filters' TPT prewarp, tan(pi*fc/fs), is evaluated whenever a cutoff
 // moves (every sample under envelope, SUB or glide). The argument is at most
 // .22 pi (the cutoff clamp), inside Cephes tan.c's |x| <= pi/4 rational,
 // x + x^3 P(x^2)/Q(x^2): at most 1 ulp (2.2e-16 relative) against glibc over
 // 1e-7..0.22 pi, at about a third of glibc's instructions.
-double prewarpTan(double x) {
+CERES_ALWAYS_INLINE double prewarpTan(double x) {
     const double z=x*x;
     const double p=(-1.30936939181383777646e4*z+1.15351664838587416140e6)*z
         -1.79565251976484877988e7;
@@ -226,21 +275,32 @@ constexpr double ringPinOneVolts=ringBusVolts*ringSignalDivider;
 // 1e-5 of u, where the remaining error is third order: at most three tanh
 // evaluations land within 4e-16 of the exact split anywhere up to +/-20V at
 // pin 1, one or two at playing levels.
-double ringSignalPair(double signal) {
+inline double ringSignalPair(double signal) {
+    if (signal == 0.0) return 0.0;
     constexpr double a=2*ringThermalVoltage, b=ringBiasCurrent*470, c=a+b;
-    const double volts=ringPinOneVolts*signal, w=volts/c;
-    double u=w*(1+b/(3*c)*w*w);
+    constexpr double k3=b/(3*c), k5=b*(3*b-2*a)/(15*c*c);
+    const double volts=ringPinOneVolts*signal, w=volts/c, w2=w*w;
+    double u=w*(1+w2*(k3+w2*k5));
     const double limiting=(std::abs(volts)-b)/a;
     if (limiting>std::abs(u) || !std::isfinite(u)) u=std::copysign(limiting,volts);
     double split=0;
     for (int i=0;i<8;++i) {
         // tanh(u) = -m/(2+m) and 1-tanh(u)^2 = 4(1+m)/(2+m)^2 from one
         // m = expm1(-2|u|), exact down to the smallest signals.
-        const double m=std::expm1(-2*std::abs(u)), t=std::copysign(-m/(2+m),u);
-        const double d=4*(1+m)/((2+m)*(2+m)), f=a*u+b*t-volts, slope=a+b*d;
+        const double au=std::abs(u);
+        double t, d;
+        if (au<.625) {
+            t=fastTanh(u);
+            d=1-t*t;
+        } else {
+            const double m=std::expm1(-2*au);
+            t=std::copysign(-m/(2+m),u);
+            d=4*(1+m)/((2+m)*(2+m));
+        }
+        const double f=a*u+b*t-volts, slope=a+b*d;
         const double step=f/(slope+f*b*t*d/slope);   // f'' = -2b*t*d
         split=t-d*step*(1+t*step);                   // tanh(u-step), 2nd order
-        if (std::abs(step)<=1e-5*std::abs(u)) break;
+        if (std::abs(step)<=1e-5*au) break;
         u-=step;
     }
     return split*c/ringPinOneVolts;
@@ -274,7 +334,7 @@ double ringWetBufferGain() {
 }
 // The patch specifies TOTAL integrator Hz at middle C. Only variable gm
 // responds to exponential control; the parallel 4.7Mohm path stays fixed.
-double modulatedFilterFrequency(double referenceHz, double factor) {
+CERES_ALWAYS_INLINE double modulatedFilterFrequency(double referenceHz, double factor) {
     return filterFrequencyFloor + std::max(0.0,referenceHz-filterFrequencyFloor)*factor;
 }
 // One board's static cutoff for the patch's: its offset trim matched it to
@@ -287,7 +347,7 @@ double boardCutoff(double referenceHz, double alignedGm, double scale) {
     if (scale==1 || gm<=0) return referenceHz;
     return filterFrequencyFloor+alignedGm*std::pow(gm/alignedGm,scale);
 }
-double clamp(double x, double lo, double hi) { return std::max(lo, std::min(x, hi)); }
+CERES_ALWAYS_INLINE double clamp(double x, double lo, double hi) { return std::max(lo, std::min(x, hi)); }
 // sin(2 pi p) for a phase p in [0,1): the PWM clock and the SUB sine each
 // take one per internal sample. Reduce the turn to its nearest quarter, then
 // the Cephes sin.c and cos.c kernels on |x| <= pi/4. The reduction is exact
@@ -295,30 +355,30 @@ double clamp(double x, double lo, double hi) { return std::max(lo, std::min(x, h
 // 1e-7 steps, this is within 7.3e-16 of glibc's result and within 1.7e-16 of
 // the long double sin (glibc: 6.9e-16). The ring carrier keeps std::sin:
 // Ceres.ring_carrier_circuit_contracts recomputes it bit for bit.
-double sinTurn(double p) {
+CERES_ALWAYS_INLINE double sinTurn(double p) {
     const double r=4*p;
     const int quarter=static_cast<int>(r+.5);
     const double x=(r-quarter)*1.5707963267948966192313216916397514421;
     const double z=x*x;
+    if (quarter&1) {
+        const double cosine=((((((-1.13585365213876817300e-11*z+2.08757008419747316778e-9)*z
+            -2.75573141792967388112e-7)*z+2.48015872888517045348e-5)*z
+            -1.38888888888730564116e-3)*z+4.16666666666665929218e-2)*z*z)-.5*z+1;
+        return (quarter&2) ? -cosine : cosine;
+    }
     const double sine=((((((1.58962301576546568060e-10*z-2.50507477628578072866e-8)*z
         +2.75573136213857245213e-6)*z-1.98412698295895385996e-4)*z
         +8.33333333332211858878e-3)*z-1.66666666666666307295e-1)*z)*x+x;
-    const double cosine=((((((-1.13585365213876817300e-11*z+2.08757008419747316778e-9)*z
-        -2.75573141792967388112e-7)*z+2.48015872888517045348e-5)*z
-        -1.38888888888730564116e-3)*z+4.16666666666665929218e-2)*z*z)-.5*z+1;
-    switch (quarter&3) {
-        case 0: return sine;
-        case 1: return cosine;
-        case 2: return -sine;
-        default: return -cosine;
-    }
+    return (quarter&2) ? -sine : sine;
 }
+#if !defined(CERES_EMBEDDED_TARGET)
 double wrap(double x) { return x - std::floor(x); }
+#endif
 // wrap for a phase that has left [0,1) by less than one turn, which is all
 // the phase arithmetic below ever does (steps are clamped under .18, the
 // subtracted fractions are under 1): the same subtraction, with the floor
 // replaced by a sign test, so the result is bit for bit wrap's.
-double wrapUnit(double x) { return x<0 ? x+1 : x>=1 ? x-1 : x; }
+CERES_ALWAYS_INLINE double wrapUnit(double x) { return x<0 ? x+1 : x>=1 ? x-1 : x; }
 
 struct Parameter { const char* key; double Patch::*member; double low, high; };
 const Parameter parameters[] = {
@@ -633,8 +693,8 @@ struct BoardTolerance {
     // Cached at the patch's amounts; the identical-board values when off.
     double hpScale=1, lpScale=1, hpEnvelopeGain=1, lpEnvelopeGain=1;
     // Static cutoffs at middle C (boardCutoff): the patch's when off.
-    double hpCutoff=0, lpCutoff=0;
-    double ampPeak=1, ampFloor=0, ampEnvelopeGain=1, sineGain=1;
+    double hpCutoff=0, lpCutoff=0, hpBrilliance=0, lpBrilliance=0;
+    double ampPeak=1, ampFloor=0, ampSustained=1, ampEnvelopeGain=1, sineGain=1;
     std::array<double,4> filterCoefficients{}, ampCoefficients{};
     // trims keeps the first stream's order, so a seed keeps the boards it
     // had; everything added since draws from more, in this order.
@@ -774,7 +834,8 @@ struct OtaSvf {
     // tanh(previousB), kept from the previous sample's final evaluation so
     // the Newton warm start does not recompute it: same argument, same bits.
     double previousTanhB = 0;
-    double cachedCutoff=0, cachedRate=0, cachedG=0;
+    bool previousTanhReady = true;
+    double cachedCutoff=0, cachedRate=0, cachedG=0, cachedNonlinear=0;
     double process(double sourceVoltage, double frequency, double resonance,
                    double fs, bool highPass, double sourceConductance = 1/150e3,
                    double referenceSourceConductance = 1/150e3) {
@@ -783,16 +844,7 @@ struct OtaSvf {
         network.setResonance(resonance);
         return process(sourceVoltage,frequency,highPass,network);
     }
-    double process(double sourceVoltage, double frequency, bool highPass, const OtaNetwork& network) {
-        const double cutoff = clamp(frequency, filterFrequencyFloor, .22 * network.fs);
-        if (cutoff!=cachedCutoff || network.fs!=cachedRate) {
-            // Exact input equality only: moving cutoff CVs retain the same
-            // capacitor TPT prewarp, with no control-rate approximation.
-            cachedG=prewarpTan(pi * cutoff / network.fs);
-            cachedCutoff=cutoff;
-            cachedRate=network.fs;
-        }
-        const double g = cachedG;
+    CERES_ALWAYS_INLINE double process(double sourceVoltage, double frequency, bool highPass, const OtaNetwork& network) {
         const double ratio=network.ratio, qBlend=network.qBlend;
         const double sourceBlend=network.sourceBlend, divisor=network.divisor;
         // X is the physical Thevenin source voltage, in the SAME OTA voltage
@@ -805,34 +857,64 @@ struct OtaSvf {
             qBlend*(1-sourceBlend)*(input-ratio*sy))/divisor;
         const double qBand=network.qBand, effectiveDamping=network.effectiveDamping;
         const double linear = network.linear;
-        const double nonlinear = cutoff<=filterFrequencyFloor ? 0.0 : std::max(0.0,g-linear);
         double b = previousB;
-        // The last tanh(b) the iterations evaluated, and its argument.
-        double tanhArgument = previousB, tanhValue = previousTanhB;
-        for (int iteration = 0; iteration < 7; ++iteration) {
-            const double tb = iteration == 0 ? previousTanhB : fastTanh(b);
-            tanhArgument = b; tanhValue = tb;
-            const double l = sl + nonlinear*tb + linear*b;
-            const double h = qConstant - effectiveDamping * b - l;
-            const double th = fastTanh(h);
-            const double residual = b - sb - nonlinear*th - linear*h;
-            const double dl = nonlinear*(1-tb*tb) + linear;
-            const double derivative = 1 + (nonlinear*(1-th*th)+linear)*(effectiveDamping+dl);
-            const double delta = residual / derivative;
-            b -= delta;
-            // Newton converges quadratically, so once a step is under 1e-9
-            // the error left in b is of order its square, under b's ulp. The
-            // earlier 1e-12 bought a further pair of tanh evaluations about a
-            // third of the time (2.34 to 2.02 iterations per solve, measured
-            // on the factory presets) and no change at the float output.
-            if (std::abs(delta) < 1e-9) break;
+        double l = 0;
+        if (frequency <= filterFrequencyFloor) {
+            const double dl = linear;
+            const double derivative = 1 + linear * (effectiveDamping + dl);
+            for (int iteration = 0; iteration < 7; ++iteration) {
+                const double lIter = sl + linear * b;
+                const double h = qConstant - effectiveDamping * b - lIter;
+                const double residual = b - sb - linear * h;
+                const double delta = residual / derivative;
+                b -= delta;
+                if (std::abs(delta) < 1e-9) break;
+            }
+            l = sl + linear * b;
+            previousTanhReady = false;
+        } else {
+            const double cutoff = std::min(frequency, .22 * network.fs);
+            if (cutoff!=cachedCutoff || network.fs!=cachedRate) {
+                // Exact input equality only: moving cutoff CVs retain the same
+                // capacitor TPT prewarp, with no control-rate approximation.
+                cachedG=prewarpTan(pi * cutoff / network.fs);
+                cachedNonlinear=std::max(0.0,cachedG-linear);
+                cachedCutoff=cutoff;
+                cachedRate=network.fs;
+            }
+            const double nonlinear = cachedNonlinear;
+            if (!previousTanhReady) {
+                previousTanhB = fastTanh(previousB);
+                previousTanhReady = true;
+            }
+            // The last tanh(b) the iterations evaluated, and its argument.
+            double tanhArgument = previousB, tanhValue = previousTanhB;
+            for (int iteration = 0; iteration < 7; ++iteration) {
+                const double tb = iteration == 0 ? previousTanhB : fastTanh(b);
+                tanhArgument = b; tanhValue = tb;
+                const double lIter = sl + nonlinear*tb + linear*b;
+                const double h = qConstant - effectiveDamping * b - lIter;
+                const double th = fastTanh(h);
+                const double residual = b - sb - nonlinear*th - linear*h;
+                const double dl = nonlinear*(1-tb*tb) + linear;
+                const double derivative = 1 + (nonlinear*(1-th*th)+linear)*(effectiveDamping+dl);
+                const double delta = residual / derivative;
+                b -= delta;
+                // Newton converges quadratically, so once a step is under 1e-9
+                // the error left in b is of order its square, under b's ulp. The
+                // earlier 1e-12 bought a further pair of tanh evaluations about a
+                // third of the time (2.34 to 2.02 iterations per solve, measured
+                // on the factory presets) and no change at the float output.
+                if (std::abs(delta) < 1e-9) break;
+            }
+            // tanh(b) is the last evaluation carried along its tangent over that
+            // final sub-ulp step; only an unconverged loop recomputes it.
+            const double step = b - tanhArgument;
+            const double tanhB = std::abs(step) < 1e-9
+                ? tanhValue + (1 - tanhValue*tanhValue)*step : fastTanh(b);
+            l = sl + nonlinear*tanhB + linear*b;
+            previousTanhB = tanhB;
         }
-        // tanh(b) is the last evaluation carried along its tangent over that
-        // final sub-ulp step; only an unconverged loop recomputes it.
-        const double step = b - tanhArgument;
-        const double tanhB = std::abs(step) < 1e-9
-            ? tanhValue + (1 - tanhValue*tanhValue)*step : fastTanh(b);
-        const double l = sl + nonlinear*tanhB + linear*b;
         const double z = qConstant+qBand*b;
         const double h = z - 2*b - l;
         // Expand sourceBlend/ratio analytically so tiny positive diagnostic
@@ -843,7 +925,6 @@ struct OtaSvf {
         sz = 2 * z - sz;
         sy = 2 * y - sy;
         previousB = b;
-        previousTanhB = tanhB;
         return highPass ? h : l;
     }
 };
@@ -875,9 +956,9 @@ struct FilterChain {
         const double low=lp.process(high,lpFrequency,lpResonance,fs,false);
         return low*filteredVcaCalibration/inputScale;
     }
-    double process(double waveSum, double branches, double hpFrequency, double lpFrequency,
-                   double drive,
-                   const OtaNetwork& hpNetwork, const OtaNetwork& lpNetwork) {
+    CERES_ALWAYS_INLINE double process(double waveSum, double branches, double hpFrequency, double lpFrequency,
+                                       double drive,
+                                       const OtaNetwork& hpNetwork, const OtaNetwork& lpNetwork) {
         const double inputScale=.3*drive;
         const double high=hp.process(inputScale*waveSum/branches,hpFrequency,true,hpNetwork);
         const double low=lp.process(high,lpFrequency,false,lpNetwork);
@@ -923,8 +1004,8 @@ constexpr double outputCouplingTau[4]={1e-6*100e3,1e-6*(27e3+100e3),
 // tanh is not constexpr in C++17, so tanh(k) is written out (std::tanh(1.4020)).
 constexpr double wscSineDrive=1.4020;
 constexpr double wscSineTanhDrive=0.8857831884152492;
-double wscSine(double input) {return fastTanh(wscSineDrive*input)/wscSineTanhDrive;}
-double wscSineSlope(double input) {
+CERES_ALWAYS_INLINE double wscSine(double input) {return fastTanh(wscSineDrive*input)/wscSineTanhDrive;}
+CERES_ALWAYS_INLINE double wscSineSlope(double input) {
     const double t=fastTanh(wscSineDrive*input);
     return wscSineDrive*(1-t*t)/wscSineTanhDrive;
 }
@@ -1008,7 +1089,7 @@ struct OutputCoupling {
             feedback=2*g; share=1/(1+g);
         }
     };
-    double process(double x,const Coefficients& c) {
+    CERES_ALWAYS_INLINE double process(double x,const Coefficients& c) {
         const double high=(x-memory)*c.share;
         memory+=c.feedback*high;
         return high;
@@ -1112,13 +1193,18 @@ struct RingCarrierCoupling {
         clear();
     }
     void clear() {memory.fill(0);}
-    double process(double source) {
-        auto rhs=memory;rhs[0]+=source;
-        std::array<double,4> nodes{};
-        for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j)nodes[i]+=inverse[i][j]*rhs[j];
-        for(unsigned i=0;i<4;++i)memory[i]=2*(nodes[i]-(i==0?source:0.))-memory[i];
+    CERES_ALWAYS_INLINE double process(double source) {
+        const double r0=memory[0]+source, r1=memory[1], r2=memory[2], r3=memory[3];
+        const double n0=inverse[0][0]*r0+inverse[0][1]*r1+inverse[0][2]*r2+inverse[0][3]*r3;
+        const double n1=inverse[1][0]*r0+inverse[1][1]*r1+inverse[1][2]*r2+inverse[1][3]*r3;
+        const double n2=inverse[2][0]*r0+inverse[2][1]*r1+inverse[2][2]*r2+inverse[2][3]*r3;
+        const double n3=inverse[3][0]*r0+inverse[3][1]*r1+inverse[3][2]*r2+inverse[3][3]*r3;
+        memory[0]=2*(n0-source)-memory[0];
+        memory[1]=2*n1-r1;
+        memory[2]=2*n2-r2;
+        memory[3]=2*n3-r3;
         // Actual pin7-pin8 carrier per volt of source; no gain normalization.
-        return (nodes[0]-nodes[1])*ringCarrierPortShunt/(33000+ringCarrierPortShunt);
+        return (n0-n1)*(ringCarrierPortShunt/(33000+ringCarrierPortShunt));
     }
 };
 
@@ -1158,17 +1244,23 @@ struct Envelope {
     bool gate = false;
     void on() { gate = true; stage = Attack; }
     void off() { gate = false; if (stage != Idle) stage = Release; }
-    double advance(double initial, double peak, double sustained,
-                   double headroom, double saturation, double attackIncrement, double currentStep,
-                   double decayCoefficient, double releaseCoefficient) {
+    static double saturatedStep(double target, double voltage, double vs, double currentStep) {
+        const double y=(target-voltage)/vs;
+        const double nextLog=logSinh(y)-currentStep;
+        const double increment=(y>20 && nextLog>20)
+            ? currentStep : y-asinhExp(nextLog);
+        return vs*increment;
+    }
+    CERES_ALWAYS_INLINE double advance(double initial, double peak, double sustained,
+                                       double headroom, double saturation, double attackIncrement, double currentStep,
+                                       double decayCoefficient, double releaseCoefficient) {
         // Key-off keeps IL/RT selected (Guide pp.43–44): an idle board is
         // still a connected capacitor, not a reset switch. Continue the
         // existing release law if its target moves; Idle remains an audio
         // bookkeeping state. The physical post-settling rate is unmeasured.
-        double target = initial, coefficient = 0;
         if (stage == Attack) {
             const double span = std::max(1e-9, std::abs(peak - initial));
-            target = peak + headroom * span;
+            const double target = peak + headroom * span;
             if (saturation>0 && voltage<peak) {
                 // Optional differential-pair/current-limit approximation:
                 // dv/dt = k*Vs*tanh((target-v)/Vs). Integrating gives
@@ -1176,12 +1268,7 @@ struct Envelope {
                 // k is normalized so a full IL->peak attack retains its
                 // requested duration. This is a model experiment, not an
                 // identified IG00151 transistor/current-limit parameter.
-                const double vs=saturation*span;
-                const double y=(target-voltage)/vs;
-                const double nextLog=logSinh(y)-currentStep;
-                const double increment=(y>20 && nextLog>20)
-                    ? currentStep : y-asinhExp(nextLog);
-                voltage+=vs*increment;
+                voltage += saturatedStep(target, voltage, saturation*span, currentStep);
             } else {
                 voltage += (target - voltage) * attackIncrement;
             }
@@ -1189,25 +1276,24 @@ struct Envelope {
             return voltage;
         }
         if (stage == Decay || stage == Sustain) {
-            target = sustained;
-            coefficient = decayCoefficient;
-            voltage = target + (voltage - target) * coefficient;
-            if (std::abs(voltage - target) < 1e-7) { voltage = target; stage = Sustain; }
+            if (voltage == sustained) { stage = Sustain; return voltage; }
+            voltage = sustained + (voltage - sustained) * decayCoefficient;
+            if (std::abs(voltage - sustained) < 1e-7) { voltage = sustained; stage = Sustain; }
         } else {
-            coefficient = releaseCoefficient;
-            voltage = target + (voltage - target) * coefficient;
-            if (std::abs(voltage - target) < 1e-7) { voltage = target; stage = Idle; }
+            if (voltage == initial) { stage = Idle; return voltage; }
+            voltage = initial + (voltage - initial) * releaseCoefficient;
+            if (std::abs(voltage - initial) < 1e-7) { voltage = initial; stage = Idle; }
         }
         return voltage;
     }
 };
 
-double blep(double phase, double step) {
+CERES_ALWAYS_INLINE double blep(double phase, double step) {
     if (phase < step) { const double t = phase / step; return 2*t - t*t - 1; }
     if (phase > 1 - step) { const double t = (phase - 1) / step; return t*t + 2*t + 1; }
     return 0;
 }
-double blamp(double phase, double step) {
+CERES_ALWAYS_INLINE double blamp(double phase, double step) {
     if (phase < step) { const double t = 1 - phase / step; return step * t*t*t / 3; }
     if (phase > 1 - step) { const double t = 1 + (phase - 1) / step; return step * t*t*t / 3; }
     return 0;
@@ -1300,10 +1386,23 @@ struct Oscillator {
     // it to the triangle's mean at that pitch.
     double stiCoupling = 0;
     bool stiPrecharged = false;
+    static CERES_NOINLINE double applySineEdges(double sine, double c, double recharge, double step,
+                                                bool resetEdge, bool phaseEdge, bool foldEdge,
+                                                double blepReset, double blampReset, double blampPhase, double fold) {
+        if (resetEdge) {
+            const bool foldAfterPlateau = recharge < .5;
+            const double plateauEnd = (foldAfterPlateau ? 1-4*recharge : 4*recharge-3)-c;
+            sine += .5*(wscSine(plateauEnd)-wscSine(1-c))*blepReset
+                + .5*(foldAfterPlateau ? -4 : 4)*wscSineSlope(plateauEnd)*blampReset;
+        }
+        if (phaseEdge) sine -= 2*wscSineSlope(1-c)*blampPhase;
+        if (foldEdge) sine += 4*wscSineSlope(-1-c)*blamp(fold,step);
+        return sine;
+    }
     // stiCoefficient: -expm1(-1/(fs*wscSineInputTau)).
-    OscillatorFrame process(double frequency, double pulseWidth, double resetSeconds, double fs,
-                            double stiCoefficient, bool sineEnabled = true,
-                            bool sawEnabled = true, bool pulseEnabled = true) {
+    CERES_ALWAYS_INLINE OscillatorFrame process(double frequency, double pulseWidth, double resetSeconds, double fs,
+                                                double stiCoefficient, bool sineEnabled = true,
+                                                bool sawEnabled = true, bool pulseEnabled = true) {
         // Guide pp.28-31: OUT7 conditions the integrating-capacitor signal
         // with the monostable pulse before the WSC. It is not the exposed raw
         // recharge triangle. In the nominal current law r=f*tau, fixed A0
@@ -1326,7 +1425,20 @@ struct Oscillator {
         // 59.73us at the guide's nominal 800uA; only Iref's own tolerance
         // (unpublished) moves r.
         const double recharge = clamp(frequency * resetSeconds, 1e-7, .9);
-        const double resetPhase = wrapUnit(phase-recharge);
+        const bool phaseEdge = phase < step || phase > 1-step;
+        double resetPhase = 0;
+        bool resetEdge = false;
+        double blepPhase = 0, blampPhase = 0, blepReset = 0, blampReset = 0;
+        if (sawEnabled || sineEnabled) {
+            resetPhase = wrapUnit(phase-recharge);
+            resetEdge = resetPhase < step || resetPhase > 1-step;
+            if (CERES_UNLIKELY(resetEdge)) {
+                blepReset = blep(resetPhase, step);
+                blampReset = blamp(resetPhase, step);
+            }
+            if (CERES_UNLIKELY(phaseEdge)) blampPhase = blamp(phase, step);
+        }
+        if (CERES_UNLIKELY(phaseEdge) && (sawEnabled || pulseEnabled)) blepPhase = blep(phase, step);
         // WSC pin5 inverts the conditioned downward ramp. Correct both
         // voltage jumps and both slope changes analytically, without tables.
         // A muted waveform is a pure function of the phase (no state of its
@@ -1334,11 +1446,10 @@ struct Oscillator {
         double saw = 0;
         if (sawEnabled) {
             const double sawBase = phase < recharge ? -1 : 2*phase-1;
-            saw = sawBase - blep(phase,step)
-                + recharge*blep(resetPhase,step)
-                + blamp(resetPhase,step)-blamp(phase,step);
+            saw = CERES_UNLIKELY(phaseEdge || resetEdge)
+                ? sawBase - blepPhase + recharge*blepReset + blampReset - blampPhase
+                : sawBase;
         }
-        const double duty = clamp(pulseWidth, .01, .99);
         // WSC guide p.31 explicitly states that PWM moves only the falling
         // edge. Its rising edge stays locked to the VCO period. Applying a
         // comparator to BOTH slopes of the internal recharge capacitor would
@@ -1355,9 +1466,12 @@ struct Oscillator {
         // step instead. The falling edge is therefore at max(d,r).
         double square = 0;
         if (pulseEnabled) {
+            const double duty = clamp(pulseWidth, .01, .99);
             const double fall = std::max(duty, recharge);
             square = phase < fall ? 1 : -1;
-            square += blep(phase,step) - blep(wrapUnit(phase-fall),step);
+            const double fallPhase = wrapUnit(phase-fall);
+            if (CERES_UNLIKELY(phaseEdge || fallPhase < step || fallPhase > 1-step))
+                square += blepPhase - blep(fallPhase,step);
         }
         // WSC pin14 -> pin3 folds the SAME conditioned ramp into the
         // triangle tri=2|p|-1 (TO, 3.2Vpp, SL pin 4 open; SM2 p.21): 1 on the
@@ -1390,16 +1504,11 @@ struct Oscillator {
         if (sineEnabled) {
             const double c = stiCoupling;
             sine = wscSine(conditioned-c);
-            if (resetPhase < step || resetPhase > 1-step) {
-                const bool foldAfterPlateau = recharge < .5;
-                const double plateauEnd = (foldAfterPlateau ? 1-4*recharge : 4*recharge-3)-c;
-                sine += .5*(wscSine(plateauEnd)-wscSine(1-c))*blep(resetPhase,step)
-                    + .5*(foldAfterPlateau ? -4 : 4)*wscSineSlope(plateauEnd)*blamp(resetPhase,step);
-            }
-            if (phase < step || phase > 1-step) sine -= 2*wscSineSlope(1-c)*blamp(phase,step);
             const double fold = wrapUnit(phase-.5);
-            if (recharge < .5 && (fold < step || fold > 1-step))
-                sine += 4*wscSineSlope(-1-c)*blamp(fold,step);
+            const bool foldEdge = recharge < .5 && (fold < step || fold > 1-step);
+            if (CERES_UNLIKELY(resetEdge || phaseEdge || foldEdge))
+                sine = applySineEdges(sine, c, recharge, step, resetEdge, phaseEdge, foldEdge,
+                                      blepReset, blampReset, blampPhase, fold);
         }
         // Keep the physical TO-STI capacitor and free oscillator running
         // while its output is muted, ready for a live sine-level edit.
@@ -1444,7 +1553,8 @@ double besselI0(double x) {
 }
 struct Decimator {
     static constexpr unsigned maxTaps = 249;
-    std::array<double,maxTaps> h{}, history{};
+    std::array<double,maxTaps> h{};
+    std::array<double,2*maxTaps> history{};
     const unsigned taps;
     unsigned cursor = 0;
     explicit Decimator(unsigned factor=4) : taps(62*factor+1) {
@@ -1462,27 +1572,30 @@ struct Decimator {
         }
         for (unsigned i=0;i<taps;++i) h[i] /= sum;
     }
-    void push(double x) { history[cursor] = x; cursor = cursor+1 == taps ? 0 : cursor+1; }
+    CERES_ALWAYS_INLINE void push(double x) {
+        cursor = (cursor == 0 ? taps : cursor) - 1;
+        history[cursor] = x;
+        history[cursor + taps] = x;
+    }
     // Newest sample first: history[cursor-1] down to [0], then wrap from
     // [taps-1], as two straight runs. Four interleaved partial sums: one
     // running sum serialises 249 additions behind each other's latency,
     // about a tenth of the 4x cost; four run in parallel. The order of the
     // additions changes, so the sum differs from a single run at its last
     // bit (1e-16 relative), not at the float output.
-    double output() const {
+    CERES_ALWAYS_INLINE double output() const {
+        const double* p = history.data() + cursor;
+        const unsigned half = taps >> 1;
         double s0 = 0, s1 = 0, s2 = 0, s3 = 0;
         unsigned i = 0;
-        const auto run = [&](unsigned at, unsigned end) {
-            for (; at - end >= 4; at -= 4, i += 4) {
-                s0 += h[i] * history[at-1];
-                s1 += h[i+1] * history[at-2];
-                s2 += h[i+2] * history[at-3];
-                s3 += h[i+3] * history[at-4];
-            }
-            while (at > end) s0 += h[i++] * history[--at];
-        };
-        run(cursor, 0);
-        run(taps, cursor);
+        for (; i + 4 <= half; i += 4) {
+            s0 += h[i] * (p[i] + p[taps - 1 - i]);
+            s1 += h[i+1] * (p[i+1] + p[taps - 2 - i]);
+            s2 += h[i+2] * (p[i+2] + p[taps - 3 - i]);
+            s3 += h[i+3] * (p[i+3] + p[taps - 4 - i]);
+        }
+        for (; i < half; ++i) s0 += h[i] * (p[i] + p[taps - 1 - i]);
+        s0 += h[half] * p[half];
         return (s0 + s1) + (s2 + s3);
     }
     void clear() { history.fill(0); cursor = 0; }
@@ -1491,12 +1604,12 @@ struct OutputRate {
     Decimator four{4}, two{2};
     std::array<double,Synth::outputLatency+1> delay{};
     unsigned cursor=0;
-    void push(double value,unsigned factor) {
+    CERES_ALWAYS_INLINE void push(double value,unsigned factor) {
         if(factor==4)four.push(value);
         else if(factor==2)two.push(value);
         else {delay[cursor]=value;cursor=(cursor+1)%delay.size();}
     }
-    double output(unsigned factor) const {
+    CERES_ALWAYS_INLINE double output(unsigned factor) const {
         if(factor==4)return four.output();
         if(factor==2)return two.output();
         return delay[cursor]; // exact31-sample delay, no redundant1x low-pass
@@ -1695,6 +1808,12 @@ struct Synth::Impl {
         // patch changes and board redraws invalidate it in updateBoardScales.
         double boardPitchExponent=0, boardPitchCents=0;
         bool boardPitchReady=false;
+        double cachedPitchExp=0, cachedFrequency=440;
+        double cachedHpExp=0, cachedHpFactor=1;
+        double cachedLpExp=0, cachedLpFactor=1;
+        bool expCacheReady=false;
+        int cachedGlideCode=60;
+        double cachedGlideStepped=1, cachedGlideVoltage=1;
 #if !defined(CERES_EMBEDDED_TARGET)
         double oscillatorFrequency=0, hpFrequency=0, lpFrequency=0;
 #endif
@@ -1719,7 +1838,7 @@ struct Synth::Impl {
     // Existing per-stage effective Q anchors are NOT raw chip voltages.
     // Two independently smoothed anchors plus the shared delta decompose
     // two stage capacitor coordinates, not three physical capacitors.
-    double qVoltageOffset=0, qControlCoefficient=0, stiCoefficient=0;
+    double qVoltageOffset=0, qControlCoefficient=0, stiCoefficient=0, glideAlpha=1;
     double hpResonanceAnchor=0, lpResonanceAnchor=0;
     bool hasProcessed=false;
     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
@@ -1750,6 +1869,7 @@ struct Synth::Impl {
     double ringPhase = 0, ringCarrier = 0, ringFrequency = 30;
     double ringDepthValue = 0, ringDepthIncrement = 0;
     unsigned ringDepthRemaining = 0;
+    double cachedRingExp = 0, cachedRingFactor = 1;
     double ringCoupledCarrier=0;
     double ringSwitchGain=ringSteering(ringDifferentialDc);
     double ringSignalInput=0, ringSignalOutput=0;
@@ -1810,6 +1930,9 @@ struct Synth::Impl {
     void updateCoefficients() {
         outputTrimGain=std::pow(10,patch.outputTrimDb/20);
         if (patch.expression<1) expression.configure(patch.expression,internalFs);
+        const double glideTau=patch.glideRate<glideMediumAbove ? glideTauLarge
+            : patch.glideRate<glideDirectAbove ? glideTauMedium : 0;
+        glideAlpha=(patch.glideMode==2 || glideTau==0) ? 1.0 : -std::expm1(-(1/internalFs)/glideTau);
         // M-board mixer: fixed 150k ground, 150k noise input, and one 150k
         // branch per enabled waveform gate. Ideal low-Z WSC/noise outputs,
         // negligible enabled-FET resistance; disabled gates are open.
@@ -1843,16 +1966,20 @@ struct Synth::Impl {
         const double lpAligned=lpfLeverHz(.5)-filterFrequencyFloor;
         for (auto& voice : voices) {
             voice.boardPitchReady=false;
+            voice.expCacheReady=false;
             auto& board=voice.board;
             board.hpScale=std::exp2(patch.boardFilterTolerance*board.hpOctaves);
             board.lpScale=std::exp2(patch.boardFilterTolerance*board.lpOctaves);
             board.hpCutoff=boardCutoff(patch.hpCutoff,hpAligned,board.hpScale);
             board.lpCutoff=boardCutoff(patch.lpCutoff,lpAligned,board.lpScale);
+            board.hpBrilliance=patch.brilliance*board.hpScale*hpBrillianceScale;
+            board.lpBrilliance=patch.brilliance*board.lpScale*lpBrillianceScale;
             const double level=1+envelope*board.filterEnvelopeError;
             board.hpEnvelopeGain=level*board.hpScale;
             board.lpEnvelopeGain=level*board.lpScale;
             board.ampPeak=1+envelope*board.ampPeakError;
             board.ampFloor=ampEnvelopeFloor+envelope*board.ampFloorError;
+            board.ampSustained=patch.ampSustain+board.ampFloor;
             // VR14 is trimmed at full sustain (CS-60 VI.4): there each board
             // gives the nominal output, whatever its own floor.
             board.ampEnvelopeGain=(1+ampEnvelopeFloor)/(1+board.ampFloor);
@@ -1926,6 +2053,7 @@ struct Synth::Impl {
         limiterRandom=Random(seed^0xd1b54a32d192ed03ULL); ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={}; ringSignalCoupling={};
         ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
+        cachedRingExp=0; cachedRingFactor=1;
         ringCarrierCoupling.clear();ringCoupledCarrier=0;
         ringSwitchGain=ringSteering(ringDifferentialDc);
         ringSignalInput=ringSignalOutput=0;
@@ -1962,7 +2090,7 @@ struct Synth::Impl {
     // Free channels carry the last-pressed key (p.23), so a newly assigned
     // board glides from the previous key. The sample-hold tracks while its key
     // is down or in Sustain II and holds the gliding value at key-off in I.
-    double advanceGlide(Voice& v,double dt) {
+    CERES_ALWAYS_INLINE double advanceGlide(Voice& v,double dt) {
         const int target=v.held || v.pedalHeld ? v.note : lastAssignedKey;
         if (patch.glideMode==0) {
             v.glideCode=target; v.glideSteps=0; v.glideReady=false;
@@ -1971,6 +2099,9 @@ struct Synth::Impl {
         if (!v.glideReady) {
             v.glideCode=static_cast<int>(std::lround(v.keyPitch));
             v.glideVoltage=std::exp2((v.keyPitch-60)/12);
+            v.cachedGlideCode=v.glideCode;
+            v.cachedGlideStepped=std::exp2((v.glideCode-60)/12.0);
+            v.cachedGlideVoltage=v.glideVoltage;
             v.glideReady=true;
         }
         if (v.glideCode==target) v.glideSteps=0;
@@ -1981,18 +2112,24 @@ struct Synth::Impl {
                 v.glideSteps-=1;
             }
         }
-        const double stepped=std::exp2((v.glideCode-60)/12.0);
+        if (v.glideCode!=v.cachedGlideCode) {
+            v.cachedGlideCode=v.glideCode;
+            v.cachedGlideStepped=std::exp2((v.glideCode-60)/12.0);
+        }
+        const double stepped=v.cachedGlideStepped;
         // Hz-linear key voltage: the integrator's RC glide is exponential in
         // Hz, so a wide glide covers its last semitones more slowly in pitch.
         // The gate the lever selects fixes the time constant; in the fast
         // regime the direct gate passes the counter's steps as they are, so
         // portamento and glissando meet at the short end of the lever.
-        const double tau=patch.glideRate<glideMediumAbove ? glideTauLarge
-            : patch.glideRate<glideDirectAbove ? glideTauMedium : 0;
-        v.glideVoltage=patch.glideMode==2 || tau==0 ? stepped
-            : v.glideVoltage+(stepped-v.glideVoltage)*-std::expm1(-dt/tau);
-        if (v.held || v.pedalHeld || patch.sustainMode==2)
-            v.keyPitch=60+12*std::log2(v.glideVoltage);
+        v.glideVoltage=glideAlpha==1.0 ? stepped
+            : v.glideVoltage+(stepped-v.glideVoltage)*glideAlpha;
+        if (v.held || v.pedalHeld || patch.sustainMode==2) {
+            if (v.glideVoltage!=v.cachedGlideVoltage) {
+                v.cachedGlideVoltage=v.glideVoltage;
+                v.keyPitch=60+12*std::log2(v.glideVoltage);
+            }
+        }
         return v.keyPitch;
     }
     double sample() {
@@ -2071,6 +2208,18 @@ struct Synth::Impl {
         const double pwm = sinTurn(pwmPhase+patch.pwmPhase);
         lfoPhase = wrapUnit(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrapUnit(pwmPhase + patch.pwmRate*dt);
+        const double pulseWidthMod = patch.pulseWidth+pwm*patch.pwmDepth;
+        const double resetSeconds = patch.resetMicroseconds*1e-6;
+        const bool sineEnabled = patch.sine!=0, sawEnabled = patch.saw!=0, pulseEnabled = patch.pulse!=0;
+        const double spreadCenter = .5*(voiceLimit-1);
+        const bool checkBoardPitch = patch.boardPitchTolerance>0 || patch.boardTemperatureRise!=0;
+        const double noiseTerm = patch.noise*noise;
+        const double octaveSemitones = 12*patch.octave;
+        const double tuneOctaves = patch.tuneCents/1200;
+        const double touchFilterDepth = patch.pressureFilter+lfo*patch.pressureWah;
+        const double filterLfoHp = patch.filterLfo*hpSubRelativeScale;
+        const bool sharedLpCutoff = patch.lpEnvelopeScale==patch.hpEnvelopeScale &&
+            patch.filterLfo==0 && patch.brilliance==0;
         double mixed = 0;
         for (unsigned i = 0; i < voiceLimit; ++i) {
             auto& v = voices[i];
@@ -2094,14 +2243,14 @@ struct Synth::Impl {
             v.drift += (v.driftTarget-v.drift) * driftCoefficient;
             // The fixed spread steps from board to board, centred on the
             // voices in use (i-1.5 at the default four).
-            double cents = patch.tuneCents + (static_cast<double>(i)-.5*(voiceLimit-1))*patch.voiceSpreadCents
+            double cents = patch.tuneCents + (static_cast<double>(i)-spreadCenter)*patch.voiceSpreadCents
                 + v.drift*patch.driftCents + lfo*(patch.vibratoCents + expression*patch.pressureVibrato)
                 + expression*patch.pressureVibrato*touchVibratoBias;
             const double key=advanceGlide(v,dt);
             // Trim residual and thermal drift of this board's linear VCO (see
             // BoardTolerance): its key voltage is the NORMAL frequency of key,
             // bend and PITCH.
-            if (patch.boardPitchTolerance>0 || patch.boardTemperatureRise!=0) {
+            if (checkBoardPitch) {
                 const double exponent=(key-69+bend+patch.tuneCents*.01)/12;
                 if (!v.boardPitchReady || exponent!=v.boardPitchExponent) {
                     v.boardPitchCents=v.board.pitchCents(patch,440*std::exp2(exponent));
@@ -2110,10 +2259,18 @@ struct Synth::Impl {
                 }
                 cents+=v.boardPitchCents;
             }
-            const double frequency = 440 * std::exp2((key-69 + bend + 12*patch.octave + cents*.01)/12);
-            const auto waves = v.osc.process(frequency, patch.pulseWidth+pwm*patch.pwmDepth,
-                                            patch.resetMicroseconds*1e-6,internalFs,stiCoefficient,
-                                            patch.sine!=0,patch.saw!=0,patch.pulse!=0);
+            const double pitchExp = (key-69 + bend + octaveSemitones + cents*.01)/12;
+            double frequency;
+            if (v.expCacheReady && pitchExp == v.cachedPitchExp) {
+                frequency = v.cachedFrequency;
+            } else {
+                frequency = 440 * std::exp2(pitchExp);
+                v.cachedPitchExp = pitchExp;
+                v.cachedFrequency = frequency;
+            }
+            const auto waves = v.osc.process(frequency, pulseWidthMod,
+                                            resetSeconds,internalFs,stiCoefficient,
+                                            sineEnabled,sawEnabled,pulseEnabled);
             // Each board's EG times, VCA-EG peak and floor (see BoardTolerance;
             // the shared values when the envelope tolerance is off).
             const auto& egf=v.board.filterCoefficients;
@@ -2121,7 +2278,7 @@ struct Synth::Impl {
             const double filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
                 patch.filterAttackHeadroom,patch.filterAttackSaturation,egf[0],egf[3],egf[1],egf[2]);
             const double ampEnvelope = std::max(0.0,v.amp.advance(v.board.ampFloor,v.board.ampPeak,
-                patch.ampSustain+v.board.ampFloor,
+                v.board.ampSustained,
                 patch.ampAttackHeadroom,patch.ampAttackSaturation,ega[0],ega[3],ega[1],ega[2]));
             // Guide printed p.34: fc=125*Kv*2^Vfc. Kv is LINEAR in key Hz: the
             // M board feeds IG00156 pin 2 from the same K terminal as VCO III
@@ -2140,27 +2297,58 @@ struct Synth::Impl {
             // -5..+7 semitones. It remains a shared master offset even when
             // the engineering-only keyTrack slope is changed. TRANSPOSE FT,
             // VIB15 and the modeled oscillator drift/spread remain VCO-only.
-            const double keyOctaves=(key-60+bend)*patch.keyTrack/12+patch.tuneCents/1200;
+            const double keyOctaves=(key-60+bend)*patch.keyTrack/12+tuneOctaves;
             // R7 TBR and VCF (touch SUB) enter each cutoff node through 47k LP
             // and 150k HP, like SUB: the HP coupling is hpSubRelativeScale.
-            const double touchOctaves=expression*(patch.pressureFilter+lfo*patch.pressureWah);
+            const double touchOctaves=expression*touchFilterDepth;
             // Board tolerance (see BoardTolerance): each Vfc input's octaves
             // scale with this board's rank residual, the static cutoff's from
             // the lever centre; the EG also with its output-level residual.
             // Every factor is exactly 1, and each cutoff the patch's, when off.
             const auto& board=v.board;
-            const double hpFactor=std::exp2(keyOctaves+filterEnvelope*board.hpEnvelopeGain*patch.hpEnvelopeScale
-                + touchOctaves*board.hpScale*hpSubRelativeScale+lfo*board.hpScale*(patch.filterLfo*hpSubRelativeScale)
-                + patch.brilliance*board.hpScale*hpBrillianceScale);
-            const double lpFactor=patch.lpEnvelopeScale==patch.hpEnvelopeScale &&
-                patch.filterLfo==0 && patch.brilliance==0 && touchOctaves==0 &&
-                board.hpEnvelopeGain==board.lpEnvelopeGain ? hpFactor
-                : std::exp2(keyOctaves+filterEnvelope*board.lpEnvelopeGain*patch.lpEnvelopeScale
-                    + touchOctaves*board.lpScale+lfo*board.lpScale*patch.filterLfo
-                    + patch.brilliance*board.lpScale*lpBrillianceScale);
-            const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + patch.noise*noise;
-            const double hpFrequency=modulatedFilterFrequency(board.hpCutoff,hpFactor);
-            const double lpFrequency=modulatedFilterFrequency(board.lpCutoff,lpFactor);
+            double hpFrequency = filterFrequencyFloor;
+            double hpExp = 0, hpFactor = 1;
+            bool hpFactorValid = false;
+            if (board.hpCutoff > filterFrequencyFloor) {
+                hpExp = keyOctaves+filterEnvelope*board.hpEnvelopeGain*patch.hpEnvelopeScale
+                    + touchOctaves*board.hpScale*hpSubRelativeScale+lfo*board.hpScale*filterLfoHp
+                    + board.hpBrilliance;
+                if (v.expCacheReady && hpExp == v.cachedHpExp) {
+                    hpFactor = v.cachedHpFactor;
+                } else {
+                    hpFactor = fastExp2(hpExp);
+                    v.cachedHpExp = hpExp;
+                    v.cachedHpFactor = hpFactor;
+                }
+                hpFactorValid = true;
+                hpFrequency = modulatedFilterFrequency(board.hpCutoff,hpFactor);
+            }
+            double lpFrequency = filterFrequencyFloor;
+            if (board.lpCutoff > filterFrequencyFloor) {
+                if (hpFactorValid && sharedLpCutoff && touchOctaves==0 &&
+                    board.hpEnvelopeGain==board.lpEnvelopeGain) {
+                    lpFrequency = modulatedFilterFrequency(board.lpCutoff,hpFactor);
+                } else {
+                    const double lpExp = keyOctaves+filterEnvelope*board.lpEnvelopeGain*patch.lpEnvelopeScale
+                        + touchOctaves*board.lpScale+lfo*board.lpScale*patch.filterLfo
+                        + board.lpBrilliance;
+                    double lpFactor;
+                    if (v.expCacheReady && lpExp == v.cachedLpExp) {
+                        lpFactor = v.cachedLpFactor;
+                    } else if (hpFactorValid && lpExp == hpExp) {
+                        lpFactor = hpFactor;
+                        v.cachedLpExp = lpExp;
+                        v.cachedLpFactor = lpFactor;
+                    } else {
+                        lpFactor = fastExp2(lpExp);
+                        v.cachedLpExp = lpExp;
+                        v.cachedLpFactor = lpFactor;
+                    }
+                    lpFrequency = modulatedFilterFrequency(board.lpCutoff,lpFactor);
+                }
+            }
+            v.expCacheReady = true;
+            const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + noiseTerm;
 #if !defined(CERES_EMBEDDED_TARGET)
             v.oscillatorFrequency=frequency; v.hpFrequency=hpFrequency; v.lpFrequency=lpFrequency;
 #endif
@@ -2185,9 +2373,11 @@ struct Synth::Impl {
             // up to 1.08 of full LEVEL, tremolo .3375) is unpublished too, so
             // it stays linear. The LEVEL levers' 100k/.01uF at LI (1ms with a
             // high-impedance pin) is not modelled: LI's impedance is unknown.
-            const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocityValue);
-            const double touchLevel=patch.pressureVolume*expression*touchLevelScale;
-            mixed += beforeVca * ampEnvelope * board.ampEnvelopeGain * velocityGain * std::max(0.0,levelControl+touchLevel);
+            if (ampEnvelope > 0.0) {
+                const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocityValue);
+                const double touchLevel=patch.pressureVolume*expression*touchLevelScale;
+                mixed += beforeVca * ampEnvelope * board.ampEnvelopeGain * velocityGain * std::max(0.0,levelControl+touchLevel);
+            }
         }
         // The PRA output preamp (outputPreamp) is linear up to its derived
         // op-amp rails; no hidden peak normalization or dynamics processor.
@@ -2213,7 +2403,12 @@ struct Synth::Impl {
             if (--ringDepthRemaining==0) ringDepthValue=patch.ringDepth;
             else ringDepthValue+=ringDepthIncrement;
         }
-        ringFrequency=clamp(patch.ringRate*std::exp2(ringDepthValue*ringControl),.2,220);
+        const double ringExp = ringDepthValue * ringControl;
+        if (ringExp != cachedRingExp) {
+            cachedRingExp = ringExp;
+            cachedRingFactor = ringExp == 0.0 ? 1.0 : std::exp2(ringExp);
+        }
+        ringFrequency=clamp(patch.ringRate*cachedRingFactor,.2,220);
         ringCarrier=std::sin(2*pi*ringPhase);
         ringPhase=wrapUnit(ringPhase+ringFrequency*dt);
         // Keep this free-running passive network connected even at mix0.
