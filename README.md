@@ -6,26 +6,20 @@ Ceres is a sample-free Yamaha CS-50 research synthesizer: a reusable C++17 circu
 
 ## Audio demos
 
-The CI-generated demos below play the **circuit engine's 14 research presets**, including Init, without preset edits, gain normalization or external audio. These are also the plug-in's factory programs: the demos drive `ceres::Synth` directly, on the one fixed unit every plug-in instance was before 0.6.4 (seed 20261017), rather than the plug-in's processor. The source phrases are original committed MIDI, not recovered hardware performances; names inherited from the research table do not establish calibrated Yamaha preset matches.
+The CI-generated demos below play **eight of the circuit engine's 14 research presets**, each from a phrase written for its role, without preset edits, gain normalization or external audio. These are also the plug-in's factory programs: the demos drive `ceres::Synth` directly, on the one fixed unit every plug-in instance was before 0.6.4 (seed 20261017), rather than the plug-in's processor. The source phrases are original committed MIDI, not recovered hardware performances; names inherited from the research table do not establish calibrated Yamaha preset matches.
 
 <!-- audio-demos-begin -->
 
 | # | Preset | Demo | Length | Peak |
 | --- | --- | --- | --- | --- |
-| 1 | init | [01-init.mp3](Docs/audio/01-init.mp3) | 12.0 s | -10.2 dBFS |
-| 2 | string1 | [02-string1.mp3](Docs/audio/02-string1.mp3) | 12.0 s | -11.3 dBFS |
-| 3 | string2 | [03-string2.mp3](Docs/audio/03-string2.mp3) | 12.0 s | -15.0 dBFS |
-| 4 | brass1 | [04-brass1.mp3](Docs/audio/04-brass1.mp3) | 12.0 s | -11.8 dBFS |
-| 5 | brass2 | [05-brass2.mp3](Docs/audio/05-brass2.mp3) | 12.0 s | -13.3 dBFS |
-| 6 | flute | [06-flute.mp3](Docs/audio/06-flute.mp3) | 12.0 s | -11.3 dBFS |
-| 7 | electric_piano | [07-electric-piano.mp3](Docs/audio/07-electric-piano.mp3) | 12.0 s | -7.8 dBFS |
-| 8 | clavichord | [08-clavichord.mp3](Docs/audio/08-clavichord.mp3) | 12.0 s | -15.7 dBFS |
-| 9 | harpsichord | [09-harpsichord.mp3](Docs/audio/09-harpsichord.mp3) | 12.0 s | -19.9 dBFS |
-| 10 | guitar1 | [10-guitar1.mp3](Docs/audio/10-guitar1.mp3) | 12.0 s | -13.3 dBFS |
-| 11 | guitar2 | [11-guitar2.mp3](Docs/audio/11-guitar2.mp3) | 12.0 s | -15.2 dBFS |
-| 12 | funky1 | [12-funky1.mp3](Docs/audio/12-funky1.mp3) | 12.0 s | -15.1 dBFS |
-| 13 | funky2 | [13-funky2.mp3](Docs/audio/13-funky2.mp3) | 12.0 s | -14.9 dBFS |
-| 14 | funky3 | [14-funky3.mp3](Docs/audio/14-funky3.mp3) | 12.0 s | -15.0 dBFS |
+| 1 | init | [01-init.wav](Docs/audio/01-init.wav) | 10.5 s | -9.5 dBFS |
+| 2 | string1 | [02-string1.wav](Docs/audio/02-string1.wav) | 11.2 s | -10.6 dBFS |
+| 4 | brass1 | [04-brass1.wav](Docs/audio/04-brass1.wav) | 10.2 s | -11.9 dBFS |
+| 6 | flute | [06-flute.wav](Docs/audio/06-flute.wav) | 9.7 s | -19.8 dBFS |
+| 7 | electric_piano | [07-electric-piano.wav](Docs/audio/07-electric-piano.wav) | 11.0 s | -7.2 dBFS |
+| 8 | clavichord | [08-clavichord.wav](Docs/audio/08-clavichord.wav) | 11.5 s | -13.2 dBFS |
+| 10 | guitar1 | [10-guitar1.wav](Docs/audio/10-guitar1.wav) | 11.8 s | -14.2 dBFS |
+| 12 | funky1 | [12-funky1.wav](Docs/audio/12-funky1.wav) | 11.5 s | -16.7 dBFS |
 
 <!-- audio-demos-end -->
 
@@ -325,7 +319,7 @@ ctest --test-dir build-dsp -L '^audio$' --output-on-failure
 ./build-dsp/RenderCeresPresetDemos --jobs 4 Docs/audio/midi build-dsp/demo-audio
 ```
 
-The demo tool uses the shared fixed 48 kHz/256-frame/seed protocol and the original [MIDI phrase definitions](Docs/audio/midi/README.md). It duplicates the mono engine into two identical channels without gain changes. Every 12 s raw render must be finite, audible, below 0 dBFS and identical on repetition. MP3 export uses ffmpeg; no captured sound or preset-specific level adjustment is involved. Historical empty-bank failure evidence remains frozen in the [initial integration report](Docs/validation/main-integration-2026-10-19/report.json); the subsequent [demo integration validation](Docs/validation/research-demos-2026-10-19/report.json) records the resolved audio path and its new build identity.
+The demo tool uses the shared fixed 48 kHz/256-frame/seed protocol and the original [MIDI phrase definitions](Docs/audio/midi/README.md). It duplicates the mono engine into two identical channels without gain changes. Every raw render must be finite, audible, below 0 dBFS, 8–12 s long and identical on repetition, and is written as a 48 kHz 24-bit WAV; no captured sound or preset-specific level adjustment is involved. Historical empty-bank failure evidence remains frozen in the [initial integration report](Docs/validation/main-integration-2026-10-19/report.json); the subsequent [demo integration validation](Docs/validation/research-demos-2026-10-19/report.json) records the resolved audio path and its new build identity.
 
 ```sh
 cmake -S . -B build-sanitize -DCMAKE_BUILD_TYPE=Debug -DCERES_BUILD_PLUGIN=OFF -DCERES_SANITIZE=ON
