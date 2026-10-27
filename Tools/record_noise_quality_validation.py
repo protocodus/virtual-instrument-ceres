@@ -73,7 +73,7 @@ paths=['CMakeLists.txt','Source/DSP/ceres.cpp','Source/DSP/ceres.hpp',
        'Tests/RingDepthContinuityTests.cpp','Tools/benchmark_configuration.cpp',
        'Tests/EmbeddedContract.cpp','Tools/record_noise_quality_validation.py',
        'Tools/check_legacy_configuration.py','Tests/ParityDriver.cpp',
-       'README.md','Docs/DSP_SOURCE.md']
+       'README.md','Docs/research/dsp-source.md']
 paths += [str(f.relative_to(ROOT)) for f in D.rglob('*') if f.is_file() and f.name!='validation.json']
 report={'status':'pass','product_version':'0.2.0','previous_commit':PARENT,
     'scope':'Audio NO only; fixed-host-rate variance/frequency normalization, no hardware gain fit, SUB/drift unchanged. Prior configuration/CPU reports historical.',

@@ -167,7 +167,7 @@ The first and final 12-render attempts also remain locally under
 `mixing/polarity-comparison/` and `mixing/polarity-comparison-002/`.
 
 The separate [baseline continuous pulse sweep](baseline-pulse-sweep.json) and
-[production probe](../../../Tools/verify_waveform_mixing.py) preserve the former
+[production probe](../../../../Tools/verify_waveform_mixing.py) preserve the former
 model's isolated monotonic response and mixed-source dips. They are synthetic
 implementation diagnostics, not hardware-verified fader curves, and do not
 represent the corrected 0.2.2 sign convention.

@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 STUDY=Path('/Users/vojta/Dev/virtual-instrument-ceres-soundpath-20261018/Docs/accuracy/audible-circuits-20261019')
-DOCS=ROOT/'Docs/audible-circuits'
+DOCS=ROOT/'Docs/validation/audible-circuits-2026-10-19'
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 def read(path):return json.loads(Path(path).read_text())
@@ -61,7 +61,7 @@ def main():
               external/'audible-osc-ring/source-review.md',external/'audible-osc-ring/oscillator-implementation-review.json',
               external/'ring-carrier-nonlinearity-20261019/source-audit.md',external/'ring-carrier-nonlinearity-20261019/evidence.json',
               external/'ring-carrier-nonlinearity-20261019/implementation-review.json']
-    local=[ROOT/'README.md',ROOT/'Docs/DSP_SOURCE.md',Path(__file__),DOCS/'README.md',DOCS/'release-final.log',DOCS/'sanitize-final.log',
+    local=[ROOT/'README.md',ROOT/'Docs/research/dsp-source.md',Path(__file__),DOCS/'README.md',DOCS/'release-final.log',DOCS/'sanitize-final.log',
            DOCS/'ring-alias-final.json',DOCS/'performance/comparison.json']
     requirements=[
       dict(requirement='Research audible oscillator/filter/envelope/ring omissions against primary documentation.',evidence='Yamaha service/IC diagrams plus original Fairchild equivalent circuit; source audits and independent review bindings.',status='proven'),

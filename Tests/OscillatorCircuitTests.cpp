@@ -319,7 +319,7 @@ void wscSineEdges() {
 // than the old cancellation model's-6dB. These deliberately broad intervals
 // encode that independent mixture behavior, not the oscillator implementation
 // or an alleged transistor-level polarity proof. Recording-chain/panel
-// uncertainty is documented in Docs/accuracy/waveform-mixing-20261019/.
+// uncertainty is documented in Docs/research/accuracy/waveform-mixing-20261019/.
 void recordedMixtureRelationship() {
     constexpr double fs=1048576,frequency=256;
     constexpr std::size_t count=4096;

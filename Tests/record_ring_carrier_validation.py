@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
-ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'Docs/ring-carrier'
+ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'Docs/validation/ring-carrier-2026-10-19'
 PARENT='d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43'
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def main():
@@ -31,7 +31,7 @@ def main():
     expected=json.loads((audit/'passive-carrier-result.json').read_text())
     actual=json.loads(subprocess.check_output(['python3',str(audit/'passive_carrier.py')],text=True))
     assert expected==actual,'Frozen passive oracle differs'
-    files=[ROOT/p for p in code]+[ROOT/'Docs/DSP_SOURCE.md']+[OUT/p for p in [
+    files=[ROOT/p for p in code]+[ROOT/'Docs/research/dsp-source.md']+[OUT/p for p in [
         'README.md','source.patch','configure.log','build.log','release.log','sanitize-configure.log',
         'sanitize-build.log','sanitize.log','parent-parity.json','parent-parity.log']]
     files += [audit/p for p in ['evidence.json','source-review.md','passive_carrier.py','passive-carrier-result.json',

@@ -6,26 +6,20 @@ Ceres is a sample-free Yamaha CS-50 research synthesizer: a reusable C++17 circu
 
 ## Audio demos
 
-The CI-generated demos below play the **circuit engine's 14 research presets**, including Init, without preset edits, gain normalization or external audio. These are also the plug-in's factory programs: the demos drive `ceres::Synth` directly, on the one fixed unit every plug-in instance was before 0.6.4 (seed 20261017), rather than the plug-in's processor. The source phrases are original committed MIDI, not recovered hardware performances; names inherited from the research table do not establish calibrated Yamaha preset matches.
+The CI-generated demos below play **eight of the circuit engine's 14 research presets**, each from a phrase written for its role, without preset edits, gain normalization or external audio. These are also the plug-in's factory programs: the demos drive `ceres::Synth` directly, on the one fixed unit every plug-in instance was before 0.6.4 (seed 20261017), rather than the plug-in's processor. The source phrases are original committed MIDI, not recovered hardware performances; names inherited from the research table do not establish calibrated Yamaha preset matches.
 
 <!-- audio-demos-begin -->
 
 | # | Preset | Demo | Length | Peak |
 | --- | --- | --- | --- | --- |
-| 1 | init | [01-init.mp3](Docs/audio/01-init.mp3) | 12.0 s | -10.2 dBFS |
-| 2 | string1 | [02-string1.mp3](Docs/audio/02-string1.mp3) | 12.0 s | -11.3 dBFS |
-| 3 | string2 | [03-string2.mp3](Docs/audio/03-string2.mp3) | 12.0 s | -15.0 dBFS |
-| 4 | brass1 | [04-brass1.mp3](Docs/audio/04-brass1.mp3) | 12.0 s | -11.8 dBFS |
-| 5 | brass2 | [05-brass2.mp3](Docs/audio/05-brass2.mp3) | 12.0 s | -13.3 dBFS |
-| 6 | flute | [06-flute.mp3](Docs/audio/06-flute.mp3) | 12.0 s | -11.3 dBFS |
-| 7 | electric_piano | [07-electric-piano.mp3](Docs/audio/07-electric-piano.mp3) | 12.0 s | -7.8 dBFS |
-| 8 | clavichord | [08-clavichord.mp3](Docs/audio/08-clavichord.mp3) | 12.0 s | -15.7 dBFS |
-| 9 | harpsichord | [09-harpsichord.mp3](Docs/audio/09-harpsichord.mp3) | 12.0 s | -19.9 dBFS |
-| 10 | guitar1 | [10-guitar1.mp3](Docs/audio/10-guitar1.mp3) | 12.0 s | -13.3 dBFS |
-| 11 | guitar2 | [11-guitar2.mp3](Docs/audio/11-guitar2.mp3) | 12.0 s | -15.2 dBFS |
-| 12 | funky1 | [12-funky1.mp3](Docs/audio/12-funky1.mp3) | 12.0 s | -15.1 dBFS |
-| 13 | funky2 | [13-funky2.mp3](Docs/audio/13-funky2.mp3) | 12.0 s | -14.9 dBFS |
-| 14 | funky3 | [14-funky3.mp3](Docs/audio/14-funky3.mp3) | 12.0 s | -15.0 dBFS |
+| 1 | init | [01-init.wav](Docs/audio/01-init.wav) | 10.5 s | -9.5 dBFS |
+| 2 | string1 | [02-string1.wav](Docs/audio/02-string1.wav) | 11.2 s | -10.6 dBFS |
+| 4 | brass1 | [04-brass1.wav](Docs/audio/04-brass1.wav) | 10.2 s | -11.9 dBFS |
+| 6 | flute | [06-flute.wav](Docs/audio/06-flute.wav) | 9.7 s | -19.8 dBFS |
+| 7 | electric_piano | [07-electric-piano.wav](Docs/audio/07-electric-piano.wav) | 11.0 s | -7.2 dBFS |
+| 8 | clavichord | [08-clavichord.wav](Docs/audio/08-clavichord.wav) | 11.5 s | -13.2 dBFS |
+| 10 | guitar1 | [10-guitar1.wav](Docs/audio/10-guitar1.wav) | 11.8 s | -14.2 dBFS |
+| 12 | funky1 | [12-funky1.wav](Docs/audio/12-funky1.wav) | 11.5 s | -16.7 dBFS |
 
 <!-- audio-demos-end -->
 
@@ -35,58 +29,58 @@ The CI-generated demos below play the **circuit engine's 14 research presets**, 
 
 - 38–52% less CPU wherever more than one voice is configured, the Rack's default four among them, and the same with one; the output is byte-identical to 1.0.5 in double precision. The voice loop used to run each board's HP and LP Newton solves to completion before starting the next board, so the processor mostly waited on each solve's chain of divisions. Now every board's solve advances one Newton step at a time, side by side, and the independent chains overlap. Each board still does exactly the same arithmetic as before. Median thread CPU on the development container (not a Reason host): four voices/1x 0.063 → 0.039 ms per 64-frame block, sixteen voices/4x 0.93 → 0.45 ms. [Protocol, timings and validation](Docs/benchmarks/cpu-voice-lockstep-2026-10-24.md).
 
-### Unreleased — 1.0.5 — built the way the Rack builds it
+### 1.0.5 — 2026-10-23 — built the way the Rack builds it
 
 - Four changes, three exact and one at the last bit, for the Rack's toolchain, which compiles the engine with `-fno-builtin` against its own libc++ and does not auto-vectorise: the audio path's `abs`, `copysign`, `sqrt` and `isfinite` are the builtin forms (library calls there), the decimator history is a mirrored ring read through one window and summed in two vector pairs, and the voice loop's envelope, glide and oscillator calls shed their per-sample overhead. Nothing changes about the sound: the 439,296-sample CPU regression stream is byte-identical to 1.0.4 after every commit, and a one-float-ulp perturbation of any cutoff or resonance on every factory preset stays at least 127 dB below the signal without growing, which is why last-bit arithmetic changes in Ceres can be graded by that null test at all. 1.6% fewer instructions at the Rack's four voices/1x and 4.4% at 4x under clang `-O3 -fno-builtin` on this container; the Rack's own object code, where the library calls are real, is where the first change counts. [Protocol, rankings, probe and validation](Docs/benchmarks/cpu-rack-flags-2026-10-23.md).
 
-### Unreleased — 1.0.4 — a third to a half less CPU, the same samples
+### 1.0.4 — 2026-10-23 — a third to a half less CPU, the same samples
 
 - The engine does 38–56% fewer instructions for the same sound (32–54% less median thread CPU on the development container, not a Reason host result): the filters' `tanh` and prewarp `tan`, the PWM clock and the SUB sine are full-precision rationals, the filter solver stops at a 1e-9 Newton step, muted saw and pulse shaping is skipped, the output couplings and the decimator reuse their constants, and the noise source stands idle while NOISE is zero and FUNCTION is off N. The 439,296-sample CPU regression stream is byte-identical to 1.0.3 at the float32 output on every preset, voice count, quality and rate; the engine's internal double arithmetic differs at its last bit. One consequence no null test can grade: when NOISE leaves zero after an idle stretch, the first ~10 ms of noise are a different realisation of the same noise than before. The owner compared it with 1.0.3 by ear and heard no difference, so it ships as chosen by ear ([decision log](Docs/decisions.md)). [Protocol, instruction counts, timings and validation](Docs/benchmarks/cpu-approximations-2026-10-23.md).
 
-### 1.0.3 — first production release
+### 1.0.3 — 2026-10-23 — first production release
 
 Combines the exact OTA filter warm-start cache with reuse of the final `tanh` result when its argument is bit-identical, and reads the decimator history in two ordered runs. The Newton solver, circuit state, quality modes, latency and preset parameters are preserved. Includes the Rack parity drivers and retained validation history. Rack-specific presets, release packaging and host measurements are maintained in the Rack Extension repository; the earlier development-machine CPU measurements are not Rack performance claims.
 
-### Unreleased — 1.0.2 — exact filter CPU reduction
+### 1.0.2 — 2026-10-23 — exact filter CPU reduction
 
 Reuse the previous sample's exact final `tanh` value at the next filter solve. Core and Rack audio match byte for byte at identical settings; measured SDK-module thread CPU improves by roughly 1–2% median. The circuit solver, quality and latency are unchanged. This version also aligns the canonical project metadata with the Ceres 1.0.2f1 Rack release; its spread and preset trim changes belong to the Rack adapter.
 
-### Unreleased — 1.0.1 — lower CPU cost
+### 1.0.1 — 2026-10-23 — lower CPU cost
 
 - The OTA filters' Newton solver reuses tanh values it has already evaluated, and the output decimator reads its history without a per-tap wrap test. Audio is unchanged: the 439,296-sample CPU regression stream matches the 1.0.0 engine byte for byte (GCC -O2/-O3, Clang -O3). On the 14 factory presets at four voices/4x, 48 kHz, this measured 14% fewer instructions and 13% lower median CPU time on a development machine; not a Reason host result.
 
-### Unreleased — 1.0.0 — first public release preparation
+### 1.0.0 — 2026-10-23 — first public release preparation
 
 - Prepares the shared engine for the first public Rack Extension release. Retains the 0.6.6 CPU optimizations and circuit sound; the Rack adapter supplies its own factory patch bank and release metadata.
 
-### Unreleased — 0.6.6 — lower CPU cost
+### 0.6.6 — 2026-10-23 — lower CPU cost
 
 - Shares filter setup across voices, reuses unchanged filter/pitch calculations and skips muted sine shaping while retaining its capacitor history. Before/after audio matches byte for byte across 439,296 regression samples. Native benchmarks measured 17.7% lower median CPU for four-voice/4x Init and 10–12% lower mean CPU in the unchanged Rack callback at its four-voice/1x default; these are development-machine measurements, not Reason host results. [Protocol, complete timings and validation](Docs/benchmarks/cpu-efficiency-2026-10-23.md).
 
-### Unreleased — 0.6.5 — the filter's Q pin and the sine's coupling
+### 0.6.5 — 2026-10-22 — the filter's Q pin and the sine's coupling
 
 - RESONANCE is heard as the lever moves: a change of RESONANCE, or of a preset's Q, settles in about 17 ms instead of 1.1 s. The filter chip's Q pin takes current into a low impedance: the CS-30, CS-15 and CS-40M drive it through 22 kΩ into a 390–470 Ω shunt, the CS-50 and CS-80 through a pair of 220 kΩ, and Yamaha prints the same Q at 10 V for both, which only a current input allows. Its 1.72 kΩ is inferred from that; no document prints it. Because a preset's Q row no longer leans on the RESONANCE bus, factory Q rises by up to 10 % (Guitar 2 and Funky 2: 1.44 → 1.58), and the RESONANCE lever law (`resonanceLeverVolts`) sags up to 0.5 V near a third of its travel. The sources decide this; it was not chosen by ear.
 - The VCO sine's shaper now hears the triangle through the M board's 4.7 µF coupling into 22 kΩ, which centres it on its own average. That matters where the oscillator's reset plateau makes the triangle lopsided, toward the top of the range: the sine's second harmonic moves by up to 5 dB (C6 on 8': −30 → −27 dB below the fundamental), and after a large jump in pitch the sine re-centres over about 0.3 s. The shaper's curve is still the one chosen by ear in 0.6.0; the coupling comes from the schematic, not from a listen.
 
-### Unreleased — 0.6.4 — every instance is its own unit
+### 0.6.4 — 2026-10-21 — every instance is its own unit
 
 - Each new plug-in instance is now a different CS-50: it draws its own random unit, so its boards' pitch, filter, envelope and VCA offsets, oscillator phases and noise differ from every other instance's, within the same service tolerances. Every voice up to `voice_count` is a board of its own, the four physical ones and each further voice alike. A saved session or preset state reopens as the unit it was saved with; a state saved by an earlier version opens as the one fixed unit every instance used to be. The demos keep that fixed unit, so a program sounds like its demo but not sample for sample. The owner asked for this; it was not chosen by ear.
 - `voice_spread_cents` is now centred on the voices in use. It was centred only at four voices, so any other voice count was detuned on average: flat below four voices, sharp above. Four voices are unchanged.
 
-### Unreleased — 0.6.3 — the boards part away from their trim point
+### 0.6.3 — 2026-10-21 — the boards part away from their trim point
 
 - The four voices' filter cutoffs now also differ when a filter lever is away from its centre. The boards are matched by ear with each lever at its centre (the CS-60's alignment of the same board), and each filter chip's sensitivity residual, which already spread the envelope, SUB, touch and BRILLIANCE depths, now stretches the lever's own octaves around that point. At the factory settings one instrument's four voices spread by up to about half an octave of the chip's share of the cutoff (Brass 1's high-pass, at the bottom of its lever, anywhere from 68 to 107 Hz at middle C instead of 85 Hz on every voice). A lever at its centre and Q are unchanged, and `board_filter_tolerance` 0 still gives identical voices. The alignment procedure decides this; it was not chosen by ear.
 
-### Unreleased — 0.6.2 — two readings from the CS-80 procedure
+### 0.6.2 — 2026-10-21 — two readings from the CS-80 procedure
 
 - After the last key-up, the ring modulator's DEPTH sweep returns to the SPEED rate over 0.46 s instead of 14.5 s. The CS-80's service procedure aligns the same ring envelope circuit at ATTACK TIME 5 V, which rules out 0.6.0's reading at 10 V; this reverses a choice made by ear in 0.6.0. The panel lever laws for ring ATTACK TIME and DECAY TIME (`ringAttackSeconds`, `ringDecaySeconds`) are 31.6 times faster at every position (attack about 1 ms to 1 s, decay 13.5 ms to 13.5 s T60). The `ring_attack` and `ring_decay` controls are unchanged.
 - The output stage clips 0.47 dB lower, and the final 33 µF coupling's corner moves from 0.9 Hz to 1.4 Hz: the HIGH output now drives the 10 kΩ load the CS-80 procedure trims its 0 dBm into, instead of an open terminal. Below the rails the level is unchanged.
 
-### Unreleased — 0.6.1 — every board trim on by default
+### 0.6.1 — 2026-10-21 — every board trim on by default
 
 - The four voices now also differ slightly in envelope timing and VCA balance, by default: each board's attacks, decays and releases sit within its ±5 % EG time trims, and its sine-to-filtered balance within its level trims (`board_envelope_time_tolerance` and `board_vca_tolerance` now 1, were 0). Set both to 0 for the 0.6.0 voices. The owner took both candidates without a listening test, so neither is chosen by ear nor measured.
 
-### Unreleased — 0.6.0 — owner verdicts and hardware laws
+### 0.6.0 — 2026-10-21 — owner verdicts and hardware laws
 
 - Filter cutoffs follow Yamaha's printed IG00156 law: one octave per volt on both filters and 62.5 Hz at middle C for 0 V, replacing the 0.7/0.65 oct/V estimates. Envelope, SUB, touch and BRILLIANCE depths rescale with it, so the filter envelope sweeps about 1.4 (HP) to 1.5 (LP) times as far. Chosen by ear from the printed candidates.
 - Resonance follows its control voltage exponentially between the printed end points, so mid-travel settings are more resonant (Q 1.6 instead of 0.9 at half travel); the end points are unchanged. Chosen by ear.
@@ -104,7 +98,7 @@ Reuse the previous sample's exact final `tanh` value at the next filter solve. C
 - Plug-in MIDI: velocity, channel pressure as touch, ±2-semitone pitch bend, the damper pedal (CC64), and CC11, which scales the `expression` pedal parameter the way MIDI expression scales volume.
 - Research for each component is in `Docs/research/*-authenticity-2026-10-20.md`; the by-ear verdicts behind this version are in [`Docs/decisions.md`](Docs/decisions.md).
 
-### Unreleased — 0.5.0 — component authenticity
+### 0.5.0 — 2026-10-20 — component authenticity
 
 - The ring modulator now multiplies by a sine instead of switching a square: the 33k sits in series between the carrier's 100 µF and the multiplier, as the PRA schematic draws it, so the µA796 stays in its linear region. You hear the two sum and difference tones without square-wave sidebands, and slow SPEED settings are no longer up to 38 dB weaker. Some dry signal leaks through, about 5 dB below each sideband, as a typical µA796 does. The wet path now loses lows below about 20 Hz. Wet loudness at full MODULATION is unchanged.
 - The output stage no longer squashes loud chords. It is now the PRA board's linear preamp, clipping hard at rails derived from its parts, about 12 dB above the 0 dBm reference. At high VOLUME, chords keep their attack peaks (up to 6 dB more on loud presets); at the default VOLUME 0.55 presets change by at most about 0.5 dB. Full VOLUME with touch LEVEL and tremolo can now exceed digital full scale; there is no limiter, so set the host level with Output Trim.
@@ -116,7 +110,7 @@ Reuse the previous sample's exact final `tanh` value at the next filter solve. C
 - Front ends get the hardware's panel lever laws: SUB SPEED runs exponentially from 0.8 to 50 Hz, full VCO lever is ±25 cents of vibrato, the VCF lever sags at mid-travel, BRILLIANCE is a B-10K lever from −15 V to +15 V about a grounded centre detent, and RESONANCE runs +10 V at MIN to 0 V at MAX. Saved parameters keep their meaning.
 - Research for each component is in `Docs/research/*-authenticity-2026-10-20.md`.
 
-### Unreleased — 0.4.0 — circuit details
+### 0.4.0 — 2026-10-20 — circuit details
 
 - The noise source is now hard-limited, as the CS-50's limiter amplifier makes it: a binary ±1 signal at the waveforms' peak level instead of uniform random values. Audio NOISE is 4.8 dB louder at the same lever setting; its spectrum is unchanged and SUB-N keeps its level. Patches using NOISE change sound.
 - The limiter now has a bandwidth, estimated at 14 kHz from the pick-up op-amp's datasheet gain-bandwidth, so NOISE has the same level at every host sample rate. At 48 kHz it is another 4.7 dB louder (9.5 dB above 0.3.0), at 96 kHz 7.7 dB louder. The bandwidth is an estimate; the level moves 3 dB per octave of error in it.
@@ -131,7 +125,7 @@ Reuse the previous sample's exact final `tanh` value at the next filter solve. C
 - Adds the expression pedal (`expression`), the PRA photo-coupler rather than a volume control. Closing it hands the signal to the 68k–2.2k/0.33 µF leg and the 0.0033 µF at the volume track, so the sound does not just get quieter: fully closed, 65 Hz sits 4.8 dB and 30 Hz 9.7 dB above 1 kHz while 10 kHz falls 6.4 dB below it. Level follows the guide's printed pedal curve, 0 to −40 dB over about 28 degrees. The default of 1 is the hardware's own no-pedal state and bypasses the network exactly, so existing patches are unchanged.
 - The two linear panel levers now load their own tracks, as the pots do. `tremolo` is SUB VCA lever travel, which delivers 7.7 % less of the SUB at mid-lever, and `ring_mix` is the MODULATION lever's crossfade, which puts the whole mix 2.35 dB down at mid-lever instead of blending flat. Both ends of each lever are unchanged, so patches at 0 or 1 sound as before. The RESONANCE and BRILLIANCE levers are C-taper pots whose curve is not published, and those controls are defined as bus voltages, so they keep no taper.
 
-### Unreleased — 0.3.0 — hardware realism
+### 0.3.0 — 2026-10-20 — hardware realism
 
 - Adds the CS-50's PORTAMENTO/GLISSANDO (`glide_mode`, `glide_rate`): a semitone counter, plus an Hz-domain integrator for portamento, on the key voltage shared by the oscillator and both filters. In Sustain II a released note keeps gliding. Off by default; existing patches are unchanged.
 - A repeated key now retriggers its own released voice, as the key assigner does, instead of starting an idle one.
@@ -140,19 +134,19 @@ Reuse the previous sample's exact final `tanh` value at the next filter solve. C
 - A key pressed while every voice is held is ignored, as on the CS-50, instead of stealing the oldest voice. Released and damper-held voices are still reused.
 - Patches with nonzero `pressure_filter`, `pressure_vibrato` or `pressure_volume`, or that play more notes than voices, change sound. See the [research write-up](Docs/research/hardware-realism-2026-10-20.md) and the [previews](Docs/audio/previews/2026-10-20-hardware-realism/).
 
-### Unreleased — 0.2.2 — waveform mixing
+### 0.2.2 — 2026-10-19 — waveform mixing
 
 - Corrects the relative pulse audio polarity so equal-level saw/pulse blends reinforce their fundamentals, following a public hardware-recording comparison. Shared oscillator phase and PWM timing remain unchanged.
-- Adds independent mixture regressions and broader rapid-note/envelope checks. The recording supports relative mixing balance; absolute phase, full pulse-width behavior and complete hardware calibration remain unresolved. See the [recording study](Docs/accuracy/waveform-mixing-20261019/) and [polarity validation](Docs/validation/waveform-polarity/).
+- Adds independent mixture regressions and broader rapid-note/envelope checks. The recording supports relative mixing balance; absolute phase, full pulse-width behavior and complete hardware calibration remain unresolved. See the [recording study](Docs/research/accuracy/waveform-mixing-20261019/) and [polarity validation](Docs/validation/waveform-polarity/).
 - Changes mixed-source tone and level intentionally; the Rack bank requires new output-trim calibration.
 
-### Unreleased — 0.2.1 — rapid-note continuity
+### 0.2.1 — 2026-10-19 — rapid-note continuity
 
 - Smooths velocity expression when an audible voice is reused, avoiding an instantaneous gain or filter-expression jump. Fresh silent notes retain their immediate velocity response.
 - Keeps overlapping repeated notes attached to their original key presses after voice stealing, so an older stolen note's key-up cannot release its newer replacement.
 - Retains free oscillator phase, envelope and filter capacitor state, keyboard pitch changes and the existing ring model.
 
-### Unreleased — 0.2.0 — configurable polyphony and processing quality
+### 0.2.0 — 2026-10-19 — configurable polyphony and processing quality
 
 - Adds 1–16 preallocated voices and actual 1×, 2× or 4× internal processing. The standalone default remains four voices at 4×.
 - Smooths live Ring Depth edits over 20 ms without restarting the carrier or envelope; saved/static depths start immediately at their configured value.
@@ -160,20 +154,20 @@ Reuse the previous sample's exact final `tanh` value at the next filter solve. C
 - Keeps the existing four-voice, 4× audio byte-identical in the recorded parent comparison. Configuration changes require an unclocked/reset engine; adapters can defer them until idle and fade residual tails.
 - Retains nominal 31-host-sample output latency at all qualities. Lower quality trades oversampling headroom and alias rejection for CPU cost; it is not the same sound under a new label.
 
-### Unreleased — 0.1.0 — circuit engine and existing plug-in scaffold
+### 0.1.0 — 2026-10-18 — circuit engine and existing plug-in scaffold
 
 - Adds the tested four-voice oscillator/filter/envelope/ring model and embedded interface alongside the existing plug-in scaffold.
 - The README demo renderer now exercises the existing circuit research presets with fixed original MIDI; the separate JUCE plug-in remains unchanged.
-- Retains the source-timed VCO conditioning, Q/idle-envelope capacitor continuity and physically scaled ring switching described in the [audible-circuit review](Docs/audible-circuits/README.md). The hardware-recording comparison remains mixed; this is not a verified full hardware match.
+- Retains the source-timed VCO conditioning, Q/idle-envelope capacitor continuity and physically scaled ring switching described in the [audible-circuit review](Docs/validation/audible-circuits-2026-10-19/README.md). The hardware-recording comparison remains mixed; this is not a verified full hardware match.
 
-### Unreleased — 0.0.1 — scaffold
+### 0.0.1 — 2026-10-18 — scaffold
 
 - Repository, silent plug-in front end, test tiers and CI set up to the portfolio standard.
 
 ## Downloads
 
 <!-- build-download-begin -->
-**[Download main build 37](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/40028819694/artifacts/12534387300)**, built from [`9cf929d18c61`](https://github.com/protocodus/virtual-instrument-ceres/commit/9cf929d18c6164e008a637b382e760d5166854c7). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
+**[Download main build 43](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/40471947604/artifacts/12720008231)**, built from [`312a7ab17261`](https://github.com/protocodus/virtual-instrument-ceres/commit/312a7ab17261cd51be0ad8d9034975d9c79dbf79). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
 <!-- build-download-end -->
 
 ---
@@ -246,7 +240,7 @@ FUNCTION EXT (`lfo_waveform` 5) takes the SUB signal from the rear EXT IN jack i
 
 In Sustain II, released/free boards follow the last assigned key in both oscillator pitch and filter tracking. Their envelope charge, gates, oscillator phase and filter state remain continuous. Entering II applies this immediately; returning to I captures the current key voltage. MIDI-damper-held boards remain protected until pedal-up, an explicit software adaptation rather than recovered Yamaha allocation behavior. This selector is distinct from `global_release` and MIDI damper gating.
 
-The ring/SUB/Sustain additions preserved the earlier audio path in their recorded same-build regression. The subsequent unequal SUB filter route intentionally changes nonzero `filter_lfo` patches. Controls and circuit uncertainties are detailed in [DSP_SOURCE.md](Docs/DSP_SOURCE.md).
+The ring/SUB/Sustain additions preserved the earlier audio path in their recorded same-build regression. The subsequent unequal SUB filter route intentionally changes nonzero `filter_lfo` patches. Controls and circuit uncertainties are detailed in [DSP_SOURCE.md](Docs/research/dsp-source.md).
 
 ### Global sound-path controls
 
@@ -259,7 +253,7 @@ The ring/SUB/Sustain additions preserved the earlier audio path in their recorde
 
 The first two controls use an explicitly anchored stiff-source model, not recovered passive-pot positions. The signed resonance offset is an engineering delta around existing effective Q settings; the actual hardware wiper is 0..10 V, and factory presets assume the RESONANCE lever at MIN (+10 V), so from them it reaches 0 to −10 V. Its capacitor state survives note/preset changes and audio panic. SUB filter depth remains the LP depth; HP gets 47k/150k, about 0.313 times as much modulation. Common VCA level adds to the existing SUB-amplitude control and closes at zero, rather than multiplying two gain controls. Factory LEVEL now drives that common VCA instead of final master volume.
 
-Neutral offsets, common level 1 and output trim 0 preserve the prior paths when the intentionally corrected SUB filter route is inactive. The output trim is a modern linear utility, not part of the analog model; it adds no limiter and cannot promise a fixed peak under arbitrary MIDI. The [source audit](Docs/sound-path-gap-audit.md) distinguishes known resistor/capacitor relationships from provisional control calibration.
+Neutral offsets, common level 1 and output trim 0 preserve the prior paths when the intentionally corrected SUB filter route is inactive. The output trim is a modern linear utility, not part of the analog model; it adds no limiter and cannot promise a fixed peak under arbitrary MIDI. The [source audit](Docs/research/sound-path-gap-audit-2026-10-18.md) distinguishes known resistor/capacitor relationships from provisional control calibration.
 
 ### Portamento, glissando and the key assigner
 
@@ -302,8 +296,8 @@ The editor (1080×750) is laid out like the CS-50 panel: the tone-selector table
 ## Known gaps
 
 - No host has yet exercised the plug-in's EXT IN as a sidechain input, and the AU's handling of it is untested. The factory programs are research presets from the circuit study, not calibrated Yamaha voices.
-- A unit can be neither seen nor chosen; only a saved state brings one back. Sixteen voices at 4× is the heaviest setting: about a third of a 2.1 GHz Xeon core at 48 kHz on the development container, and more on a slower one. `voice_count` and `oversampling` trade CPU for polyphony and alias rejection.
-- Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. The ring envelope's alignment voltage and the output level meter's load come from the CS-80's procedure for the same circuits; no CS-50 document states them. The RESONANCE controls' 17 ms lag and the Q buses' loads take the filter chip's resonance pin as a 1.72 kΩ current input: the CS-30, CS-15 and CS-40M boards for the same chip show that it takes current, but its input resistance is inferred, not printed. See [DSP source and model limits](Docs/DSP_SOURCE.md) and the [audible circuit evidence](Docs/audible-circuits/README.md).
+- A unit can be neither seen nor chosen; only a saved state brings one back. Sixteen voices at 4× can need more than a whole CPU core at 48 kHz; `voice_count` and `oversampling` trade CPU for polyphony and alias rejection.
+- Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. The ring envelope's alignment voltage and the output level meter's load come from the CS-80's procedure for the same circuits; no CS-50 document states them. The RESONANCE controls' 17 ms lag and the Q buses' loads take the filter chip's resonance pin as a 1.72 kΩ current input: the CS-30, CS-15 and CS-40M boards for the same chip show that it takes current, but its input resistance is inferred, not printed. See [DSP source and model limits](Docs/research/dsp-source.md) and the [audible circuit evidence](Docs/validation/audible-circuits-2026-10-19/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
 - EXT IN's host-rate signal is interpolated linearly inside the oversampled engine; the op-amp swings are datasheet typicals, and the EXT preamp's bandwidth and slew rate are not modelled. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
 - The portamento/glissando clock rate and the noise limiter's bandwidth and slew rate are not calibrated.
@@ -316,7 +310,7 @@ CMake 3.22+, a C++17/20 compiler and Python3 are required for the full unit suit
 cmake -S . -B build-dsp -DCMAKE_BUILD_TYPE=Release -DCERES_BUILD_PLUGIN=OFF -DBUILD_TESTING=ON
 cmake --build build-dsp --parallel
 ctest --test-dir build-dsp -L '^unit$' --output-on-failure
-./build-dsp/ceres_render --events Examples/init.events.tsv --preset init \
+./build-dsp/ceres_render --events Tools/init.events.tsv --preset init \
   --rate 48000 --frames 288000 --seed 50 --output /tmp/ceres-init.wav
 ```
 
@@ -329,7 +323,7 @@ ctest --test-dir build-dsp -L '^audio$' --output-on-failure
 ./build-dsp/RenderCeresPresetDemos --jobs 4 Docs/audio/midi build-dsp/demo-audio
 ```
 
-The demo tool uses the shared fixed 48 kHz/256-frame/seed protocol and the original [MIDI phrase definitions](Docs/audio/midi/README.md). It duplicates the mono engine into two identical channels without gain changes. Every 12 s raw render must be finite, audible, below 0 dBFS and identical on repetition. MP3 export uses ffmpeg; no captured sound or preset-specific level adjustment is involved. Historical empty-bank failure evidence remains frozen in the [initial integration report](Docs/validation/main-integration-2026-10-19/report.json); the subsequent [demo integration validation](Docs/validation/research-demos-2026-10-19/report.json) records the resolved audio path and its new build identity.
+The demo tool uses the shared fixed 48 kHz/256-frame/seed protocol and the original [MIDI phrase definitions](Docs/audio/midi/README.md). It duplicates the mono engine into two identical channels without gain changes. Every raw render must be finite, audible, below 0 dBFS, 8–12 s long and identical on repetition, and is written as a 48 kHz 24-bit WAV; no captured sound or preset-specific level adjustment is involved. Historical empty-bank failure evidence remains frozen in the [initial integration report](Docs/validation/main-integration-2026-10-19/report.json); the subsequent [demo integration validation](Docs/validation/research-demos-2026-10-19/report.json) records the resolved audio path and its new build identity.
 
 ```sh
 cmake -S . -B build-sanitize -DCMAKE_BUILD_TYPE=Debug -DCERES_BUILD_PLUGIN=OFF -DCERES_SANITIZE=ON

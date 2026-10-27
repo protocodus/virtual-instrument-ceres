@@ -106,7 +106,7 @@ limiter; `output_trim_db` is the place to set a host level.
 | Gap | Effect | Data needed |
 |---|---|---|
 | IG00151 transfer above 10 V LI | touch LEVEL (up to +1.08 of full) and tremolo (±0.3375) push LC past the trimmed maximum; kept linear | IG00151 data sheet or a measurement of output current against LI at 0–20 V |
-| IG00151 input stage | linear range, input admittance (see `Docs/accuracy/sine-input-admittance.md`), internal current limit | Yamaha IC Guide pin-level values or a measurement |
+| IG00151 input stage | linear range, input admittance (see `Docs/research/accuracy/sine-input-admittance.md`), internal current limit | Yamaha IC Guide pin-level values or a measurement |
 | IC5 control feedthrough | IC5 has no offset trim, so SUB tremolo could reach CP5 as a DC-coupled signal into IC6 | a measurement of CP5 with a 0 V input and swinging LC |
 | LP1/LP2/LC control RC | 100 kΩ/0.01 µF at LI is a 1 ms lever smoothing only if LI is high-impedance | LI input impedance |
 | HA1452 swing and Icc | rails ±1 V either way | Hitachi HA1452 data sheet |

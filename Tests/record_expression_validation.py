@@ -20,7 +20,7 @@ def main():
            'Tests/ParityDriver.cpp','Tests/check_expression_parity.py','Tests/check_expression_legacy.py',
            'Tests/record_expression_validation.py','Tests/check_expression_performance.py',
            'Tests/check_sound_path_parity.py','Tools/check_embedded.py',
-           'Tools/render_main.cpp','Tools/build_identity.hpp.in','README.md','Docs/DSP_SOURCE.md']
+           'Tools/render_main.cpp','Tools/build_identity.hpp.in','README.md','Docs/research/dsp-source.md']
     bindings={p:sha(ROOT/p) for p in files};builds={}
     names=['native_dsp_contracts','sound_path_circuit_contracts','voice_expression_contracts',
            'embedded_allocation_contract','native_embedded_audio_parity','active_sound_path_audio_parity',

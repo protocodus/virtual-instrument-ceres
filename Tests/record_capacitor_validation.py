@@ -7,7 +7,7 @@ from pathlib import Path
 import re
 import subprocess
 ROOT=Path(__file__).resolve().parents[1]
-OUT=ROOT/'Docs/capacitor-continuity'
+OUT=ROOT/'Docs/validation/capacitor-continuity-2026-10-19'
 PARENT='d5e0b2dfb21d4c7fa8350d2c5c9555f3bb711f43'
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 def main():

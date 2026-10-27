@@ -13,7 +13,7 @@ contains the Yamaha small-sheet manual, large-sheet manual and Overall diagram.
 The [Yamaha CS Series Servicing Guide](https://rcarchives.com/m/YamahaCSSeriesSynthesizerServicingGuidePOSTED.pdf)
 supplies explanatory diagrams. Below, PDF page numbers are one-based; printed
 page numbers follow the slash. Exact local scan and crop hashes are in
-[the evidence manifest](soundpath/source-manifest.json); scans remain outside
+[the evidence manifest](../validation/soundpath-2026-10-18/source-manifest.json); scans remain outside
 this repository. The archive listing was verified online on 18 October. Direct
 PDF opens were unavailable through the web tool; existing hash-bound scans,
 not a newly fetched version, supplied the circuit evidence.
@@ -164,10 +164,10 @@ early/tail outcomes; no new control path is automatically a fidelity improvement
 
 ## Verification and next evidence
 
-[check_networks.py](soundpath/check_networks.py) independently solves11-node
+[check_networks.py](../validation/soundpath-2026-10-18/check_networks.py) independently solves11-node
 passive networks, verifies36 cutoff derivative ratios and18 Q networks/modes.
-Run `python3 Docs/soundpath/check_networks.py --check`; the result is
-[nodal-checks.json](soundpath/nodal-checks.json). No renderer, optimizer or
+Run `python3 Docs/validation/soundpath-2026-10-18/check_networks.py --check`; the result is
+[nodal-checks.json](../validation/soundpath-2026-10-18/nodal-checks.json). No renderer, optimizer or
 hardware audio is invoked. These checks verify equations, not component gain
 calibration.
 

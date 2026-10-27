@@ -46,7 +46,7 @@ Raw streams, frozen cores and binaries remain in the ignored local
 
 [Source identity](source-state.json) records the compiler, exact input hashes,
 verified SDK 500028 / TargetVersion 5.0 and unchanged source bytes through the
-runs. The [earlier validation evidence](../cpu-exact-tanh-20261023/README.md)
+runs. The [earlier validation evidence](../cpu-exact-tanh-2026-10-23/README.md)
 remains byte-identical and keeps its original scope and provenance.
 
 This evidence covers native canonical correctness. It supplies no new CPU

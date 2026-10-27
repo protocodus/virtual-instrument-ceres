@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
-ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'Docs/ring-switching'
+ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'Docs/validation/ring-switching-2026-10-19'
 PARENT='8c5a96e75f426dd7854cfee8e76cccd9478bbbfe'
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def main():
@@ -37,7 +37,7 @@ def main():
     for name,digest in evidence['verified_sha256'].items():assert sha(name)==digest,name
     constants=evidence['conditional_constants']
     assert constants['carrier_dc_volts']==-.023489437180096218 and constants['source_peak_volts']==1.5
-    files=[ROOT/p for p in code]+[ROOT/'Docs/DSP_SOURCE.md',ROOT/'Tests/RingCarrierTests.cpp',ROOT/'Tests/ParityDriver.cpp',ROOT/'Tests/EmbeddedContract.cpp']
+    files=[ROOT/p for p in code]+[ROOT/'Docs/research/dsp-source.md',ROOT/'Tests/RingCarrierTests.cpp',ROOT/'Tests/ParityDriver.cpp',ROOT/'Tests/EmbeddedContract.cpp']
     files+=[OUT/p for p in ['README.md','source.patch','configure.log','build.log','release.log','sanitize-configure.log',
         'sanitize-build.log','sanitize.log','parent-parity.json','parent-parity.log','alias.json','alias.log']]
     files+=[audit/p for p in ['evidence.json','source-audit.md','ElectronicSynth.pdf','fairchild-12.png',

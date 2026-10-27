@@ -20,8 +20,8 @@ from scipy.io import wavfile
 
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT/'Docs/accuracy/joint-calibration'
-DC = ROOT/'Docs/accuracy/preset-dc-loading'
+OUT = ROOT/'Docs/research/accuracy/joint-calibration'
+DC = ROOT/'Docs/research/accuracy/preset-dc-loading'
 TRAIN = ['flute-high-factory-physical', 'brass-history20']
 FS, INTERNAL_FS = 48000., 192000.
 CI, CS, CQ = 1.5e-9, 1e-6, 180e-12
@@ -199,8 +199,8 @@ def selected_cases():
 
 def bindings(cases, dcplan):
     paths = [Path(__file__).resolve(), OUT/'control_trace.cpp', OUT/'plan.json',
-        METRIC_PATH, DC/'plan.json', ROOT/'Docs/accuracy/plan.json',
-        ROOT/'Docs/accuracy/inputs/research/brass1-release-spectra-160.json']
+        METRIC_PATH, DC/'plan.json', ROOT/'Docs/research/accuracy/plan.json',
+        ROOT/'Docs/research/accuracy/inputs/research/brass1-release-spectra-160.json']
     identity = DC/'identity'
     for name,digest in dcplan['compiled_source_sha256'].items():
         path = identity/name
@@ -275,7 +275,7 @@ def masks_and_windows(clip):
     if clip['family']=='flute':
         times=np.arange(.064,clip['duration']-.064+1e-8,.04)
         return times,.128,np.ones((len(times),6),bool)
-    raw=read(ROOT/'Docs/accuracy/inputs/research/brass1-release-spectra-160.json')
+    raw=read(ROOT/'Docs/research/accuracy/inputs/research/brass1-release-spectra-160.json')
     # Read only frozen centers/eligibility, never hardware ratios or amplitudes.
     times=np.array([r['time'] for r in raw['source']['rows']])
     valid=np.asarray(raw['source']['valid'],bool)

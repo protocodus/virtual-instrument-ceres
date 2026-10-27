@@ -7,7 +7,7 @@ from scipy.io import wavfile
 from scipy.signal import resample_poly
 import metrics as m
 ROOT=Path(__file__).resolve().parents[2]
-BASE=ROOT/'Docs/accuracy'
+BASE=ROOT/'Docs/research/accuracy'
 OLD=Path('/tmp/ceres-cs50-1x8LGd')
 COMMIT='10e17fd9ecdc0a5a0354bad4c5a53780885a5503'
 IDENTITY=['Source/DSP/ceres.hpp','Source/DSP/ceres.cpp','Tools/render_main.cpp','Tools/build_identity.hpp.in','CMakeLists.txt']

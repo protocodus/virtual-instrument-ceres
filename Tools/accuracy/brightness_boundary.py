@@ -15,8 +15,8 @@ from scipy.optimize import minimize
 
 sys.dont_write_bytecode=True
 ROOT=Path(__file__).resolve().parents[2]
-OUT=ROOT/'Docs/accuracy/brightness-boundary'
-OLD=ROOT/'Docs/accuracy/joint-calibration'
+OUT=ROOT/'Docs/research/accuracy/brightness-boundary'
+OLD=ROOT/'Docs/research/accuracy/joint-calibration'
 FIT_TOOL=ROOT/'Tools/accuracy/joint_fit.py'
 FIT_SHA='f563762e55ab2b0c41ff4c4ba34cac103c936dc55115b5683a8a2364f330dab6'
 import hashlib
@@ -477,7 +477,7 @@ def validate(folder):
     cp=q.sha(candidate_path)
     p,bound=start(folder,'validate',[candidate_path,OUT/PHASES['qualify']/'report.json'])
     theta=np.asarray(candidate['candidate']);source=b.verify_plan()
-    baseline=q.read(ROOT/'Docs/accuracy/runs/expression-55869df8/report.json')
+    baseline=q.read(ROOT/'Docs/research/accuracy/runs/expression-55869df8/report.json')
     old_native_plan=q.read(OLD/'plan.json')['native_controls']
     old_native_report=q.read(OLD/'native-controls-001/report.json')
     qualification=gate_report(OUT/PHASES['qualify']/'report.json')

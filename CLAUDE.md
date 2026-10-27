@@ -67,9 +67,11 @@ These README parts are written by the build, never by hand:
 
 - The demo table between `<!-- audio-demos-begin -->` and
   `<!-- audio-demos-end -->`, rendered from one
-  `Docs/audio/midi/<NN>-<preset-slug>.mid` per factory preset (change a source
-  only on purpose, in its own commit) and committed by the main build as
-  `Docs/audio/<NN>-<preset-slug>.mp3`.
+  `Docs/audio/midi/<NN>-<preset-slug>.mid` per curated preset demo (at most 8,
+  each preset showing a different side of the instrument, or every preset of a
+  bank of 8 or fewer; change a source only on purpose, in its own commit) and
+  committed by the main build as `Docs/audio/<NN>-<preset-slug>.wav`, 8–12 s
+  of 48 kHz 24-bit audio.
 - The block between `<!-- build-download-begin -->` and
   `<!-- build-download-end -->`, rewritten by the main build, which also
   commits the README screenshot under `Docs/screenshots/`.
@@ -152,7 +154,7 @@ ctest --test-dir build-dsp -L unit --output-on-failure
 Use a separate `build-plugin` directory (`-DCERES_BUILD_PLUGIN=ON`, the
 default) for the processor, editor and packaging. Every test is
 `Ceres.<Suite>` with one tier label: `unit`, `audio` (`Ceres.AudioDemos`,
-every existing standalone circuit research preset rendered twice),
+the curated research preset demos rendered twice),
 `render` (`Ceres.EditorRender`, the editor screenshot) or `fuzz` (`Ceres.DspFuzz`; `Ceres.ParameterMatrix` in
 the plug-in build). Select the suites that cover a change with `-R`, then run
 the full suite before a substantive DSP change is called done.

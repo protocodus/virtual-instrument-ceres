@@ -12,7 +12,7 @@ unambiguous common timing reference; the physical mixer uses equal source
 resistors without a separate pulse inverter. The correction therefore does
 not claim to identify an active-low chip stage. Reference selection, comparison
 settings and recording-chain uncertainty belong to the
-[public-recording study](../../accuracy/waveform-mixing-20261019/).
+[public-recording study](../../research/accuracy/waveform-mixing-20261019/).
 
 ## Independent regression witnesses
 
