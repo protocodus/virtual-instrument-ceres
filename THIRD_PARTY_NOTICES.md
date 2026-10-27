@@ -55,3 +55,14 @@ submodules:
 
 Both dependencies are Copyright (c) 2021 Alexandre BIQUE. These licence files
 are included in every distribution archive and macOS installer package.
+
+## Arm Optimized Routines (exp2)
+
+The engine's inline `exp2` (`tableExp2` in `Source/DSP/ceres.cpp`, used for
+each board's pitch and cutoff factors) follows `math/exp2.c` of Arm Optimized
+Routines, Copyright (c) 2018 Arm Limited, with its 128-entry `2^(i/128)`
+table: <https://github.com/ARM-software/optimized-routines>. The project is
+licensed `MIT OR Apache-2.0 WITH LLVM-exception`; Ceres uses it under the MIT
+License, included in
+[`ThirdParty/ARM-OPTIMIZED-ROUTINES-LICENSE.md`](ThirdParty/ARM-OPTIMIZED-ROUTINES-LICENSE.md).
+The same routine is glibc's and musl's `exp2`.

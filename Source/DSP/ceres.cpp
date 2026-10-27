@@ -50,6 +50,129 @@ inline bool inlineFinite(double x) { return std::isfinite(x); }
 
 
 #define CERES_FORCE_INLINE CERES_ALWAYS_INLINE
+
+// exp2 sets every board's pitch and both cutoff factors each internal
+// sample, three library calls per voice-sample (9% of the instructions at
+// 1x after the inlining above), and a software routine in the Rack SDK's
+// libm. tableExp2 is the exp2 of Arm's optimized-routines (math/exp2.c,
+// Copyright (c) 2018 Arm Limited, MIT; see THIRD_PARTY_NOTICES.md), which
+// glibc 2.28 and later ship as their exp2 and musl as its own: x = k/128 + r
+// with |r| <= 1/256, 2^(k/128) from the table below as scale*(1+tail), and
+// 2^r - 1 by a fifth-order polynomial. The same operations in the same order
+// as glibc's (no FMA there: glibc's x86-64 exp2 has no FMA variant), so on
+// glibc the result is bit for bit std::exp2's; Tests/dsp_tests.cpp sweeps it
+// against std::exp2 (identical on glibc, within 1 ulp elsewhere; the
+// routine's own bound is .52 ulp). Only the common range runs inline:
+// 2^-54 <= |x| < 512. Zero, tiny, huge, infinite and NaN arguments go to
+// std::exp2, as glibc's special cases would. The ring carrier's exp2 stays
+// std::exp2: Ceres.ring_depth_continuity_contracts recomputes it exactly.
+// tableExp2Data[2i+1] is the bits of 2^(i/128) rounded to double, less
+// i<<45 (the exponent the k/128 octave adds back); tableExp2Data[2i] the bits
+// of the rounded relative tail (2^(i/128)-hi)/hi. Computed with 80-digit
+// decimal arithmetic; byte for byte glibc 2.39's __exp_data table.
+inline std::uint64_t doubleBits(double x) {
+    std::uint64_t bits;
+#if defined(__GNUC__) || defined(__clang__)
+    __builtin_memcpy(&bits,&x,sizeof bits);
+#else
+    std::memcpy(&bits,&x,sizeof bits);
+#endif
+    return bits;
+}
+inline double bitsDouble(std::uint64_t bits) {
+    double x;
+#if defined(__GNUC__) || defined(__clang__)
+    __builtin_memcpy(&x,&bits,sizeof x);
+#else
+    std::memcpy(&x,&bits,sizeof x);
+#endif
+    return x;
+}
+constexpr std::uint64_t tableExp2Data[256]={
+    0x0000000000000000, 0x3ff0000000000000, 0x3c9b3b4f1a88bf6e, 0x3feff63da9fb3335,
+    0xbc7160139cd8dc5d, 0x3fefec9a3e778061, 0xbc905e7a108766d1, 0x3fefe315e86e7f85,
+    0x3c8cd2523567f613, 0x3fefd9b0d3158574, 0xbc8bce8023f98efa, 0x3fefd06b29ddf6de,
+    0x3c60f74e61e6c861, 0x3fefc74518759bc8, 0x3c90a3e45b33d399, 0x3fefbe3ecac6f383,
+    0x3c979aa65d837b6d, 0x3fefb5586cf9890f, 0x3c8eb51a92fdeffc, 0x3fefac922b7247f7,
+    0x3c3ebe3d702f9cd1, 0x3fefa3ec32d3d1a2, 0xbc6a033489906e0b, 0x3fef9b66affed31b,
+    0xbc9556522a2fbd0e, 0x3fef9301d0125b51, 0xbc5080ef8c4eea55, 0x3fef8abdc06c31cc,
+    0xbc91c923b9d5f416, 0x3fef829aaea92de0, 0x3c80d3e3e95c55af, 0x3fef7a98c8a58e51,
+    0xbc801b15eaa59348, 0x3fef72b83c7d517b, 0xbc8f1ff055de323d, 0x3fef6af9388c8dea,
+    0x3c8b898c3f1353bf, 0x3fef635beb6fcb75, 0xbc96d99c7611eb26, 0x3fef5be084045cd4,
+    0x3c9aecf73e3a2f60, 0x3fef54873168b9aa, 0xbc8fe782cb86389d, 0x3fef4d5022fcd91d,
+    0x3c8a6f4144a6c38d, 0x3fef463b88628cd6, 0x3c807a05b0e4047d, 0x3fef3f49917ddc96,
+    0x3c968efde3a8a894, 0x3fef387a6e756238, 0x3c875e18f274487d, 0x3fef31ce4fb2a63f,
+    0x3c80472b981fe7f2, 0x3fef2b4565e27cdd, 0xbc96b87b3f71085e, 0x3fef24dfe1f56381,
+    0x3c82f7e16d09ab31, 0x3fef1e9df51fdee1, 0xbc3d219b1a6fbffa, 0x3fef187fd0dad990,
+    0x3c8b3782720c0ab4, 0x3fef1285a6e4030b, 0x3c6e149289cecb8f, 0x3fef0cafa93e2f56,
+    0x3c834d754db0abb6, 0x3fef06fe0a31b715, 0x3c864201e2ac744c, 0x3fef0170fc4cd831,
+    0x3c8fdd395dd3f84a, 0x3feefc08b26416ff, 0xbc86a3803b8e5b04, 0x3feef6c55f929ff1,
+    0xbc924aedcc4b5068, 0x3feef1a7373aa9cb, 0xbc9907f81b512d8e, 0x3feeecae6d05d866,
+    0xbc71d1e83e9436d2, 0x3feee7db34e59ff7, 0xbc991919b3ce1b15, 0x3feee32dc313a8e5,
+    0x3c859f48a72a4c6d, 0x3feedea64c123422, 0xbc9312607a28698a, 0x3feeda4504ac801c,
+    0xbc58a78f4817895b, 0x3feed60a21f72e2a, 0xbc7c2c9b67499a1b, 0x3feed1f5d950a897,
+    0x3c4363ed60c2ac11, 0x3feece086061892d, 0x3c9666093b0664ef, 0x3feeca41ed1d0057,
+    0x3c6ecce1daa10379, 0x3feec6a2b5c13cd0, 0x3c93ff8e3f0f1230, 0x3feec32af0d7d3de,
+    0x3c7690cebb7aafb0, 0x3feebfdad5362a27, 0x3c931dbdeb54e077, 0x3feebcb299fddd0d,
+    0xbc8f94340071a38e, 0x3feeb9b2769d2ca7, 0xbc87deccdc93a349, 0x3feeb6daa2cf6642,
+    0xbc78dec6bd0f385f, 0x3feeb42b569d4f82, 0xbc861246ec7b5cf6, 0x3feeb1a4ca5d920f,
+    0x3c93350518fdd78e, 0x3feeaf4736b527da, 0x3c7b98b72f8a9b05, 0x3feead12d497c7fd,
+    0x3c9063e1e21c5409, 0x3feeab07dd485429, 0x3c34c7855019c6ea, 0x3feea9268a5946b7,
+    0x3c9432e62b64c035, 0x3feea76f15ad2148, 0xbc8ce44a6199769f, 0x3feea5e1b976dc09,
+    0xbc8c33c53bef4da8, 0x3feea47eb03a5585, 0xbc845378892be9ae, 0x3feea34634ccc320,
+    0xbc93cedd78565858, 0x3feea23882552225, 0x3c5710aa807e1964, 0x3feea155d44ca973,
+    0xbc93b3efbf5e2228, 0x3feea09e667f3bcd, 0xbc6a12ad8734b982, 0x3feea012750bdabf,
+    0xbc6367efb86da9ee, 0x3fee9fb23c651a2f, 0xbc80dc3d54e08851, 0x3fee9f7df9519484,
+    0xbc781f647e5a3ecf, 0x3fee9f75e8ec5f74, 0xbc86ee4ac08b7db0, 0x3fee9f9a48a58174,
+    0xbc8619321e55e68a, 0x3fee9feb564267c9, 0x3c909ccb5e09d4d3, 0x3feea0694fde5d3f,
+    0xbc7b32dcb94da51d, 0x3feea11473eb0187, 0x3c94ecfd5467c06b, 0x3feea1ed0130c132,
+    0x3c65ebe1abd66c55, 0x3feea2f336cf4e62, 0xbc88a1c52fb3cf42, 0x3feea427543e1a12,
+    0xbc9369b6f13b3734, 0x3feea589994cce13, 0xbc805e843a19ff1e, 0x3feea71a4623c7ad,
+    0xbc94d450d872576e, 0x3feea8d99b4492ed, 0x3c90ad675b0e8a00, 0x3feeaac7d98a6699,
+    0x3c8db72fc1f0eab4, 0x3feeace5422aa0db, 0xbc65b6609cc5e7ff, 0x3feeaf3216b5448c,
+    0x3c7bf68359f35f44, 0x3feeb1ae99157736, 0xbc93091fa71e3d83, 0x3feeb45b0b91ffc6,
+    0xbc5da9b88b6c1e29, 0x3feeb737b0cdc5e5, 0xbc6c23f97c90b959, 0x3feeba44cbc8520f,
+    0xbc92434322f4f9aa, 0x3feebd829fde4e50, 0xbc85ca6cd7668e4b, 0x3feec0f170ca07ba,
+    0x3c71affc2b91ce27, 0x3feec49182a3f090, 0x3c6dd235e10a73bb, 0x3feec86319e32323,
+    0xbc87c50422622263, 0x3feecc667b5de565, 0x3c8b1c86e3e231d5, 0x3feed09bec4a2d33,
+    0xbc91bbd1d3bcbb15, 0x3feed503b23e255d, 0x3c90cc319cee31d2, 0x3feed99e1330b358,
+    0x3c8469846e735ab3, 0x3feede6b5579fdbf, 0xbc82dfcd978e9db4, 0x3feee36bbfd3f37a,
+    0x3c8c1a7792cb3387, 0x3feee89f995ad3ad, 0xbc907b8f4ad1d9fa, 0x3feeee07298db666,
+    0xbc55c3d956dcaeba, 0x3feef3a2b84f15fb, 0xbc90a40e3da6f640, 0x3feef9728de5593a,
+    0xbc68d6f438ad9334, 0x3feeff76f2fb5e47, 0xbc91eee26b588a35, 0x3fef05b030a1064a,
+    0x3c74ffd70a5fddcd, 0x3fef0c1e904bc1d2, 0xbc91bdfbfa9298ac, 0x3fef12c25bd71e09,
+    0x3c736eae30af0cb3, 0x3fef199bdd85529c, 0x3c8ee3325c9ffd94, 0x3fef20ab5fffd07a,
+    0x3c84e08fd10959ac, 0x3fef27f12e57d14b, 0x3c63cdaf384e1a67, 0x3fef2f6d9406e7b5,
+    0x3c676b2c6c921968, 0x3fef3720dcef9069, 0xbc808a1883ccb5d2, 0x3fef3f0b555dc3fa,
+    0xbc8fad5d3ffffa6f, 0x3fef472d4a07897c, 0xbc900dae3875a949, 0x3fef4f87080d89f2,
+    0x3c74a385a63d07a7, 0x3fef5818dcfba487, 0xbc82919e2040220f, 0x3fef60e316c98398,
+    0x3c8e5a50d5c192ac, 0x3fef69e603db3285, 0x3c843a59ac016b4b, 0x3fef7321f301b460,
+    0xbc82d52107b43e1f, 0x3fef7c97337b9b5f, 0xbc892ab93b470dc9, 0x3fef864614f5a129,
+    0x3c74b604603a88d3, 0x3fef902ee78b3ff6, 0x3c83c5ec519d7271, 0x3fef9a51fbc74c83,
+    0xbc8ff7128fd391f0, 0x3fefa4afa2a490da, 0xbc8dae98e223747d, 0x3fefaf482d8e67f1,
+    0x3c8ec3bc41aa2008, 0x3fefba1bee615a27, 0x3c842b94c3a9eb32, 0x3fefc52b376bba97,
+    0x3c8a64a931d185ee, 0x3fefd0765b6e4540, 0xbc8e37bae43be3ed, 0x3fefdbfdad9cbe14,
+    0x3c77893b4d91cd9d, 0x3fefe7c1819e90d8, 0x3c5305c14160cc89, 0x3feff3c22b8f71f1,
+};
+double tableExp2(double x) {
+    const std::uint32_t abstop=static_cast<std::uint32_t>(doubleBits(x)>>52)&0x7ff;
+    // top12(0x1p-54) = 0x3c9, top12(512) = 0x408: glibc's special-case test.
+    if (abstop-0x3c9u >= 0x408u-0x3c9u) return std::exp2(x);
+    constexpr double shift=0x1.8p52/128;
+    constexpr double c1=0x1.62e42fefa39efp-1, c2=0x1.ebfbdff82c424p-3,
+        c3=0x1.c6b08d70cf4b5p-5, c4=0x1.3b2abd24650ccp-7, c5=0x1.5d7e09b4e3a84p-10;
+    double kd=x+shift;
+    const std::uint64_t ki=doubleBits(kd);
+    kd-=shift;
+    const double r=x-kd;
+    const std::uint64_t index=2*(ki%128), top=ki<<45;
+    const double tail=bitsDouble(tableExp2Data[index]);
+    const std::uint64_t scaleBits=tableExp2Data[index+1]+top;
+    const double r2=r*r;
+    const double tmp=tail+r*c1+r2*(c2+r*c3)+r2*r2*(c4+r*c5);
+    const double scale=bitsDouble(scaleBits);
+    return scale+scale*tmp;
+}
 // tanh is the engine's most frequent transcendental: the OTA filters solve
 // one per Newton iteration per stage, the WSC shaper one per sample and the
 // ring carrier's steering one per sample. For |x| < .625, evaluate
@@ -840,6 +963,11 @@ struct OtaNetwork {
     double fs=0, conductance=0, referenceConductance=0, ratio=0;
     double qBlend=0, sourceBlend=0, divisor=0, linear=0, sourceInput=0;
     double resonance=0, qBand=0, effectiveDamping=0;
+    // Factors of the per-sample solve that depend on the network alone,
+    // formed here once instead of in every voice's every sample. Each is the
+    // leading product or difference of its expression in OtaSvf::process,
+    // which C++ evaluates left to right, so the bits are the same.
+    double twoRatio=0, heldQ=0, sourceQ=0, heldSource=0;
     bool resonanceReady=false;
     void configure(double rate, double sourceConductance=1/150e3,
                    double referenceSourceConductance=1/150e3) {
@@ -853,6 +981,10 @@ struct OtaNetwork {
         divisor=1-qBlend*ratio*sourceBlend;
         linear=1/(2*fs*filterCapacitance*filterFeedResistance);
         sourceInput=conductance/(sourceConductance+2*fs*sourceCapacitance);
+        twoRatio=2*ratio;
+        heldQ=1-qBlend;
+        sourceQ=qBlend*(1-sourceBlend);
+        heldSource=1-sourceBlend;
         resonanceReady=false;
     }
     void setResonance(double value) {
@@ -906,16 +1038,16 @@ struct OtaSvf {
             cachedRate=network.fs;
         }
         const double g = cachedG;
-        const double ratio=network.ratio, qBlend=network.qBlend;
+        const double ratio=network.ratio;
         const double sourceBlend=network.sourceBlend, divisor=network.divisor;
         // X is the physical Thevenin source voltage, in the SAME OTA voltage
         // unit at both stages. Canonical u=2*Gs*X/D0 is a local algebraic
         // coordinate, not a separate per-stage signal normalization.
-        const double input=2*ratio*sourceVoltage;
+        const double input=network.twoRatio*sourceVoltage;
         // Eliminate both linear capacitor nodes simultaneously. The remaining
         // OTA equation has positive derivative because effectiveDamping>0.
-        solve.qConstant=((1-qBlend)*sz+
-            qBlend*(1-sourceBlend)*(input-ratio*sy))/divisor;
+        solve.qConstant=(network.heldQ*sz+
+            network.sourceQ*(input-ratio*sy))/divisor;
         const double linear = network.linear;
         solve.nonlinear = cutoff<=filterFrequencyFloor ? 0.0 : std::max(0.0,g-linear);
         solve.cutoff = cutoff;
@@ -963,7 +1095,7 @@ struct OtaSvf {
         const double h = z - 2*b - l;
         // Expand sourceBlend/ratio analytically so tiny positive diagnostic
         // conductances cannot overflow at the intermediate input/ratio.
-        const double y=(1-sourceBlend)*sy+sourceBlend*(-z+2*b)+network.sourceInput*input;
+        const double y=network.heldSource*sy+sourceBlend*(-z+2*b)+network.sourceInput*input;
         sb = 2 * b - sb;
         sl = 2 * l - sl;
         sz = 2 * z - sz;
@@ -2363,7 +2495,7 @@ struct Synth::Impl {
             if (v.expCacheReady && pitchExp == v.cachedPitchExp) {
                 frequency = v.cachedFrequency;
             } else {
-                frequency = 440 * std::exp2(pitchExp);
+                frequency = 440 * tableExp2(pitchExp);
                 v.cachedPitchExp = pitchExp;
                 v.cachedFrequency = frequency;
             }
@@ -2415,7 +2547,7 @@ struct Synth::Impl {
                 if (v.expCacheReady && hpExp == v.cachedHpExp) {
                     hpFactor = v.cachedHpFactor;
                 } else {
-                    hpFactor = fastExp2(hpExp);
+                    hpFactor = tableExp2(hpExp);
                     v.cachedHpExp = hpExp;
                     v.cachedHpFactor = hpFactor;
                 }
@@ -2439,7 +2571,7 @@ struct Synth::Impl {
                         v.cachedLpExp = lpExp;
                         v.cachedLpFactor = lpFactor;
                     } else {
-                        lpFactor = fastExp2(lpExp);
+                        lpFactor = tableExp2(lpExp);
                         v.cachedLpExp = lpExp;
                         v.cachedLpFactor = lpFactor;
                     }
@@ -2880,6 +3012,8 @@ std::vector<double> envelopeTrace(double fs,const Patch& supplied,bool filter,
     }
     return result;
 }
+
+double engineExp2(double x) { return tableExp2(x); }
 
 std::vector<OscillatorFrame> oscillatorTrace(double fs,double frequency,
     const Patch& supplied,std::size_t frames,double initialPhase) {

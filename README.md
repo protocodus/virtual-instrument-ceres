@@ -31,6 +31,11 @@ The CI-generated demos below play **eight of the circuit engine's 14 research pr
 
 ### 1.0.5 — 2026-10-23 — built the way the Rack builds it
 
+### Unreleased — 1.0.6 — lower CPU, sound unchanged
+
+- About 11% fewer instructions on the factory presets under clang `-O3 -fno-builtin` (the Rack's compiler family; 3% under GCC `-O3`), sound unchanged: the 439,296-sample CPU regression stream is byte-identical to 1.0.5. The voice loop's oscillator, filter-solve and envelope calls are inlined under clang, the filter solve's network-only factors are formed once per configuration, and pitch and cutoff `exp2` run inline as glibc's own routine (Arm optimized-routines, MIT), bit for bit glibc's. [Protocol, instruction counts and validation](Docs/benchmarks/cpu-inlining-2026-10-25.md).
+
+
 - Four changes, three exact and one at the last bit, for the Rack's toolchain, which compiles the engine with `-fno-builtin` against its own libc++ and does not auto-vectorise: the audio path's `abs`, `copysign`, `sqrt` and `isfinite` are the builtin forms (library calls there), the decimator history is a mirrored ring read through one window and summed in two vector pairs, and the voice loop's envelope, glide and oscillator calls shed their per-sample overhead. Nothing changes about the sound: the 439,296-sample CPU regression stream is byte-identical to 1.0.4 after every commit, and a one-float-ulp perturbation of any cutoff or resonance on every factory preset stays at least 127 dB below the signal without growing, which is why last-bit arithmetic changes in Ceres can be graded by that null test at all. 1.6% fewer instructions at the Rack's four voices/1x and 4.4% at 4x under clang `-O3 -fno-builtin` on this container; the Rack's own object code, where the library calls are real, is where the first change counts. [Protocol, rankings, probe and validation](Docs/benchmarks/cpu-rack-flags-2026-10-23.md).
 
 ### 1.0.4 — 2026-10-23 — a third to a half less CPU, the same samples
