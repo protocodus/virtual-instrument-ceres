@@ -44,7 +44,8 @@ include(CTest)
 
 option(CERES_SANITIZE "Compatibility alias for CERES_ENABLE_SANITIZERS" OFF)
 option(CERES_ENABLE_SANITIZERS "Instrument development builds with ASan and UBSan" OFF)
-option(CERES_BUILD_LIBFUZZER "Build CeresDspFuzz as a Clang libFuzzer target" OFF)
+option(CERES_BUILD_FUZZER "Build CeresDspFuzz as a Clang libFuzzer target" OFF)
+option(CERES_REQUIRE_PYTHON_TESTS "Fail to configure without the interpreter the Python checks need" OFF)
 if(CERES_SANITIZE)
     set(CERES_ENABLE_SANITIZERS ON)
 endif()
@@ -346,7 +347,13 @@ if(BUILD_TESTING)
   target_link_libraries(ceres_native_external_parity PRIVATE ceres_native)
   add_executable(ceres_embedded_external_parity Tests/ExternalParityDriver.cpp)
   target_link_libraries(ceres_embedded_external_parity PRIVATE ceres_embedded)
-  find_package(Python3 COMPONENTS Interpreter)
+  # The Python checks use the standard library only. CI requires the
+  # interpreter, so a missing one cannot silently register fewer tests.
+  if(CERES_REQUIRE_PYTHON_TESTS)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  else()
+    find_package(Python3 COMPONENTS Interpreter)
+  endif()
   if(Python3_Interpreter_FOUND)
     add_test(NAME Ceres.benchmark_cpu_provenance COMMAND "${Python3_EXECUTABLE}" -B
       "${CMAKE_CURRENT_SOURCE_DIR}/Tests/test_benchmark_cpu_provenance.py")
@@ -386,29 +393,36 @@ if(BUILD_TESTING)
       ceres_native_external_parity ceres_embedded_external_parity)
     set_target_properties(${target} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
   endforeach()
-    # U4 input fuzzing. With CERES_BUILD_LIBFUZZER (Clang) it is a libFuzzer
-    # target over coverage-instrumented DSP; otherwise FuzzHarness.h supplies
-    # a main that replays Tests/fuzz-regressions/ and then seeded inputs.
-    add_executable(CeresDspFuzz Tests/DspFuzz.cpp)
-    target_include_directories(CeresDspFuzz PRIVATE Source Source/DSP)
-    set_target_properties(CeresDspFuzz PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
-    if(CERES_BUILD_LIBFUZZER)
+    # U4/U8 input fuzzing, one harness built twice. CeresDspFuzzReplay (any
+    # compiler, FuzzHarness.h's main) replays the fixed crashes committed in
+    # Tests/Fixtures/fuzz/ and then seeded inputs, as a unit test.
+    # CeresDspFuzz (CERES_BUILD_FUZZER, Clang) is the libFuzzer target over
+    # coverage-instrumented DSP; its short run is the fuzz tier.
+    add_executable(CeresDspFuzzReplay Tests/DspFuzz.cpp)
+    target_include_directories(CeresDspFuzzReplay PRIVATE Source Source/DSP)
+    set_target_properties(CeresDspFuzzReplay PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+    target_link_libraries(CeresDspFuzzReplay PRIVATE CeresDSP)
+    target_compile_definitions(CeresDspFuzzReplay PRIVATE PROTOCODUS_FUZZ_MAIN)
+    file(GLOB CERES_FUZZ_REPRODUCERS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Tests/Fixtures/fuzz/*")
+    add_test(NAME Ceres.DspFuzzReplay
+             COMMAND CeresDspFuzzReplay -seed=1 -runs=300 ${CERES_FUZZ_REPRODUCERS})
+    set_tests_properties(Ceres.DspFuzzReplay PROPERTIES TIMEOUT 600 LABELS unit)
+    if(CERES_BUILD_FUZZER)
         if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-            message(FATAL_ERROR "CERES_BUILD_LIBFUZZER requires Clang")
+            message(FATAL_ERROR "CERES_BUILD_FUZZER requires Clang")
         endif()
-        target_sources(CeresDspFuzz PRIVATE Source/DSP/ceres.cpp)
+        add_executable(CeresDspFuzz Tests/DspFuzz.cpp Source/DSP/ceres.cpp)
+        target_include_directories(CeresDspFuzz PRIVATE Source Source/DSP)
+        set_target_properties(CeresDspFuzz PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
         target_compile_options(CeresDspFuzz PRIVATE
             -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
         target_link_options(CeresDspFuzz PRIVATE -fsanitize=fuzzer,address,undefined)
-    else()
-        target_link_libraries(CeresDspFuzz PRIVATE CeresDSP)
-        target_compile_definitions(CeresDspFuzz PRIVATE PROTOCODUS_FUZZ_MAIN)
+        file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fuzz-corpus")
+        add_test(NAME Ceres.DspFuzz
+                 COMMAND CeresDspFuzz -seed=1 -max_total_time=120 -max_len=4096 -timeout=30 -rss_limit_mb=2048
+                         "${CMAKE_CURRENT_BINARY_DIR}/fuzz-corpus")
+        set_tests_properties(Ceres.DspFuzz PROPERTIES TIMEOUT 600 LABELS fuzz)
     endif()
-    file(GLOB CERES_FUZZ_REGRESSIONS CONFIGURE_DEPENDS
-         "${CMAKE_CURRENT_SOURCE_DIR}/Tests/fuzz-regressions/*")
-    add_test(NAME Ceres.DspFuzz
-             COMMAND CeresDspFuzz -seed=1 -runs=300 ${CERES_FUZZ_REGRESSIONS})
-    set_tests_properties(Ceres.DspFuzz PROPERTIES TIMEOUT 600 LABELS fuzz)
 
     if(CERES_BUILD_TOOLS)
         # Every preset demo renders finite, audible, under the ceiling, 10-20 s
@@ -417,9 +431,15 @@ if(BUILD_TESTING)
                  COMMAND RenderCeresPresetDemos --jobs 4 --check
                          "${CMAKE_CURRENT_SOURCE_DIR}/Docs/audio/midi")
         set_tests_properties(Ceres.AudioDemos PROPERTIES TIMEOUT 900 LABELS audio)
+        # U7: the same demos timed on one thread against the budget in
+        # Tools/RenderPresetDemos.cpp. Timing means nothing instrumented.
+        if(CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT CERES_ENABLE_SANITIZERS)
+            add_test(NAME Ceres.CpuBudget
+                     COMMAND RenderCeresPresetDemos --cpu --json "${CMAKE_BINARY_DIR}/cpu.json"
+                             "${CMAKE_CURRENT_SOURCE_DIR}/Docs/audio/midi")
+            set_tests_properties(Ceres.CpuBudget PROPERTIES TIMEOUT 900 LABELS perf RUN_SERIAL TRUE)
+        endif()
     endif()
-
-    find_package(Python3 COMPONENTS Interpreter)
 
     if(CERES_BUILD_PLUGIN)
         foreach(suite IN ITEMS PluginProcessor ParameterMatrix)
@@ -452,7 +472,7 @@ if(BUILD_TESTING)
         # A fixed sample of the U4 matrix at one rate and block size per case;
         # the main build's nightly shards cover every case at all nine.
         add_test(NAME Ceres.ParameterMatrix
-                 COMMAND CeresParameterMatrixTests --rotation --shard 1/50 --jobs 4)
+                 COMMAND CeresParameterMatrixTests --rotation --shard 0/50 --jobs 4)
         set_tests_properties(Ceres.ParameterMatrix PROPERTIES TIMEOUT 1800 LABELS fuzz)
 
         if(Python3_Interpreter_FOUND)

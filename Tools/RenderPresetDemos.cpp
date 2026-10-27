@@ -57,6 +57,9 @@ int main (int argc, char** argv)
     instrument.name = "Ceres standalone circuit research presets";
     instrument.presets = ceres::presetNames();
     instrument.ceiling = 1.0f;
+    // U7 perf budget: 0 reports without failing until the CI runner's
+    // median is measured.
+    instrument.cpuBudget = 0.0;
     instrument.open = [names = instrument.presets] (std::size_t preset, double sampleRate, int, std::uint32_t seed)
     {
         return std::make_unique<CeresVoice> (names.at (preset), sampleRate, seed);

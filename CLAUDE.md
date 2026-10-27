@@ -143,6 +143,26 @@ defensible on their own physics. It does not license drawing a constant, fitting
 a curve, or keeping a formulation the measurements reject. If every candidate
 needs an invented number, the answer is still that none of them ships.
 
+## Testing
+
+Tests follow the portfolio testing standard (U1–U10); the `portfolio-testing`
+skill has the procedures. These hold in every session:
+
+- Every CTest test is `<Name>.<Suite>` with exactly one tier label: `unit`,
+  `audio`, `render`, `fuzz` or `perf`.
+- A test is never skipped, disabled, loosened or given a longer timeout to
+  get green. Diagnose a failure against the baseline first; when a fixture or
+  limit was wrong, fix it and say why beside it, in the same commit.
+- Checks run in Release builds: use the file's always-on helper, never a bare
+  `assert()`. Seeds, rates and block sizes are fixed.
+- Nothing outside the `perf` tier measures time, and `perf` never runs in a
+  Debug or sanitized build. CPU figures are development-machine figures,
+  never Reason or DAW CPU.
+- A fixed fuzz crash's input goes in `Tests/Fixtures/fuzz/`, which
+  `<Name>.DspFuzzReplay` replays in the `unit` tier.
+- A DSP change is done when the suites it touches, the `unit`, `audio` and
+  `perf` tiers and `<Name>DSPCxx17` pass.
+
 ## Build and verify
 
 ```sh
@@ -152,26 +172,28 @@ ctest --test-dir build-dsp -L unit --output-on-failure
 ```
 
 Use a separate `build-plugin` directory (`-DCERES_BUILD_PLUGIN=ON`, the
-default) for the processor, editor and packaging. Every test is
-`Ceres.<Suite>` with one tier label: `unit`, `audio` (`Ceres.AudioDemos`,
-the curated research preset demos rendered twice),
-`render` (`Ceres.EditorRender`, the editor screenshot) or `fuzz` (`Ceres.DspFuzz`; `Ceres.ParameterMatrix` in
-the plug-in build). Select the suites that cover a change with `-R`, then run
-the full suite before a substantive DSP change is called done.
-
-A test is never skipped, disabled or loosened to get green. Diagnose a failed
-contract against the baseline before changing a fixture, and document why an
-assumption was stale.
+default) for the processor, editor and packaging. Ceres's suites by tier:
+`unit` (the contracts, `Ceres.DspFuzzReplay` and the Python parity checks;
+`-DCERES_REQUIRE_PYTHON_TESTS=ON` makes a missing interpreter a configure
+error), `audio` (`Ceres.AudioDemos`, the curated research preset demos
+rendered twice), `render` (`Ceres.EditorRender`, the editor screenshot),
+`fuzz` (`Ceres.ParameterMatrix` in the plug-in build; `Ceres.DspFuzz` in a
+Clang build with `-DCERES_BUILD_FUZZER=ON`) and `perf` (`Ceres.CpuBudget`,
+Release builds without sanitizers). Select the suites that cover a change
+with `-R`, then run the full suite before a substantive DSP change is called
+done. `scripts/validate-plugins.sh build-plugin Ceres aumu Cer1 Cers
+0x43455253` runs the host validators on a plug-in build.
 
 ## Shared portfolio tools
 
 `Tools/PresetDemoRenderer.h`, `Tools/update_readme_blocks.py`,
-`Tests/ParameterMatrix.h` and `Tests/FuzzHarness.h`, and the Documentation
-layout and A–Z listening tests sections above, are byte-identical copies of
+`Tests/ParameterMatrix.h`, `Tests/FuzzHarness.h` and
+`scripts/validate-plugins.sh`, and the Documentation layout, A–Z listening
+tests and Testing sections above, are byte-identical copies of
 the portfolio masters in `reason-rack-extensions/Tools/portfolio/`. Change
 them there, never here. Ceres's own parts are `Tools/RenderPresetDemos.cpp`
-(the preset list and demo voice) and `Tests/ParameterMatrixTests.cpp` (the
-limits Ceres's design implies).
+(the preset list, demo voice and CPU budget) and
+`Tests/ParameterMatrixTests.cpp` (the limits Ceres's design implies).
 
 ## Sibling evidence (owner decision, 2026-10-21)
 
