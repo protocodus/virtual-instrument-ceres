@@ -155,9 +155,9 @@ skill has the procedures. These hold in every session:
   limit was wrong, fix it and say why beside it, in the same commit.
 - Checks run in Release builds: use the file's always-on helper, never a bare
   `assert()`. Seeds, rates and block sizes are fixed.
-- Nothing outside the `perf` tier measures time, and `perf` never runs in a
-  Debug or sanitized build. CPU figures are development-machine figures,
-  never Reason or DAW CPU.
+- No test outside the `perf` tier passes or fails on time, and `perf` never
+  runs in a Debug or sanitized build. CPU figures are development-machine
+  figures, never Reason or DAW CPU.
 - A fixed fuzz crash's input goes in `Tests/Fixtures/fuzz/`, which
   `<Name>.DspFuzzReplay` replays in the `unit` tier.
 - A DSP change is done when the suites it touches, the `unit`, `audio` and
