@@ -1,21 +1,31 @@
 #!/usr/bin/env python3
-"""Reproduce the authored research-preset demonstration MIDI sources (G3, G3a).
+"""Write the committed research-preset demo phrases, Docs/audio/midi (G3, G3a).
 
 Eight of the fourteen research presets, each showing a different side of the
 circuit, get an original phrase written for its role: the Init voice as a
 bass line, String 1 as a pad, Brass 1 as stabs and a swell, Flute as a
 melody, Electric Piano comping, Clavichord as a staccato riff, Guitar 1
-arpeggiated and Funky 1 as a syncopated line. None is recovered hardware MIDI.
+arpeggiated and Funky 1 as a syncopated line. None is recovered hardware MIDI
+or a recorded performance, and the preset names inherited from the research
+table do not establish calibrated Yamaha voices.
 Phrases stay within the CS-50's four voices, use note events only at
-velocity 100 (the research presets ignore velocity), and end by 9.25 s so the
-shared renderer's 2.5 s tail keeps every demo within 8-12 s. No sound is
-rendered and no engine parameter is adjusted by this tool.
-Default operation checks bytes; --write deliberately replaces these sources.
+velocity 100 (the research presets ignore velocity), at 120 bpm and 960 ticks
+per quarter on channel 1, and their last event falls at 5.5-9.25 s so the
+shared renderer's 2.5 s tail keeps every demo within 8-12 s. That fixed tail
+is not a claim that every slow internal capacitor has fully settled. No
+controller changes, external audio, gain matching, normalization, tuning or
+preset-specific adjustment is included, and no sound is rendered here.
+
+    python3 Tools/write_preset_midi.py           # write Docs/audio/midi
+    python3 Tools/write_preset_midi.py --check   # the committed files match
+
+Change a phrase only on purpose and commit it on its own; never regenerate
+the sources because the DSP changed.
 """
 import argparse
-import hashlib
 from pathlib import Path
 import struct
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 TICKS = 960  # per quarter note, at the 120 bpm tempo below
@@ -134,34 +144,43 @@ def midi(name, notes):
 
 
 def check(notes):
-    """At most four keys down at once, and the last Note Off within 9.25 s."""
+    """At most four keys down at once, and the last Note Off at 5.5-9.25 s."""
     edges = sorted([(start, 1) for start, _, _ in notes] + [(end, -1) for _, end, _ in notes])
     held = 0
     for _, step in edges:
         held += step
         assert held <= 4, 'more than four voices'
-    assert max(end for _, end, _ in notes) * 0.5 <= 9.25, 'phrase ends after 9.25 s'
+    assert 5.5 <= max(end for _, end, _ in notes) * 0.5 <= 9.25, 'phrase ends outside 5.5-9.25 s'
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--write', action='store_true')
-    args = ap.parse_args()
-    folder = ROOT / 'Docs/audio/midi'
-    folder.mkdir(parents=True, exist_ok=True)
-    expected = []
+def files():
+    result = {}
     for number, name, phrase in DEMOS:
         notes = phrase()
         check(notes)
-        path = folder / f'{number:02}-{name.replace("_", "-")}.mid'
-        data = midi(name, notes)
-        expected.append(path.name)
-        if args.write:
-            path.write_bytes(data)
-        assert path.read_bytes() == data, str(path)
-        print(path.name, hashlib.sha256(data).hexdigest())
-    assert sorted(p.name for p in folder.glob('*.mid')) == sorted(expected), 'Unexpected or missing MIDI source'
-    print(f'PASS {len(DEMOS)} authored phrases, at most four voices, ending by 9.25 s')
+        result[f'{number:02}-{name.replace("_", "-")}.mid'] = midi(name, notes)
+    return result
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument('--check', action='store_true', help='fail unless the committed files match')
+    args = ap.parse_args()
+    folder = ROOT / 'Docs/audio/midi'
+    expected = files()
+    found = {path.name: path.read_bytes() for path in folder.glob('*.mid')}
+    if args.check:
+        stale = sorted(set(found) ^ set(expected) | {n for n in expected if found.get(n) != expected[n]})
+        if stale:
+            sys.exit(f'Docs/audio/midi differs from {Path(__file__).name} in: {", ".join(stale)}')
+        print(f'PASS {len(expected)} authored phrases match, at most four voices, ending by 9.25 s')
+        return
+    folder.mkdir(parents=True, exist_ok=True)
+    for name in set(found) - set(expected):
+        (folder / name).unlink()
+    for name, data in expected.items():
+        (folder / name).write_bytes(data)
+        print(name)
 
 
 if __name__ == '__main__':

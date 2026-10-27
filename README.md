@@ -319,7 +319,7 @@ ctest --test-dir build-dsp -L '^audio$' --output-on-failure
 ./build-dsp/RenderCeresPresetDemos --jobs 4 Docs/audio/midi build-dsp/demo-audio
 ```
 
-The demo tool uses the shared fixed 48 kHz/256-frame/seed protocol and the original [MIDI phrase definitions](Docs/audio/midi/README.md). It duplicates the mono engine into two identical channels without gain changes. Every raw render must be finite, audible, below 0 dBFS, 8–12 s long and identical on repetition, and is written as a 48 kHz 24-bit WAV; no captured sound or preset-specific level adjustment is involved. Historical empty-bank failure evidence remains frozen in the [initial integration report](Docs/validation/main-integration-2026-10-19/report.json); the subsequent [demo integration validation](Docs/validation/research-demos-2026-10-19/report.json) records the resolved audio path and its new build identity.
+The demo tool uses the shared fixed 48 kHz/256-frame/seed protocol and the original MIDI phrases written by [`Tools/write_preset_midi.py`](Tools/write_preset_midi.py). It duplicates the mono engine into two identical channels without gain changes. Every raw render must be finite, audible, below 0 dBFS, 8–12 s long and identical on repetition, and is written as a 48 kHz 24-bit WAV; no captured sound or preset-specific level adjustment is involved. Historical empty-bank failure evidence remains frozen in the [initial integration report](Docs/validation/main-integration-2026-10-19/report.json); the subsequent [demo integration validation](Docs/validation/research-demos-2026-10-19/report.json) records the resolved audio path and its new build identity.
 
 ```sh
 cmake -S . -B build-sanitize -DCMAKE_BUILD_TYPE=Debug -DCERES_BUILD_PLUGIN=OFF -DCERES_SANITIZE=ON

@@ -350,6 +350,9 @@ if(BUILD_TESTING)
   if(Python3_Interpreter_FOUND)
     add_test(NAME Ceres.benchmark_cpu_provenance COMMAND "${Python3_EXECUTABLE}" -B
       "${CMAKE_CURRENT_SOURCE_DIR}/Tests/test_benchmark_cpu_provenance.py")
+    # The committed demo phrases are what the writer writes (G3a).
+    add_test(NAME Ceres.DemoMidiSources COMMAND "${Python3_EXECUTABLE}" -B
+      "${CMAKE_CURRENT_SOURCE_DIR}/Tools/write_preset_midi.py" --check)
     if(CERES_BUILD_TOOLS)
       add_test(NAME Ceres.configuration_cli_contract COMMAND "${Python3_EXECUTABLE}"
         "${CMAKE_CURRENT_SOURCE_DIR}/Tests/check_configuration_cli.py"
@@ -411,7 +414,7 @@ if(BUILD_TESTING)
     set_tests_properties(Ceres.DspFuzz PROPERTIES TIMEOUT 600 LABELS fuzz)
 
     if(CERES_BUILD_TOOLS)
-        # Every preset demo renders finite, audible, under the ceiling, 10-20 s
+        # Every preset demo renders finite, audible, under the ceiling, 8-12 s
         # long and bit-identical on a second render.
         add_test(NAME Ceres.AudioDemos
                  COMMAND RenderCeresPresetDemos --jobs 4 --check
