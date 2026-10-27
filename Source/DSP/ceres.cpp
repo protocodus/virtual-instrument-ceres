@@ -1030,7 +1030,8 @@ struct OtaSvf {
     static constexpr int maxIterations = 7;
     CERES_FORCE_INLINE void begin(Solve& solve, double sourceVoltage, double frequency, const OtaNetwork& network) {
         const double cutoff = clamp(frequency, filterFrequencyFloor, .22 * network.fs);
-        if (cutoff!=cachedCutoff || network.fs!=cachedRate) {
+        if (frequency > filterFrequencyFloor
+            && (cutoff!=cachedCutoff || network.fs!=cachedRate)) {
             // Exact input equality only: moving cutoff CVs retain the same
             // capacitor TPT prewarp, with no control-rate approximation.
             cachedG=prewarpTan(pi * cutoff / network.fs);
@@ -1053,6 +1054,10 @@ struct OtaSvf {
         solve.cutoff = cutoff;
         solve.input = input;
         solve.b = previousB;
+        if (solve.nonlinear != 0.0 && !previousTanhReady) {
+            previousTanhB = fastTanh(previousB);
+            previousTanhReady = true;
+        }
         solve.tanhArgument = previousB;
         solve.tanhValue = previousTanhB;
         solve.converged = false;
@@ -1062,6 +1067,18 @@ struct OtaSvf {
         const double effectiveDamping=network.effectiveDamping, linear=network.linear;
         const double nonlinear=solve.nonlinear, qConstant=solve.qConstant;
         double b = solve.b;
+        if (nonlinear == 0.0) {
+            // The feed-resistor floor is a linear circuit. Keep its original
+            // arithmetic and avoid every tanh and nonlinear derivative term.
+            const double l = sl + linear * b;
+            const double h = qConstant - effectiveDamping * b - l;
+            const double residual = b - sb - linear * h;
+            const double derivative = 1 + linear * (effectiveDamping + linear);
+            const double delta = residual / derivative;
+            solve.b = b - delta;
+            solve.converged = inlineAbs(delta) < 1e-9;
+            return;
+        }
         const double tb = iteration == 0 ? previousTanhB : fastTanh(b);
         solve.tanhArgument = b; solve.tanhValue = tb;
         const double l = sl + nonlinear*tb + linear*b;
@@ -1088,9 +1105,17 @@ struct OtaSvf {
         // final sub-ulp step; only an unconverged loop recomputes it.
         const double step = b - solve.tanhArgument;
         const double tanhValue = solve.tanhValue;
-        const double tanhB = inlineAbs(step) < 1e-9
-            ? tanhValue + (1 - tanhValue*tanhValue)*step : fastTanh(b);
-        const double l = sl + nonlinear*tanhB + linear*b;
+        double l;
+        if (nonlinear == 0.0) {
+            l = sl + linear * b;
+            previousTanhReady = false;
+        } else {
+            const double tanhB = inlineAbs(step) < 1e-9
+                ? tanhValue + (1 - tanhValue*tanhValue)*step : fastTanh(b);
+            l = sl + nonlinear*tanhB + linear*b;
+            previousTanhB = tanhB;
+            previousTanhReady = true;
+        }
         const double z = qConstant+qBand*b;
         const double h = z - 2*b - l;
         // Expand sourceBlend/ratio analytically so tiny positive diagnostic
@@ -1100,8 +1125,6 @@ struct OtaSvf {
         sl = 2 * l - sl;
         sz = 2 * z - sz;
         sy = 2 * y - sy;
-        previousTanhB = tanhB;
-        previousTanhReady = true;
         previousB = b;
         return highPass ? h : l;
     }
