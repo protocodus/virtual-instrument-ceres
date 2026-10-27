@@ -57,9 +57,10 @@ int main (int argc, char** argv)
     instrument.name = "Ceres standalone circuit research presets";
     instrument.presets = ceres::presetNames();
     instrument.ceiling = 1.0f;
-    // U7 perf budget: 0 reports without failing until the CI runner's
-    // median is measured.
-    instrument.cpuBudget = 0.0;
+    // U7 perf budget: about 3x the slowest demo's median realtime factor on
+    // the CI runner, 0.198 (12-funky1) in ci.yml run 80 (ubuntu-24.04,
+    // AMD EPYC 7763, three repeats), 2026-10-27.
+    instrument.cpuBudget = 0.6;
     instrument.open = [names = instrument.presets] (std::size_t preset, double sampleRate, int, std::uint32_t seed)
     {
         return std::make_unique<CeresVoice> (names.at (preset), sampleRate, seed);
