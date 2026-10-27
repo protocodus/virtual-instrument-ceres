@@ -244,6 +244,8 @@ if(CERES_BUILD_TOOLS)
     add_executable(RenderCeresPresetDemos Tools/RenderPresetDemos.cpp)
     find_package(Threads REQUIRED)
     target_link_libraries(RenderCeresPresetDemos PRIVATE ceres_native Threads::Threads)
+    # PluginControls.h names the programs the demos carry.
+    target_include_directories(RenderCeresPresetDemos PRIVATE Source)
     set_target_properties(RenderCeresPresetDemos PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
     if(MSVC)
         target_compile_options(RenderCeresPresetDemos PRIVATE /W4 /permissive-)

@@ -10,10 +10,35 @@
 // below still becomes a parameter, in the Engine group under its own key, so
 // the plug-in always exposes exactly the engine's parameter list.
 
+#include <cctype>
 #include <cstring>
+#include <string>
 
 namespace ceres_plugin
 {
+// The program name a host lists for an engine preset key, which the README
+// demos use too: "string1" -> "String 1", "electric_piano" -> "Electric Piano".
+inline std::string programName (const std::string& key)
+{
+    std::string name;
+    bool wordStart = true;
+    for (std::size_t i = 0; i < key.size(); ++i)
+    {
+        const auto c = static_cast<unsigned char> (key[i]);
+        if (c == '_' || c == '-')
+        {
+            name += ' ';
+            wordStart = true;
+            continue;
+        }
+        if (std::isdigit (c) && i > 0 && ! std::isdigit (static_cast<unsigned char> (key[i - 1])))
+            name += ' ';
+        name += static_cast<char> (wordStart ? std::toupper (c) : c);
+        wordStart = false;
+    }
+    return name;
+}
+
 enum class Unit
 {
     Plain,       // the engine's own number

@@ -24,6 +24,7 @@ the sources because the DSP changed.
 """
 import argparse
 from pathlib import Path
+import re
 import struct
 import sys
 
@@ -112,7 +113,7 @@ def funky1():
     return notes + [(16.5, 18, key) for key in (43, 50, 55)]
 
 
-# Program number (the file's <NN>) and research-table name of each demo.
+# Program number (the file's <NN>) and research-table key of each demo.
 DEMOS = [(1, 'init', init), (2, 'string1', string1), (4, 'brass1', brass1), (6, 'flute', flute),
          (7, 'electric_piano', electric_piano), (8, 'clavichord', clavichord),
          (10, 'guitar1', guitar1), (12, 'funky1', funky1)]
@@ -153,12 +154,30 @@ def check(notes):
     assert 5.5 <= max(end for _, end, _ in notes) * 0.5 <= 9.25, 'phrase ends outside 5.5-9.25 s'
 
 
+def program_name(key):
+    """The plug-in's program name, as ceres_plugin::programName in Source/PluginControls.h."""
+    name, word_start = '', True
+    for i, c in enumerate(key):
+        if c in '_-':
+            name, word_start = name + ' ', True
+            continue
+        if c.isdigit() and i > 0 and not key[i - 1].isdigit():
+            name += ' '
+        name, word_start = name + (c.upper() if word_start else c), False
+    return name
+
+
+def slug(name):
+    # The renderer's slug rule: lowercase alphanumerics, other runs as one '-'.
+    return re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')
+
+
 def files():
     result = {}
-    for number, name, phrase in DEMOS:
+    for number, key, phrase in DEMOS:
         notes = phrase()
         check(notes)
-        result[f'{number:02}-{name.replace("_", "-")}.mid'] = midi(name, notes)
+        result[f'{number:02}-{slug(program_name(key))}.mid'] = midi(key, notes)
     return result
 
 

@@ -12,14 +12,14 @@ The CI-generated demos below play **eight of the circuit engine's 14 research pr
 
 | # | Preset | Demo | Length | Peak |
 | --- | --- | --- | --- | --- |
-| 1 | init | [01-init.wav](Docs/audio/01-init.wav) | 10.5 s | -9.5 dBFS |
-| 2 | string1 | [02-string1.wav](Docs/audio/02-string1.wav) | 11.2 s | -10.6 dBFS |
-| 4 | brass1 | [04-brass1.wav](Docs/audio/04-brass1.wav) | 10.2 s | -11.9 dBFS |
-| 6 | flute | [06-flute.wav](Docs/audio/06-flute.wav) | 9.7 s | -19.8 dBFS |
-| 7 | electric_piano | [07-electric-piano.wav](Docs/audio/07-electric-piano.wav) | 11.0 s | -7.2 dBFS |
-| 8 | clavichord | [08-clavichord.wav](Docs/audio/08-clavichord.wav) | 11.5 s | -13.2 dBFS |
-| 10 | guitar1 | [10-guitar1.wav](Docs/audio/10-guitar1.wav) | 11.8 s | -14.2 dBFS |
-| 12 | funky1 | [12-funky1.wav](Docs/audio/12-funky1.wav) | 11.5 s | -16.7 dBFS |
+| 1 | Init | [01-init.wav](Docs/audio/01-init.wav) | 10.5 s | -9.5 dBFS |
+| 2 | String 1 | [02-string-1.wav](Docs/audio/02-string-1.wav) | 11.2 s | -10.6 dBFS |
+| 4 | Brass 1 | [04-brass-1.wav](Docs/audio/04-brass-1.wav) | 10.2 s | -11.9 dBFS |
+| 6 | Flute | [06-flute.wav](Docs/audio/06-flute.wav) | 9.7 s | -19.8 dBFS |
+| 7 | Electric Piano | [07-electric-piano.wav](Docs/audio/07-electric-piano.wav) | 11.0 s | -7.2 dBFS |
+| 8 | Clavichord | [08-clavichord.wav](Docs/audio/08-clavichord.wav) | 11.5 s | -13.2 dBFS |
+| 10 | Guitar 1 | [10-guitar-1.wav](Docs/audio/10-guitar-1.wav) | 11.8 s | -14.2 dBFS |
+| 12 | Funky 1 | [12-funky-1.wav](Docs/audio/12-funky-1.wav) | 11.5 s | -16.7 dBFS |
 
 <!-- audio-demos-end -->
 
