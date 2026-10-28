@@ -13,12 +13,12 @@ The CI-generated demos below play **eight of the circuit engine's 14 research pr
 | # | Preset | Demo | Length | Peak |
 | --- | --- | --- | --- | --- |
 | 1 | Init | [01-init.wav](Docs/audio/01-init.wav) | 10.5 s | -9.5 dBFS |
-| 2 | String 1 | [02-string-1.wav](Docs/audio/02-string-1.wav) | 11.2 s | -10.6 dBFS |
+| 2 | String 1 | [02-string-1.wav](Docs/audio/02-string-1.wav) | 11.2 s | -10.5 dBFS |
 | 4 | Brass 1 | [04-brass-1.wav](Docs/audio/04-brass-1.wav) | 10.2 s | -11.9 dBFS |
-| 6 | Flute | [06-flute.wav](Docs/audio/06-flute.wav) | 9.7 s | -19.8 dBFS |
-| 7 | Electric Piano | [07-electric-piano.wav](Docs/audio/07-electric-piano.wav) | 11.0 s | -7.2 dBFS |
+| 6 | Flute | [06-flute.wav](Docs/audio/06-flute.wav) | 9.7 s | -19.9 dBFS |
+| 7 | Electric Piano | [07-electric-piano.wav](Docs/audio/07-electric-piano.wav) | 11.0 s | -7.1 dBFS |
 | 8 | Clavichord | [08-clavichord.wav](Docs/audio/08-clavichord.wav) | 11.5 s | -13.2 dBFS |
-| 10 | Guitar 1 | [10-guitar-1.wav](Docs/audio/10-guitar-1.wav) | 11.8 s | -14.2 dBFS |
+| 10 | Guitar 1 | [10-guitar-1.wav](Docs/audio/10-guitar-1.wav) | 11.8 s | -13.3 dBFS |
 | 12 | Funky 1 | [12-funky-1.wav](Docs/audio/12-funky-1.wav) | 11.5 s | -16.7 dBFS |
 
 <!-- audio-demos-end -->
@@ -172,7 +172,7 @@ Reuse the previous sample's exact final `tanh` value at the next filter solve. C
 ## Downloads
 
 <!-- build-download-begin -->
-**[Download main build 47](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/40663604406/artifacts/12811325663)**, built from [`e2147cdb9fd8`](https://github.com/protocodus/virtual-instrument-ceres/commit/e2147cdb9fd85e41a6824d6fb79377de5fc18864). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
+**[Download main build 48](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/40733217704/artifacts/12835659285)**, built from [`0b100a60aca5`](https://github.com/protocodus/virtual-instrument-ceres/commit/0b100a60aca5580a83baa7402830b1b695ed4bac). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
 <!-- build-download-end -->
 
 ---
