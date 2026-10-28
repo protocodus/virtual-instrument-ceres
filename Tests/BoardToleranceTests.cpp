@@ -150,7 +150,7 @@ void defaultsShipTheVerdict() {
             defaults.boardEnvelopeTolerance==1 && defaults.boardEnvelopeTimeTolerance==1 &&
             defaults.boardVcaTolerance==1 && defaults.boardTemperatureRise==0,
             "every board residual ships; temperature does not");
-    for(const char* name:{"init","brass1","string1"}) {
+    for(const auto& name:ceres::presetNames()) {
         const auto preset=ceres::preset(name);
         require(preset.boardPitchTolerance==1 && preset.boardFilterTolerance==1 &&
                 preset.boardEnvelopeTolerance==1 && preset.boardEnvelopeTimeTolerance==1 &&
@@ -623,8 +623,9 @@ void everyVoiceIsItsOwnBoard() {
 // board to. Its time course has no source and is not checked here.
 void driftStaysInTheTuningBand() {
     const ceres::Patch defaults;
-    require(defaults.driftCents==1 && ceres::preset("brass1").driftCents==1,
-            "drift ships at the tuning tolerance, factory presets included");
+    require(defaults.driftCents==1,"drift ships at the tuning tolerance");
+    for(const auto& name:ceres::presetNames())
+        require(ceres::preset(name).driftCents==1,"every factory preset drifts as shipped");
     auto p=plain();p.driftCents=defaults.driftCents;p.vibratoCents=0;
     auto twice=p;twice.driftCents=2;
     // The four boards, then all sixteen voices: every board wanders.
