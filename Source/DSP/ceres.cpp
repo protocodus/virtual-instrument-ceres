@@ -174,10 +174,10 @@ double leverFraction(double x,double ratio) { return x/(1+x*(1-x)*ratio); }
 // network's input (SM2 p.26 wiring; p.22 for what MI drives). With the pedal
 // open the cell ties MI to MO, so the wiper works into the A-10k VOLUME track
 // with its 330 ohm foot in parallel with the 68k leg's 34k+2.2k: 8.04k, and
-// the whole mix sits 2.35dB low at mid-lever. A closed pedal raises that load
-// and straightens the taper; that coupling is not modelled.
+// the whole mix sits 2.35dB low at mid-lever. As the pedal closes, the cell
+// (ExpressionNetwork) takes MO off MI and the load rises toward 67k, so the
+// taper straightens: at a -16.5dB pedal the mid-lever sag is .64dB.
 constexpr double ringMixLoad=1/(1/(68e3/2+2.2e3)+1/(10e3+330));
-constexpr double ringMixLeverRatio=10e3/ringMixLoad;
 // Each pin 7 has 220k to its preset Q bus, 220k to RES and 10uF (SM1 p.14;
 // SM2 p.16), and pin 7 takes current into a low impedance. The CS-30 drives
 // the same IG00156's VQ through 22k into a 390-470 ohm rank shunt with 10uF
@@ -1158,6 +1158,8 @@ constexpr double expressionCurve[]={0,-1.4,-3.8,-7.2,-11.5,-16.5,-22,-27.3,-32.4
 struct ExpressionNetwork {
     double b0=1,b1=0,b2=0,a1=0,a2=0;
     double x1=0,x2=0,y1=0,y2=0;
+    // MI's midband load on the MODULATION wiper (see ringMixLoad).
+    double load=ringMixLoad;
     void clear() { x1=x2=y1=y2=0; }
     void configure(double expression,double fs) {
         const double travel=clamp(1-expression,0.0,1.0)*10;
@@ -1169,6 +1171,9 @@ struct ExpressionNetwork {
         const double pass=g*g/(2*g+gs), shunted=g-pass;
         const double gain=std::pow(10,decibels/20);
         const double cell=(gain*(shunted+gl)-pass)/(1-gain);
+        // MI's own current, 1V in: the 68k to the midpoint and the cell to MO.
+        const double mo=gain, mid=g*(1+mo)/(2*g+gs);
+        load=1/(g*(1-mid)+cell*(1-mo));
         const double tau=expressionShunt*expressionShuntCap;
         const double sum=cell+g+gl;
         const double n0=2*g*cell+g*g, n1=(2*g*cell+g*g)*tau+cell*expressionShuntCap;
@@ -2487,8 +2492,9 @@ struct Synth::Impl {
         ringSignalOutput=ringSignalPair(ringSignalInput);
         const double wet=ringWetGain*ringWetCoupling.process(ringSignalOutput*ringSwitchGain,ringWetCoefficients);
         // Explicit bypass avoids even a rounding change for old patches.
+        const double ringMixRatio=10e3/(patch.expression>=1 ? ringMixLoad : expression.load);
         const double ringed=patch.ringMix==0 ? bus
-            : (bus+patch.ringMix*(wet-bus))/(1+patch.ringMix*(1-patch.ringMix)*ringMixLeverRatio);
+            : (bus+patch.ringMix*(wet-bus))/(1+patch.ringMix*(1-patch.ringMix)*ringMixRatio);
         // MI to MO. A fully open pedal is the fully conducting cell, which is
         // the path this engine was calibrated on, so it stays a bare wire.
         const double expressed=patch.expression>=1 ? ringed : expression.process(ringed);

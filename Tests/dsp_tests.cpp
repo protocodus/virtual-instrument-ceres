@@ -1106,6 +1106,30 @@ void ringAudioAndFreeCarrier() {
     const double sag=1+.25*10e3/(1/(1/(68e3/2+2.2e3)+1/(10e3+330)));
     for(std::size_t i=0;i<m.size();++i)
         require(std::abs(m[i]-.5*(w[i]+d[i])/sag)<1e-7,"Ring blend is the loaded lever's crossfade before the common rail");
+    {   // Half-closed pedal: the cell (from the printed -16.5dB at travel .5)
+        // takes MO off MI, so MI loads the lever less. MI's midband load by
+        // nodal analysis, 1V at MI: the 68k-68k leg's midpoint with 2.2k to
+        // ground (.33uF short), MO with the cell to MI and 10.33k to ground.
+        const double g=1/68e3,gs=1/2.2e3,gl=1/(10e3+330);
+        const auto nodes=[&](double cell) {
+            const double a=2*g+gs,b=-g,c=-g,e=cell+g+gl,det=a*e-b*c;
+            return std::make_pair((g*e-b*cell)/det,(a*cell-c*g)/det); // midpoint, MO
+        };
+        double low=1e-12,high=1;
+        for(unsigned i=0;i<200;++i){const double cell=std::sqrt(low*high);
+            (nodes(cell).second<std::pow(10,-16.5/20) ? low : high)=cell;}
+        const auto [mid,mo]=nodes(low);
+        const double closedLoad=1/(g*(1-mid)+low*(1-mo));
+        require(closedLoad>3.5*8.04e3,"A half-closed pedal lifts MI's load several times");
+        const double closedSag=1+.25*10e3/closedLoad;
+        auto q=p;q.expression=.5;
+        ceres::Synth cw(fs,71),cd(fs,71),cm(fs,71);
+        q.ringMix=1;cw.setPatch(q);q.ringMix=0;cd.setPatch(q);q.ringMix=.5;cm.setPatch(q);
+        cw.noteOn(69);cd.noteOn(69);cm.noteOn(69);render(cw,120000);render(cd,120000);render(cm,120000);
+        const auto x=render(cw,8000),y=render(cd,8000),z=render(cm,8000);
+        for(std::size_t i=0;i<z.size();++i)
+            require(std::abs(z[i]-.5*(x[i]+y[i])/closedSag)<1e-7,"The lever's load follows the pedal's cell");
+    }
     const double low=toneMagnitude(w,393,fs),high=toneMagnitude(w,487,fs);
     require(low>1 && high>1 && std::abs(low/high-1)<.02,"Balanced product produces both sum/difference sidebands");
     // Physical upper-pair steering has a typical-part DC offset and therefore
