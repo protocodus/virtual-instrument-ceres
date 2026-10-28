@@ -13,17 +13,26 @@ The CI-generated demos below play **eight of the circuit engine's 14 research pr
 | # | Preset | Demo | Length | Peak |
 | --- | --- | --- | --- | --- |
 | 1 | Init | [01-init.wav](Docs/audio/01-init.wav) | 10.5 s | -9.5 dBFS |
-| 2 | String 1 | [02-string-1.wav](Docs/audio/02-string-1.wav) | 11.2 s | -10.6 dBFS |
+| 2 | String 1 | [02-string-1.wav](Docs/audio/02-string-1.wav) | 11.2 s | -10.5 dBFS |
 | 4 | Brass 1 | [04-brass-1.wav](Docs/audio/04-brass-1.wav) | 10.2 s | -11.9 dBFS |
-| 6 | Flute | [06-flute.wav](Docs/audio/06-flute.wav) | 9.7 s | -19.8 dBFS |
-| 7 | Electric Piano | [07-electric-piano.wav](Docs/audio/07-electric-piano.wav) | 11.0 s | -7.2 dBFS |
+| 6 | Flute | [06-flute.wav](Docs/audio/06-flute.wav) | 9.7 s | -19.9 dBFS |
+| 7 | Electric Piano | [07-electric-piano.wav](Docs/audio/07-electric-piano.wav) | 11.0 s | -7.1 dBFS |
 | 8 | Clavichord | [08-clavichord.wav](Docs/audio/08-clavichord.wav) | 11.5 s | -13.2 dBFS |
-| 10 | Guitar 1 | [10-guitar-1.wav](Docs/audio/10-guitar-1.wav) | 11.8 s | -14.2 dBFS |
+| 10 | Guitar 1 | [10-guitar-1.wav](Docs/audio/10-guitar-1.wav) | 11.8 s | -13.3 dBFS |
 | 12 | Funky 1 | [12-funky-1.wav](Docs/audio/12-funky-1.wav) | 11.5 s | -16.7 dBFS |
 
 <!-- audio-demos-end -->
 
 ## Version history
+
+### 1.1.0 — 2026-10-28 — circuit realism
+
+- A new key takes the board whose key went up longest ago, as the key assigner's "old key off" detector does, instead of the quietest one: a long note's tail is now cut before a shorter, younger one. The assigner reads keys, not envelopes.
+- The ring MODULATION lever's mid-travel dip follows the expression pedal: 2.35 dB with the pedal open, as before, shrinking as it closes (0.64 dB at a −16.5 dB pedal). Both lever ends and an open pedal are unchanged.
+- An overdriven EXT IN signal slews at the preamp op-amp's 1 V/µs, so a clipped square reaches the SUB as a trapezoid. A signal the slew rate does not limit passes bit for bit as before.
+- The four boards' cutoffs now lift each other through the shared FH and FL rows: up to 0.1 octave with four boards' filter EGs at +5 V near the lever's floor, 0.009 octave with the lever at 1 V. On the factory presets the change sits at least 62 dB below the signal; a patch with nothing lifting the rows is unchanged. `modulationState()` reports the rows as `hpBus` and `lpBus`.
+- Portamento's integrator legs follow the KAS clock trims, 6 Hz at LONG and 6 kHz at SHORT, from the CS-60's alignment of the same board, instead of the CS-50 manual's conflicting figure: up to 54 steps/s a glide runs on the 108.9 ms leg, above that on the 13.6 ms one, and no `glide_rate` reaches the direct gate, so portamento no longer steps. At the default rate of 24 a glide is one smooth curve trailing the counter by about 0.1 s instead of a rippled staircase. Patches with `glide_mode` 1 change; taken on the owner's word after an A/B set ([decision log](Docs/decisions.md)).
+- [Sources and measurements](Docs/research/circuit-realism-2026-10-28.md) and [before/after previews](Docs/audio/previews/2026-10-28-circuit-realism/README.md).
 
 ### 1.0.5 — 2026-10-23 — built the way the Rack builds it
 
@@ -163,7 +172,7 @@ Reuse the previous sample's exact final `tanh` value at the next filter solve. C
 ## Downloads
 
 <!-- build-download-begin -->
-**[Download main build 46](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/40516581105/artifacts/12767057747)**, built from [`5856bed4e1a0`](https://github.com/protocodus/virtual-instrument-ceres/commit/5856bed4e1a0382a87f4a187b0d9f854037033e1). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
+**[Download main build 48](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/40733217704/artifacts/12835659285)**, built from [`0b100a60aca5`](https://github.com/protocodus/virtual-instrument-ceres/commit/0b100a60aca5580a83baa7402830b1b695ed4bac). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
 <!-- build-download-end -->
 
 ---
@@ -230,9 +239,11 @@ Live `ring_depth` changes interpolate over 20 ms in the digital control domain. 
 
 The ring envelope triggers when the first physical key is pressed after all keys have been released. Additional held keys do not retrigger it, including a key that finds no free voice. Final key-up returns its frequency envelope toward zero through a fixed release of 0.46 s T60: the PRA holds the release voltage fixed, on an envelope law Yamaha aligns to a 31 ms attack at ATTACK TIME 5 V (the CS-80 procedure for the same circuit); the carrier phase keeps running. The total carrier is bounded at 220 Hz, so SPEED and DEPTH interact near that limit. The multiplier's input pair limits as the µA796's does, on a bus scale taken from the voice-board alignment: four-note chords compress it by at most about 1 %, while touch LEVEL and extra virtual voices push it into its limit. This is a circuit-informed balanced-multiplier model with an envelope alignment taken from the CS-80 and a provisional wet gain.
 
+`ring_mix` is the MODULATION lever's travel. The lever is a 10 kΩ pot whose wiper feeds the expression network, so its own track sags the mix in mid-travel: 2.35 dB down at mid-lever with the pedal open, where the photo-cell ties the network to the VOLUME track (8.04 kΩ). Closing the pedal takes that path away and the load rises toward 67 kΩ, so the sag shrinks: 1.25 dB at a −7 dB pedal, 0.64 dB at −16.5 dB. The cell's resistance is the one the printed pedal curve requires (see `expression`), not a CdS law.
+
 The selected SUB waveform drives VCO, VCF, VCA and pressure vibrato. Noise uses the documented 22k/0.1µF low-pass and a fixed engineering level; it is independent of SUB rate and audio Noise mix. PWM retains its separate sine oscillator.
 
-FUNCTION EXT (`lfo_waveform` 5) takes the SUB signal from the rear EXT IN jack instead, through the same routes. A front end feeds one sample per host frame with `Synth::externalInput()` before each `process()`. One unit is 1.5 V/101, about 14.9 mV at the jack: the ×101 EXT preamp lifts it to the internal waveforms' 1.5 V peak, so a ±1 signal at `ext_level` 1 modulates as deeply as the internal SUB. The preamp's 10 µF output capacitor high-passes the signal at 0.32 Hz while EXT is selected and keeps its charge when FUNCTION moves away (0.16 Hz there). The preamp and the SUI buffer clip at their datasheet-typical swings, 9.33 and 8.67 units, an estimate. The LEVEL pot's taper is not published, so `ext_level` is its wiper ratio rather than its travel. The internal waveforms ignore the jack, and EXT with nothing fed is a silent SUB. See [the SUB research note](Docs/research/sub-authenticity-2026-10-20.md).
+FUNCTION EXT (`lfo_waveform` 5) takes the SUB signal from the rear EXT IN jack instead, through the same routes. A front end feeds one sample per host frame with `Synth::externalInput()` before each `process()`. One unit is 1.5 V/101, about 14.9 mV at the jack: the ×101 EXT preamp lifts it to the internal waveforms' 1.5 V peak, so a ±1 signal at `ext_level` 1 modulates as deeply as the internal SUB. The preamp's 10 µF output capacitor high-passes the signal at 0.32 Hz while EXT is selected and keeps its charge when FUNCTION moves away (0.16 Hz there). The preamp and the SUI buffer clip at their datasheet-typical swings, 9.33 and 8.67 units, and the preamp slews at its op-amp's datasheet-typical 1 V/µs, so an overdriven input, the usual case at ×101, reaches SUI with 28 µs edges rather than a square's; both are estimates. The LEVEL pot's taper is not published, so `ext_level` is its wiper ratio rather than its travel. The internal waveforms ignore the jack, and EXT with nothing fed is a silent SUB. See [the SUB research note](Docs/research/sub-authenticity-2026-10-20.md).
 
 In Sustain II, released/free boards follow the last assigned key in both oscillator pitch and filter tracking. Their envelope charge, gates, oscillator phase and filter state remain continuous. Entering II applies this immediately; returning to I captures the current key voltage. MIDI-damper-held boards remain protected until pedal-up, an explicit software adaptation rather than recovered Yamaha allocation behavior. This selector is distinct from `global_release` and MIDI damper gating.
 
@@ -251,6 +262,8 @@ The first two controls use an explicitly anchored stiff-source model, not recove
 
 Neutral offsets, common level 1 and output trim 0 preserve the prior paths when the intentionally corrected SUB filter route is inactive. The output trim is a modern linear utility, not part of the analog model; it adds no limiter and cannot promise a fixed peak under arbitrary MIDI. The [source audit](Docs/research/sound-path-gap-audit-2026-10-18.md) distinguishes known resistor/capacitor relationships from provisional control calibration.
 
+The four boards' cutoffs share the FH and FL rows. A board's VCF EG, touch, SUB and BRILLIANCE lift its filter chip's control node, which then draws less from the row through its 39k, so the row and every board's cutoff rise a little; `modulationState()` reports the rise as `hpBus` and `lpBus`. Near the PANEL lever's floor, four boards at +5 V of LP EG raise each other's cutoff by 0.1 octave; higher up the lever's diode holds the row, to 0.009 octave with the lever at 1 V. The rows always carry the four physical boards, idle ones at their EG's initial level, at any voice count; further voices follow the rows without loading them. With nothing lifting them the cutoffs are exactly the patch's.
+
 ### Portamento, glissando and the key assigner
 
 | Key | Range | Default | Meaning |
@@ -258,11 +271,11 @@ Neutral offsets, common level 1 and output trim 0 preserve the prior paths when 
 | `glide_mode` | 0..2 | 0 | Off, Portamento, Glissando |
 | `glide_rate` | 1..200 semitones/s | 24 | Glissando counter clock |
 
-The CS-50 builds each board's key voltage in the KAS board (Servicing Guide printed pp.22–25). The assigner's key code passes a glissando counter, an integrating gate and a sample-hold, then reaches the VCO and both filters. Ceres follows that order. The counter steps one semitone at a time toward the board's assigner key at `glide_rate`. Glissando sends each step straight on. Portamento integrates the stepped key voltage with a time constant of one step period, which matches the guide's statement that the integrating rate is matched to the counter rate. The key voltage is linear in Hz, so the glide approaches its target exponentially in Hz rather than in pitch.
+The CS-50 builds each board's key voltage in the KAS board (Servicing Guide printed pp.22–25). The assigner's key code passes a glissando counter, an integrating gate and a sample-hold, then reaches the VCO and both filters. Ceres follows that order. The counter steps one semitone at a time toward the board's assigner key at `glide_rate`. Glissando sends each step straight on. Portamento integrates the stepped key voltage through the gate the lever's comparators select (printed p.25): the 3.3 MΩ into 0.033 µF, 108.9 ms, below 54 steps/s, and 470 kΩ‖3.3 MΩ, 13.6 ms, up to `glide_rate`'s top of 200. The direct gate, where portamento would step like glissando, lies beyond that. The key voltage is linear in Hz, so the glide approaches its target exponentially in Hz rather than in pitch.
 
-Free channels carry the last-pressed key, so a newly assigned board glides from the previous key. While its key is down, or in Sustain II, the sample-hold follows the glide. In Sustain I it freezes the pitch at key-off. The guide's 470 kΩ/3.3 MΩ/1 µF integrator and the comparator table fix the topology but not the clock: the counter oscillator's control law is not printed, so `glide_rate` is an engineering rate, not a calibrated lever.
+Free channels carry the last-pressed key, so a newly assigned board glides from the previous key. While its key is down, or in Sustain II, the sample-hold follows the glide. In Sustain I it freezes the pitch at key-off. The comparator thresholds sit on a counter clock taken as log-linear across the lever between the KAS board's trims, 6 Hz at LONG and 6 kHz at SHORT. Those trims are the CS-60's alignment of the same board (sibling evidence), taken over the CS-50 manual's conflicting 11 s to 1.4 ms on the owner's word ([decision log](Docs/decisions.md)). The law between them is not printed, so `glide_rate` is the clock rate, not a lever position.
 
-The assigner only writes a new key into a channel whose code differs from that key and whose key is up (guide pp.17–18). A released board that still holds the pressed key is therefore re-keyed first, then an idle board, then the quietest released board, then the oldest damper-held board (its key is up). A key pressed while every board's key is down is not stored (guide p.19 timing chart): it does not sound, and it does not start later when a board frees. Keys pressed together are encoded higher note first (guide p.16), so a key arriving in the same sample as a lower stored key takes that key's board: a simultaneous five-note chord keeps its four highest notes, whatever order the MIDI events arrive in.
+The assigner only writes a new key into a channel whose code differs from that key and whose key is up (guide pp.17–18). A released board that still holds the pressed key is therefore re-keyed first, then the free board whose key went up longest ago (boards not yet played count as oldest, in board order), then the oldest damper-held board (its key is up). The assigner sees keys only, never an envelope, so a board still sounding its release is as free as a silent one: the chip's block diagram names an "Old Key OFF CH Detector" (IC Guide, YM26600) and the guide's p.19 chart gives the next key to the channel released first. A key pressed while every board's key is down is not stored (guide p.19 timing chart): it does not sound, and it does not start later when a board frees. Keys pressed together are encoded higher note first (guide p.16), so a key arriving in the same sample as a lower stored key takes that key's board: a simultaneous five-note chord keeps its four highest notes, whatever order the MIDI events arrive in.
 
 ### Velocity expression
 
@@ -295,8 +308,9 @@ The editor (1080×750) is laid out like the CS-50 panel: the tone-selector table
 - A unit can be neither seen nor chosen; only a saved state brings one back. Sixteen voices at 4× can need more than a whole CPU core at 48 kHz; `voice_count` and `oversampling` trade CPU for polyphony and alias rejection.
 - Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. The ring envelope's alignment voltage and the output level meter's load come from the CS-80's procedure for the same circuits; no CS-50 document states them. The RESONANCE controls' 17 ms lag and the Q buses' loads take the filter chip's resonance pin as a 1.72 kΩ current input: the CS-30, CS-15 and CS-40M boards for the same chip show that it takes current, but its input resistance is inferred, not printed. See [DSP source and model limits](Docs/research/dsp-source.md) and the [audible circuit evidence](Docs/validation/audible-circuits-2026-10-19/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
-- EXT IN's host-rate signal is interpolated linearly inside the oversampled engine; the op-amp swings are datasheet typicals, and the EXT preamp's bandwidth and slew rate are not modelled. Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
-- The portamento/glissando clock rate and the noise limiter's bandwidth and slew rate are not calibrated.
+- EXT IN's host-rate signal is interpolated linearly inside the oversampled engine; the op-amp swings and the preamp's slew rate are datasheet typicals, and the preamp's 29.7 kHz closed-loop bandwidth is not modelled (under 0.5 dB at 10 kHz). Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
+- The cutoff rows are solved behind the PANEL lever's follower and diode. A patch does not say whether a tablet set its cutoff, and a tablet's column couples the boards more: 0.07–0.09 octave with four boards at +5 V of LP EG on the weaker columns.
+- The portamento clock is taken as log-linear between the CS-60's LONG and SHORT trims, and `glide_rate` covers 1–200 steps/s of the lever's 6 Hz–6 kHz. The noise limiter's bandwidth and slew rate are not calibrated.
 
 ## Build
 

@@ -34,11 +34,13 @@ void advance(ceres::Synth& s,unsigned n=16) {
     for(unsigned i=0;i<n;++i)require(std::isfinite(s.process()),"Finite expression audio");
 }
 void checkVoice(const ceres::Synth& s,unsigned board,double velocity,const ceres::Patch& p) {
-    const auto v=s.voiceState()[board];
+    const auto v=s.voiceState()[board];const auto m=s.modulationState();
+    // Plus the shared rows' rise under all four boards' touch, which
+    // Ceres.sound_path_circuit_contracts solves from the network.
     const double key=(v.keyNote-60)*p.keyTrack/12+p.tuneCents/1200;
-    near(v.hpFrequency,floorHz+(p.hpCutoff-floorHz)*std::exp2(key+velocity*p.pressureFilter*hpTouch),1e-10,
+    near(v.hpFrequency,floorHz+(p.hpCutoff-floorHz)*std::exp2(key+velocity*p.pressureFilter*hpTouch+m.hpBus),1e-10,
          "HP tracks the board's latched expression above the fixed gm floor");
-    near(v.lpFrequency,floorHz+(p.lpCutoff-floorHz)*std::exp2(key+velocity*p.pressureFilter),1e-9,
+    near(v.lpFrequency,floorHz+(p.lpCutoff-floorHz)*std::exp2(key+velocity*p.pressureFilter+m.lpBus),1e-9,
          "LP tracks the board's latched expression above the fixed gm floor");
     const double cents=s.modulationState().sub*(p.vibratoCents+velocity*p.pressureVibrato)
         +velocity*p.pressureVibrato*vibratoBias+p.tuneCents;
@@ -69,11 +71,12 @@ void polyphonyIsolation() {
         const double d=a.process()-b.process();audioDifference+=d*d;
         for(unsigned i=0;i<4;++i) {
             checkVoice(a,i,velocities[i],p);checkVoice(b,i,i==1?.9:velocities[i],p);
+            // Board 1's touch lifts the shared cutoff rows under every board,
+            // so the others' filters move with the rows alone (checkVoice).
             if(i!=1) {
                 const auto x=a.voiceState()[i],y=b.voiceState()[i];
-                require(x.oscillatorPhase==y.oscillatorPhase && x.hpFrequency==y.hpFrequency &&
-                        x.lpFrequency==y.lpFrequency && x.ampEnvelope==y.ampEnvelope,
-                        "One note's velocity must not change another board's oscillator/filter/envelope");
+                require(x.oscillatorPhase==y.oscillatorPhase && x.ampEnvelope==y.ampEnvelope,
+                        "One note's velocity must not change another board's oscillator/envelope");
             }
         }
     }
@@ -158,8 +161,12 @@ void audioLawsAndZeroDepth() {
         // Touch LEVEL adds 1.08 x depth x touch to LEVEL at common VCA2 (R7 LC).
         if(route==0){equivalent.ampLevel=p.ampLevel+(6/150e3)/(10/270e3)*v*p.pressureVolume;equivalent.pressureVolume=0;}
         if(route==1) {
-            equivalent.hpCutoff=floorHz+(p.hpCutoff-floorHz)*std::exp2(v*p.pressureFilter*hpTouch);
-            equivalent.lpCutoff=floorHz+(p.lpCutoff-floorHz)*std::exp2(v*p.pressureFilter);
+            // The board's touch also lifts the shared cutoff rows, which a
+            // static cutoff does not; add their rise as checkVoice does.
+            ceres::Synth lifted(8000,6);lifted.setPatch(p);lifted.noteOn(60,v);lifted.process();
+            const auto rows=lifted.modulationState();
+            equivalent.hpCutoff=floorHz+(p.hpCutoff-floorHz)*std::exp2(v*p.pressureFilter*hpTouch+rows.hpBus);
+            equivalent.lpCutoff=floorHz+(p.lpCutoff-floorHz)*std::exp2(v*p.pressureFilter+rows.lpBus);
             equivalent.pressureFilter=0;
         }
         // The touch vibrato's +.5V centre is a VCO-only offset, as TRANSPOSE is.
@@ -195,7 +202,7 @@ void audioLawsAndZeroDepth() {
 int main() {
     try {
         rangeContract();std::cout<<"PASS expression enum/default/nonfinite contract\n";
-        polyphonyIsolation();std::cout<<"PASS mixed-velocity polyphony oscillator/filter/audio isolation\n";
+        polyphonyIsolation();std::cout<<"PASS mixed-velocity polyphony: oscillator/envelope isolation, filters joined only by the shared rows\n";
         lifecycle();std::cout<<"PASS expression release, repeated notes, pedal, Sustain II, steal, panic and reset\n";
         pressureIsolationAndLiveSelection();std::cout<<"PASS pressure isolation and state-preserving live source selection\n";
         touchRc();std::cout<<"PASS touch follows the 10ms pre-amplifier RC\n";

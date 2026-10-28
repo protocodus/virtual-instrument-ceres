@@ -24,6 +24,51 @@ double advance(ceres::Synth& synth,unsigned frames) {
     return energy;
 }
 
+// The shared FH and FL rows (T71, SM2 printed p.11) reach each board's pin-4
+// node through 39k (R7, SM1 printed p.14), beside the node's own resistors
+// (SM2 printed p.16 at rank B with the trim centred; EG 220k HP, 47k LP on
+// the Overall drawing). The PANEL follower drives a row through a 1S1555,
+// taken as the engine's 1N4148-class estimate, with 10k to ground. Kirchhoff
+// at the row and at every node, solved by bisection: a board whose sources
+// lift its node draws less from the row, so the row rises under every board.
+// A node's sources are given as the current they inject: the EG and BR
+// through their resistors, SUB and touch as the octaves they give times
+// 1/39k (the nodal ratio brillianceAndSubKcl checks).
+struct BusNetwork {
+    std::vector<double> shunts; // node resistors to 0V, every source's included
+    double eg,br,share; // EG and BR resistors; the SUB/touch share of LP's
+    double nodeConductance() const {double g=0;for(double r:shunts)g+=1/r;return g;}
+    double inject(double eg,double br,double subTouchOctaves) const {
+        return eg/this->eg+br/this->br+share*subTouchOctaves/39e3;
+    }
+};
+constexpr double rowBranch=39e3,rowLoad=10e3,diodeIs=2.52e-9,diodeNvt=1.75*25.85e-3;
+double rowCurrent(const BusNetwork& n,double row,const std::vector<double>& injected) {
+    double i=row/rowLoad;
+    for(double in:injected)i+=(row-(row/rowBranch+in)/(1/rowBranch+n.nodeConductance()))/rowBranch;
+    return i;
+}
+// The row voltage for a source behind the diode, given what each of the four
+// physical boards injects into its node.
+double rowVolts(const BusNetwork& n,double source,const std::vector<double>& injected) {
+    double low=-20,high=20;
+    for(int i=0;i<200;++i) {
+        const double mid=.5*(low+high);
+        const double diode=diodeIs*std::expm1((source-mid)/diodeNvt);
+        (diode>rowCurrent(n,mid,injected) ? low : high)=mid;
+    }
+    return .5*(low+high);
+}
+// How far a row at rest volts (the patch's cutoff, 1 oct/V from 62.5Hz of gm)
+// rises when the boards inject these currents.
+double rowShift(const BusNetwork& n,double cutoffHz,const std::vector<double>& injected) {
+    const double rest=std::log2((cutoffHz-floorHz)/62.5);
+    const double source=rest+diodeNvt*std::log1p(rowCurrent(n,rest,std::vector<double>(4,0.))/diodeIs);
+    return rowVolts(n,source,injected)-rest;
+}
+const BusNetwork lpRow{{2.4e3,330e3+25e3,220e3,47e3,47e3,47e3,47e3},47e3,220e3,1};
+const BusNetwork hpRow{{2.2e3,330e3+25e3,680e3,150e3,150e3,150e3,220e3},220e3,680e3,47./150};
+
 void controlRanges() {
     ceres::Patch p;
     require(p.brilliance==0 && p.resonanceOffset==0 && p.ampLevel==1,"Neutral defaults");
@@ -66,10 +111,12 @@ void brillianceAndSubKcl() {
         p.boardFilterTolerance=0; // nominal IG00156 rank: the printed node ratios
         ceres::Synth s(8000,1);s.setPatch(p);s.noteOn(67);s.pitchBend(.3);
         for(unsigned n=0;n<250;++n) {
-            s.process();const auto v=s.voiceState()[0];const double lfo=s.modulationState().sub;
+            s.process();const auto v=s.voiceState()[0];const auto m=s.modulationState();const double lfo=m.sub;
+            // Less the shared rows' rise under all four boards' BR and SUB
+            // (sharedCutoffBuses checks that rise).
             const double key=(67-60+.3)*tracking/12+230./1200;
-            const double hpOct=std::log2((v.hpFrequency-floorHz)/(p.hpCutoff-floorHz))-key;
-            const double lpOct=std::log2((v.lpFrequency-floorHz)/(p.lpCutoff-floorHz))-key;
+            const double hpOct=std::log2((v.hpFrequency-floorHz)/(p.hpCutoff-floorHz))-key-m.hpBus;
+            const double lpOct=std::log2((v.lpFrequency-floorHz)/(p.lpCutoff-floorHz))-key-m.lpBus;
             near(hpOct,br*39000/680000+lfo*1.3*(47000./150000),2e-14,"HP actual summed control currents");
             near(lpOct,br*39000/220000+lfo*1.3,2e-14,"LP actual summed control currents");
         }
@@ -80,11 +127,16 @@ void brillianceAndSubKcl() {
     }
     // Full audio equivalence to the same physical static gm shift, not only
     // a disconnected diagnostic variable. No frequency boundary is active.
-    ceres::Patch p;p.hpCutoff=150;p.lpCutoff=1800;p.brilliance=-8;
+    // BR also lowers the shared rows under all four boards, so the static
+    // shift includes that; with the EG still, nothing else lifts a node.
+    ceres::Patch p;p.hpCutoff=150;p.lpCutoff=1800;p.brilliance=-8;p.filterInitial=p.filterPeak=0;
     p.boardFilterTolerance=0; // nominal rank: BR and a static shift match
+    const auto brRow=[](const BusNetwork& n,double cutoff) {
+        return rowShift(n,cutoff,std::vector<double>(4,n.inject(0,-8,0)));
+    };
     auto equivalent=p;equivalent.brilliance=0;
-    equivalent.hpCutoff=floorHz+(p.hpCutoff-floorHz)*std::exp2(-8*39000./680000);
-    equivalent.lpCutoff=floorHz+(p.lpCutoff-floorHz)*std::exp2(-8*39000./220000);
+    equivalent.hpCutoff=floorHz+(p.hpCutoff-floorHz)*std::exp2(-8*39000./680000+brRow(hpRow,p.hpCutoff));
+    equivalent.lpCutoff=floorHz+(p.lpCutoff-floorHz)*std::exp2(-8*39000./220000+brRow(lpRow,p.lpCutoff));
     ceres::Synth a(8000,71),b(8000,71);a.setPatch(p);b.setPatch(equivalent);a.noteOn(60);b.noteOn(60);
     for(unsigned i=0;i<2000;++i)near(a.process(),b.process(),2e-7,"BR must affect actual filter audio at correct gm position");
 }
@@ -222,8 +274,11 @@ void sharedSubPolarity() {
             // The .4 lever delivers .4/(1+.4*.6/3) of SUO into its 30k load.
             const double wiper=.4/(1+.4*.6*(10e3/30e3));
             near(gain,.8+wiper*(1.5/120e3)/(10/270e3)*source,2e-16,"Common gain swings around LEVEL by the loaded R7 120k/270k ratio");
-            near(lpOct,.4*source,2e-14,"Selected SUB feeds actual LP variable-gm control");
-            near(hpOct,.4*source*(47./150.),2e-14,"Selected SUB feeds actual HP variable-gm control");
+            // SUB lifts all four boards' nodes, and the shared rows with them.
+            const double lpRise=rowShift(lpRow,p.lpCutoff,std::vector<double>(4,lpRow.inject(0,0,.4*source)));
+            const double hpRise=rowShift(hpRow,p.hpCutoff,std::vector<double>(4,hpRow.inject(0,0,.4*source)));
+            near(lpOct,.4*source+lpRise,2e-14,"Selected SUB feeds actual LP variable-gm control");
+            near(hpOct,.4*source*(47./150.)+hpRise,2e-14,"Selected SUB feeds actual HP variable-gm control");
             if(source>.05) {
                 ++positive;require(gain>.8 && hpOct>0 && lpOct>0,"Positive shared SUB raises gain and both cutoffs");
             }
@@ -324,6 +379,61 @@ void postCircuitOutputTrim() {
     }
 }
 }
+void sharedCutoffBuses() {
+    // Lever at its floor (a 0V row, the diode at rest) and at a 1V row; four
+    // boards and six, of which only the four physical boards hang on the
+    // rows; each node source in turn: EG alone, then BR, SUB and touch beside it.
+    for(double rest:{0.,1.}) for(unsigned voices:{4u,6u}) for(unsigned sources=0;sources<4;++sources) {
+        const double br=sources==1 ? 6 : 0,sub=sources==2 ? .8 : 0,touch=sources==3 ? .5 : 0;
+        ceres::Patch p;p.keyTrack=0;p.filterInitial=0;p.filterPeak=5;
+        p.filterAttack=.004;p.filterDecay=.3;p.filterRelease=.2;
+        p.brilliance=br;p.filterLfo=sub;p.lfoRate=7;p.pressureFilter=1;
+        // Hardware EG couplings, so the engine's lift is the EG's own current.
+        p.lpEnvelopeScale=39./47;p.hpEnvelopeScale=39./220;
+        p.boardFilterTolerance=p.boardEnvelopeTolerance=0;
+        p.hpCutoff=p.lpCutoff=floorHz+62.5*std::exp2(rest);
+        ceres::Synth s(8000,1);require(s.configure(voices,1),"Bus engine configuration");s.setPatch(p);
+        s.pressure(touch);
+        const int notes[]={48,55,60,64,67,72};
+        for(unsigned n=0;n<4000;++n) {
+            if(n%400==0 && n/400<voices)s.noteOn(notes[n/400]);
+            s.process();
+            const auto all=s.allVoiceState();const auto m=s.modulationState();
+            // Touch follows the pre-amplifier's 10ms RC from 0.
+            const double pressure=touch*(1-std::pow(std::exp(-1/(8000*.01)),n+1));
+            const double octaves=m.sub*sub+pressure;
+            std::vector<double> lpIn,hpIn;
+            for(unsigned b=0;b<4;++b) {
+                const double eg=b<voices ? all[b].filterEnvelope : 0;
+                lpIn.push_back(lpRow.inject(eg,br,octaves));hpIn.push_back(hpRow.inject(eg,br,octaves));
+            }
+            const double lpShift=rowShift(lpRow,p.lpCutoff,lpIn),hpShift=rowShift(hpRow,p.hpCutoff,hpIn);
+            near(m.lpBus,lpShift,1e-9,"FL row rises with its boards' node sources");
+            near(m.hpBus,hpShift,1e-9,"FH row rises with its boards' node sources");
+            for(unsigned b=0;b<voices;++b) {
+                near(std::log2((all[b].lpFrequency-floorHz)/62.5),
+                     rest+lpShift+all[b].filterEnvelope*39/47+br*39/220+octaves,1e-9,
+                     "Every board's LP cutoff follows the shared row");
+                near(std::log2((all[b].hpFrequency-floorHz)/62.5),
+                     rest+hpShift+all[b].filterEnvelope*39/220+br*39/680+octaves*47/150,1e-9,
+                     "Every board's HP cutoff follows the shared row");
+            }
+            // The witness: at the floor, one board's EG near its peak lifts the others.
+            if(rest==0 && sources==0 && n==40)require(lpShift>.02 && all[1].lpFrequency>floorHz+62.5*1.01,
+                "One board's EG moves an idle board's cutoff");
+        }
+    }
+    // Nothing lifts the nodes: the rows stay where the patch put them, exactly.
+    ceres::Patch p;p.filterInitial=p.filterPeak=0;p.keyTrack=0;p.lpCutoff=300;p.hpCutoff=80;
+    p.boardFilterTolerance=0;
+    ceres::Synth s(8000,1);s.setPatch(p);s.noteOn(60);
+    for(unsigned n=0;n<800;++n) {
+        s.process();const auto m=s.modulationState();const auto v=s.voiceState()[0];
+        require(m.hpBus==0 && m.lpBus==0,"Unlifted rows do not move");
+        require(v.lpFrequency==300 && v.hpFrequency==80,"Unlifted cutoffs are the patch's");
+    }
+}
+
 int main() {
     try {
         controlRanges();std::cout<<"PASS new control ranges/neutral/invalid-input contract\n";
@@ -333,5 +443,6 @@ int main() {
         sharedSubPolarity();std::cout<<"PASS all five shared SUB polarities, continuous clock, lifecycle and reset\n";
         postCircuitOutputTrim();std::cout<<"PASS post-FIR utility trim linearity, neutral bypass and state/latency independence\n";
         expressionNetwork();std::cout<<"PASS expression photo-coupler bypass, printed level curve and its tone shaping\n";
+        sharedCutoffBuses();std::cout<<"PASS shared cutoff rows: every board's cutoff follows its neighbours' node lifts\n";
     } catch(const std::exception& e) {std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
 }

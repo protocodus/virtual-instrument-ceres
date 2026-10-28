@@ -204,8 +204,8 @@ struct Patch {
     // mix=0 preserves the previous signal path exactly; carrier phase is free.
     // mix is MODULATION lever travel: the B-10k crossfades dry against wet and
     // its own track loads the 8.04k it works into, so the whole mix sits
-    // 2.35dB low at mid-lever. Both ends stay exact. The load assumes the
-    // expression pedal open; closing it straightens the taper (not modelled).
+    // 2.35dB low at mid-lever with the expression pedal open. Closing the
+    // pedal raises that load and straightens the taper. Both ends stay exact.
     // Live digital Depth edits interpolate over20ms without restarting the EG
     // or carrier. Startup/reset precharge the saved value. This dezipper is a
     // DAW-control policy, not a measured component or physical timing law.
@@ -228,10 +228,10 @@ struct Patch {
     // one semitone at a time toward its assigner key at glideRate semitones/s.
     // Glissando sends the steps to the sample-hold; portamento integrates the
     // stepped key voltage, which is linear in Hz, through the gate the lever's
-    // comparators select: 108.9ms below 1.58 steps/s, 13.6ms below 43.2, and
+    // comparators select: 108.9ms below 54.2 steps/s, 13.6ms below 692, and
     // the direct gate above that, where portamento steps like glissando. Those
-    // two thresholds assume a log-linear counter clock, since the lever's
-    // PS-voltage law is not printed; glideRate is an engineering rate.
+    // thresholds assume a counter clock log-linear between the KAS trims'
+    // 6Hz LONG and 6kHz SHORT; glideRate is the clock, not a lever position.
     double glideMode = 0.0, glideRate = 24.0;
     // Modern optional expression routing: 0=channel aftertouch (default),
     // through the touch pre-amplifier's 10ms RC, 1=each board's latched
@@ -453,6 +453,9 @@ public:
         // the linear-pair equivalent of the signal pair's current split
         // (equal for small signals; the pair limits near .56V at pin 1).
         double ringSignalInput, ringSignalOutput;
+        // The FH and FL cutoff buses above their unlifted level, in bus volts
+        // (octaves at the lever's 1 oct/V before a board's own sensitivity).
+        double hpBus, lpBus;
     };
     struct SoundPathState {
         double resonanceVoltageOffset, hpResonance, lpResonance;

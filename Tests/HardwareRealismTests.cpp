@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstdio>
 #include <stdexcept>
+#include <vector>
 
 namespace {
 constexpr double pi=3.14159265358979323846;
@@ -62,18 +63,21 @@ void glissandoSteps() {
 
 // The lever's three integrator regimes (guide printed pp.24-25, SM2 p.3): the
 // 3.3M alone, 470k||3.3M, and the direct gate, each into the .033uF hold cap.
-// The thresholds follow from the printed 11s..1.4ms clock range over the
-// lever's -6.5..+8.5V, the log-linear clock law the engine assumes.
+// The thresholds follow from the KAS clock trims, 6Hz at LONG and 6kHz at
+// SHORT (CS-60 SM printed p.35, KAS IV), over the lever's -6.5..+8.5V, the
+// log-linear clock law the engine assumes.
 void glideIntegratorRegimes() {
-    const double slow=1/11., fast=1/1.4e-3;
+    const double slow=6, fast=6e3;
     auto rateAtPs=[&](double ps){return slow*std::pow(fast/slow,(ps+6.5)/15);};
-    near(rateAtPs(-1.72),1.584522156984606,1e-12,"Medium-gate threshold rate");
-    near(rateAtPs(3.81),43.24665787480699,1e-12,"Direct-gate threshold rate");
+    near(rateAtPs(-1.72),54.21896842333811,1e-12,"Medium-gate threshold rate");
+    near(rateAtPs(3.81),692.0719546926555,1e-12,"Direct-gate threshold rate");
     constexpr double fs=8000;
-    // One rate inside each regime, against an explicit counter and integrator.
-    for(auto band:{std::make_pair(1.5,3.3e6*.033e-6),
-                   std::make_pair(12.,(470e3*3.3e6/(470e3+3.3e6))*.033e-6),
-                   std::make_pair(100.,0.)}) {
+    // One rate inside each reachable regime, against an explicit counter and
+    // integrator. glide_rate tops out at 200 steps/s, still on the 470k gate:
+    // the direct gate lies beyond it.
+    for(auto band:{std::make_pair(12.,3.3e6*.033e-6),
+                   std::make_pair(100.,(470e3*3.3e6/(470e3+3.3e6))*.033e-6),
+                   std::make_pair(200.,(470e3*3.3e6/(470e3+3.3e6))*.033e-6)}) {
         const double rate=band.first,tau=band.second;
         ceres::Synth s(fs,3);require(s.configure(1,1),"Configure regime witness");
         auto p=plain();p.glideMode=1;p.glideRate=rate;s.setPatch(p);
@@ -97,7 +101,7 @@ void portamentoIntegratesHz() {
     auto p=plain();p.glideMode=1;p.glideRate=rate;s.setPatch(p);
     s.noteOn(48);
     double code=60,steps=0,voltage=1;
-    const double c=-std::expm1(-1/(fs*(470e3*3.3e6/(470e3+3.3e6))*.033e-6));
+    const double c=-std::expm1(-1/(fs*3.3e6*.033e-6));
     double previous=-1;
     for(unsigned n=0;n<unsigned(fs*3);++n) {
         if(code!=48){steps+=rate/fs;while(steps>=1&&code!=48){code-=1;steps-=1;}}else steps=0;
@@ -180,17 +184,73 @@ void simultaneousKeysKeepHighest() {
     }
 }
 
+// The KAS gives a new key to the free board whose key went up longest ago
+// (the YM26600's Old Key OFF CH Detector). Guide printed p.19: C2, G2, E3 and
+// A4 fill channels 1-4, A5 is not stored, A5, C2 and A4 are released and C#5
+// takes channel 1. Releasing A4 before C2 instead gives C#5 channel 4, which a
+// fixed channel preference would not.
+void keyOffOrderAssigns() {
+    for(bool reversed:{false,true}) {
+        ceres::Synth s(48000,5);s.setPatch(plain());
+        for(int note:{36,43,52,69,81}){s.noteOn(note);s.process();}
+        s.noteOff(81);s.noteOff(reversed?69:36);s.process();s.noteOff(reversed?36:69);s.process();
+        s.noteOn(73);
+        const auto v=s.allVoiceState();
+        const unsigned board=reversed?3:0;
+        require(v[board].held&&v[board].note==73,"The board released first takes the next key");
+        require(v[1].note==43&&v[2].note==52,"Held channels keep their keys");
+    }
+}
+
+// No envelope reaches the KAS (SM2 pp.3, 7): the same keys give the same
+// boards whatever the EGs do, a sounding release included.
+void assignmentIgnoresEnvelopes() {
+    struct Event {unsigned at;int note;bool on;};
+    static constexpr Event events[]={{0,60,true},{200,64,true},{400,67,true},{900,60,false},
+        {1000,72,true},{1100,64,false},{1150,72,false},{1400,76,true},{1500,79,true},
+        {1700,67,false},{1800,84,true},{2400,76,false},{2500,62,true},{2600,65,true}};
+    std::vector<std::array<int,4>> first;
+    bool witnessed=false;
+    for(const auto& times:{std::array<double,3>{.001,.02,.05},std::array<double,3>{.5,2,8},
+                           std::array<double,3>{.001,.001,.001},std::array<double,3>{.2,.01,20}}) {
+        ceres::Synth s(8000,5);auto p=plain();
+        p.ampAttack=times[0];p.ampDecay=times[1];p.ampRelease=times[2];p.ampSustain=.3;
+        s.setPatch(p);
+        std::vector<std::array<int,4>> boards;
+        std::size_t next=0;
+        for(unsigned n=0;n<3000;++n) {
+            for(;next<std::size(events)&&events[next].at==n;++next) {
+                const auto before=s.allVoiceState();
+                if(events[next].on)s.noteOn(events[next].note);else s.noteOff(events[next].note);
+                const auto after=s.allVoiceState();
+                std::array<int,4> notes{};
+                for(unsigned i=0;i<4;++i) {
+                    notes[i]=after[i].held?after[i].note:-1;
+                    if(after[i].held&&!before[i].held&&before[i].ampEnvelope>.01)witnessed=true;
+                }
+                boards.push_back(notes);
+            }
+            s.process();
+        }
+        if(first.empty())first=boards;
+        else require(boards==first,"Board assignment does not depend on the envelopes");
+    }
+    require(witnessed,"A sounding release was reassigned");
+}
+
 void touchRoutes() {
     ceres::Patch p=plain();p.expressionSource=1;p.pressureWah=1.5;p.pressureFilter=.8;
     p.pressureVibrato=30;p.lfoRate=3;p.keyTrack=0;p.hpCutoff=90;p.lpCutoff=900;
     ceres::Synth s(8000,9);s.setPatch(p);s.noteOn(60,.6);
     for(unsigned n=0;n<500;++n) {
         s.process();
-        const double sub=s.modulationState().sub;
+        const auto m=s.modulationState();const double sub=m.sub;
         const auto v=s.allVoiceState()[0];
+        // Each board's touch also lifts the shared cutoff rows, by the rise
+        // Ceres.sound_path_circuit_contracts solves from the network.
         const double lp=.6*(p.pressureFilter+sub*p.pressureWah);
-        near(v.lpFrequency,floorHz+(p.lpCutoff-floorHz)*std::exp2(lp),1e-9,"Touch brilliance and wah reach LP in full");
-        near(v.hpFrequency,floorHz+(p.hpCutoff-floorHz)*std::exp2(lp*hpShare),1e-9,"HP gets the 150k/47k share");
+        near(v.lpFrequency,floorHz+(p.lpCutoff-floorHz)*std::exp2(lp+m.lpBus),1e-9,"Touch brilliance and wah reach LP in full");
+        near(v.hpFrequency,floorHz+(p.hpCutoff-floorHz)*std::exp2(lp*hpShare+m.hpBus),1e-9,"HP gets the 150k/47k share");
         const double cents=.6*p.pressureVibrato*(sub+1./3);
         near(v.oscillatorFrequency,261.6255653005986*std::exp2(cents/1200),1e-9,"Touch vibrato is centred on +.5V");
     }
@@ -209,6 +269,7 @@ int main() {
         keys();offIsUnchanged();glissandoSteps();glideIntegratorRegimes();
         portamentoIntegratesHz();sustainModesAtRelease();
         freeBoardGlidesFromLastKey();sameKeyReuse();simultaneousKeysKeepHighest();touchRoutes();
+        keyOffOrderAssigns();assignmentIgnoresEnvelopes();
     } catch(const std::exception& e) {std::fprintf(stderr,"FAIL %s\n",e.what());return 1;}
-    std::puts("PASS glide, same-key reuse and touch-route contracts");
+    std::puts("PASS glide, same-key reuse, key-off order and touch-route contracts");
 }

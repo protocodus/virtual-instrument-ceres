@@ -174,10 +174,10 @@ double leverFraction(double x,double ratio) { return x/(1+x*(1-x)*ratio); }
 // network's input (SM2 p.26 wiring; p.22 for what MI drives). With the pedal
 // open the cell ties MI to MO, so the wiper works into the A-10k VOLUME track
 // with its 330 ohm foot in parallel with the 68k leg's 34k+2.2k: 8.04k, and
-// the whole mix sits 2.35dB low at mid-lever. A closed pedal raises that load
-// and straightens the taper; that coupling is not modelled.
+// the whole mix sits 2.35dB low at mid-lever. As the pedal closes, the cell
+// (ExpressionNetwork) takes MO off MI and the load rises toward 67k, so the
+// taper straightens: at a -16.5dB pedal the mid-lever sag is .64dB.
 constexpr double ringMixLoad=1/(1/(68e3/2+2.2e3)+1/(10e3+330));
-constexpr double ringMixLeverRatio=10e3/ringMixLoad;
 // Each pin 7 has 220k to its preset Q bus, 220k to RES and 10uF (SM1 p.14;
 // SM2 p.16), and pin 7 takes current into a low impedance. The CS-30 drives
 // the same IG00156's VQ through 22k into a 390-470 ohm rank shunt with 10uF
@@ -213,14 +213,19 @@ constexpr double qBranchReturn=qPinResistance/(220e3+qPinResistance);
 constexpr double glideHoldCap=.033e-6;
 constexpr double glideTauLarge=3.3e6*glideHoldCap;
 constexpr double glideTauMedium=(470e3*3.3e6/(470e3+3.3e6))*glideHoldCap;
-// Mapping a glide rate back to a PS voltage needs the lever's clock law, which
-// is not printed. ESTIMATE: the counter clock period runs log-linearly in PS
-// across the lever, from the printed 11s at -6.5V to 1.4ms at +8.5V (SM1 p.5,
-// YM26700 pin 4 "the frequency is variable by changing the portamento VR").
-// That places the two comparator thresholds at these step rates;
-// Ceres.HardwareRealism recomputes both from the printed endpoints.
-constexpr double glideMediumAbove=1.584522156984606;
-constexpr double glideDirectAbove=43.24665787480699;
+// Mapping a glide rate back to a PS voltage needs the lever's clock law. Its
+// ends are trimmed on the KAS board: VR5 sets the counter clock (IC24 pin 6)
+// to 6Hz at LONG and VR4 to 6kHz at SHORT (sibling CS-60 SM printed p.35, KAS
+// IV, a page that also gives the 4-sound CS-50 its own figures in III and V
+// and none here). The CS-50's SM1 printed p.5 gives YM26700 pin 4 as 11s at
+// -6.5V to 1.4ms at +8.5V instead, a LONG/SHORT ratio of 7860 against 1000,
+// so the two cannot be one node; the owner chose the CS-60 trim on
+// 2026-10-28 (Docs/decisions.md). ESTIMATE: the clock runs log-linearly in PS
+// across the lever's -6.5..+8.5V. That places the two comparator thresholds
+// at these step rates; Ceres.HardwareRealism recomputes both from the trimmed
+// ends. The direct gate lies above glide_rate's 200 steps/s.
+constexpr double glideMediumAbove=54.21896842333811;
+constexpr double glideDirectAbove=692.0719546926555;
 // PRA ring modulator, IC8 Fairchild uA796HC (SM2 printed p.22 / PDF16; guide
 // printed p.52 / PDF61; overall circuit diagram). Pin roles are the uA796
 // sheet's (Fairchild 1973 Linear IC catalog pp.7-74..7-77): 1/4 signal
@@ -726,7 +731,7 @@ struct BoardTolerance {
     std::array<double,2> filterTimeLog{}, ampTimeLog{};
     double ampFloorError=0, sineError=0, filteredError=0;
     // Cached at the patch's amounts; the identical-board values when off.
-    double hpScale=1, lpScale=1, hpEnvelopeGain=1, lpEnvelopeGain=1;
+    double hpScale=1, lpScale=1, hpEnvelopeGain=1, lpEnvelopeGain=1, filterEnvelopeLevel=1;
     // Static cutoffs at middle C (boardCutoff): the patch's when off.
     double hpCutoff=0, lpCutoff=0, hpBrilliance=0, lpBrilliance=0;
     double ampPeak=1, ampFloor=0, ampSustained=1, ampEnvelopeGain=1, sineGain=1;
@@ -1158,6 +1163,8 @@ constexpr double expressionCurve[]={0,-1.4,-3.8,-7.2,-11.5,-16.5,-22,-27.3,-32.4
 struct ExpressionNetwork {
     double b0=1,b1=0,b2=0,a1=0,a2=0;
     double x1=0,x2=0,y1=0,y2=0;
+    // MI's midband load on the MODULATION wiper (see ringMixLoad).
+    double load=ringMixLoad;
     void clear() { x1=x2=y1=y2=0; }
     void configure(double expression,double fs) {
         const double travel=clamp(1-expression,0.0,1.0)*10;
@@ -1169,6 +1176,9 @@ struct ExpressionNetwork {
         const double pass=g*g/(2*g+gs), shunted=g-pass;
         const double gain=std::pow(10,decibels/20);
         const double cell=(gain*(shunted+gl)-pass)/(1-gain);
+        // MI's own current, 1V in: the 68k to the midpoint and the cell to MO.
+        const double mo=gain, mid=g*(1+mo)/(2*g+gs);
+        load=1/(g*(1-mid)+cell*(1-mo));
         const double tau=expressionShunt*expressionShuntCap;
         const double sum=cell+g+gl;
         const double n0=2*g*cell+g*g, n1=(2*g*cell+g*g)*tau+cell*expressionShuntCap;
@@ -1381,12 +1391,23 @@ constexpr double subNoiseRail=15*(100./122.)/1.5;
 // (VOM, +/-15 V; ESTIMATE): the preamp drives 101k||50k, so +/-14 V (RL>=10k);
 // IC1-1 drives the three B-10k PN3 levers, about 3k, so +/-13 V (RL>=2k). The
 // square's 15k/1.8k divider assumes the same 14 V (14*1.8/16.8 = 1.5 V).
-// The preamp's 3 MHz typical gain-bandwidth (29.7 kHz closed-loop) and 1 V/us
-// slew rate act only at the top of the audio band or in hard overload, and
-// are not modelled.
+// The preamp's slew rate is an NJM4558 datasheet typical too (1 V/us;
+// ESTIMATE, as for the noise limiter): a rail-to-rail swing takes 28 us, so an
+// overdriven input, the usual case at x101, reaches SUI as a trapezoid rather
+// than a square, and a full-swing tone loses its edges above about 11 kHz.
+// The 3 MHz gain-bandwidth closes the x101 loop at 29.7 kHz, under .5 dB at
+// 10 kHz and a 5.4 us settling tail; it is left out, so a signal the slew rate
+// does not limit passes as before.
 constexpr double externalPreampRail=14/1.5, externalBufferRail=13/1.5;
+constexpr double externalPreampSlew=1e6/1.5; // SUB units per second
 constexpr double externalCouplingTauSelected=10e-6*(100e3*100e3/200e3);
 constexpr double externalCouplingTauOpen=10e-6*100e3;
+// One internal step: reach the target, or move by at most the slew step.
+CERES_ALWAYS_INLINE double externalPreampStep(double y,double target,double step) {
+    const double error=target-y;
+    y=inlineAbs(error)<=step ? target : y+(error>0 ? step : -step);
+    return clamp(y,-externalPreampRail,externalPreampRail);
+}
 
 // Acklam's rational inverse normal CDF, relative error below 1.2e-9: one
 // uniform draw per Gaussian sample keeps the shared random sequence intact.
@@ -1818,6 +1839,60 @@ double panelCutoffHz(double travel,double load) {
     return filterFrequencyFloor+gmHzAtMiddleC*
         std::exp2(leverOctavesPerVolt*panelCutoffBus(clamp(travel,0.,1.),load));
 }
+
+// The shared cutoff buses: each lifts with its boards. A board's EG, SUB,
+// touch and BRILLIANCE sources lift its pin-4 node (u, in bus volts: the cutoff octaves they
+// give at the lever's 1 oct/V), so its 39k draws less from the row, and the row
+// rises under every board. With node conductance Gn and G=1/39k+Gn, the lifts
+// return a current J = sum(u)/(39k^2 G) to the row, which then solves
+// V + Vd(V/rl - J) = S. Near the lever's floor the diode is off and V rises by
+// J*rl: one board at +5V LP EG lifts every board's cutoff .026 octave, four
+// .10; with the lever at 1V (a .52V row) the diode holds four to .009. The source is the PANEL lever's follower
+// and diode: a patch does not say whether a tablet set its cutoff, and a
+// tablet's column resistance couples more (.07-.09 octave with four on the
+// weaker columns). Only the change from unlifted nodes is applied, so with no
+// lift the cutoffs are exactly the patch's. The bus has the four physical
+// boards' branches; extra virtual boards follow it without loading it.
+struct CutoffBus {
+    double source=0, rest=0, restCurrent=0, rl=0, gain=0;
+    double current=0, lastLift=0, shift=0;
+    bool conducting=false, settled=true;
+    void configure(double cutoffHz, double node) {
+        const double load=(39e3+node)/4;
+        rl=presetLoad*load/(presetLoad+load);
+        gain=1/(39e3*39e3*(1/39e3+1/node));
+        const double gm=cutoffHz-filterFrequencyFloor;
+        rest=gm>0 ? std::log2(gm/gmHzAtMiddleC)/leverOctavesPerVolt : 0;
+        // Below the lever's 0V the patch has no PANEL source: the row follows
+        // its lifts alone. (With no gm the shift moves nothing.)
+        conducting=gm>0 && rest>=0;
+        restCurrent=conducting ? rest/rl : 0;
+        source=conducting ? rest+presetDiodeVt*std::log1p(restCurrent/presetDiodeIs) : 0;
+        // A new rest: solve the next sample afresh from it.
+        reset();
+    }
+    void reset() { current=restCurrent; lastLift=shift=0; settled=true; }
+    // Bus volts above the unlifted row, from the boards' summed lifts: Newton
+    // on the diode current I, I + J = (S - Vd(I))/rl, from the last sample's
+    // solution, so a moving lift takes a few steps and a held one none once
+    // settled; a step left unsettled carries on the next sample.
+    double update(double lift) {
+        const double j=gain*lift;
+        if (!conducting) return shift=j*rl;
+        if (lift==0) { current=restCurrent; lastLift=0; settled=true; return shift=0; }
+        if (lift==lastLift && settled) return shift;
+        settled=false;
+        for (int step=0; step<16 && !settled; ++step) {
+            const double g=current+j-(source-presetDiodeVt*std::log1p(current/presetDiodeIs))/rl;
+            double next=current-g/(1+presetDiodeVt/(rl*(presetDiodeIs+current)));
+            if (next<=-presetDiodeIs) next=.5*(current-presetDiodeIs);
+            settled=inlineAbs(next-current)<=1e-14*(inlineAbs(next)+presetDiodeIs);
+            current=next;
+        }
+        lastLift=lift;
+        return shift=(current+j)*rl-rest;
+    }
+};
 } // namespace
 
 double hpfLeverHz(double travel) { return panelCutoffHz(travel,fhBusLoad); }
@@ -1848,7 +1923,9 @@ struct Synth::Impl {
         double velocity = 1, velocityValue = 1, drift = 0, driftTarget = 0;
         std::uint32_t pressTicket = 0;
         unsigned driftCountdown = 0;
-        std::uint64_t age = 0;
+        // age: order of the last key-on; keyOffOrder: of the last key-off
+        // (0 for a board never played since reset).
+        std::uint64_t age = 0, keyOffOrder = 0;
         // Host sample (plus one) of the last assignment, and whether the board
         // was silent before it, so a same-sample assignment can be replaced.
         std::uint64_t assignedAt = 0;
@@ -1858,6 +1935,7 @@ struct Synth::Impl {
         // Physical board capacitor histories persist across allocation and Idle.
         OutputCoupling filteredCoupling, commonCoupling;
         Envelope amp, filter;
+        double filterEnvelope = 0; // this sample's VCF EG output
         BoardTolerance board;
         // The board's pitch residual excludes free-running drift/vibrato.
         // Reuse it only while the exact key/bend/PITCH expression is equal;
@@ -1918,6 +1996,7 @@ struct Synth::Impl {
     // and the interpolated value for this internal step; the coupling
     // capacitor between the EXT preamp and EXO/SUI.
     double externalTarget = 0, externalPrevious = 0, externalNow = 0;
+    double externalPreamp = 0, externalPreampSlewStep = 0;
     OutputCoupling externalCoupling;
     OutputCoupling::Coefficients externalSelectedCoefficients, externalOpenCoefficients;
     Envelope ringEnvelope;
@@ -1926,6 +2005,8 @@ struct Synth::Impl {
     double ringDepthValue = 0, ringDepthIncrement = 0;
     unsigned ringDepthRemaining = 0;
     double cachedRingExp = 0, cachedRingFactor = 1;
+    // FH and FL, the shared cutoff buses.
+    CutoffBus hpBus, lpBus;
     double ringCoupledCarrier=0;
     double ringSwitchGain=ringSteering(ringDifferentialDc);
     double ringSignalInput=0, ringSignalOutput=0;
@@ -1978,6 +2059,7 @@ struct Synth::Impl {
         pickupCoefficients=OutputCoupling::Coefficients(pickupCouplingTau,limiterRate);
         externalSelectedCoefficients=OutputCoupling::Coefficients(externalCouplingTauSelected,internalFs);
         externalOpenCoefficients=OutputCoupling::Coefficients(externalCouplingTauOpen,internalFs);
+        externalPreampSlewStep=externalPreampSlew/internalFs;
         ringSignalCoefficients=OutputCoupling::Coefficients(ringSignalCouplingTau,internalFs);
         ringWetCoefficients=OutputCoupling::Coefficients(ringWetCouplingTau,internalFs);
         ringCarrierCoupling.configure(internalFs);
@@ -2011,6 +2093,8 @@ struct Synth::Impl {
         updateBoardScales();
     }
     void updateBoardScales() {
+        hpBus.configure(patch.hpCutoff,hpCutoffNode);
+        lpBus.configure(patch.lpCutoff,lpCutoffNode);
         const double envelope=patch.boardEnvelopeTolerance, time=patch.boardEnvelopeTimeTolerance;
         const double vca=patch.boardVcaTolerance;
         const double filterRelease=effectiveRelease(patch.filterRelease,patch.globalRelease);
@@ -2031,6 +2115,7 @@ struct Synth::Impl {
             board.hpBrilliance=patch.brilliance*board.hpScale*hpBrillianceScale;
             board.lpBrilliance=patch.brilliance*board.lpScale*lpBrillianceScale;
             const double level=1+envelope*board.filterEnvelopeError;
+            board.filterEnvelopeLevel=level;
             board.hpEnvelopeGain=level*board.hpScale;
             board.lpEnvelopeGain=level*board.lpScale;
             board.ampPeak=1+envelope*board.ampPeakError;
@@ -2065,6 +2150,11 @@ struct Synth::Impl {
             const double vr6=std::sqrt(Synth::voiceCount/power);
             for (auto& voice : voices) voice.board.ampEnvelopeGain*=vr6;
         }
+    }
+    // A board's key goes up: its EGs release, and the KAS notes the order.
+    void keyUp(Voice& v) {
+        if (v.amp.gate) v.keyOffOrder=++age;
+        v.amp.off(); v.filter.off();
     }
     void followFreeKeys() {
         if (patch.sustainMode==2)
@@ -2105,7 +2195,7 @@ struct Synth::Impl {
         physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
         physicalKeyPresses=0; lastAssignedKey=60;
         subNoiseMemory=limiterInput=limiterOutput=0; pickupCoupling={};
-        externalTarget=externalPrevious=externalNow=0; externalCoupling={};
+        externalTarget=externalPrevious=externalNow=externalPreamp=0; externalCoupling={};
         limiterRandom=Random(seed^0xd1b54a32d192ed03ULL); ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={}; ringSignalCoupling={};
         ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
@@ -2177,7 +2267,8 @@ struct Synth::Impl {
         // Hz, so a wide glide covers its last semitones more slowly in pitch.
         // The gate the lever selects fixes the time constant; in the fast
         // regime the direct gate passes the counter's steps as they are, so
-        // portamento and glissando meet at the short end of the lever.
+        // portamento and glissando meet at the short end of the lever (beyond
+        // glide_rate's range).
         v.glideVoltage=glideAlpha==1.0 ? stepped
             : v.glideVoltage+(stepped-v.glideVoltage)*glideAlpha;
         if (v.held || v.pedalHeld || patch.sustainMode==2) {
@@ -2230,8 +2321,8 @@ struct Synth::Impl {
         // switch-loaded coupling capacitor, then the IC1-1 follower's swing.
         // The preamp and capacitor run whatever FUNCTION selects.
         const bool external=patch.lfoWaveform==5;
-        const double externalSub=clamp(externalCoupling.process(
-            clamp(patch.extLevel*externalNow,-externalPreampRail,externalPreampRail),
+        externalPreamp=externalPreampStep(externalPreamp,patch.extLevel*externalNow,externalPreampSlewStep);
+        const double externalSub=clamp(externalCoupling.process(externalPreamp,
             external ? externalSelectedCoefficients : externalOpenCoefficients),
             -externalBufferRail,externalBufferRail);
         const double lfo = external ? externalSub : subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
@@ -2274,10 +2365,16 @@ struct Synth::Impl {
         const double tuneOctaves = patch.tuneCents/1200;
         const double touchFilterDepth = patch.pressureFilter+lfo*patch.pressureWah;
         const double filterLfoHp = patch.filterLfo*hpSubRelativeScale;
-        const bool sharedLpCutoff = patch.lpEnvelopeScale==patch.hpEnvelopeScale &&
-            patch.filterLfo==0 && patch.brilliance==0;
-        double mixed = 0;
-        for (unsigned i = 0; i < voiceLimit; ++i) {
+        // Each board's VCF EG, touch, SUB and BRILLIANCE lift its pin-4 node,
+        // in bus volts before its chip's own sensitivity (the EG at the
+        // patch's coupling scales, 220k HP and 47k LP in hardware); the buses
+        // answer the four physical boards' lifts in the same sample (CutoffBus).
+        // All four stay on the rows at a lower polyphony, their idle EGs
+        // resting at the initial level, so a board sounds the same at any.
+        const double hpBrillianceLift=patch.brilliance*hpBrillianceScale/leverOctavesPerVolt;
+        const double lpBrillianceLift=patch.brilliance*lpBrillianceScale/leverOctavesPerVolt;
+        double hpLift=0, lpLift=0;
+        for (unsigned i = 0; i < std::max(voiceLimit,Synth::voiceCount); ++i) {
             auto& v = voices[i];
             // Velocity is stored per physical board on note assignment. Do
             // not replace it when a released board follows another key CV.
@@ -2289,6 +2386,28 @@ struct Synth::Impl {
             // existing 5ms controller RC clock; silent assignments precharge in
             // noteOn. This digital adaptation does not slew the keyboard CV.
             v.velocityValue+=(v.velocity-v.velocityValue)*velocityCoefficient;
+            // Each board's EG times (see BoardTolerance; the shared values
+            // when the envelope tolerance is off).
+            const auto& egf=v.board.filterCoefficients;
+            v.filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
+                patch.filterAttackHeadroom,patch.filterAttackSaturation,egf[0],egf[3],egf[1],egf[2]);
+            if (i<Synth::voiceCount) {
+                const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
+                const double touchOctaves=expression*touchFilterDepth;
+                const double egLift=v.filterEnvelope*v.board.filterEnvelopeLevel;
+                hpLift+=(egLift*patch.hpEnvelopeScale+touchOctaves*hpSubRelativeScale+lfo*filterLfoHp)
+                    /leverOctavesPerVolt+hpBrillianceLift;
+                lpLift+=(egLift*patch.lpEnvelopeScale+touchOctaves+lfo*patch.filterLfo)/leverOctavesPerVolt
+                    +lpBrillianceLift;
+            }
+        }
+        const double hpBusOctaves=leverOctavesPerVolt*hpBus.update(hpLift);
+        const double lpBusOctaves=leverOctavesPerVolt*lpBus.update(lpLift);
+        const bool sharedLpCutoff = patch.lpEnvelopeScale==patch.hpEnvelopeScale &&
+            patch.filterLfo==0 && patch.brilliance==0 && hpBusOctaves==lpBusOctaves;
+        double mixed = 0;
+        for (unsigned i = 0; i < voiceLimit; ++i) {
+            auto& v = voices[i];
             const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
             // Free-running wander, driftCents peak (see ceres.hpp): its 0.2-0.7s
             // hold and .3s smoothing are engineering choices with no source.
@@ -2327,12 +2446,10 @@ struct Synth::Impl {
             const auto waves = v.osc.process(frequency, pulseWidthMod,
                                             resetSeconds,internalFs,stiCoefficient,
                                             sineEnabled,sawEnabled,pulseEnabled);
-            // Each board's EG times, VCA-EG peak and floor (see BoardTolerance;
+            // Each board's VCA-EG times, peak and floor (see BoardTolerance;
             // the shared values when the envelope tolerance is off).
-            const auto& egf=v.board.filterCoefficients;
             const auto& ega=v.board.ampCoefficients;
-            const double filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
-                patch.filterAttackHeadroom,patch.filterAttackSaturation,egf[0],egf[3],egf[1],egf[2]);
+            const double filterEnvelope = v.filterEnvelope;
             const double ampEnvelope = std::max(0.0,v.amp.advance(v.board.ampFloor,v.board.ampPeak,
                 v.board.ampSustained,
                 patch.ampAttackHeadroom,patch.ampAttackSaturation,ega[0],ega[3],ega[1],ega[2]));
@@ -2368,7 +2485,7 @@ struct Synth::Impl {
             if (board.hpCutoff > filterFrequencyFloor) {
                 hpExp = keyOctaves+filterEnvelope*board.hpEnvelopeGain*patch.hpEnvelopeScale
                     + touchOctaves*board.hpScale*hpSubRelativeScale+lfo*board.hpScale*filterLfoHp
-                    + board.hpBrilliance;
+                    + hpBusOctaves*board.hpScale + board.hpBrilliance;
                 if (v.expCacheReady && hpExp == v.cachedHpExp) {
                     hpFactor = v.cachedHpFactor;
                 } else {
@@ -2387,7 +2504,7 @@ struct Synth::Impl {
                 } else {
                     const double lpExp = keyOctaves+filterEnvelope*board.lpEnvelopeGain*patch.lpEnvelopeScale
                         + touchOctaves*board.lpScale+lfo*board.lpScale*patch.filterLfo
-                        + board.lpBrilliance;
+                        + lpBusOctaves*board.lpScale + board.lpBrilliance;
                     double lpFactor;
                     if (v.expCacheReady && lpExp == v.cachedLpExp) {
                         lpFactor = v.cachedLpFactor;
@@ -2480,8 +2597,9 @@ struct Synth::Impl {
         ringSignalOutput=ringSignalPair(ringSignalInput);
         const double wet=ringWetGain*ringWetCoupling.process(ringSignalOutput*ringSwitchGain,ringWetCoefficients);
         // Explicit bypass avoids even a rounding change for old patches.
+        const double ringMixRatio=10e3/(patch.expression>=1 ? ringMixLoad : expression.load);
         const double ringed=patch.ringMix==0 ? bus
-            : (bus+patch.ringMix*(wet-bus))/(1+patch.ringMix*(1-patch.ringMix)*ringMixLeverRatio);
+            : (bus+patch.ringMix*(wet-bus))/(1+patch.ringMix*(1-patch.ringMix)*ringMixRatio);
         // MI to MO. A fully open pedal is the fully conducting cell, which is
         // the path this engine was calibrated on, so it stays a bare wire.
         const double expressed=patch.expression>=1 ? ringed : expression.process(ringed);
@@ -2535,27 +2653,29 @@ void Synth::noteOn(int note, double velocity) {
     // KAS gate control (guide printed pp.17-18) writes a new key only into a
     // channel whose code differs and whose key is up; a released channel that
     // still holds this key is re-keyed. Reuse that board first. Otherwise use
-    // an idle voice, then the quietest released voice, then the oldest
-    // pedal-held one (its key is up). A key pressed while every board's key is
-    // down is not stored (guide printed p.19 timing chart): it sounds neither
-    // now nor when a board frees, though its press still counts for the ring
-    // trigger. Keys pressed together are encoded higher note first (guide
-    // printed p.16), so a key pressed in the same sample as a lower stored key
-    // takes that board instead: a simultaneous chord keeps its highest notes.
-    // Overlapping presses of a still-held note occupy separate voices.
+    // the free board whose key went up longest ago, boards never played
+    // first in channel order, then the oldest pedal-held one (its key is up).
+    // The YM26600 block diagram names an "Old Key OFF CH Detector" (IC Guide
+    // PDF 16), and the guide's p.19 chart gives the next key to channel 1,
+    // released before channel 4; a fixed channel preference would fit that
+    // chart too, but would need no such detector. The KAS
+    // sees only keys: no wire brings an envelope back to it (SM2 pp.3, 7), so
+    // a board still sounding its release is as free as a silent one. A key
+    // pressed while every board's key is down is not stored (guide printed
+    // p.19 timing chart): it sounds neither now nor when a board frees, though
+    // its press still counts for the ring trigger. Keys pressed together are
+    // encoded higher note first (guide printed p.16), so a key pressed in the
+    // same sample as a lower stored key takes that board instead: a
+    // simultaneous chord keeps its highest notes. Overlapping presses of a
+    // still-held note occupy separate voices.
     for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it)
         if (it->note==note && !it->held && !it->pedalHeld) {
             selected=&*it; break;
         }
     if (!selected)
-    for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it) {
-        auto& voice=*it;
-        if (voice.amp.stage == Envelope::Idle && (!selected || voice.age < selected->age)) selected = &voice;
-    }
-    if (!selected)
         for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it) {
             auto& voice=*it;
-            if (!voice.held && !voice.pedalHeld && (!selected || voice.amp.voltage < selected->amp.voltage)) selected = &voice;
+            if (!voice.held && !voice.pedalHeld && (!selected || voice.keyOffOrder < selected->keyOffOrder)) selected = &voice;
         }
     if (!selected)
         for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it)
@@ -2596,7 +2716,7 @@ void Synth::noteOff(int note) {
     if (selected) {
         selected->held = false;
         selected->pedalHeld = impl_->pedal;
-        if (!selected->pedalHeld) { selected->amp.off(); selected->filter.off(); }
+        if (!selected->pedalHeld) impl_->keyUp(*selected);
         impl_->followFreeKeys();
     }
 }
@@ -2612,7 +2732,7 @@ void Synth::sustain(bool down) {
         for (auto& voice : impl_->voices)
             if (voice.pedalHeld) {
                 voice.pedalHeld = false;
-                if (!voice.held) { voice.amp.off(); voice.filter.off(); }
+                if (!voice.held) impl_->keyUp(voice);
             }
     impl_->followFreeKeys();
 }
@@ -2621,7 +2741,7 @@ void Synth::allNotesOff() {
     for (auto& voice : impl_->voices) {
         if (voice.held) voice.pedalHeld = impl_->pedal;
         voice.held = false;
-        if (!voice.pedalHeld) { voice.amp.off(); voice.filter.off(); }
+        if (!voice.pedalHeld) impl_->keyUp(voice);
     }
     impl_->followFreeKeys();
 }
@@ -2702,7 +2822,7 @@ std::array<Synth::VoiceState,Synth::maxVoiceCount> Synth::allVoiceState() const 
 Synth::ModulationState Synth::modulationState() const {
     return {impl_->lastSub,impl_->ringEnvelope.voltage,impl_->ringFrequency,
         impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier,impl_->ringSwitchGain,impl_->ringDepthValue,
-        impl_->ringSignalInput,impl_->ringSignalOutput};
+        impl_->ringSignalInput,impl_->ringSignalOutput,impl_->hpBus.shift,impl_->lpBus.shift};
 }
 Synth::SoundPathState Synth::soundPathState() const {
     return {impl_->qVoltageOffset,impl_->effectiveHpResonance,
@@ -2973,9 +3093,11 @@ Patch preset(const std::string& name) {
         // the shared EG uses 220k for HP and 47k for LP, so at the levers'
         // 1 oct/V the EG moves the cutoffs 39/220 and 39/47 octave per EG
         // volt, relative to the loaded bus voltage above. A board's EG also
-        // lifts its pin-4 node, which unloads the shared passive bus and so
-        // raises every board's cutoff a little: at most .03 octave per board
-        // at +5V LP EG on a weak column, .1 with all four. Not modelled.
+        // lifts its pin-4 node, which unloads the shared bus and raises every
+        // board's cutoff a little (CutoffBus). That is solved behind the
+        // PANEL lever's diode; a tablet's column couples more than the lever
+        // above its floor: .07-.09 octave with four boards at +5V LP EG on
+        // the weaker columns.
         p.hpEnvelopeScale=leverOctavesPerVolt*39/220;
         p.lpEnvelopeScale=leverOctavesPerVolt*39/47;
         // Q columns h (HP) and j (LP): each pin 7 takes its preset Q bus P

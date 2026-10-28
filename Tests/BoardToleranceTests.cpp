@@ -73,12 +73,13 @@ ceres::Patch everything(ceres::Patch p) {
 }
 // State of one board playing one key: earlier boards take other keys.
 ceres::Synth::VoiceState play(std::uint64_t seed,const ceres::Patch& p,unsigned board,int key,
-                              unsigned voices=0) {
+                              unsigned voices=0,ceres::Synth::ModulationState* rows=nullptr) {
     ceres::Synth s(rate,seed);require(s.configure(voices ? voices : voicesFor(board),4),"configure");
     s.setPatch(p);
     for(unsigned i=0;i<board;++i)s.noteOn(firstOtherKey+int(i));
     s.noteOn(key);
     for(unsigned n=0;n<4;++n)s.process();
+    if(rows)*rows=s.modulationState();
     const auto state=s.allVoiceState()[board];
     require(state.note==key && state.held,"the key landed on the intended board");
     return state;
@@ -358,13 +359,24 @@ void envelopeLevelResidual() {
     auto p=plain();p.boardFilterTolerance=1;p.boardEnvelopeTolerance=1;p.filterAttack=30;
     auto ideal=p;ideal.boardFilterTolerance=ideal.boardEnvelopeTolerance=0;
     auto low=p;low.filterInitial=-2;auto idealLow=ideal;idealLow.filterInitial=-2;
+    // Every held board's EG also moves the shared cutoff rows, by an amount
+    // set by all their levels and each row's own network (checked in
+    // Ceres.sound_path_circuit_contracts); a board takes the rows' volts
+    // through its own sensitivity. Take that out to leave this board's EG.
+    const auto ownOctaves=[](std::uint64_t seed,const ceres::Patch& a,const ceres::Patch& b,unsigned board,
+                             bool high,double scale) {
+        ceres::Synth::ModulationState ra{},rb{};
+        const auto va=play(seed,a,board,60,0,&ra),vb=play(seed,b,board,60,0,&rb);
+        return variableOctaves(va,vb,high)-scale*(high ? ra.hpBus-rb.hpBus : ra.lpBus-rb.lpBus);
+    };
     double widest=0;
     for(std::uint64_t seed=1;seed<=40;++seed)for(unsigned board=0;board<boardsFor(seed,40);++board) {
         double gains[2];
         for(bool high:{true,false}) {
-            const double tolerant=variableOctaves(play(seed,low,board,60),play(seed,p,board,60),high);
-            const double nominal=variableOctaves(play(seed,idealLow,board,60),play(seed,ideal,board,60),high);
-            gains[high]=tolerant/nominal/sensitivity(seed,p,board,high);
+            const double scale=sensitivity(seed,p,board,high);
+            const double tolerant=ownOctaves(seed,low,p,board,high,scale);
+            const double nominal=ownOctaves(seed,idealLow,ideal,board,high,1);
+            gains[high]=tolerant/nominal/scale;
         }
         near(gains[0],gains[1],1e-9,"one VCF EG buffer feeds both filters");
         require(std::abs(gains[0]-1)<=.5/5+1e-9,"VCF EG level within the +/-.5V of 5V check band");
