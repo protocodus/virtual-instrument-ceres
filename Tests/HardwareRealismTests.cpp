@@ -241,11 +241,13 @@ void touchRoutes() {
     ceres::Synth s(8000,9);s.setPatch(p);s.noteOn(60,.6);
     for(unsigned n=0;n<500;++n) {
         s.process();
-        const double sub=s.modulationState().sub;
+        const auto m=s.modulationState();const double sub=m.sub;
         const auto v=s.allVoiceState()[0];
+        // Each board's touch also lifts the shared cutoff rows, by the rise
+        // Ceres.sound_path_circuit_contracts solves from the network.
         const double lp=.6*(p.pressureFilter+sub*p.pressureWah);
-        near(v.lpFrequency,floorHz+(p.lpCutoff-floorHz)*std::exp2(lp),1e-9,"Touch brilliance and wah reach LP in full");
-        near(v.hpFrequency,floorHz+(p.hpCutoff-floorHz)*std::exp2(lp*hpShare),1e-9,"HP gets the 150k/47k share");
+        near(v.lpFrequency,floorHz+(p.lpCutoff-floorHz)*std::exp2(lp+m.lpBus),1e-9,"Touch brilliance and wah reach LP in full");
+        near(v.hpFrequency,floorHz+(p.hpCutoff-floorHz)*std::exp2(lp*hpShare+m.hpBus),1e-9,"HP gets the 150k/47k share");
         const double cents=.6*p.pressureVibrato*(sub+1./3);
         near(v.oscillatorFrequency,261.6255653005986*std::exp2(cents/1200),1e-9,"Touch vibrato is centred on +.5V");
     }

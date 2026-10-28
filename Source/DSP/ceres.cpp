@@ -726,7 +726,7 @@ struct BoardTolerance {
     std::array<double,2> filterTimeLog{}, ampTimeLog{};
     double ampFloorError=0, sineError=0, filteredError=0;
     // Cached at the patch's amounts; the identical-board values when off.
-    double hpScale=1, lpScale=1, hpEnvelopeGain=1, lpEnvelopeGain=1;
+    double hpScale=1, lpScale=1, hpEnvelopeGain=1, lpEnvelopeGain=1, filterEnvelopeLevel=1;
     // Static cutoffs at middle C (boardCutoff): the patch's when off.
     double hpCutoff=0, lpCutoff=0, hpBrilliance=0, lpBrilliance=0;
     double ampPeak=1, ampFloor=0, ampSustained=1, ampEnvelopeGain=1, sineGain=1;
@@ -1834,6 +1834,60 @@ double panelCutoffHz(double travel,double load) {
     return filterFrequencyFloor+gmHzAtMiddleC*
         std::exp2(leverOctavesPerVolt*panelCutoffBus(clamp(travel,0.,1.),load));
 }
+
+// The shared cutoff buses: each lifts with its boards. A board's EG, SUB,
+// touch and BRILLIANCE sources lift its pin-4 node (u, in bus volts: the cutoff octaves they
+// give at the lever's 1 oct/V), so its 39k draws less from the row, and the row
+// rises under every board. With node conductance Gn and G=1/39k+Gn, the lifts
+// return a current J = sum(u)/(39k^2 G) to the row, which then solves
+// V + Vd(V/rl - J) = S. Near the lever's floor the diode is off and V rises by
+// J*rl: one board at +5V LP EG lifts every board's cutoff .026 octave, four
+// .10; with the lever at 1V (a .52V row) the diode holds four to .009. The source is the PANEL lever's follower
+// and diode: a patch does not say whether a tablet set its cutoff, and a
+// tablet's column resistance couples more (.07-.09 octave with four on the
+// weaker columns). Only the change from unlifted nodes is applied, so with no
+// lift the cutoffs are exactly the patch's. The bus has the four physical
+// boards' branches; extra virtual boards follow it without loading it.
+struct CutoffBus {
+    double source=0, rest=0, restCurrent=0, rl=0, gain=0;
+    double current=0, lastLift=0, shift=0;
+    bool conducting=false, settled=true;
+    void configure(double cutoffHz, double node) {
+        const double load=(39e3+node)/4;
+        rl=presetLoad*load/(presetLoad+load);
+        gain=1/(39e3*39e3*(1/39e3+1/node));
+        const double gm=cutoffHz-filterFrequencyFloor;
+        rest=gm>0 ? std::log2(gm/gmHzAtMiddleC)/leverOctavesPerVolt : 0;
+        // Below the lever's 0V the patch has no PANEL source: the row follows
+        // its lifts alone. (With no gm the shift moves nothing.)
+        conducting=gm>0 && rest>=0;
+        restCurrent=conducting ? rest/rl : 0;
+        source=conducting ? rest+presetDiodeVt*std::log1p(restCurrent/presetDiodeIs) : 0;
+        // A new rest: solve the next sample afresh from it.
+        reset();
+    }
+    void reset() { current=restCurrent; lastLift=shift=0; settled=true; }
+    // Bus volts above the unlifted row, from the boards' summed lifts: Newton
+    // on the diode current I, I + J = (S - Vd(I))/rl, from the last sample's
+    // solution, so a moving lift takes a few steps and a held one none once
+    // settled; a step left unsettled carries on the next sample.
+    double update(double lift) {
+        const double j=gain*lift;
+        if (!conducting) return shift=j*rl;
+        if (lift==0) { current=restCurrent; lastLift=0; settled=true; return shift=0; }
+        if (lift==lastLift && settled) return shift;
+        settled=false;
+        for (int step=0; step<16 && !settled; ++step) {
+            const double g=current+j-(source-presetDiodeVt*std::log1p(current/presetDiodeIs))/rl;
+            double next=current-g/(1+presetDiodeVt/(rl*(presetDiodeIs+current)));
+            if (next<=-presetDiodeIs) next=.5*(current-presetDiodeIs);
+            settled=inlineAbs(next-current)<=1e-14*(inlineAbs(next)+presetDiodeIs);
+            current=next;
+        }
+        lastLift=lift;
+        return shift=(current+j)*rl-rest;
+    }
+};
 } // namespace
 
 double hpfLeverHz(double travel) { return panelCutoffHz(travel,fhBusLoad); }
@@ -1876,6 +1930,7 @@ struct Synth::Impl {
         // Physical board capacitor histories persist across allocation and Idle.
         OutputCoupling filteredCoupling, commonCoupling;
         Envelope amp, filter;
+        double filterEnvelope = 0; // this sample's VCF EG output
         BoardTolerance board;
         // The board's pitch residual excludes free-running drift/vibrato.
         // Reuse it only while the exact key/bend/PITCH expression is equal;
@@ -1945,6 +2000,8 @@ struct Synth::Impl {
     double ringDepthValue = 0, ringDepthIncrement = 0;
     unsigned ringDepthRemaining = 0;
     double cachedRingExp = 0, cachedRingFactor = 1;
+    // FH and FL, the shared cutoff buses.
+    CutoffBus hpBus, lpBus;
     double ringCoupledCarrier=0;
     double ringSwitchGain=ringSteering(ringDifferentialDc);
     double ringSignalInput=0, ringSignalOutput=0;
@@ -2031,6 +2088,8 @@ struct Synth::Impl {
         updateBoardScales();
     }
     void updateBoardScales() {
+        hpBus.configure(patch.hpCutoff,hpCutoffNode);
+        lpBus.configure(patch.lpCutoff,lpCutoffNode);
         const double envelope=patch.boardEnvelopeTolerance, time=patch.boardEnvelopeTimeTolerance;
         const double vca=patch.boardVcaTolerance;
         const double filterRelease=effectiveRelease(patch.filterRelease,patch.globalRelease);
@@ -2051,6 +2110,7 @@ struct Synth::Impl {
             board.hpBrilliance=patch.brilliance*board.hpScale*hpBrillianceScale;
             board.lpBrilliance=patch.brilliance*board.lpScale*lpBrillianceScale;
             const double level=1+envelope*board.filterEnvelopeError;
+            board.filterEnvelopeLevel=level;
             board.hpEnvelopeGain=level*board.hpScale;
             board.lpEnvelopeGain=level*board.lpScale;
             board.ampPeak=1+envelope*board.ampPeakError;
@@ -2299,10 +2359,16 @@ struct Synth::Impl {
         const double tuneOctaves = patch.tuneCents/1200;
         const double touchFilterDepth = patch.pressureFilter+lfo*patch.pressureWah;
         const double filterLfoHp = patch.filterLfo*hpSubRelativeScale;
-        const bool sharedLpCutoff = patch.lpEnvelopeScale==patch.hpEnvelopeScale &&
-            patch.filterLfo==0 && patch.brilliance==0;
-        double mixed = 0;
-        for (unsigned i = 0; i < voiceLimit; ++i) {
+        // Each board's VCF EG, touch, SUB and BRILLIANCE lift its pin-4 node,
+        // in bus volts before its chip's own sensitivity (the EG at the
+        // patch's coupling scales, 220k HP and 47k LP in hardware); the buses
+        // answer the four physical boards' lifts in the same sample (CutoffBus).
+        // All four stay on the rows at a lower polyphony, their idle EGs
+        // resting at the initial level, so a board sounds the same at any.
+        const double hpBrillianceLift=patch.brilliance*hpBrillianceScale/leverOctavesPerVolt;
+        const double lpBrillianceLift=patch.brilliance*lpBrillianceScale/leverOctavesPerVolt;
+        double hpLift=0, lpLift=0;
+        for (unsigned i = 0; i < std::max(voiceLimit,Synth::voiceCount); ++i) {
             auto& v = voices[i];
             // Velocity is stored per physical board on note assignment. Do
             // not replace it when a released board follows another key CV.
@@ -2314,6 +2380,28 @@ struct Synth::Impl {
             // existing 5ms controller RC clock; silent assignments precharge in
             // noteOn. This digital adaptation does not slew the keyboard CV.
             v.velocityValue+=(v.velocity-v.velocityValue)*velocityCoefficient;
+            // Each board's EG times (see BoardTolerance; the shared values
+            // when the envelope tolerance is off).
+            const auto& egf=v.board.filterCoefficients;
+            v.filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
+                patch.filterAttackHeadroom,patch.filterAttackSaturation,egf[0],egf[3],egf[1],egf[2]);
+            if (i<Synth::voiceCount) {
+                const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
+                const double touchOctaves=expression*touchFilterDepth;
+                const double egLift=v.filterEnvelope*v.board.filterEnvelopeLevel;
+                hpLift+=(egLift*patch.hpEnvelopeScale+touchOctaves*hpSubRelativeScale+lfo*filterLfoHp)
+                    /leverOctavesPerVolt+hpBrillianceLift;
+                lpLift+=(egLift*patch.lpEnvelopeScale+touchOctaves+lfo*patch.filterLfo)/leverOctavesPerVolt
+                    +lpBrillianceLift;
+            }
+        }
+        const double hpBusOctaves=leverOctavesPerVolt*hpBus.update(hpLift);
+        const double lpBusOctaves=leverOctavesPerVolt*lpBus.update(lpLift);
+        const bool sharedLpCutoff = patch.lpEnvelopeScale==patch.hpEnvelopeScale &&
+            patch.filterLfo==0 && patch.brilliance==0 && hpBusOctaves==lpBusOctaves;
+        double mixed = 0;
+        for (unsigned i = 0; i < voiceLimit; ++i) {
+            auto& v = voices[i];
             const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
             // Free-running wander, driftCents peak (see ceres.hpp): its 0.2-0.7s
             // hold and .3s smoothing are engineering choices with no source.
@@ -2352,12 +2440,10 @@ struct Synth::Impl {
             const auto waves = v.osc.process(frequency, pulseWidthMod,
                                             resetSeconds,internalFs,stiCoefficient,
                                             sineEnabled,sawEnabled,pulseEnabled);
-            // Each board's EG times, VCA-EG peak and floor (see BoardTolerance;
+            // Each board's VCA-EG times, peak and floor (see BoardTolerance;
             // the shared values when the envelope tolerance is off).
-            const auto& egf=v.board.filterCoefficients;
             const auto& ega=v.board.ampCoefficients;
-            const double filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
-                patch.filterAttackHeadroom,patch.filterAttackSaturation,egf[0],egf[3],egf[1],egf[2]);
+            const double filterEnvelope = v.filterEnvelope;
             const double ampEnvelope = std::max(0.0,v.amp.advance(v.board.ampFloor,v.board.ampPeak,
                 v.board.ampSustained,
                 patch.ampAttackHeadroom,patch.ampAttackSaturation,ega[0],ega[3],ega[1],ega[2]));
@@ -2393,7 +2479,7 @@ struct Synth::Impl {
             if (board.hpCutoff > filterFrequencyFloor) {
                 hpExp = keyOctaves+filterEnvelope*board.hpEnvelopeGain*patch.hpEnvelopeScale
                     + touchOctaves*board.hpScale*hpSubRelativeScale+lfo*board.hpScale*filterLfoHp
-                    + board.hpBrilliance;
+                    + hpBusOctaves*board.hpScale + board.hpBrilliance;
                 if (v.expCacheReady && hpExp == v.cachedHpExp) {
                     hpFactor = v.cachedHpFactor;
                 } else {
@@ -2412,7 +2498,7 @@ struct Synth::Impl {
                 } else {
                     const double lpExp = keyOctaves+filterEnvelope*board.lpEnvelopeGain*patch.lpEnvelopeScale
                         + touchOctaves*board.lpScale+lfo*board.lpScale*patch.filterLfo
-                        + board.lpBrilliance;
+                        + lpBusOctaves*board.lpScale + board.lpBrilliance;
                     double lpFactor;
                     if (v.expCacheReady && lpExp == v.cachedLpExp) {
                         lpFactor = v.cachedLpFactor;
@@ -2730,7 +2816,7 @@ std::array<Synth::VoiceState,Synth::maxVoiceCount> Synth::allVoiceState() const 
 Synth::ModulationState Synth::modulationState() const {
     return {impl_->lastSub,impl_->ringEnvelope.voltage,impl_->ringFrequency,
         impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier,impl_->ringSwitchGain,impl_->ringDepthValue,
-        impl_->ringSignalInput,impl_->ringSignalOutput};
+        impl_->ringSignalInput,impl_->ringSignalOutput,impl_->hpBus.shift,impl_->lpBus.shift};
 }
 Synth::SoundPathState Synth::soundPathState() const {
     return {impl_->qVoltageOffset,impl_->effectiveHpResonance,
@@ -3001,9 +3087,11 @@ Patch preset(const std::string& name) {
         // the shared EG uses 220k for HP and 47k for LP, so at the levers'
         // 1 oct/V the EG moves the cutoffs 39/220 and 39/47 octave per EG
         // volt, relative to the loaded bus voltage above. A board's EG also
-        // lifts its pin-4 node, which unloads the shared passive bus and so
-        // raises every board's cutoff a little: at most .03 octave per board
-        // at +5V LP EG on a weak column, .1 with all four. Not modelled.
+        // lifts its pin-4 node, which unloads the shared bus and raises every
+        // board's cutoff a little (CutoffBus). That is solved behind the
+        // PANEL lever's diode; a tablet's column couples more than the lever
+        // above its floor: .07-.09 octave with four boards at +5V LP EG on
+        // the weaker columns.
         p.hpEnvelopeScale=leverOctavesPerVolt*39/220;
         p.lpEnvelopeScale=leverOctavesPerVolt*39/47;
         // Q columns h (HP) and j (LP): each pin 7 takes its preset Q bus P

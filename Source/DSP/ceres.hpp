@@ -453,6 +453,9 @@ public:
         // the linear-pair equivalent of the signal pair's current split
         // (equal for small signals; the pair limits near .56V at pin 1).
         double ringSignalInput, ringSignalOutput;
+        // The FH and FL cutoff buses above their unlifted level, in bus volts
+        // (octaves at the lever's 1 oct/V before a board's own sensitivity).
+        double hpBus, lpBus;
     };
     struct SoundPathState {
         double resonanceVoltageOffset, hpResonance, lpResonance;

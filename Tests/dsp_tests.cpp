@@ -177,8 +177,13 @@ void fixedConductanceModulation() {
     const double fixedHz=1/(2*pi*capacitance*resistance);
     for (int note : {36,48,60,72,84}) for (bool zeroGm : {false,true}) {
         auto tracking=ceres::preset("init");
+        // Below the PANEL lever's 0V floor (gm 62.5Hz) at every key, so the
+        // shared cutoff rows' diodes stay off and the rows answer the EG
+        // linearly whatever the cutoff: key tracking and a static gm change
+        // then see the same row rise. Above it a static cutoff also sets the
+        // row diode's bias, which key tracking does not.
         tracking.hpCutoff=zeroGm ? 5 : 30;
-        tracking.lpCutoff=zeroGm ? 10 : 100;
+        tracking.lpCutoff=zeroGm ? 10 : 35;
         tracking.hpResonance=.4; tracking.lpResonance=.7;
         tracking.filterInitial=-2; tracking.filterPeak=3;
         tracking.filterAttack=.015; tracking.filterDecay=.12;
@@ -213,14 +218,22 @@ void fixedConductanceModulation() {
     // shift. Both envelopes have identical span/duration and differ by one
     // volt throughout the attack. This isolates EG from keyboard tracking.
     auto a=ceres::preset("init");
-    a.keyTrack=0; a.hpCutoff=30; a.lpCutoff=100;
+    a.keyTrack=0; a.hpCutoff=30; a.lpCutoff=60;
     a.hpResonance=.4; a.lpResonance=.7; a.drive=.05;
     a.filterInitial=-2; a.filterPeak=2; a.filterAttack=.3;
     a.hpEnvelopeScale=.2; a.lpEnvelopeScale=.8;
     a.boardFilterTolerance=a.boardEnvelopeTolerance=0; // nominal EG octaves per volt
     auto b=a; b.filterInitial+=1; b.filterPeak+=1;
-    b.hpCutoff=fixedHz+(a.hpCutoff-fixedHz)*std::pow(2.0,-a.hpEnvelopeScale);
-    b.lpCutoff=fixedHz+(a.lpCutoff-fixedHz)*std::pow(2.0,-a.lpEnvelopeScale);
+    // The volt also lifts the shared cutoff rows under all four boards. Both
+    // cutoffs sit below the lever's 0V floor, where the rows are linear, so
+    // that rise is a constant the calibration absorbs too; the rows
+    // themselves are checked in Ceres.sound_path_circuit_contracts.
+    const auto rowRise=[&](const ceres::Patch& p) {
+        ceres::Synth s(48000,71);s.setPatch(p);s.noteOn(60);s.process();return s.modulationState();
+    };
+    const auto low=rowRise(a), high=rowRise(b);
+    b.hpCutoff=fixedHz+(a.hpCutoff-fixedHz)*std::pow(2.0,-a.hpEnvelopeScale-(high.hpBus-low.hpBus));
+    b.lpCutoff=fixedHz+(a.lpCutoff-fixedHz)*std::pow(2.0,-a.lpEnvelopeScale-(high.lpBus-low.lpBus));
     ceres::Synth first(48000,71), shifted(48000,71);
     first.setPatch(a); shifted.setPatch(b);
     first.noteOn(60); shifted.noteOn(60);
@@ -258,7 +271,10 @@ void masterPitchRouting() {
             for (bool zeroGm : {false,true}) {
                 auto tuned=ceres::preset("init");
                 tuned.tuneCents=cents; tuned.keyTrack=tracking;
-                tuned.hpCutoff=zeroGm ? 5 : 180; tuned.lpCutoff=zeroGm ? 5 : 1600;
+                // Below the lever's 0V floor (gm 62.5Hz) at every PITCH, where
+                // the shared rows answer the EG linearly whatever the cutoff
+                // (see fixedConductanceModulation).
+                tuned.hpCutoff=zeroGm ? 5 : 30; tuned.lpCutoff=zeroGm ? 5 : 60;
                 tuned.hpResonance=.4; tuned.lpResonance=.7; tuned.drive=.05;
                 tuned.filterInitial=-2; tuned.filterPeak=3; tuned.filterAttack=.015;
                 tuned.filterDecay=.12; tuned.hpEnvelopeScale=.2; tuned.lpEnvelopeScale=.8;
@@ -1282,12 +1298,14 @@ void sustainKeyCvModes() {
     require(opened.note==60 && opened.keyNote==72,"Entering II immediately tracks last assigned key without changing ownership");
     require(opened.ampEnvelope==released.ampEnvelope && opened.filterEnvelope==released.filterEnvelope &&
         opened.oscillatorPhase==released.oscillatorPhase && !opened.held,"Opening SH must preserve all board charge/phase/gates");
-    s.process();const auto sounding=s.voiceState()[0];
+    s.process();const auto sounding=s.voiceState()[0];const auto rows=s.modulationState();
     const double floor=1/(2*pi*1.5e-9*4.7e6);
     require(std::abs(sounding.oscillatorFrequency-523.2511306011972)<1e-10,"Released tail VCO tracks updated key CV");
-    require(std::abs(sounding.hpFrequency-(floor+(p.hpCutoff-floor)*std::exp2(1+sounding.filterEnvelope*p.hpEnvelopeScale)))<1e-10,
+    // Every board's EG also lifts the shared cutoff rows; their rise is
+    // checked against the printed network in Ceres.sound_path_circuit_contracts.
+    require(std::abs(sounding.hpFrequency-(floor+(p.hpCutoff-floor)*std::exp2(1+sounding.filterEnvelope*p.hpEnvelopeScale+rows.hpBus)))<1e-10,
         "Released tail HP shares updated keyboard voltage");
-    require(std::abs(sounding.lpFrequency-(floor+(p.lpCutoff-floor)*std::exp2(1+sounding.filterEnvelope*p.lpEnvelopeScale)))<1e-9,
+    require(std::abs(sounding.lpFrequency-(floor+(p.lpCutoff-floor)*std::exp2(1+sounding.filterEnvelope*p.lpEnvelopeScale+rows.lpBus)))<1e-9,
         "Released tail LP shares updated keyboard voltage");
     s.noteOn(67);require(s.voiceState()[0].keyNote==67 && s.voiceState()[1].keyNote==72,
         "New assignments retune free tails while held boards remain unchanged");

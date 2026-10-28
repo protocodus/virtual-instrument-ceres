@@ -253,6 +253,8 @@ The first two controls use an explicitly anchored stiff-source model, not recove
 
 Neutral offsets, common level 1 and output trim 0 preserve the prior paths when the intentionally corrected SUB filter route is inactive. The output trim is a modern linear utility, not part of the analog model; it adds no limiter and cannot promise a fixed peak under arbitrary MIDI. The [source audit](Docs/research/sound-path-gap-audit-2026-10-18.md) distinguishes known resistor/capacitor relationships from provisional control calibration.
 
+The four boards' cutoffs share the FH and FL rows. A board's VCF EG, touch, SUB and BRILLIANCE lift its filter chip's control node, which then draws less from the row through its 39k, so the row and every board's cutoff rise a little; `modulationState()` reports the rise as `hpBus` and `lpBus`. Near the PANEL lever's floor, four boards at +5 V of LP EG raise each other's cutoff by 0.1 octave; higher up the lever's diode holds the row, to 0.009 octave with the lever at 1 V. The rows always carry the four physical boards, idle ones at their EG's initial level, at any voice count; further voices follow the rows without loading them. With nothing lifting them the cutoffs are exactly the patch's.
+
 ### Portamento, glissando and the key assigner
 
 | Key | Range | Default | Meaning |
@@ -298,6 +300,7 @@ The editor (1080×750) is laid out like the CS-50 panel: the tone-selector table
 - Factory control-voltage calibration, source impedances, some chip loading/nonlinearities and absolute ring wet gain remain uncertain. The ring envelope's alignment voltage and the output level meter's load come from the CS-80's procedure for the same circuits; no CS-50 document states them. The RESONANCE controls' 17 ms lag and the Q buses' loads take the filter chip's resonance pin as a 1.72 kΩ current input: the CS-30, CS-15 and CS-40M boards for the same chip show that it takes current, but its input resistance is inferred, not printed. See [DSP source and model limits](Docs/research/dsp-source.md) and the [audible circuit evidence](Docs/validation/audible-circuits-2026-10-19/README.md).
 - Historical research reports bind their original sources and may reference external working directories or source recordings. They are retained provenance, not portable current-CI results.
 - EXT IN's host-rate signal is interpolated linearly inside the oversampled engine; the op-amp swings and the preamp's slew rate are datasheet typicals, and the preamp's 29.7 kHz closed-loop bandwidth is not modelled (under 0.5 dB at 10 kHz). Optional velocity and MIDI-pedal behavior are explicitly modern adaptations.
+- The cutoff rows are solved behind the PANEL lever's follower and diode. A patch does not say whether a tablet set its cutoff, and a tablet's column couples the boards more: 0.07–0.09 octave with four boards at +5 V of LP EG on the weaker columns.
 - The portamento/glissando clock rate and the noise limiter's bandwidth and slew rate are not calibrated.
 
 ## Build

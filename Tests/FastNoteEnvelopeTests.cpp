@@ -88,8 +88,10 @@ void rapidVelocityAndGates() {
                 for(unsigned f=0;f<13;++f) {
                     expected=target+(expected-target)*std::exp(-1/(fs*.005));
                     require(std::isfinite(synth.process()),"Finite rapid CV sample");
-                    // LP carries the full touch-brilliance depth (R7 TBR 47k).
-                    const double actual=std::log2((synth.allVoiceState()[0].lpFrequency-floorHz)/(1000-floorHz));
+                    // LP carries the full touch-brilliance depth (R7 TBR 47k), less
+                    // the shared row's rise under it (sound path contracts).
+                    const double actual=std::log2((synth.allVoiceState()[0].lpFrequency-floorHz)/(1000-floorHz))
+                        -synth.modulationState().lpBus;
                     near(actual,expected,4e-12,"Rapid velocity retarget follows elapsed-time five-ms RC");
                 }
             }
