@@ -129,7 +129,8 @@ void vibratoThroughEngine() {
 // ratio, the non-inverting preamp's 1+100k/1k, a 10uF capacitor into EXO's
 // 100k (with SUI's 100k in parallel while EXT is selected), and the two
 // NJM4558 output swings, datasheet typicals and so an ESTIMATE: +/-14 V into
-// the preamp's >=10k load, +/-13 V into the levers' >=2k. One SUB unit is the
+// the preamp's >=10k load, +/-13 V into the levers' >=2k. The preamp slews at
+// the datasheet's typical 1 V/us, an ESTIMATE too. One SUB unit is the
 // internal sources' 1.5 V peak at SUI.
 constexpr double pi=3.14159265358979323846;
 constexpr double subPeakVolts=1.5;
@@ -137,6 +138,7 @@ constexpr double extPreampGain=1+100e3/1e3;
 constexpr double extTauSelected=10e-6*(100e3*100e3/(100e3+100e3));
 constexpr double extTauOpen=10e-6*100e3;
 constexpr double extPreampSwing=14/subPeakVolts, extFollowerSwing=13/subPeakVolts;
+constexpr double extSlewPerSecond=1e6/subPeakVolts;
 
 ceres::Synth configured(double fs,unsigned factor,const ceres::Patch& p,std::uint64_t seed=5) {
     ceres::Synth s(fs,seed);
@@ -249,6 +251,37 @@ void externalSwings() {
         s.process();const double sub=s.modulationState().sub;
         if(n<1700)require(sub==extFollowerSwing,"4x EXT overdrive holds the follower swing");
         if(n>=1800)require(sub<extFollowerSwing,"4x EXT overdrive decays below the follower swing");
+    }
+}
+
+void externalSlew() {
+    // An overdriven square: the preamp sits on one swing, then the jack flips.
+    // A full swing (28 V) takes 28 us, longer than a 48 kHz host period, so the
+    // edge reaches SUI as a ramp. Held 10 ms first, the capacitor has decayed
+    // little and the follower clips the held level, not the ramp.
+    const double fs=48000,T=1/fs;constexpr unsigned held=480;
+    {
+        auto s=configured(fs,1,externalPatch());s.externalInput(50);
+        for(unsigned n=0;n<held;++n)s.process();
+        s.externalInput(-50);s.process();
+        // One host period of slew from +14 V, then the RC step response.
+        const double ramp=extSlewPerSecond*T;
+        near(s.modulationState().sub,extPreampSwing*std::exp(-(held+.5)*T/extTauSelected)
+             -ramp*std::exp(-.5*T/extTauSelected),1e-8,"EXT preamp slews 1 V/us at 1x");
+        s.process();
+        near(s.modulationState().sub,-extFollowerSwing,0,"The second host period completes the swing");
+    }
+    {
+        // At 4x the host step is interpolated across four internal steps: the
+        // targets are 25, 0, -25 and -50, so the preamp leaves its swing at the
+        // second step and slews for three. The capacitor decays 4e-4 in that time.
+        auto s=configured(fs,4,externalPatch());s.externalInput(50);
+        for(unsigned n=0;n<held;++n)s.process();
+        const double before=s.modulationState().sub;
+        s.externalInput(-50);s.process();
+        const double unclipped=extPreampSwing*std::exp(-(held-.5)*T/extTauSelected);
+        require(before==extFollowerSwing && unclipped>extFollowerSwing,"The held swing clips at the follower");
+        near(s.modulationState().sub-unclipped,-3*extSlewPerSecond*T/4,5e-4,"EXT preamp slews 1 V/us at 4x");
     }
 }
 
@@ -366,7 +399,7 @@ void externalHousekeeping() {
 int main() {
     try {
         speedCalibration();depthLevers();sourceShapes();vibratoThroughEngine();
-        externalSelector();externalPassband();externalCoupling();externalSwings();
+        externalSelector();externalPassband();externalCoupling();externalSwings();externalSlew();
         externalInert();externalRoutes();externalHousekeeping();
     } catch(const std::exception& e) {std::fprintf(stderr,"FAIL: %s\n",e.what());return 1;}
     std::puts("SUB oscillator contracts passed");

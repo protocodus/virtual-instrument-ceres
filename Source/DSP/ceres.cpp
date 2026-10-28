@@ -1386,12 +1386,23 @@ constexpr double subNoiseRail=15*(100./122.)/1.5;
 // (VOM, +/-15 V; ESTIMATE): the preamp drives 101k||50k, so +/-14 V (RL>=10k);
 // IC1-1 drives the three B-10k PN3 levers, about 3k, so +/-13 V (RL>=2k). The
 // square's 15k/1.8k divider assumes the same 14 V (14*1.8/16.8 = 1.5 V).
-// The preamp's 3 MHz typical gain-bandwidth (29.7 kHz closed-loop) and 1 V/us
-// slew rate act only at the top of the audio band or in hard overload, and
-// are not modelled.
+// The preamp's slew rate is an NJM4558 datasheet typical too (1 V/us;
+// ESTIMATE, as for the noise limiter): a rail-to-rail swing takes 28 us, so an
+// overdriven input, the usual case at x101, reaches SUI as a trapezoid rather
+// than a square, and a full-swing tone loses its edges above about 11 kHz.
+// The 3 MHz gain-bandwidth closes the x101 loop at 29.7 kHz, under .5 dB at
+// 10 kHz and a 5.4 us settling tail; it is left out, so a signal the slew rate
+// does not limit passes as before.
 constexpr double externalPreampRail=14/1.5, externalBufferRail=13/1.5;
+constexpr double externalPreampSlew=1e6/1.5; // SUB units per second
 constexpr double externalCouplingTauSelected=10e-6*(100e3*100e3/200e3);
 constexpr double externalCouplingTauOpen=10e-6*100e3;
+// One internal step: reach the target, or move by at most the slew step.
+CERES_ALWAYS_INLINE double externalPreampStep(double y,double target,double step) {
+    const double error=target-y;
+    y=inlineAbs(error)<=step ? target : y+(error>0 ? step : -step);
+    return clamp(y,-externalPreampRail,externalPreampRail);
+}
 
 // Acklam's rational inverse normal CDF, relative error below 1.2e-9: one
 // uniform draw per Gaussian sample keeps the shared random sequence intact.
@@ -1925,6 +1936,7 @@ struct Synth::Impl {
     // and the interpolated value for this internal step; the coupling
     // capacitor between the EXT preamp and EXO/SUI.
     double externalTarget = 0, externalPrevious = 0, externalNow = 0;
+    double externalPreamp = 0, externalPreampSlewStep = 0;
     OutputCoupling externalCoupling;
     OutputCoupling::Coefficients externalSelectedCoefficients, externalOpenCoefficients;
     Envelope ringEnvelope;
@@ -1985,6 +1997,7 @@ struct Synth::Impl {
         pickupCoefficients=OutputCoupling::Coefficients(pickupCouplingTau,limiterRate);
         externalSelectedCoefficients=OutputCoupling::Coefficients(externalCouplingTauSelected,internalFs);
         externalOpenCoefficients=OutputCoupling::Coefficients(externalCouplingTauOpen,internalFs);
+        externalPreampSlewStep=externalPreampSlew/internalFs;
         ringSignalCoefficients=OutputCoupling::Coefficients(ringSignalCouplingTau,internalFs);
         ringWetCoefficients=OutputCoupling::Coefficients(ringWetCouplingTau,internalFs);
         ringCarrierCoupling.configure(internalFs);
@@ -2117,7 +2130,7 @@ struct Synth::Impl {
         physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
         physicalKeyPresses=0; lastAssignedKey=60;
         subNoiseMemory=limiterInput=limiterOutput=0; pickupCoupling={};
-        externalTarget=externalPrevious=externalNow=0; externalCoupling={};
+        externalTarget=externalPrevious=externalNow=externalPreamp=0; externalCoupling={};
         limiterRandom=Random(seed^0xd1b54a32d192ed03ULL); ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={}; ringSignalCoupling={};
         ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
@@ -2242,8 +2255,8 @@ struct Synth::Impl {
         // switch-loaded coupling capacitor, then the IC1-1 follower's swing.
         // The preamp and capacitor run whatever FUNCTION selects.
         const bool external=patch.lfoWaveform==5;
-        const double externalSub=clamp(externalCoupling.process(
-            clamp(patch.extLevel*externalNow,-externalPreampRail,externalPreampRail),
+        externalPreamp=externalPreampStep(externalPreamp,patch.extLevel*externalNow,externalPreampSlewStep);
+        const double externalSub=clamp(externalCoupling.process(externalPreamp,
             external ? externalSelectedCoefficients : externalOpenCoefficients),
             -externalBufferRail,externalBufferRail);
         const double lfo = external ? externalSub : subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
