@@ -12,14 +12,14 @@ The CI-generated demos below play **eight of the circuit engine's 14 research pr
 
 | # | Preset | Demo | Length | Peak |
 | --- | --- | --- | --- | --- |
-| 1 | init | [01-init.wav](Docs/audio/01-init.wav) | 10.5 s | -9.5 dBFS |
-| 2 | string1 | [02-string1.wav](Docs/audio/02-string1.wav) | 11.2 s | -10.6 dBFS |
-| 4 | brass1 | [04-brass1.wav](Docs/audio/04-brass1.wav) | 10.2 s | -11.9 dBFS |
-| 6 | flute | [06-flute.wav](Docs/audio/06-flute.wav) | 9.7 s | -19.8 dBFS |
-| 7 | electric_piano | [07-electric-piano.wav](Docs/audio/07-electric-piano.wav) | 11.0 s | -7.2 dBFS |
-| 8 | clavichord | [08-clavichord.wav](Docs/audio/08-clavichord.wav) | 11.5 s | -13.2 dBFS |
-| 10 | guitar1 | [10-guitar1.wav](Docs/audio/10-guitar1.wav) | 11.8 s | -14.2 dBFS |
-| 12 | funky1 | [12-funky1.wav](Docs/audio/12-funky1.wav) | 11.5 s | -16.7 dBFS |
+| 1 | Init | [01-init.wav](Docs/audio/01-init.wav) | 10.5 s | -9.5 dBFS |
+| 2 | String 1 | [02-string-1.wav](Docs/audio/02-string-1.wav) | 11.2 s | -10.6 dBFS |
+| 4 | Brass 1 | [04-brass-1.wav](Docs/audio/04-brass-1.wav) | 10.2 s | -11.9 dBFS |
+| 6 | Flute | [06-flute.wav](Docs/audio/06-flute.wav) | 9.7 s | -19.8 dBFS |
+| 7 | Electric Piano | [07-electric-piano.wav](Docs/audio/07-electric-piano.wav) | 11.0 s | -7.2 dBFS |
+| 8 | Clavichord | [08-clavichord.wav](Docs/audio/08-clavichord.wav) | 11.5 s | -13.2 dBFS |
+| 10 | Guitar 1 | [10-guitar-1.wav](Docs/audio/10-guitar-1.wav) | 11.8 s | -14.2 dBFS |
+| 12 | Funky 1 | [12-funky-1.wav](Docs/audio/12-funky-1.wav) | 11.5 s | -16.7 dBFS |
 
 <!-- audio-demos-end -->
 
@@ -163,7 +163,7 @@ Reuse the previous sample's exact final `tanh` value at the next filter solve. C
 ## Downloads
 
 <!-- build-download-begin -->
-**[Download main build 43](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/40471947604/artifacts/12720008231)**, built from [`312a7ab17261`](https://github.com/protocodus/virtual-instrument-ceres/commit/312a7ab17261cd51be0ad8d9034975d9c79dbf79). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
+**[Download main build 46](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/40516581105/artifacts/12767057747)**, built from [`5856bed4e1a0`](https://github.com/protocodus/virtual-instrument-ceres/commit/5856bed4e1a0382a87f4a187b0d9f854037033e1). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
 <!-- build-download-end -->
 
 ---
@@ -319,7 +319,7 @@ ctest --test-dir build-dsp -L '^audio$' --output-on-failure
 ./build-dsp/RenderCeresPresetDemos --jobs 4 Docs/audio/midi build-dsp/demo-audio
 ```
 
-The demo tool uses the shared fixed 48 kHz/256-frame/seed protocol and the original [MIDI phrase definitions](Docs/audio/midi/README.md). It duplicates the mono engine into two identical channels without gain changes. Every raw render must be finite, audible, below 0 dBFS, 8–12 s long and identical on repetition, and is written as a 48 kHz 24-bit WAV; no captured sound or preset-specific level adjustment is involved. Historical empty-bank failure evidence remains frozen in the [initial integration report](Docs/validation/main-integration-2026-10-19/report.json); the subsequent [demo integration validation](Docs/validation/research-demos-2026-10-19/report.json) records the resolved audio path and its new build identity.
+The demo tool uses the shared fixed 48 kHz/256-frame/seed protocol and the original MIDI phrases written by [`Tools/write_preset_midi.py`](Tools/write_preset_midi.py). It duplicates the mono engine into two identical channels without gain changes. Every raw render must be finite, audible, below 0 dBFS, 8–12 s long and identical on repetition, and is written as a 48 kHz 24-bit WAV; no captured sound or preset-specific level adjustment is involved. Historical empty-bank failure evidence remains frozen in the [initial integration report](Docs/validation/main-integration-2026-10-19/report.json); the subsequent [demo integration validation](Docs/validation/research-demos-2026-10-19/report.json) records the resolved audio path and its new build identity.
 
 ```sh
 cmake -S . -B build-sanitize -DCMAKE_BUILD_TYPE=Debug -DCERES_BUILD_PLUGIN=OFF -DCERES_SANITIZE=ON

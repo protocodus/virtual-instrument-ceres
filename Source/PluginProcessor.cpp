@@ -20,29 +20,6 @@ constexpr int kStateVersion = 2;
 const juce::Identifier kStateType { "Ceres" }, kStateVersionProperty { "stateVersion" },
     kProgramProperty { "program" }, kPluginVersionProperty { "pluginVersion" }, kUnitProperty { "unit" };
 
-// "string1" -> "String 1", "electric_piano" -> "Electric Piano".
-juce::String programName (const std::string& key)
-{
-    juce::String name;
-    bool wordStart = true;
-    for (std::size_t i = 0; i < key.size(); ++i)
-    {
-        const auto c = static_cast<juce::juce_wchar> (static_cast<unsigned char> (key[i]));
-        if (c == '_' || c == '-')
-        {
-            name << ' ';
-            wordStart = true;
-            continue;
-        }
-        if (juce::CharacterFunctions::isDigit (c) && i > 0 && ! juce::CharacterFunctions::isDigit (
-                static_cast<juce::juce_wchar> (static_cast<unsigned char> (key[i - 1]))))
-            name << ' ';
-        name << juce::String::charToString (wordStart ? juce::CharacterFunctions::toUpperCase (c) : c);
-        wordStart = false;
-    }
-    return name;
-}
-
 // An engine key the presentation table does not know: "board_x" -> "Board x".
 juce::String keyName (const char* key)
 {
@@ -203,7 +180,7 @@ CeresAudioProcessor::CeresAudioProcessor()
     globalReleaseValue = parameters.getRawParameterValue ("global_release");
 
     for (const auto& name : ceres::presetNames())
-        programs.push_back ({ programName (name), ceres::preset (name) });
+        programs.push_back ({ juce::String (ceres_plugin::programName (name)), ceres::preset (name) });
     // A new instance opens on the first program, Init.
     setCurrentProgram (0);
     readControls (true);
