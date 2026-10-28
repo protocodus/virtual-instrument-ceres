@@ -213,14 +213,19 @@ constexpr double qBranchReturn=qPinResistance/(220e3+qPinResistance);
 constexpr double glideHoldCap=.033e-6;
 constexpr double glideTauLarge=3.3e6*glideHoldCap;
 constexpr double glideTauMedium=(470e3*3.3e6/(470e3+3.3e6))*glideHoldCap;
-// Mapping a glide rate back to a PS voltage needs the lever's clock law, which
-// is not printed. ESTIMATE: the counter clock period runs log-linearly in PS
-// across the lever, from the printed 11s at -6.5V to 1.4ms at +8.5V (SM1 p.5,
-// YM26700 pin 4 "the frequency is variable by changing the portamento VR").
-// That places the two comparator thresholds at these step rates;
-// Ceres.HardwareRealism recomputes both from the printed endpoints.
-constexpr double glideMediumAbove=1.584522156984606;
-constexpr double glideDirectAbove=43.24665787480699;
+// Mapping a glide rate back to a PS voltage needs the lever's clock law. Its
+// ends are trimmed on the KAS board: VR5 sets the counter clock (IC24 pin 6)
+// to 6Hz at LONG and VR4 to 6kHz at SHORT (sibling CS-60 SM printed p.35, KAS
+// IV, a page that also gives the 4-sound CS-50 its own figures in III and V
+// and none here). The CS-50's SM1 printed p.5 gives YM26700 pin 4 as 11s at
+// -6.5V to 1.4ms at +8.5V instead, a LONG/SHORT ratio of 7860 against 1000,
+// so the two cannot be one node; the owner chose the CS-60 trim on
+// 2026-10-28 (Docs/decisions.md). ESTIMATE: the clock runs log-linearly in PS
+// across the lever's -6.5..+8.5V. That places the two comparator thresholds
+// at these step rates; Ceres.HardwareRealism recomputes both from the trimmed
+// ends. The direct gate lies above glide_rate's 200 steps/s.
+constexpr double glideMediumAbove=54.21896842333811;
+constexpr double glideDirectAbove=692.0719546926555;
 // PRA ring modulator, IC8 Fairchild uA796HC (SM2 printed p.22 / PDF16; guide
 // printed p.52 / PDF61; overall circuit diagram). Pin roles are the uA796
 // sheet's (Fairchild 1973 Linear IC catalog pp.7-74..7-77): 1/4 signal
@@ -2262,7 +2267,8 @@ struct Synth::Impl {
         // Hz, so a wide glide covers its last semitones more slowly in pitch.
         // The gate the lever selects fixes the time constant; in the fast
         // regime the direct gate passes the counter's steps as they are, so
-        // portamento and glissando meet at the short end of the lever.
+        // portamento and glissando meet at the short end of the lever (beyond
+        // glide_rate's range).
         v.glideVoltage=glideAlpha==1.0 ? stepped
             : v.glideVoltage+(stepped-v.glideVoltage)*glideAlpha;
         if (v.held || v.pedalHeld || patch.sustainMode==2) {

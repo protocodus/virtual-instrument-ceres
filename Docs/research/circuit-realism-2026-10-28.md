@@ -5,12 +5,13 @@ authentic through circuit modelling. The engine already models almost every
 documented CS-50 stage, so this round looked for places where the engine
 itself computed an effect and then left it out, where its behaviour
 contradicted a printed diagram, or where two printed sources disagree. Four
-changes ship in 1.1.0; the fifth is a disagreement between two printed sources
-that the owner decides by ear.
+changes ship in 1.1.0 from printed circuits; the fifth was a disagreement
+between two printed sources, which the owner settled.
 
-Each change is the commit named beside it on `claude/project-thread-f75gcl`,
-and each has a before/after pair rendered from that commit and its parent in
-[the previews](../audio/previews/2026-10-28-circuit-realism/README.md).
+Each change is the commit named beside it. The first four each have a
+before/after pair rendered from that commit and its parent in
+[the previews](../audio/previews/2026-10-28-circuit-realism/README.md); the
+fifth was judged on its listening set, which was not committed.
 
 ## Sources
 
@@ -117,7 +118,7 @@ cutoff also biases the row's diode, which those modulations do not, so the
 identities moved below it, where the rows are linear and they still hold
 exactly.
 
-## 5. The portamento clock: two printed sources disagree (listening test)
+## 5. The portamento clock follows the KAS trims (owner's choice)
 
 The Guide prints the KAS gate/integrator's three regimes against the
 PORTAMENTO lever voltage (printed p.25: 108.9 ms, 13.6 ms, and a direct gate
@@ -128,9 +129,20 @@ give that clock disagree: the CS-50's SM1 printed p.5 gives YM26700 pin 4 as
 p.35) trims IC24 pin 6 to 6 Hz at LONG and 6 kHz at SHORT. Their LONG/SHORT
 ratios differ (about 7860 against 1000), so they cannot both describe the same
 node. The CS-50's document is not silent here, so under the sibling-evidence
-rule the CS-60 figure cannot decide alone. A lettered set, level-matched, is
-with the owner; its key stays with the set until the verdict, which goes to
-[the decision log](../decisions.md). Nothing ships for it until then.
+rule the CS-60 figure could not decide alone, and a lettered, level-matched
+set went to the owner. The owner took the CS-60 trims ("merge all
+candidates"); [the decision log](../decisions.md) records it as the owner's
+word.
+
+**Now.** The thresholds sit at 54.2 and 692 steps/s instead of 1.58 and 43.2.
+Up to 54 steps/s a glide runs on the 108.9 ms leg, above that on the 13.6 ms
+one; `glide_rate` stops at 200, so the direct gate is out of reach and
+portamento no longer steps. At the default 24 a glide is a smooth curve about
+0.1 s behind the counter, where it was a rippled staircase.
+
+**Evidence.** Sibling procedure (CS-60, on a page that also covers the 4-sound
+CS-50), chosen over a conflicting CS-50 figure by the owner. The log-linear
+clock law between the trims remains an estimate.
 
 ## Candidates considered and set aside
 

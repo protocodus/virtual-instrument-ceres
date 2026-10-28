@@ -63,18 +63,21 @@ void glissandoSteps() {
 
 // The lever's three integrator regimes (guide printed pp.24-25, SM2 p.3): the
 // 3.3M alone, 470k||3.3M, and the direct gate, each into the .033uF hold cap.
-// The thresholds follow from the printed 11s..1.4ms clock range over the
-// lever's -6.5..+8.5V, the log-linear clock law the engine assumes.
+// The thresholds follow from the KAS clock trims, 6Hz at LONG and 6kHz at
+// SHORT (CS-60 SM printed p.35, KAS IV), over the lever's -6.5..+8.5V, the
+// log-linear clock law the engine assumes.
 void glideIntegratorRegimes() {
-    const double slow=1/11., fast=1/1.4e-3;
+    const double slow=6, fast=6e3;
     auto rateAtPs=[&](double ps){return slow*std::pow(fast/slow,(ps+6.5)/15);};
-    near(rateAtPs(-1.72),1.584522156984606,1e-12,"Medium-gate threshold rate");
-    near(rateAtPs(3.81),43.24665787480699,1e-12,"Direct-gate threshold rate");
+    near(rateAtPs(-1.72),54.21896842333811,1e-12,"Medium-gate threshold rate");
+    near(rateAtPs(3.81),692.0719546926555,1e-12,"Direct-gate threshold rate");
     constexpr double fs=8000;
-    // One rate inside each regime, against an explicit counter and integrator.
-    for(auto band:{std::make_pair(1.5,3.3e6*.033e-6),
-                   std::make_pair(12.,(470e3*3.3e6/(470e3+3.3e6))*.033e-6),
-                   std::make_pair(100.,0.)}) {
+    // One rate inside each reachable regime, against an explicit counter and
+    // integrator. glide_rate tops out at 200 steps/s, still on the 470k gate:
+    // the direct gate lies beyond it.
+    for(auto band:{std::make_pair(12.,3.3e6*.033e-6),
+                   std::make_pair(100.,(470e3*3.3e6/(470e3+3.3e6))*.033e-6),
+                   std::make_pair(200.,(470e3*3.3e6/(470e3+3.3e6))*.033e-6)}) {
         const double rate=band.first,tau=band.second;
         ceres::Synth s(fs,3);require(s.configure(1,1),"Configure regime witness");
         auto p=plain();p.glideMode=1;p.glideRate=rate;s.setPatch(p);
@@ -98,7 +101,7 @@ void portamentoIntegratesHz() {
     auto p=plain();p.glideMode=1;p.glideRate=rate;s.setPatch(p);
     s.noteOn(48);
     double code=60,steps=0,voltage=1;
-    const double c=-std::expm1(-1/(fs*(470e3*3.3e6/(470e3+3.3e6))*.033e-6));
+    const double c=-std::expm1(-1/(fs*3.3e6*.033e-6));
     double previous=-1;
     for(unsigned n=0;n<unsigned(fs*3);++n) {
         if(code!=48){steps+=rate/fs;while(steps>=1&&code!=48){code-=1;steps-=1;}}else steps=0;

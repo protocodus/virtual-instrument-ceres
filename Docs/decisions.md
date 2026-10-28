@@ -339,3 +339,35 @@ its `key.md` held the rendering details summarised here.
   It does not license changing the noise model's density, slew, substep rate
   or draw order, which are unchanged, nor other state-freezing optimisations
   (idle voices, decaying filters), each of which would need its own set.
+
+## 2026-10-28: the owner took the portamento clock candidate
+
+The owner answered the open set with "merge all candidates", without saying
+whether it was heard. It is recorded as the owner's word, not as a choice by
+ear; the candidate stands on its own printed source. The set was not
+committed; its `key.md` held the rendering details summarised here.
+
+### Portamento clock law (`2026-10-28-portamento-clock`)
+
+- **Decided:** which printed clock range places the PORTAMENTO lever's three
+  integrator legs (Servicing Guide printed p.25: 3.3M alone, 108.9 ms;
+  470k‖3.3M, 13.6 ms; the direct gate). Both letters take the counter clock as
+  log-linear across the lever's −6.5..+8.5 V; they differ only in its ends,
+  which two printed sources give differently (LONG/SHORT ratios 7860 and
+  1000, so they cannot be one node).
+- **A:** the shipping engine: CS-50 SM1 printed p.5, YM26700 pin 4, 11 s at
+  −6.5 V to 1.4 ms at +8.5 V. Thresholds at 1.58 and 43.2 steps/s; the
+  default `glide_rate` 24 on the 13.6 ms leg, rates above 43.2 on the direct
+  gate.
+- **B:** CS-60 SM printed p.35, KAS adjustment IV: IC24 pin 6 trimmed to 6 Hz
+  at LONG and 6 kHz at SHORT, on a page that covers the 4-sound CS-50 too.
+  Thresholds at 54.2 and 692 steps/s; rates up to 54 on the 108.9 ms leg,
+  above it on the 13.6 ms leg, and the direct gate beyond `glide_rate`'s 200.
+- **Material:** Init, a legato C4 C3 C4 G3 C5 E4 line at `glide_rate` 24 then
+  100, `glide_mode` 1, 48 kHz, four voices, 4x, seed 50. Whole-file RMS
+  matched to A: B +0.039 dB, then +9.71 dB on both.
+- **Chosen:** B, on the owner's word.
+- **Licensed:** the CS-60 clock trims and the thresholds they give ship in
+  Ceres 1.1.0, as sibling evidence. It does not license the log-linear law
+  between the trims, which stays an estimate, nor widening `glide_rate` to
+  the lever's 6 Hz–6 kHz span, which would move saved parameter values.

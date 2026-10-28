@@ -228,10 +228,10 @@ struct Patch {
     // one semitone at a time toward its assigner key at glideRate semitones/s.
     // Glissando sends the steps to the sample-hold; portamento integrates the
     // stepped key voltage, which is linear in Hz, through the gate the lever's
-    // comparators select: 108.9ms below 1.58 steps/s, 13.6ms below 43.2, and
+    // comparators select: 108.9ms below 54.2 steps/s, 13.6ms below 692, and
     // the direct gate above that, where portamento steps like glissando. Those
-    // two thresholds assume a log-linear counter clock, since the lever's
-    // PS-voltage law is not printed; glideRate is an engineering rate.
+    // thresholds assume a counter clock log-linear between the KAS trims'
+    // 6Hz LONG and 6kHz SHORT; glideRate is the clock, not a lever position.
     double glideMode = 0.0, glideRate = 24.0;
     // Modern optional expression routing: 0=channel aftertouch (default),
     // through the touch pre-amplifier's 10ms RC, 1=each board's latched
