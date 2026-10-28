@@ -204,8 +204,8 @@ struct Patch {
     // mix=0 preserves the previous signal path exactly; carrier phase is free.
     // mix is MODULATION lever travel: the B-10k crossfades dry against wet and
     // its own track loads the 8.04k it works into, so the whole mix sits
-    // 2.35dB low at mid-lever. Both ends stay exact. The load assumes the
-    // expression pedal open; closing it straightens the taper (not modelled).
+    // 2.35dB low at mid-lever with the expression pedal open. Closing the
+    // pedal raises that load and straightens the taper. Both ends stay exact.
     // Live digital Depth edits interpolate over20ms without restarting the EG
     // or carrier. Startup/reset precharge the saved value. This dezipper is a
     // DAW-control policy, not a measured component or physical timing law.
