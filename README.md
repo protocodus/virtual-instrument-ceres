@@ -25,6 +25,14 @@ The CI-generated demos below play **eight of the circuit engine's 14 research pr
 
 ## Version history
 
+### 1.1.0 — 2026-10-28 — circuit realism
+
+- A new key takes the board whose key went up longest ago, as the key assigner's "old key off" detector does, instead of the quietest one: a long note's tail is now cut before a shorter, younger one. The assigner reads keys, not envelopes.
+- The ring MODULATION lever's mid-travel dip follows the expression pedal: 2.35 dB with the pedal open, as before, shrinking as it closes (0.64 dB at a −16.5 dB pedal). Both lever ends and an open pedal are unchanged.
+- An overdriven EXT IN signal slews at the preamp op-amp's 1 V/µs, so a clipped square reaches the SUB as a trapezoid. A signal the slew rate does not limit passes bit for bit as before.
+- The four boards' cutoffs now lift each other through the shared FH and FL rows: up to 0.1 octave with four boards' filter EGs at +5 V near the lever's floor, 0.009 octave with the lever at 1 V. On the factory presets the change sits at least 62 dB below the signal; a patch with nothing lifting the rows is unchanged. `modulationState()` reports the rows as `hpBus` and `lpBus`.
+- [Sources and measurements](Docs/research/circuit-realism-2026-10-28.md) and [before/after previews](Docs/audio/previews/2026-10-28-circuit-realism/README.md).
+
 ### 1.0.5 — 2026-10-23 — built the way the Rack builds it
 
 - Four changes, three exact and one at the last bit, for the Rack's toolchain, which compiles the engine with `-fno-builtin` against its own libc++ and does not auto-vectorise: the audio path's `abs`, `copysign`, `sqrt` and `isfinite` are the builtin forms (library calls there), the decimator history is a mirrored ring read through one window and summed in two vector pairs, and the voice loop's envelope, glide and oscillator calls shed their per-sample overhead. Nothing changes about the sound: the 439,296-sample CPU regression stream is byte-identical to 1.0.4 after every commit, and a one-float-ulp perturbation of any cutoff or resonance on every factory preset stays at least 127 dB below the signal without growing, which is why last-bit arithmetic changes in Ceres can be graded by that null test at all. 1.6% fewer instructions at the Rack's four voices/1x and 4.4% at 4x under clang `-O3 -fno-builtin` on this container; the Rack's own object code, where the library calls are real, is where the first change counts. [Protocol, rankings, probe and validation](Docs/benchmarks/cpu-rack-flags-2026-10-23.md).
