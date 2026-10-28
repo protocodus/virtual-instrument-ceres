@@ -1848,7 +1848,9 @@ struct Synth::Impl {
         double velocity = 1, velocityValue = 1, drift = 0, driftTarget = 0;
         std::uint32_t pressTicket = 0;
         unsigned driftCountdown = 0;
-        std::uint64_t age = 0;
+        // age: order of the last key-on; keyOffOrder: of the last key-off
+        // (0 for a board never played since reset).
+        std::uint64_t age = 0, keyOffOrder = 0;
         // Host sample (plus one) of the last assignment, and whether the board
         // was silent before it, so a same-sample assignment can be replaced.
         std::uint64_t assignedAt = 0;
@@ -2065,6 +2067,11 @@ struct Synth::Impl {
             const double vr6=std::sqrt(Synth::voiceCount/power);
             for (auto& voice : voices) voice.board.ampEnvelopeGain*=vr6;
         }
+    }
+    // A board's key goes up: its EGs release, and the KAS notes the order.
+    void keyUp(Voice& v) {
+        if (v.amp.gate) v.keyOffOrder=++age;
+        v.amp.off(); v.filter.off();
     }
     void followFreeKeys() {
         if (patch.sustainMode==2)
@@ -2535,27 +2542,29 @@ void Synth::noteOn(int note, double velocity) {
     // KAS gate control (guide printed pp.17-18) writes a new key only into a
     // channel whose code differs and whose key is up; a released channel that
     // still holds this key is re-keyed. Reuse that board first. Otherwise use
-    // an idle voice, then the quietest released voice, then the oldest
-    // pedal-held one (its key is up). A key pressed while every board's key is
-    // down is not stored (guide printed p.19 timing chart): it sounds neither
-    // now nor when a board frees, though its press still counts for the ring
-    // trigger. Keys pressed together are encoded higher note first (guide
-    // printed p.16), so a key pressed in the same sample as a lower stored key
-    // takes that board instead: a simultaneous chord keeps its highest notes.
-    // Overlapping presses of a still-held note occupy separate voices.
+    // the free board whose key went up longest ago, boards never played
+    // first in channel order, then the oldest pedal-held one (its key is up).
+    // The YM26600 block diagram names an "Old Key OFF CH Detector" (IC Guide
+    // PDF 16), and the guide's p.19 chart gives the next key to channel 1,
+    // released before channel 4; a fixed channel preference would fit that
+    // chart too, but would need no such detector. The KAS
+    // sees only keys: no wire brings an envelope back to it (SM2 pp.3, 7), so
+    // a board still sounding its release is as free as a silent one. A key
+    // pressed while every board's key is down is not stored (guide printed
+    // p.19 timing chart): it sounds neither now nor when a board frees, though
+    // its press still counts for the ring trigger. Keys pressed together are
+    // encoded higher note first (guide printed p.16), so a key pressed in the
+    // same sample as a lower stored key takes that board instead: a
+    // simultaneous chord keeps its highest notes. Overlapping presses of a
+    // still-held note occupy separate voices.
     for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it)
         if (it->note==note && !it->held && !it->pedalHeld) {
             selected=&*it; break;
         }
     if (!selected)
-    for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it) {
-        auto& voice=*it;
-        if (voice.amp.stage == Envelope::Idle && (!selected || voice.age < selected->age)) selected = &voice;
-    }
-    if (!selected)
         for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it) {
             auto& voice=*it;
-            if (!voice.held && !voice.pedalHeld && (!selected || voice.amp.voltage < selected->amp.voltage)) selected = &voice;
+            if (!voice.held && !voice.pedalHeld && (!selected || voice.keyOffOrder < selected->keyOffOrder)) selected = &voice;
         }
     if (!selected)
         for (auto it=state.voices.begin();it!=state.voices.begin()+state.voiceLimit;++it)
@@ -2596,7 +2605,7 @@ void Synth::noteOff(int note) {
     if (selected) {
         selected->held = false;
         selected->pedalHeld = impl_->pedal;
-        if (!selected->pedalHeld) { selected->amp.off(); selected->filter.off(); }
+        if (!selected->pedalHeld) impl_->keyUp(*selected);
         impl_->followFreeKeys();
     }
 }
@@ -2612,7 +2621,7 @@ void Synth::sustain(bool down) {
         for (auto& voice : impl_->voices)
             if (voice.pedalHeld) {
                 voice.pedalHeld = false;
-                if (!voice.held) { voice.amp.off(); voice.filter.off(); }
+                if (!voice.held) impl_->keyUp(voice);
             }
     impl_->followFreeKeys();
 }
@@ -2621,7 +2630,7 @@ void Synth::allNotesOff() {
     for (auto& voice : impl_->voices) {
         if (voice.held) voice.pedalHeld = impl_->pedal;
         voice.held = false;
-        if (!voice.pedalHeld) { voice.amp.off(); voice.filter.off(); }
+        if (!voice.pedalHeld) impl_->keyUp(voice);
     }
     impl_->followFreeKeys();
 }
