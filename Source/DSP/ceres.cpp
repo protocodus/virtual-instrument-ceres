@@ -1986,6 +1986,14 @@ double panelCutoffHz(double travel,double load) {
 struct CutoffBus {
     double source=0, rest=0, restCurrent=0, rl=0, gain=0;
     double current=0, lastLift=0, shift=0;
+    // The current-only terms of the last Newton step: Vd(I) in log1p form and
+    // the slope 1+Vt/(rl(Is+I)). A settled final step often leaves I bit for
+    // bit unchanged (45% of the demos' solves), and the next sample's first
+    // step then evaluates the same terms at the same I. Equal doubles of
+    // different bits are only +/-0, whose terms give the same step. rl
+    // changes only in configure().
+    double termCurrent=0, termLog=0, termSlope=0;
+    bool termsReady=false;
     bool conducting=false, settled=true;
     void configure(double cutoffHz, double node) {
         const double load=(39e3+node)/4;
@@ -1998,6 +2006,7 @@ struct CutoffBus {
         conducting=gm>0 && rest>=0;
         restCurrent=conducting ? rest/rl : 0;
         source=conducting ? rest+presetDiodeVt*std::log1p(restCurrent/presetDiodeIs) : 0;
+        termsReady=false;
         // A new rest: solve the next sample afresh from it.
         reset();
     }
@@ -2013,8 +2022,14 @@ struct CutoffBus {
         if (lift==lastLift && settled) return shift;
         settled=false;
         for (int step=0; step<16 && !settled; ++step) {
-            const double g=current+j-(source-presetDiodeVt*std::log1p(current/presetDiodeIs))/rl;
-            double next=current-g/(1+presetDiodeVt/(rl*(presetDiodeIs+current)));
+            if (!termsReady || current!=termCurrent) {
+                termLog=std::log1p(current/presetDiodeIs);
+                termSlope=1+presetDiodeVt/(rl*(presetDiodeIs+current));
+                termCurrent=current;
+                termsReady=true;
+            }
+            const double g=current+j-(source-presetDiodeVt*termLog)/rl;
+            double next=current-g/termSlope;
             if (next<=-presetDiodeIs) next=.5*(current-presetDiodeIs);
             settled=inlineAbs(next-current)<=1e-14*(inlineAbs(next)+presetDiodeIs);
             current=next;
