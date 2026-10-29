@@ -84,6 +84,52 @@ CERES_ALWAYS_INLINE double fastTanh(double x) {
     }
     return fastTanhLarge(x, ax);
 }
+#if defined(__GNUC__) || defined(__clang__)
+// Two boards' filters solved side by side in explicit two-double lanes (the
+// Rack SDK does not auto-vectorise). Each lane performs the scalar code's
+// IEEE operations in its order, so every lane's bits are the scalar result's;
+// MSVC builds keep the scalar path. aligned(8)/may_alias as for the decimator.
+#define CERES_FILTER_LANES 1
+typedef double Lanes __attribute__((vector_size(16), aligned(8), may_alias));
+typedef long long LaneMask __attribute__((vector_size(16), aligned(8), may_alias));
+CERES_ALWAYS_INLINE Lanes laneAbs(Lanes x) {
+    return (Lanes)((LaneMask)x & 0x7fffffffffffffffLL);
+}
+// mask ? a : b, lane by lane, on the bits.
+CERES_ALWAYS_INLINE Lanes laneSelect(LaneMask mask, Lanes a, Lanes b) {
+    return (Lanes)(((LaneMask)a & mask) | ((LaneMask)b & ~mask));
+}
+// fastTanh in each lane: the same polynomial and grouping, and the same
+// out-of-line identity for a lane at or beyond .625.
+CERES_ALWAYS_INLINE Lanes fastTanhLanes(Lanes x) {
+    const Lanes ax=laneAbs(x);
+    const Lanes s=x*x;
+    constexpr double t0 = -3.33333333333333148e-01;
+    constexpr double t1 = 1.33333333333261500e-01;
+    constexpr double t2 = -5.39682539613069168e-02;
+    constexpr double t3 = 2.18694882598293727e-02;
+    constexpr double t4 = -8.86322982774347123e-03;
+    constexpr double t5 = 3.59205896987225019e-03;
+    constexpr double t6 = -1.45530928769224970e-03;
+    constexpr double t7 = 5.87437278861239988e-04;
+    constexpr double t8 = -2.30776158678562397e-04;
+    constexpr double t9 = 7.95995556195767229e-05;
+    constexpr double t10 = -1.72448740671528368e-05;
+    const Lanes s2 = s * s;
+    const Lanes s4 = s2 * s2;
+    const Lanes r = ((t0 + s * t1) + s2 * (t2 + s * t3))
+        + s4 * ((t4 + s * t5) + s2 * (t6 + s * t7))
+        + (s4 * s4) * ((t8 + s * t9) + s2 * t10);
+    Lanes y = x+x*s*r;
+    const Lanes limit = {.625, .625};
+    const LaneMask small = (LaneMask)(ax < limit);
+    if (CERES_UNLIKELY(!(small[0] & small[1]))) {
+        if (!small[0]) y[0] = fastTanhLarge(x[0], ax[0]);
+        if (!small[1]) y[1] = fastTanhLarge(x[1], ax[1]);
+    }
+    return y;
+}
+#endif
 // 2^x evaluation for filter cutoff factors: 32-entry double-double table
 // (exp2TabHi/Lo) on [0, 1) reduced by k = rint(32 * x), followed by a degree-6
 // polynomial on r in [-1/64, 1/64] under round-to-nearest. The callers pass
@@ -884,18 +930,67 @@ struct OtaSvf {
         network.setResonance(resonance);
         return process(sourceVoltage,frequency,highPass,network);
     }
-    CERES_ALWAYS_INLINE double process(double sourceVoltage, double frequency, bool highPass, const OtaNetwork& network) {
+    // The source terms both capacitor nodes contribute this sample.
+    CERES_ALWAYS_INLINE void begin(double sourceVoltage, const OtaNetwork& network,
+                                   double& input, double& qConstant) const {
         const double ratio=network.ratio, qBlend=network.qBlend;
         const double sourceBlend=network.sourceBlend, divisor=network.divisor;
         // X is the physical Thevenin source voltage, in the SAME OTA voltage
         // unit at both stages. Canonical u=2*Gs*X/D0 is a local algebraic
         // coordinate, not a separate per-stage signal normalization.
-        const double input=2*ratio*sourceVoltage;
+        input=2*ratio*sourceVoltage;
         // Eliminate both linear capacitor nodes simultaneously. The remaining
         // OTA equation has positive derivative because effectiveDamping>0.
-        const double qConstant=((1-qBlend)*sz+
+        qConstant=((1-qBlend)*sz+
             qBlend*(1-sourceBlend)*(input-ratio*sy))/divisor;
-        const double qBand=network.qBand, effectiveDamping=network.effectiveDamping;
+    }
+    // Above the floor: the OTA's gain beyond its feed resistor, and tanh of
+    // the Newton warm start.
+    CERES_ALWAYS_INLINE double nonlinearGain(double frequency, const OtaNetwork& network) {
+        const double cutoff = std::min(frequency, .22 * network.fs);
+        if (cutoff!=cachedCutoff || network.fs!=cachedRate) {
+            // Exact input equality only: moving cutoff CVs retain the same
+            // capacitor TPT prewarp, with no control-rate approximation.
+            cachedG=prewarpTan(pi * cutoff / network.fs);
+            cachedNonlinear=std::max(0.0,cachedG-network.linear);
+            cachedCutoff=cutoff;
+            cachedRate=network.fs;
+        }
+        if (!previousTanhReady) {
+            previousTanhB = fastTanh(previousB);
+            previousTanhReady = true;
+        }
+        return cachedNonlinear;
+    }
+    // tanh(b) is the last evaluation carried along its tangent over that
+    // final sub-ulp step; only an unconverged loop recomputes it.
+    CERES_ALWAYS_INLINE double settledLow(double b, double tanhArgument, double tanhValue,
+                                          double nonlinear, double linear) {
+        const double step = b - tanhArgument;
+        const double tanhB = inlineAbs(step) < 1e-9
+            ? tanhValue + (1 - tanhValue*tanhValue)*step : fastTanh(b);
+        previousTanhB = tanhB;
+        return sl + nonlinear*tanhB + linear*b;
+    }
+    CERES_ALWAYS_INLINE double end(double b, double l, double input, double qConstant,
+                                   bool highPass, const OtaNetwork& network) {
+        const double sourceBlend=network.sourceBlend;
+        const double z = qConstant+network.qBand*b;
+        const double h = z - 2*b - l;
+        // Expand sourceBlend/ratio analytically so tiny positive diagnostic
+        // conductances cannot overflow at the intermediate input/ratio.
+        const double y=(1-sourceBlend)*sy+sourceBlend*(-z+2*b)+network.sourceInput*input;
+        sb = 2 * b - sb;
+        sl = 2 * l - sl;
+        sz = 2 * z - sz;
+        sy = 2 * y - sy;
+        previousB = b;
+        return highPass ? h : l;
+    }
+    CERES_ALWAYS_INLINE double process(double sourceVoltage, double frequency, bool highPass, const OtaNetwork& network) {
+        double input, qConstant;
+        begin(sourceVoltage,network,input,qConstant);
+        const double effectiveDamping=network.effectiveDamping;
         const double linear = network.linear;
         double b = previousB;
         double l = 0;
@@ -913,20 +1008,7 @@ struct OtaSvf {
             l = sl + linear * b;
             previousTanhReady = false;
         } else {
-            const double cutoff = std::min(frequency, .22 * network.fs);
-            if (cutoff!=cachedCutoff || network.fs!=cachedRate) {
-                // Exact input equality only: moving cutoff CVs retain the same
-                // capacitor TPT prewarp, with no control-rate approximation.
-                cachedG=prewarpTan(pi * cutoff / network.fs);
-                cachedNonlinear=std::max(0.0,cachedG-linear);
-                cachedCutoff=cutoff;
-                cachedRate=network.fs;
-            }
-            const double nonlinear = cachedNonlinear;
-            if (!previousTanhReady) {
-                previousTanhB = fastTanh(previousB);
-                previousTanhReady = true;
-            }
+            const double nonlinear = nonlinearGain(frequency,network);
             // The last tanh(b) the iterations evaluated, and its argument.
             double tanhArgument = previousB, tanhValue = previousTanhB;
             for (int iteration = 0; iteration < 7; ++iteration) {
@@ -947,26 +1029,59 @@ struct OtaSvf {
                 // on the factory presets) and no change at the float output.
                 if (inlineAbs(delta) < 1e-9) break;
             }
-            // tanh(b) is the last evaluation carried along its tangent over that
-            // final sub-ulp step; only an unconverged loop recomputes it.
-            const double step = b - tanhArgument;
-            const double tanhB = inlineAbs(step) < 1e-9
-                ? tanhValue + (1 - tanhValue*tanhValue)*step : fastTanh(b);
-            l = sl + nonlinear*tanhB + linear*b;
-            previousTanhB = tanhB;
+            l = settledLow(b,tanhArgument,tanhValue,nonlinear,linear);
         }
-        const double z = qConstant+qBand*b;
-        const double h = z - 2*b - l;
-        // Expand sourceBlend/ratio analytically so tiny positive diagnostic
-        // conductances cannot overflow at the intermediate input/ratio.
-        const double y=(1-sourceBlend)*sy+sourceBlend*(-z+2*b)+network.sourceInput*input;
-        sb = 2 * b - sb;
-        sl = 2 * l - sl;
-        sz = 2 * z - sz;
-        sy = 2 * y - sy;
-        previousB = b;
-        return highPass ? h : l;
+        return end(b,l,input,qConstant,highPass,network);
     }
+#if defined(CERES_FILTER_LANES)
+    // Two boards' filters on the same network, each exactly as process()
+    // would solve it. Both lanes iterate until both have converged; a lane
+    // that has converged keeps its b and its last tanh pair unchanged, as its
+    // scalar loop's break would. A board at the floor takes the scalar path.
+    static CERES_ALWAYS_INLINE void processPair(OtaSvf& first, OtaSvf& second,
+            double firstSource, double secondSource, double firstFrequency, double secondFrequency,
+            bool highPass, const OtaNetwork& network, double& firstOut, double& secondOut) {
+        if (firstFrequency <= filterFrequencyFloor || secondFrequency <= filterFrequencyFloor) {
+            firstOut = first.process(firstSource,firstFrequency,highPass,network);
+            secondOut = second.process(secondSource,secondFrequency,highPass,network);
+            return;
+        }
+        double firstInput, firstQ, secondInput, secondQ;
+        first.begin(firstSource,network,firstInput,firstQ);
+        second.begin(secondSource,network,secondInput,secondQ);
+        const double firstNonlinear = first.nonlinearGain(firstFrequency,network);
+        const double secondNonlinear = second.nonlinearGain(secondFrequency,network);
+        const double effectiveDamping=network.effectiveDamping;
+        const double linear = network.linear;
+        const Lanes nonlinear = {firstNonlinear, secondNonlinear};
+        const Lanes qConstant = {firstQ, secondQ};
+        const Lanes sl = {first.sl, second.sl}, sb = {first.sb, second.sb};
+        const Lanes warmTanh = {first.previousTanhB, second.previousTanhB};
+        Lanes b = {first.previousB, second.previousB};
+        Lanes tanhArgument = b, tanhValue = warmTanh;
+        LaneMask active = {-1, -1};
+        const Lanes tolerance = {1e-9, 1e-9};
+        for (int iteration = 0; iteration < 7; ++iteration) {
+            const Lanes tb = iteration == 0 ? warmTanh : fastTanhLanes(b);
+            tanhArgument = laneSelect(active, b, tanhArgument);
+            tanhValue = laneSelect(active, tb, tanhValue);
+            const Lanes lIter = sl + nonlinear*tb + linear*b;
+            const Lanes h = qConstant - effectiveDamping * b - lIter;
+            const Lanes th = fastTanhLanes(h);
+            const Lanes residual = b - sb - nonlinear*th - linear*h;
+            const Lanes dl = nonlinear*(1.0-tb*tb) + linear;
+            const Lanes derivative = 1.0 + (nonlinear*(1.0-th*th)+linear)*(effectiveDamping+dl);
+            const Lanes delta = residual / derivative;
+            b = laneSelect(active, b - delta, b);
+            active &= ~(LaneMask)(laneAbs(delta) < tolerance);
+            if (!(active[0] | active[1])) break;
+        }
+        const double firstLow = first.settledLow(b[0],tanhArgument[0],tanhValue[0],firstNonlinear,linear);
+        const double secondLow = second.settledLow(b[1],tanhArgument[1],tanhValue[1],secondNonlinear,linear);
+        firstOut = first.end(b[0],firstLow,firstInput,firstQ,highPass,network);
+        secondOut = second.end(b[1],secondLow,secondInput,secondQ,highPass,network);
+    }
+#endif
 };
 
 // The shared M-board service procedure (CS-60 manual p.38, section VI)
@@ -1004,6 +1119,21 @@ struct FilterChain {
         const double low=lp.process(high,lpFrequency,false,lpNetwork);
         return low*filteredVcaCalibration/inputScale;
     }
+#if defined(CERES_FILTER_LANES)
+    // Two boards' chains, each exactly as process() above.
+    static CERES_ALWAYS_INLINE void processPair(FilterChain& first, FilterChain& second,
+            const double* waveSum, double branches, const double* hpFrequency, const double* lpFrequency,
+            double drive, const OtaNetwork& hpNetwork, const OtaNetwork& lpNetwork, double* low) {
+        const double inputScale=.3*drive;
+        double high[2];
+        OtaSvf::processPair(first.hp,second.hp,inputScale*waveSum[0]/branches,inputScale*waveSum[1]/branches,
+            hpFrequency[0],hpFrequency[1],true,hpNetwork,high[0],high[1]);
+        OtaSvf::processPair(first.lp,second.lp,high[0],high[1],lpFrequency[0],lpFrequency[1],
+            false,lpNetwork,low[0],low[1]);
+        low[0]=low[0]*filteredVcaCalibration/inputScale;
+        low[1]=low[1]*filteredVcaCalibration/inputScale;
+    }
+#endif
 };
 
 // Conditional output circuit, using the dedicated M-board and PRA schematics
@@ -2405,7 +2535,14 @@ struct Synth::Impl {
         const double lpBusOctaves=leverOctavesPerVolt*lpBus.update(lpLift);
         const bool sharedLpCutoff = patch.lpEnvelopeScale==patch.hpEnvelopeScale &&
             patch.filterLfo==0 && patch.brilliance==0 && hpBusOctaves==lpBusOctaves;
-        double mixed = 0;
+        // Each board's filter input and cutoffs, and what its VCA needs after
+        // the filters: the boards' filters are solved after all their inputs
+        // (two at a time where the lanes exist), then the VCAs mix in board
+        // order. The boards share no state between those stages.
+        double filterSource[Synth::maxVoiceCount], hpCutoffHz[Synth::maxVoiceCount];
+        double lpCutoffHz[Synth::maxVoiceCount], sineWave[Synth::maxVoiceCount];
+        double ampLevel[Synth::maxVoiceCount], boardExpression[Synth::maxVoiceCount];
+        double filterLow[Synth::maxVoiceCount];
         for (unsigned i = 0; i < voiceLimit; ++i) {
             auto& v = voices[i];
             const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
@@ -2525,14 +2662,31 @@ struct Synth::Impl {
 #if !defined(CERES_EMBEDDED_TARGET)
             v.oscillatorFrequency=frequency; v.hpFrequency=hpFrequency; v.lpFrequency=lpFrequency;
 #endif
-            const double low=v.filters.process(source,hpSourceBranches,hpFrequency,lpFrequency,
-                patch.drive,hpFilterNetwork,lpFilterNetwork);
+            filterSource[i]=source; hpCutoffHz[i]=hpFrequency; lpCutoffHz[i]=lpFrequency;
+            sineWave[i]=waves.sine; ampLevel[i]=ampEnvelope; boardExpression[i]=expression;
+        }
+        unsigned solved = 0;
+#if defined(CERES_FILTER_LANES)
+        for (; solved + 2 <= voiceLimit; solved += 2)
+            FilterChain::processPair(voices[solved].filters,voices[solved+1].filters,
+                filterSource+solved,hpSourceBranches,hpCutoffHz+solved,lpCutoffHz+solved,
+                patch.drive,hpFilterNetwork,lpFilterNetwork,filterLow+solved);
+#endif
+        for (; solved < voiceLimit; ++solved)
+            filterLow[solved]=voices[solved].filters.process(filterSource[solved],hpSourceBranches,
+                hpCutoffHz[solved],lpCutoffHz[solved],patch.drive,hpFilterNetwork,lpFilterNetwork);
+        double mixed = 0;
+        for (unsigned i = 0; i < voiceLimit; ++i) {
+            auto& v = voices[i];
+            const auto& board=v.board;
+            const double expression=boardExpression[i], ampEnvelope=ampLevel[i];
+            const double low=filterLow[i];
             // CP3 coupling precedes filtered level; CP4 coupling acts on
             // the filtered/sine sum before common level and envelope VCAs.
             const double filtered=v.filteredCoupling.process(low,couplingCoefficients[0]);
             // The sine's VR11/VR12 balance against the filtered path (VCA
             // amount); exactly 1 when off.
-            const double summed=filtered*patch.filterLevel + waves.sine*patch.sine*board.sineGain;
+            const double summed=filtered*patch.filterLevel + sineWave[i]*patch.sine*board.sineGain;
             const double beforeVca=v.commonCoupling.process(summed,couplingCoefficients[1]);
             // IG00151 gain is LINEAR in envelope CV (guide pp.40–41). The
             // optional velocity term is zero in factory-derived presets.
