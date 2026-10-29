@@ -95,10 +95,6 @@ typedef long long LaneMask __attribute__((vector_size(16), aligned(8), may_alias
 CERES_ALWAYS_INLINE Lanes laneAbs(Lanes x) {
     return (Lanes)((LaneMask)x & 0x7fffffffffffffffLL);
 }
-// mask ? a : b, lane by lane, on the bits.
-CERES_ALWAYS_INLINE Lanes laneSelect(LaneMask mask, Lanes a, Lanes b) {
-    return (Lanes)(((LaneMask)a & mask) | ((LaneMask)b & ~mask));
-}
 // fastTanh in each lane: the same polynomial and grouping, and the same
 // out-of-line identity for a lane at or beyond .625.
 CERES_ALWAYS_INLINE Lanes fastTanhLanes(Lanes x) {
@@ -987,6 +983,30 @@ struct OtaSvf {
         previousB = b;
         return highPass ? h : l;
     }
+    // Newton on b from the given iteration (0 starts from the warm start's
+    // tanh), keeping the last tanh(b) evaluated and its argument.
+    CERES_ALWAYS_INLINE void solve(int iteration, double& b, double& tanhArgument, double& tanhValue,
+                                   double nonlinear, double qConstant, double effectiveDamping,
+                                   double linear) const {
+        for (; iteration < 7; ++iteration) {
+            const double tb = iteration == 0 ? previousTanhB : fastTanh(b);
+            tanhArgument = b; tanhValue = tb;
+            const double lIter = sl + nonlinear*tb + linear*b;
+            const double h = qConstant - effectiveDamping * b - lIter;
+            const double th = fastTanh(h);
+            const double residual = b - sb - nonlinear*th - linear*h;
+            const double dl = nonlinear*(1-tb*tb) + linear;
+            const double derivative = 1 + (nonlinear*(1-th*th)+linear)*(effectiveDamping+dl);
+            const double delta = residual / derivative;
+            b -= delta;
+            // Newton converges quadratically, so once a step is under 1e-9
+            // the error left in b is of order its square, under b's ulp. The
+            // earlier 1e-12 bought a further pair of tanh evaluations about a
+            // third of the time (2.34 to 2.02 iterations per solve, measured
+            // on the factory presets) and no change at the float output.
+            if (inlineAbs(delta) < 1e-9) break;
+        }
+    }
     CERES_ALWAYS_INLINE double process(double sourceVoltage, double frequency, bool highPass, const OtaNetwork& network) {
         double input, qConstant;
         begin(sourceVoltage,network,input,qConstant);
@@ -1011,33 +1031,16 @@ struct OtaSvf {
             const double nonlinear = nonlinearGain(frequency,network);
             // The last tanh(b) the iterations evaluated, and its argument.
             double tanhArgument = previousB, tanhValue = previousTanhB;
-            for (int iteration = 0; iteration < 7; ++iteration) {
-                const double tb = iteration == 0 ? previousTanhB : fastTanh(b);
-                tanhArgument = b; tanhValue = tb;
-                const double lIter = sl + nonlinear*tb + linear*b;
-                const double h = qConstant - effectiveDamping * b - lIter;
-                const double th = fastTanh(h);
-                const double residual = b - sb - nonlinear*th - linear*h;
-                const double dl = nonlinear*(1-tb*tb) + linear;
-                const double derivative = 1 + (nonlinear*(1-th*th)+linear)*(effectiveDamping+dl);
-                const double delta = residual / derivative;
-                b -= delta;
-                // Newton converges quadratically, so once a step is under 1e-9
-                // the error left in b is of order its square, under b's ulp. The
-                // earlier 1e-12 bought a further pair of tanh evaluations about a
-                // third of the time (2.34 to 2.02 iterations per solve, measured
-                // on the factory presets) and no change at the float output.
-                if (inlineAbs(delta) < 1e-9) break;
-            }
+            solve(0,b,tanhArgument,tanhValue,nonlinear,qConstant,effectiveDamping,linear);
             l = settledLow(b,tanhArgument,tanhValue,nonlinear,linear);
         }
         return end(b,l,input,qConstant,highPass,network);
     }
 #if defined(CERES_FILTER_LANES)
     // Two boards' filters on the same network, each exactly as process()
-    // would solve it. Both lanes iterate until both have converged; a lane
-    // that has converged keeps its b and its last tanh pair unchanged, as its
-    // scalar loop's break would. A board at the floor takes the scalar path.
+    // would solve it: both lanes iterate together until either converges
+    // (both, most often), and the other then finishes in solve() from the
+    // same iteration. A board at the floor takes the scalar path.
     static CERES_ALWAYS_INLINE void processPair(OtaSvf& first, OtaSvf& second,
             double firstSource, double secondSource, double firstFrequency, double secondFrequency,
             bool highPass, const OtaNetwork& network, double& firstOut, double& secondOut) {
@@ -1058,13 +1061,12 @@ struct OtaSvf {
         const Lanes sl = {first.sl, second.sl}, sb = {first.sb, second.sb};
         const Lanes warmTanh = {first.previousTanhB, second.previousTanhB};
         Lanes b = {first.previousB, second.previousB};
-        Lanes tanhArgument = b, tanhValue = warmTanh;
-        LaneMask active = {-1, -1};
+        Lanes tanhArgument, tanhValue, tb = warmTanh;
         const Lanes tolerance = {1e-9, 1e-9};
-        for (int iteration = 0; iteration < 7; ++iteration) {
-            const Lanes tb = iteration == 0 ? warmTanh : fastTanhLanes(b);
-            tanhArgument = laneSelect(active, b, tanhArgument);
-            tanhValue = laneSelect(active, tb, tanhValue);
+        int iteration = 0;
+        LaneMask converged;
+        for (;;) {
+            tanhArgument = b; tanhValue = tb;
             const Lanes lIter = sl + nonlinear*tb + linear*b;
             const Lanes h = qConstant - effectiveDamping * b - lIter;
             const Lanes th = fastTanhLanes(h);
@@ -1072,14 +1074,23 @@ struct OtaSvf {
             const Lanes dl = nonlinear*(1.0-tb*tb) + linear;
             const Lanes derivative = 1.0 + (nonlinear*(1.0-th*th)+linear)*(effectiveDamping+dl);
             const Lanes delta = residual / derivative;
-            b = laneSelect(active, b - delta, b);
-            active &= ~(LaneMask)(laneAbs(delta) < tolerance);
-            if (!(active[0] | active[1])) break;
+            b -= delta;
+            ++iteration;
+            converged = (LaneMask)(laneAbs(delta) < tolerance);
+            if ((converged[0] | converged[1]) || iteration == 7) break;
+            tb = fastTanhLanes(b);
         }
-        const double firstLow = first.settledLow(b[0],tanhArgument[0],tanhValue[0],firstNonlinear,linear);
-        const double secondLow = second.settledLow(b[1],tanhArgument[1],tanhValue[1],secondNonlinear,linear);
-        firstOut = first.end(b[0],firstLow,firstInput,firstQ,highPass,network);
-        secondOut = second.end(b[1],secondLow,secondInput,secondQ,highPass,network);
+        // The first lane to converge stops; the other carries on alone.
+        double firstB = b[0], firstArgument = tanhArgument[0], firstValue = tanhValue[0];
+        double secondB = b[1], secondArgument = tanhArgument[1], secondValue = tanhValue[1];
+        if (!converged[0])
+            first.solve(iteration,firstB,firstArgument,firstValue,firstNonlinear,firstQ,effectiveDamping,linear);
+        if (!converged[1])
+            second.solve(iteration,secondB,secondArgument,secondValue,secondNonlinear,secondQ,effectiveDamping,linear);
+        const double firstLow = first.settledLow(firstB,firstArgument,firstValue,firstNonlinear,linear);
+        const double secondLow = second.settledLow(secondB,secondArgument,secondValue,secondNonlinear,linear);
+        firstOut = first.end(firstB,firstLow,firstInput,firstQ,highPass,network);
+        secondOut = second.end(secondB,secondLow,secondInput,secondQ,highPass,network);
     }
 #endif
 };
