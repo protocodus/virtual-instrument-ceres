@@ -25,6 +25,10 @@ The CI-generated demos below play **eight of the circuit engine's 14 research pr
 
 ## Version history
 
+### Unreleased — 1.1.1 — lower CPU cost
+
+- Two boards' filters are solved side by side in two-double lanes, and the cutoff rows' diode solver reuses the terms of a step that left its current unchanged. Audio is unchanged: every factory preset at 1, 4 and 16 voices and 1x/2x/4x gives the same double-precision output bits as 1.1.0 (GCC and Clang, with and without FMA contraction), the 439,296-sample CPU regression stream matches byte for byte and the demos re-render identically. On this development container the eight README demos (four voices, 4x, 48 kHz) took 29% less median CPU time, and the factory presets at four voices/1x 31% less; a one-voice configuration, which keeps the scalar solve, is unchanged within noise. Not a Reason host result.
+
 ### 1.1.0 — 2026-10-28 — circuit realism
 
 - A new key takes the board whose key went up longest ago, as the key assigner's "old key off" detector does, instead of the quietest one: a long note's tail is now cut before a shorter, younger one. The assigner reads keys, not envelopes.
