@@ -25,6 +25,10 @@ The CI-generated demos below play **eight of the circuit engine's 14 research pr
 
 ## Version history
 
+### Unreleased — 1.1.2 — an idle Ceres rests
+
+- A second after every board has gone silent, with the output tail already under 2^-24 (below a 24-bit file's last step), the engine rests: it returns exact silence and only keeps the clocks a later note reads (touch, drift, the SUB and PWM phases, the noise streams, the ring carrier), until a note, a patch change or an EXT IN signal wakes it. Resting costs about 5% of a running engine: on this development container an idle four-voice/1x Ceres took 1.6 ms of CPU per second of audio instead of 30 ms (not a Reason host result). Everything before the rest is bit for bit as before. A note after a rest finds the boards' VCOs and filters where they stopped, as a note played a little earlier would; over 40 seeds its level spread matches the always-running engine's.
+
 ### Unreleased — 1.1.1 — lower CPU cost
 
 - Two boards' filters are solved side by side in two-double lanes, and the cutoff rows' diode solver reuses the terms of a step that left its current unchanged. Audio is unchanged: every factory preset at 1, 4 and 16 voices and 1x/2x/4x gives the same double-precision output bits as 1.1.0 (GCC and Clang, with and without FMA contraction), the 439,296-sample CPU regression stream matches byte for byte and the demos re-render identically. On this development container the eight README demos (four voices, 4x, 48 kHz) took 29% less median CPU time, and the factory presets at four voices/1x 31% less; a one-voice configuration, which keeps the scalar solve, is unchanged within noise. Not a Reason host result.

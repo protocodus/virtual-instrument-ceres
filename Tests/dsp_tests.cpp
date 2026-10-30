@@ -967,6 +967,9 @@ void subOscillatorRoutes() {
     ceres::Patch p;p.lfoWaveform=4;p.lfoRate=.05;
     ceres::Synth noise(fs,91),other(fs,91);noise.setPatch(p);
     p.lfoRate=100;p.noise=1;other.setPatch(p);
+    // A held key keeps both engines from resting after a silent second,
+    // which would pause the noise source this diagnostic reads.
+    noise.noteOn(60);other.noteOn(60);
     double sum=0,sum2=0,cross=0,previous=0;
     for(unsigned n=0;n<20000;++n) {
         noise.process();other.process();const double x=noise.modulationState().sub;
@@ -1322,6 +1325,44 @@ void sustainKeyCvModes() {
 
 }
 
+// Rest is a CPU measure: once every board is silent for a second the engine
+// returns exact silence where its tail was already under 2^-24, and the
+// clocks a later note reads keep time. A twin fed a negligible EXT sample
+// never rests (canRest) and is otherwise the same engine.
+void restingWhenSilent() {
+    const double fs=48000;
+    ceres::Patch p=ceres::preset("brass1");p.ringMix=.5;p.ringDepth=1;
+    ceres::Synth resting(fs,5),awake(fs,5);resting.setPatch(p);awake.setPatch(p);
+    for(int key:{48,55,60}){resting.noteOn(key,.8);awake.noteOn(key,.8);}
+    std::size_t firstRest=0,restSamples=0;
+    for(std::size_t n=0;n<8*48000;++n) {
+        if(n==24000){resting.allNotesOff();awake.allNotesOff();}
+        if(n==5*48000){resting.pressure(.7);awake.pressure(.7);}
+        awake.externalInput(1e-300);
+        const float a=awake.process(),r=resting.process();
+        if(r==a)continue;
+        require(r==0 && std::abs(a)<0x1p-24f,"A resting engine replaces only a tail under 2^-24 with silence");
+        if(!restSamples)firstRest=n;
+        ++restSamples;
+    }
+    require(restSamples>0 && firstRest<6*48000,"A silent engine rests within seconds of its release");
+    for(int key:{50,57}){resting.noteOn(key,.6);awake.noteOn(key,.6);}
+    double energy=0;
+    for(std::size_t n=0;n<9600;++n){awake.externalInput(1e-300);awake.process();const double y=resting.process();energy+=y*y;}
+    require(energy>1e-3,"A note wakes a resting engine");
+    const auto r=resting.modulationState(),a=awake.modulationState();
+    require(r.ringCarrier==a.ringCarrier && r.ringCoupledCarrier==a.ringCoupledCarrier && r.ringFrequency==a.ringFrequency,
+            "The ring carrier keeps time through a rest");
+    // A live EXT signal keeps the engine awake, as it moves the SUB path.
+    ceres::Synth fed(fs,5);fed.setPatch(p);fed.noteOn(60);
+    std::size_t zeros=0;
+    for(std::size_t n=0;n<8*48000;++n) {
+        if(n==24000)fed.allNotesOff();
+        fed.externalInput(.1*std::sin(.01*double(n)));
+        zeros=fed.process()==0 ? zeros+1 : 0;
+        require(zeros<4800,"An engine with a live EXT input does not rest");
+    }
+}
 int main() {
     try {
         panelParameterRanges(); std::cout<<"PASS ring/SUB/Sustain mode ranges and validation\n";
@@ -1330,6 +1371,7 @@ int main() {
         ringAudioAndFreeCarrier(); std::cout<<"PASS global ring sidebands, dry bypass, free carrier and reset\n";
         ringSignalPairLaw(); std::cout<<"PASS ring signal pair large-signal law at the aligned bus scale\n";
         sustainKeyCvModes(); std::cout<<"PASS Sustain I/II live key CV, shared VCO/filters, state continuity and MIDI pedal adaptation\n";
+        restingWhenSilent(); std::cout<<"PASS a silent engine rests, keeps its clocks and wakes for a note, not under a live EXT input\n";
         parametersAndConstruction(); std::cout<<"PASS parameter ranges and constructor validation\n";
         circuitResponse(); std::cout<<"PASS physical source/Q capacitor transfer, four source loads, DC rejection, Q and slope\n";
         physicalCascade(); std::cout<<"PASS production cascade physical voltages, passive mixer, fixed Q current and VCA calibration\n";

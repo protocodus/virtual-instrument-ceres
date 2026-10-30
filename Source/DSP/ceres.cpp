@@ -2131,6 +2131,11 @@ struct Synth::Impl {
     double qVoltageOffset=0, qControlCoefficient=0, stiCoefficient=0, glideAlpha=1;
     double hpResonanceAnchor=0, lpResonanceAnchor=0;
     bool hasProcessed=false;
+    // At rest (see canRest) process() returns silence and only restSample()
+    // runs. quietSamples counts host
+    // samples whose output stayed under restLevel.
+    bool resting=false;
+    std::uint64_t quietSamples=0;
     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
     double outputTrimGain=1;
     ExpressionNetwork expression;
@@ -2342,6 +2347,41 @@ struct Synth::Impl {
         physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
         physicalKeyPresses=0; ringEnvelope.off();
     }
+    // CPU only, not a circuit stage. With every VCA closed (its floor sits
+    // below zero, so an idle board passes nothing), the output is the
+    // post-VCA couplings' decay and nothing else. Once that has stayed under
+    // restLevel, below a 24-bit export's last step, for a second, and no state
+    // a later note would start from is still moving (EGs, keys, glide, the
+    // ring EG and depth ramp, EXT), the engine rests: restSample() keeps the
+    // clocks and RCs a note reads in time, and the audio path pauses. What
+    // pauses is the boards' VCOs, filters and couplings, the CutoffBus
+    // solution and the noise limiter: they resume together where they
+    // stopped, so a note after the rest finds its VCOs at other phases, as
+    // a note played a little earlier or later would. The RCs left to settle
+    // in that second (Q anchors, velocity) are far shorter than it.
+    static constexpr float restLevel=0x1p-24f;
+    bool canRest() const {
+        if (physicalKeyPresses || ringEnvelope.stage!=Envelope::Idle || ringDepthRemaining) return false;
+        if (externalTarget!=0 || externalPreamp!=0 || inlineAbs(externalCoupling.memory)>1e-9) return false;
+        for (unsigned i=0; i<std::max(voiceLimit,Synth::voiceCount); ++i) {
+            const auto& v=voices[i];
+            if (v.held || v.pedalHeld || v.amp.stage!=Envelope::Idle || v.amp.voltage>0 ||
+                v.filter.stage!=Envelope::Idle) return false;
+            // A released board's key CV keeps gliding toward the last key, and
+            // its next note glides on from wherever it got to.
+            if (patch.glideMode!=0 && v.glideReady && (v.glideCode!=lastAssignedKey ||
+                (glideAlpha!=1.0 && inlineAbs(v.glideVoltage-v.cachedGlideStepped)>1e-9*v.cachedGlideStepped)))
+                return false;
+        }
+        return true;
+    }
+    void watchRest(float output) {
+        if (!(inlineAbs(output)<restLevel)) { quietSamples=0; return; }
+        if (++quietSamples<fs) return;
+        if (canRest()) resting=true;
+        else quietSamples-=64; // look again 64 samples on
+    }
+    void wake() { resting=false; quietSamples=0; }
     void reset() {
         random = Random(seed);
         voices = {}; hostSamples = 0;
@@ -2361,7 +2401,7 @@ struct Synth::Impl {
         ringSignalInput=ringSignalOutput=0;
         qVoltageOffset=0;
         hpResonanceAnchor=patch.hpResonance; lpResonanceAnchor=patch.lpResonance;
-        hasProcessed=false;
+        hasProcessed=false; resting=false; quietSamples=0;
         effectiveHpResonance=patch.hpResonance; effectiveLpResonance=patch.lpResonance;
         commonVcaGain=patch.ampLevel;
         decimator.clear(); expression.clear();
@@ -2434,6 +2474,58 @@ struct Synth::Impl {
             }
         }
         return v.keyPitch;
+    }
+    // Free-running wander, driftCents peak (see ceres.hpp): its 0.2-0.7s
+    // hold and .3s smoothing are engineering choices with no source.
+    CERES_ALWAYS_INLINE void advanceDrift(Voice& v) {
+        if (v.driftCountdown-- == 0) {
+            v.driftTarget = random.bipolar();
+            v.driftCountdown = static_cast<unsigned>(internalFs * (.2 + random.unit()*.5));
+        }
+        v.drift += (v.driftTarget-v.drift) * driftCoefficient;
+    }
+    // The ring carrier: its EG, depth ramp, free sine and the passive network
+    // at pins 7-8, which no audio reaches.
+    CERES_ALWAYS_INLINE void advanceRingCarrier(double dt) {
+        // The carrier uses the physical matched upper-BJT steering law at the
+        // pins 7-8 carrier (see ringSteering).
+        const double ringControl=ringEnvelope.advance(0,1,0,.01,0,
+            ringCoefficients[0],0,ringCoefficients[1],ringCoefficients[2]);
+        // Digital control dezippering only: retain the physical EG trajectory,
+        // free carrier phase and frequency cap. Static configured patches use
+        // the exact target, including at startup; no invented analog RC.
+        if (ringDepthRemaining) {
+            if (--ringDepthRemaining==0) ringDepthValue=patch.ringDepth;
+            else ringDepthValue+=ringDepthIncrement;
+        }
+        const double ringExp = ringDepthValue * ringControl;
+        if (ringExp != cachedRingExp) {
+            cachedRingExp = ringExp;
+            cachedRingFactor = ringExp == 0.0 ? 1.0 : std::exp2(ringExp);
+        }
+        ringFrequency=clamp(patch.ringRate*cachedRingFactor,.2,220);
+        ringCarrier=std::sin(2*pi*ringPhase);
+        ringPhase=wrapUnit(ringPhase+ringFrequency*dt);
+        // Keep this free-running passive network connected even at mix0.
+        ringCoupledCarrier=ringCarrierCoupling.process(ringCarrier);
+        // No mean removal or gain normalization: the typical-part carrier-
+        // port offset passes dry signal (about 5dB under each sideband) and
+        // gives even carrier products. 25C, matched transistors, ideal source.
+        ringSwitchGain=ringSteering(ringDifferentialDc+ringSourcePeakVolts*ringCoupledCarrier);
+    }
+    // One internal sample at rest (see canRest): the clocks and RCs a later
+    // note would read keep time exactly, as in sample(): touch, both random
+    // streams (the noise source's draws, which drift shares), the SUB and PWM
+    // phases, each board's drift and the ring carrier.
+    void restSample() {
+        const double dt = 1 / internalFs;
+        pressureValue += (pressureTarget-pressureValue) * pressureCoefficient;
+        random.skip(1);
+        limiterRandom.skip(limiterSteps-1);
+        lfoPhase = wrapUnit(lfoPhase + patch.lfoRate*dt);
+        pwmPhase = wrapUnit(pwmPhase + patch.pwmRate*dt);
+        for (unsigned i = 0; i < voiceLimit; ++i) advanceDrift(voices[i]);
+        advanceRingCarrier(dt);
     }
     double sample() {
         hasProcessed=true;
@@ -2572,13 +2664,7 @@ struct Synth::Impl {
         for (unsigned i = 0; i < voiceLimit; ++i) {
             auto& v = voices[i];
             const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
-            // Free-running wander, driftCents peak (see ceres.hpp): its 0.2-0.7s
-            // hold and .3s smoothing are engineering choices with no source.
-            if (v.driftCountdown-- == 0) {
-                v.driftTarget = random.bipolar();
-                v.driftCountdown = static_cast<unsigned>(internalFs * (.2 + random.unit()*.5));
-            }
-            v.drift += (v.driftTarget-v.drift) * driftCoefficient;
+            advanceDrift(v);
             // The fixed spread steps from board to board, centred on the
             // voices in use (i-1.5 at the default four).
             double cents = patch.tuneCents + (static_cast<double>(i)-spreadCenter)*patch.voiceSpreadCents
@@ -2742,34 +2828,11 @@ struct Synth::Impl {
         // with previous overall midband gain retained as a calibration choice.
         const double bus=busCoupling.process(mixed,couplingCoefficients[2]);
         // One global processor, after the voice bus and before expression/
-        // output. The carrier uses the physical matched upper-BJT steering
-        // law at the pins 7-8 carrier, and the degenerated signal pair its
-        // large-signal law at the aligned bus level (ringSignalPair). Wet
-        // gain is the derived modulator gain times the wet buffer's VR4
-        // trim (see above).
-        const double ringControl=ringEnvelope.advance(0,1,0,.01,0,
-            ringCoefficients[0],0,ringCoefficients[1],ringCoefficients[2]);
-        // Digital control dezippering only: retain the physical EG trajectory,
-        // free carrier phase and frequency cap. Static configured patches use
-        // the exact target, including at startup; no invented analog RC.
-        if (ringDepthRemaining) {
-            if (--ringDepthRemaining==0) ringDepthValue=patch.ringDepth;
-            else ringDepthValue+=ringDepthIncrement;
-        }
-        const double ringExp = ringDepthValue * ringControl;
-        if (ringExp != cachedRingExp) {
-            cachedRingExp = ringExp;
-            cachedRingFactor = ringExp == 0.0 ? 1.0 : std::exp2(ringExp);
-        }
-        ringFrequency=clamp(patch.ringRate*cachedRingFactor,.2,220);
-        ringCarrier=std::sin(2*pi*ringPhase);
-        ringPhase=wrapUnit(ringPhase+ringFrequency*dt);
-        // Keep this free-running passive network connected even at mix0.
-        ringCoupledCarrier=ringCarrierCoupling.process(ringCarrier);
-        // No mean removal or gain normalization: the typical-part carrier-
-        // port offset passes dry signal (about 5dB under each sideband) and
-        // gives even carrier products. 25C, matched transistors, ideal source.
-        ringSwitchGain=ringSteering(ringDifferentialDc+ringSourcePeakVolts*ringCoupledCarrier);
+        // output: the carrier (advanceRingCarrier), and the degenerated
+        // signal pair at its large-signal law at the aligned bus level
+        // (ringSignalPair). Wet gain is the derived modulator gain times the
+        // wet buffer's VR4 trim (see above).
+        advanceRingCarrier(dt);
         // Pin 1 sees the bus through 10uF into 330+463 ohm (20Hz); pin 6 and
         // the wet buffer are coupled through 10uF into 2.5k+10k (1.27Hz).
         // Both run even at mix 0, like the carrier network.
@@ -2796,6 +2859,7 @@ Synth::Synth(Synth&&) noexcept = default;
 Synth& Synth::operator=(Synth&&) noexcept = default;
 void Synth::setPatch(const Patch& patch) {
     const Patch validated = validatePatch(patch);
+    impl_->wake();
     const bool openingKeyHold=impl_->patch.sustainMode!=2 && validated.sustainMode==2;
     const bool changingRingDepth=impl_->patch.ringDepth!=validated.ringDepth;
     impl_->patch = validated;
@@ -2827,6 +2891,7 @@ void Synth::noteOn(int note, double velocity) {
     if (note < 0 || note > 127 || !std::isfinite(velocity)) return;
     if (velocity <= 0) { noteOff(note); return; }
     auto& state = *impl_;
+    state.wake();
     std::uint32_t ticket=0;
     if (!state.keyOn(note,ticket)) return;
     Impl::Voice* selected = nullptr;
@@ -2961,13 +3026,18 @@ void Synth::externalInput(double sample) noexcept {
     // Numerical guard only: 1e9 units overdrives the preamp at any LEVEL
     // above 1e-8, and keeps the interpolation below overflow.
     impl_->externalTarget=inlineFinite(sample) ? clamp(sample,-1e9,1e9) : 0.;
+    if (impl_->externalTarget!=0) impl_->wake();
 }
 float Synth::process() {
     ++impl_->hostSamples;
+    auto& state=*impl_;
+    if (state.resting) {
+        for (unsigned i = 0; i < state.rateFactor; ++i) state.restSample();
+        return 0.f;
+    }
     // SUB-EXT arrives at the host rate: step linearly from the previous host
     // value, landing on the new one at the last internal step (exact at 1x).
     // A digital adaptation of the continuous jack, not a hardware stage.
-    auto& state=*impl_;
     const double from=state.externalPrevious, to=state.externalTarget;
     for (unsigned i = 0; i < state.rateFactor; ++i) {
         state.externalNow=i+1==state.rateFactor ? to : from+(to-from)*(i+1)*state.rateScale;
@@ -2977,7 +3047,9 @@ float Synth::process() {
     const double output=impl_->decimator.output(impl_->rateFactor);
     // Post-circuit/post-FIR utility gain: no change to analog state, timing,
     // nonlinear operating level or default sound. No output limiter is added.
-    return static_cast<float>(impl_->patch.outputTrimDb==0 ? output : output*impl_->outputTrimGain);
+    const float y=static_cast<float>(impl_->patch.outputTrimDb==0 ? output : output*impl_->outputTrimGain);
+    state.watchRest(y);
+    return y;
 }
 
 #if !defined(CERES_EMBEDDED_TARGET)
