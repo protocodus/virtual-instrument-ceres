@@ -2186,8 +2186,8 @@ struct Synth::Impl {
     double qVoltageOffset=0, qControlCoefficient=0, stiCoefficient=0, glideAlpha=1;
     double hpResonanceAnchor=0, lpResonanceAnchor=0;
     bool hasProcessed=false;
-    // At rest (see canRest) process() returns silence and only restSample()
-    // runs. quietSamples counts host
+    // At rest (see canRest) process() returns silence and runs only
+    // silentSample(). quietSamples counts host
     // samples whose output stayed under restLevel.
     bool resting=false;
     std::uint64_t quietSamples=0;
@@ -2407,13 +2407,11 @@ struct Synth::Impl {
     // post-VCA couplings' decay and nothing else. Once that has stayed under
     // restLevel, below a 24-bit export's last step, for a second, and no state
     // a later note would start from is still moving (EGs, keys, glide, the
-    // ring EG and depth ramp, EXT), the engine rests: restSample() keeps the
-    // clocks and RCs a note reads in time, and the audio path pauses. What
-    // pauses is the boards' VCOs, filters and couplings, the CutoffBus
-    // solution and the noise limiter: they resume together where they
+    // ring EG and depth ramp, EXT), the engine rests in silentSample(): the
+    // clocks and RCs a note reads keep time, and the audio path pauses. The
+    // boards' VCOs, filters and couplings resume together where they
     // stopped, so a note after the rest finds its VCOs at other phases, as
-    // a note played a little earlier or later would. The RCs left to settle
-    // in that second (Q anchors, velocity) are far shorter than it.
+    // a note played a little earlier or later would.
     static constexpr float restLevel=0x1p-24f;
     bool canRest() const {
         if (physicalKeyPresses || ringEnvelope.stage!=Envelope::Idle || ringDepthRemaining) return false;
@@ -2568,19 +2566,83 @@ struct Synth::Impl {
         // gives even carrier products. 25C, matched transistors, ideal source.
         ringSwitchGain=ringSteering(ringDifferentialDc+ringSourcePeakVolts*ringCoupledCarrier);
     }
-    // One internal sample at rest (see canRest): the clocks and RCs a later
-    // note would read keep time exactly, as in sample(): touch, both random
-    // streams (the noise source's draws, which drift shares), the SUB and PWM
-    // phases, each board's drift and the ring carrier.
-    void restSample() {
+    // SUB-EXT (see externalPreampRail): LEVEL, the preamp's swing, the
+    // switch-loaded coupling capacitor, then the IC1-1 follower's swing.
+    // The preamp and capacitor run whatever FUNCTION selects.
+    CERES_ALWAYS_INLINE double advanceExternal() {
+        externalPreamp=externalPreampStep(externalPreamp,patch.extLevel*externalNow,externalPreampSlewStep);
+        return clamp(externalCoupling.process(externalPreamp,
+            patch.lfoWaveform==5 ? externalSelectedCoefficients : externalOpenCoefficients),
+            -externalBufferRail,externalBufferRail);
+    }
+    // Exact zero-order-held RC update. Never bypass while offset returns
+    // to zero: capacitor charge survives note allocation, patch edits,
+    // and audio panic. reset() is the explicit electrical-state reset.
+    CERES_ALWAYS_INLINE void advanceQAnchors() {
+        qVoltageOffset+=(patch.resonanceOffset*.5-qVoltageOffset)*qControlCoefficient;
+        hpResonanceAnchor+=(patch.hpResonance-hpResonanceAnchor)*qControlCoefficient;
+        lpResonanceAnchor+=(patch.lpResonance-lpResonanceAnchor)*qControlCoefficient;
+    }
+    // Velocity is stored per physical board on note assignment. Do not
+    // replace it when a released board follows another key CV. Channel
+    // pressure keeps smoothing in either mode, so switching back retains its
+    // ordinary controller history.
+    // Modern MIDI velocity is not a physical CS-50 control. Reusing an
+    // audible board must not step its VCA gain or expression CV while its
+    // capacitor/oscillator histories remain connected. Use the existing 5ms
+    // controller RC clock; silent assignments precharge in noteOn. This
+    // digital adaptation does not slew the keyboard CV. Then the board's VCF
+    // EG, at its own times (see BoardTolerance; the shared values when the
+    // envelope tolerance is off).
+    CERES_ALWAYS_INLINE void advanceBoardControls(Voice& v) {
+        v.velocityValue+=(v.velocity-v.velocityValue)*velocityCoefficient;
+        const auto& egf=v.board.filterCoefficients;
+        v.filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
+            patch.filterAttackHeadroom,patch.filterAttackSaturation,egf[0],egf[3],egf[1],egf[2]);
+    }
+    // Each board's VCA-EG times, peak and floor (see BoardTolerance; the
+    // shared values when the envelope tolerance is off).
+    CERES_ALWAYS_INLINE double advanceAmpEnvelope(Voice& v) {
+        const auto& ega=v.board.ampCoefficients;
+        return std::max(0.0,v.amp.advance(v.board.ampFloor,v.board.ampPeak,v.board.ampSustained,
+            patch.ampAttackHeadroom,patch.ampAttackSaturation,ega[0],ega[3],ega[1],ega[2]));
+    }
+    // One internal sample with the audio path paused (processSilently(), and
+    // at rest): everything a later note reads advances exactly as in
+    // sample(), in its order: touch, both random streams (the noise source's
+    // draws, which drift shares), EXT, Q, the SUB and PWM phases, each
+    // board's velocity, EGs, drift and key CV, and the ring carrier. The
+    // boards' VCOs, filters and couplings, the CutoffBus solution, the noise
+    // limiter and the output stages hold.
+    void silentSample() {
+        hasProcessed=true;
         const double dt = 1 / internalFs;
         pressureValue += (pressureTarget-pressureValue) * pressureCoefficient;
         random.skip(1);
         limiterRandom.skip(limiterSteps-1);
+        advanceExternal();
+        advanceQAnchors();
         lfoPhase = wrapUnit(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrapUnit(pwmPhase + patch.pwmRate*dt);
-        for (unsigned i = 0; i < voiceLimit; ++i) advanceDrift(voices[i]);
+        for (unsigned i = 0; i < std::max(voiceLimit,Synth::voiceCount); ++i) advanceBoardControls(voices[i]);
+        for (unsigned i = 0; i < voiceLimit; ++i) {
+            auto& v = voices[i];
+            advanceDrift(v);
+            advanceGlide(v,dt);
+            advanceAmpEnvelope(v);
+        }
         advanceRingCarrier(dt);
+    }
+    // SUB-EXT arrives at the host rate: step linearly from the previous host
+    // value, landing on the new one at the last internal step (exact at 1x).
+    // A digital adaptation of the continuous jack, not a hardware stage.
+    CERES_ALWAYS_INLINE void stepExternal(unsigned i, double from, double to) {
+        externalNow=i+1==rateFactor ? to : from+(to-from)*(i+1)*rateScale;
+    }
+    void advanceSilently() {
+        const double from=externalPrevious, to=externalTarget;
+        for (unsigned i = 0; i < rateFactor; ++i) { stepExternal(i,from,to); silentSample(); }
+        externalPrevious=to;
     }
     double sample() {
         hasProcessed=true;
@@ -2620,23 +2682,12 @@ struct Synth::Impl {
             random.skip(1);
             limiterRandom.skip(limiterSteps-1);
         }
-        // SUB-EXT (see externalPreampRail): LEVEL, the preamp's swing, the
-        // switch-loaded coupling capacitor, then the IC1-1 follower's swing.
-        // The preamp and capacitor run whatever FUNCTION selects.
         const bool external=patch.lfoWaveform==5;
-        externalPreamp=externalPreampStep(externalPreamp,patch.extLevel*externalNow,externalPreampSlewStep);
-        const double externalSub=clamp(externalCoupling.process(externalPreamp,
-            external ? externalSelectedCoefficients : externalOpenCoefficients),
-            -externalBufferRail,externalBufferRail);
+        const double externalSub=advanceExternal();
         const double lfo = external ? externalSub : subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,
             patch.lfoWaveform==4 ? subNoise*subNoiseRail:0.);
         lastSub=lfo;
-        // Exact zero-order-held RC update. Never bypass while offset returns
-        // to zero: capacitor charge survives note allocation, patch edits,
-        // and audio panic. reset() is the explicit electrical-state reset.
-        qVoltageOffset+=(patch.resonanceOffset*.5-qVoltageOffset)*qControlCoefficient;
-        hpResonanceAnchor+=(patch.hpResonance-hpResonanceAnchor)*qControlCoefficient;
-        lpResonanceAnchor+=(patch.lpResonance-lpResonanceAnchor)*qControlCoefficient;
+        advanceQAnchors();
         // Printed endpoints Vq0:Q5,Vq10:Q.5, Vq being the pin current times
         // 110k+Rin. deltaVq moves Vq itself; OtaSvf applies the exponential
         // law to the sum.
@@ -2679,21 +2730,7 @@ struct Synth::Impl {
         double hpLift=0, lpLift=0;
         for (unsigned i = 0; i < std::max(voiceLimit,Synth::voiceCount); ++i) {
             auto& v = voices[i];
-            // Velocity is stored per physical board on note assignment. Do
-            // not replace it when a released board follows another key CV.
-            // Channel pressure keeps smoothing in either mode, so switching
-            // back retains its ordinary controller history.
-            // Modern MIDI velocity is not a physical CS-50 control. Reusing an
-            // audible board must not step its VCA gain or expression CV while
-            // its capacitor/oscillator histories remain connected. Use the
-            // existing 5ms controller RC clock; silent assignments precharge in
-            // noteOn. This digital adaptation does not slew the keyboard CV.
-            v.velocityValue+=(v.velocity-v.velocityValue)*velocityCoefficient;
-            // Each board's EG times (see BoardTolerance; the shared values
-            // when the envelope tolerance is off).
-            const auto& egf=v.board.filterCoefficients;
-            v.filterEnvelope = v.filter.advance(patch.filterInitial,patch.filterPeak,0,
-                patch.filterAttackHeadroom,patch.filterAttackSaturation,egf[0],egf[3],egf[1],egf[2]);
+            advanceBoardControls(v);
             if (i<Synth::voiceCount) {
                 const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
                 const double touchOctaves=expression*touchFilterDepth;
@@ -2750,13 +2787,8 @@ struct Synth::Impl {
             const auto waves = v.osc.process(frequency, pulseWidthMod,
                                             resetSeconds,internalFs,stiCoefficient,
                                             sineEnabled,sawEnabled,pulseEnabled);
-            // Each board's VCA-EG times, peak and floor (see BoardTolerance;
-            // the shared values when the envelope tolerance is off).
-            const auto& ega=v.board.ampCoefficients;
             const double filterEnvelope = v.filterEnvelope;
-            const double ampEnvelope = std::max(0.0,v.amp.advance(v.board.ampFloor,v.board.ampPeak,
-                v.board.ampSustained,
-                patch.ampAttackHeadroom,patch.ampAttackSaturation,ega[0],ega[3],ega[1],ega[2]));
+            const double ampEnvelope = advanceAmpEnvelope(v);
             // Guide printed p.34: fc=125*Kv*2^Vfc. Kv is LINEAR in key Hz: the
             // M board feeds IG00156 pin 2 from the same K terminal as VCO III
             // pin 2 (SM2 p.16), 0.25V at 130.8Hz to 4V at 2093Hz (Yamaha's
@@ -3089,19 +3121,20 @@ void Synth::externalInput(double sample) noexcept {
     impl_->externalTarget=inlineFinite(sample) ? clamp(sample,-1e9,1e9) : 0.;
     if (impl_->externalTarget!=0) impl_->wake();
 }
+void Synth::processSilently() noexcept {
+    ++impl_->hostSamples;
+    impl_->advanceSilently();
+}
 float Synth::process() {
     ++impl_->hostSamples;
     auto& state=*impl_;
     if (state.resting) {
-        for (unsigned i = 0; i < state.rateFactor; ++i) state.restSample();
+        state.advanceSilently();
         return 0.f;
     }
-    // SUB-EXT arrives at the host rate: step linearly from the previous host
-    // value, landing on the new one at the last internal step (exact at 1x).
-    // A digital adaptation of the continuous jack, not a hardware stage.
     const double from=state.externalPrevious, to=state.externalTarget;
     for (unsigned i = 0; i < state.rateFactor; ++i) {
-        state.externalNow=i+1==state.rateFactor ? to : from+(to-from)*(i+1)*state.rateScale;
+        state.stepExternal(i,from,to);
         state.decimator.push(state.sample(),state.rateFactor);
     }
     state.externalPrevious=to;

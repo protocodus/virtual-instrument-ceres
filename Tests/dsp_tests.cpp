@@ -1325,6 +1325,37 @@ void sustainKeyCvModes() {
 
 }
 
+// processSilently() keeps an unheard engine warm: keys, pedal, EGs, glide
+// and the ring carrier advance exactly as process() advances them, so the
+// layer it feeds can fade back in mid-phrase.
+void silentProcessing() {
+    ceres::Patch p=ceres::preset("string1");p.glideMode=1;p.ringMix=.3;p.ringDepth=1;
+    ceres::Synth heard(48000,9),silent(48000,9);heard.setPatch(p);silent.setPatch(p);
+    const auto both=[&](auto&& event){event(heard);event(silent);};
+    for(std::size_t n=0;n<96000;++n) {
+        if(n==100)both([](ceres::Synth& s){s.noteOn(48,.7);s.noteOn(55,.5);});
+        if(n==9000)both([](ceres::Synth& s){s.sustain(true);s.noteOff(48);s.pressure(.6);s.pitchBend(1.5);});
+        if(n==30000)both([](ceres::Synth& s){s.noteOn(62,.9);s.sustain(false);});
+        if(n==50000)both([](ceres::Synth& s){s.noteOff(55);s.noteOn(55,.3);});
+        heard.process();
+        if(n>=4000 && n<70000) silent.processSilently(); else silent.process();
+        if(n%997==0 || n==69999) {
+            const auto a=heard.allVoiceState(),b=silent.allVoiceState();
+            for(std::size_t i=0;i<a.size();++i)
+                require(a[i].note==b[i].note && a[i].keyNote==b[i].keyNote && a[i].held==b[i].held &&
+                        a[i].pedalHeld==b[i].pedalHeld && a[i].ampEnvelope==b[i].ampEnvelope &&
+                        a[i].filterEnvelope==b[i].filterEnvelope,
+                        "Silent processing keeps every board's keys, pedal and EGs");
+            const auto x=heard.modulationState(),y=silent.modulationState();
+            require(x.ringEnvelope==y.ringEnvelope && x.ringCarrier==y.ringCarrier &&
+                    x.ringCoupledCarrier==y.ringCoupledCarrier && x.physicalKeyPresses==y.physicalKeyPresses,
+                    "Silent processing keeps the ring EG, carrier and key ledger");
+        }
+    }
+    double energy=0;
+    for(std::size_t n=0;n<4800;++n){const double y=silent.process();require(std::isfinite(y),"Finite after silent processing");energy+=y*y;}
+    require(energy>1e-4,"A silently processed engine sounds its held notes when heard again");
+}
 // Rest is a CPU measure: once every board is silent for a second the engine
 // returns exact silence where its tail was already under 2^-24, and the
 // clocks a later note reads keep time. A twin fed a negligible EXT sample
@@ -1372,6 +1403,7 @@ int main() {
         ringSignalPairLaw(); std::cout<<"PASS ring signal pair large-signal law at the aligned bus scale\n";
         sustainKeyCvModes(); std::cout<<"PASS Sustain I/II live key CV, shared VCO/filters, state continuity and MIDI pedal adaptation\n";
         restingWhenSilent(); std::cout<<"PASS a silent engine rests, keeps its clocks and wakes for a note, not under a live EXT input\n";
+        silentProcessing(); std::cout<<"PASS silent processing keeps keys, pedal, EGs and the ring carrier warm\n";
         parametersAndConstruction(); std::cout<<"PASS parameter ranges and constructor validation\n";
         circuitResponse(); std::cout<<"PASS physical source/Q capacitor transfer, four source loads, DC rejection, Q and slope\n";
         physicalCascade(); std::cout<<"PASS production cascade physical voltages, passive mixer, fixed Q current and VCA calibration\n";

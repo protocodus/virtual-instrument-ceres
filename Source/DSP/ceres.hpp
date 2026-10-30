@@ -418,6 +418,12 @@ public:
     unsigned polyphony() const noexcept;
     unsigned oversamplingFactor() const noexcept;
     float process();
+    // One host sample whose output nobody hears, for a front end that keeps
+    // an unheard instrument warm (a muted layer). Keys, EGs, glide, touch,
+    // drift, the SUB and PWM clocks, Q and the ring carrier advance exactly
+    // as in process(); the VCOs, filters and couplings pause and resume
+    // where they stopped at the next process().
+    void processSilently() noexcept;
     // Counts active amplitude envelopes, not residual output capacitor tails.
     // The common output bus has a .8883s time constant and keeps running at zero.
     std::size_t activeVoices() const;
