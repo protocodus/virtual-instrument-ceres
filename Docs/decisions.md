@@ -371,3 +371,38 @@ committed; its `key.md` held the rendering details summarised here.
   Ceres 1.1.0, as sibling evidence. It does not license the log-linear law
   between the trims, which stays an estimate, nor widening `glide_rate` to
   the lever's 6 Hz–6 kHz span, which would move saved parameter values.
+
+## 2026-10-30: a silent engine may rest, taken unheard
+
+The 1.1.2 CPU round froze state in two places a null test cannot grade, so
+one set was rendered and sent to the owner. The candidate is taken under the
+project's standing rule that a listening-test candidate wins unless the
+owner says otherwise: a choice made unheard, not by ear and not by a
+measurement. The set was not committed; its `key.md` holds the rendering
+details summarised here.
+
+### Rest after silence (`2026-10-30-rest`)
+
+- **Decided:** whether the engine may rest once every board has been silent
+  for a second with the tail under 2^-24 (commit `393c0c0`, rest path
+  unified with `processSilently()` in `cbc5e66`). Keys, EGs, glide, touch,
+  drift, Q, the SUB and PWM clocks and the ring carrier keep exact time; the
+  VCOs, filters, couplings, CutoffBus solution and noise limiter pause and
+  resume together, so the first note after a rest finds its VCOs at other
+  phases. Output is bit-identical up to the rest, which replaces tail
+  samples of at most 3.1e-8 with silence. Over 40 seeds the 1 s RMS of a
+  chord after a rest has the median and spread of the always-running
+  engine's (electric piano, 16 voices/4x, slow portamento: −24.4 against
+  −23.9 dB, sd 4.2 both; Guitar 2, 4 voices/1x: −26.9 against −25.9 dB,
+  sd 2.3 both).
+- **A:** the 1.1.1 engine (`c291d40`), every board running at all times.
+- **B:** the 1.1.2 engine (`cbc5e66`).
+- **Material:** Funky I, String I and Clavichord, four voices/1x, 48 kHz,
+  seed 50: a chord and a four-note line, five seconds of silence, the phrase
+  again. Whole-file RMS matched (B +0.085 dB), one common +9.43 dB gain.
+- **Chosen:** B, unheard.
+- **Licensed:** whole-engine rest after silence, and `processSilently()`
+  for a front end's unheard layer, which freezes the same audio-path state
+  while the keys and EGs run on. It does not license freezing one board
+  while others play: that breaks `Ceres.native_dsp_contracts`' "idle
+  physical boards must continue charging" and was dropped.
