@@ -1041,6 +1041,63 @@ struct OtaSvf {
     // would solve it: both lanes iterate together until either converges
     // (both, most often), and the other then finishes in solve() from the
     // same iteration. A board at the floor takes the scalar path.
+    struct PairSolve {
+        OtaSvf *first, *second;
+        double firstInput, firstQ, secondInput, secondQ, firstNonlinear, secondNonlinear;
+        Lanes nonlinear, qConstant, sl, sb, b, tb, tanhArgument, tanhValue;
+        LaneMask converged;
+        int iteration;
+        bool running;
+    };
+    static CERES_ALWAYS_INLINE void beginPair(PairSolve& p, OtaSvf& first, OtaSvf& second,
+            double firstSource, double secondSource, double firstFrequency, double secondFrequency,
+            const OtaNetwork& network) {
+        p.first=&first; p.second=&second;
+        first.begin(firstSource,network,p.firstInput,p.firstQ);
+        second.begin(secondSource,network,p.secondInput,p.secondQ);
+        p.firstNonlinear = first.nonlinearGain(firstFrequency,network);
+        p.secondNonlinear = second.nonlinearGain(secondFrequency,network);
+        p.nonlinear = Lanes{p.firstNonlinear, p.secondNonlinear};
+        p.qConstant = Lanes{p.firstQ, p.secondQ};
+        p.sl = Lanes{first.sl, second.sl}; p.sb = Lanes{first.sb, second.sb};
+        p.tb = Lanes{first.previousTanhB, second.previousTanhB};
+        p.b = Lanes{first.previousB, second.previousB};
+        p.iteration = 0; p.running = true;
+    }
+    // One Newton iteration of both lanes; running stops where processPair()
+    // used to leave its loop.
+    static CERES_ALWAYS_INLINE void stepPair(PairSolve& p, double effectiveDamping, double linear) {
+        const Lanes tolerance = {1e-9, 1e-9};
+        p.tanhArgument = p.b; p.tanhValue = p.tb;
+        const Lanes lIter = p.sl + p.nonlinear*p.tb + linear*p.b;
+        const Lanes h = p.qConstant - effectiveDamping * p.b - lIter;
+        const Lanes th = fastTanhLanes(h);
+        const Lanes residual = p.b - p.sb - p.nonlinear*th - linear*h;
+        const Lanes dl = p.nonlinear*(1.0-p.tb*p.tb) + linear;
+        const Lanes derivative = 1.0 + (p.nonlinear*(1.0-th*th)+linear)*(effectiveDamping+dl);
+        const Lanes delta = residual / derivative;
+        p.b -= delta;
+        ++p.iteration;
+        p.converged = (LaneMask)(laneAbs(delta) < tolerance);
+        if ((p.converged[0] | p.converged[1]) || p.iteration == 7) p.running = false;
+        else p.tb = fastTanhLanes(p.b);
+    }
+    // The first lane to converge stops; the other carries on alone.
+    static CERES_ALWAYS_INLINE void endPair(PairSolve& p, bool highPass, const OtaNetwork& network,
+                                            double& firstOut, double& secondOut) {
+        const double effectiveDamping=network.effectiveDamping, linear=network.linear;
+        OtaSvf& first=*p.first; OtaSvf& second=*p.second;
+        double firstB = p.b[0], firstArgument = p.tanhArgument[0], firstValue = p.tanhValue[0];
+        double secondB = p.b[1], secondArgument = p.tanhArgument[1], secondValue = p.tanhValue[1];
+        if (!p.converged[0])
+            first.solve(p.iteration,firstB,firstArgument,firstValue,p.firstNonlinear,p.firstQ,effectiveDamping,linear);
+        if (!p.converged[1])
+            second.solve(p.iteration,secondB,secondArgument,secondValue,p.secondNonlinear,p.secondQ,effectiveDamping,linear);
+        const double firstLow = first.settledLow(firstB,firstArgument,firstValue,p.firstNonlinear,linear);
+        const double secondLow = second.settledLow(secondB,secondArgument,secondValue,p.secondNonlinear,linear);
+        firstOut = first.end(firstB,firstLow,p.firstInput,p.firstQ,highPass,network);
+        secondOut = second.end(secondB,secondLow,p.secondInput,p.secondQ,highPass,network);
+    }
     static CERES_ALWAYS_INLINE void processPair(OtaSvf& first, OtaSvf& second,
             double firstSource, double secondSource, double firstFrequency, double secondFrequency,
             bool highPass, const OtaNetwork& network, double& firstOut, double& secondOut) {
@@ -1049,48 +1106,33 @@ struct OtaSvf {
             secondOut = second.process(secondSource,secondFrequency,highPass,network);
             return;
         }
-        double firstInput, firstQ, secondInput, secondQ;
-        first.begin(firstSource,network,firstInput,firstQ);
-        second.begin(secondSource,network,secondInput,secondQ);
-        const double firstNonlinear = first.nonlinearGain(firstFrequency,network);
-        const double secondNonlinear = second.nonlinearGain(secondFrequency,network);
-        const double effectiveDamping=network.effectiveDamping;
-        const double linear = network.linear;
-        const Lanes nonlinear = {firstNonlinear, secondNonlinear};
-        const Lanes qConstant = {firstQ, secondQ};
-        const Lanes sl = {first.sl, second.sl}, sb = {first.sb, second.sb};
-        const Lanes warmTanh = {first.previousTanhB, second.previousTanhB};
-        Lanes b = {first.previousB, second.previousB};
-        Lanes tanhArgument, tanhValue, tb = warmTanh;
-        const Lanes tolerance = {1e-9, 1e-9};
-        int iteration = 0;
-        LaneMask converged;
-        for (;;) {
-            tanhArgument = b; tanhValue = tb;
-            const Lanes lIter = sl + nonlinear*tb + linear*b;
-            const Lanes h = qConstant - effectiveDamping * b - lIter;
-            const Lanes th = fastTanhLanes(h);
-            const Lanes residual = b - sb - nonlinear*th - linear*h;
-            const Lanes dl = nonlinear*(1.0-tb*tb) + linear;
-            const Lanes derivative = 1.0 + (nonlinear*(1.0-th*th)+linear)*(effectiveDamping+dl);
-            const Lanes delta = residual / derivative;
-            b -= delta;
-            ++iteration;
-            converged = (LaneMask)(laneAbs(delta) < tolerance);
-            if ((converged[0] | converged[1]) || iteration == 7) break;
-            tb = fastTanhLanes(b);
+        PairSolve p;
+        beginPair(p,first,second,firstSource,secondSource,firstFrequency,secondFrequency,network);
+        do stepPair(p,network.effectiveDamping,network.linear); while (p.running);
+        endPair(p,highPass,network,firstOut,secondOut);
+    }
+    // Four boards as two pairs, each pair exactly as processPair() solves it.
+    // Their iterations interleave in one loop: the pairs' Newton chains are
+    // independent, so each fills the other's latency (the tanh polynomials
+    // and the division are serial within a chain).
+    static CERES_ALWAYS_INLINE void processQuad(OtaSvf* const filter[4], const double* source,
+            const double* frequency, bool highPass, const OtaNetwork& network, double* out) {
+        if (frequency[0] <= filterFrequencyFloor || frequency[1] <= filterFrequencyFloor ||
+            frequency[2] <= filterFrequencyFloor || frequency[3] <= filterFrequencyFloor) {
+            processPair(*filter[0],*filter[1],source[0],source[1],frequency[0],frequency[1],highPass,network,out[0],out[1]);
+            processPair(*filter[2],*filter[3],source[2],source[3],frequency[2],frequency[3],highPass,network,out[2],out[3]);
+            return;
         }
-        // The first lane to converge stops; the other carries on alone.
-        double firstB = b[0], firstArgument = tanhArgument[0], firstValue = tanhValue[0];
-        double secondB = b[1], secondArgument = tanhArgument[1], secondValue = tanhValue[1];
-        if (!converged[0])
-            first.solve(iteration,firstB,firstArgument,firstValue,firstNonlinear,firstQ,effectiveDamping,linear);
-        if (!converged[1])
-            second.solve(iteration,secondB,secondArgument,secondValue,secondNonlinear,secondQ,effectiveDamping,linear);
-        const double firstLow = first.settledLow(firstB,firstArgument,firstValue,firstNonlinear,linear);
-        const double secondLow = second.settledLow(secondB,secondArgument,secondValue,secondNonlinear,linear);
-        firstOut = first.end(firstB,firstLow,firstInput,firstQ,highPass,network);
-        secondOut = second.end(secondB,secondLow,secondInput,secondQ,highPass,network);
+        PairSolve x, y;
+        beginPair(x,*filter[0],*filter[1],source[0],source[1],frequency[0],frequency[1],network);
+        beginPair(y,*filter[2],*filter[3],source[2],source[3],frequency[2],frequency[3],network);
+        const double effectiveDamping=network.effectiveDamping, linear=network.linear;
+        do {
+            if (x.running) stepPair(x,effectiveDamping,linear);
+            if (y.running) stepPair(y,effectiveDamping,linear);
+        } while (x.running || y.running);
+        endPair(x,highPass,network,out[0],out[1]);
+        endPair(y,highPass,network,out[2],out[3]);
     }
 #endif
 };
@@ -1143,6 +1185,19 @@ struct FilterChain {
             false,lpNetwork,low[0],low[1]);
         low[0]=low[0]*filteredVcaCalibration/inputScale;
         low[1]=low[1]*filteredVcaCalibration/inputScale;
+    }
+    // Four boards' chains, each exactly as process() above.
+    static CERES_ALWAYS_INLINE void processQuad(FilterChain* const chain[4],
+            const double* waveSum, double branches, const double* hpFrequency, const double* lpFrequency,
+            double drive, const OtaNetwork& hpNetwork, const OtaNetwork& lpNetwork, double* low) {
+        const double inputScale=.3*drive;
+        OtaSvf* const hp[4]={&chain[0]->hp,&chain[1]->hp,&chain[2]->hp,&chain[3]->hp};
+        OtaSvf* const lp[4]={&chain[0]->lp,&chain[1]->lp,&chain[2]->lp,&chain[3]->lp};
+        double source[4], high[4];
+        for (unsigned i=0;i<4;++i) source[i]=inputScale*waveSum[i]/branches;
+        OtaSvf::processQuad(hp,source,hpFrequency,true,hpNetwork,high);
+        OtaSvf::processQuad(lp,high,lpFrequency,false,lpNetwork,low);
+        for (unsigned i=0;i<4;++i) low[i]=low[i]*filteredVcaCalibration/inputScale;
     }
 #endif
 };
@@ -2779,6 +2834,12 @@ struct Synth::Impl {
         }
         unsigned solved = 0;
 #if defined(CERES_FILTER_LANES)
+        for (; solved + 4 <= voiceLimit; solved += 4) {
+            FilterChain* const chains[4]={&voices[solved].filters,&voices[solved+1].filters,
+                &voices[solved+2].filters,&voices[solved+3].filters};
+            FilterChain::processQuad(chains,filterSource+solved,hpSourceBranches,hpCutoffHz+solved,
+                lpCutoffHz+solved,patch.drive,hpFilterNetwork,lpFilterNetwork,filterLow+solved);
+        }
         for (; solved + 2 <= voiceLimit; solved += 2)
             FilterChain::processPair(voices[solved].filters,voices[solved+1].filters,
                 filterSource+solved,hpSourceBranches,hpCutoffHz+solved,lpCutoffHz+solved,
