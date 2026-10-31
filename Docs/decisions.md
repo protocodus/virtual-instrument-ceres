@@ -424,6 +424,7 @@ details summarised here.
   48 kHz, seed 50: a held C3 G3 C4 E4 chord, then C4. Whole-file RMS matched
   (B −0.05 dB), one common +7.87 dB gain. The set was sent for listening and
   not committed.
+- **Chosen:** B, by ear (owner, 2026-10-31), confirming the measurement.
 - **Licensed:** `drift_cents` 0.3 as the shipping default, factory presets
   and the Rack bank included (Ceres 1.1.3). It does not license a wander
   time course, nor anything about the minutes-long thermal drift, which the
