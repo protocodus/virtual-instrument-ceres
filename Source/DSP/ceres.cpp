@@ -2528,8 +2528,8 @@ struct Synth::Impl {
         }
         return v.keyPitch;
     }
-    // Free-running wander, driftCents peak (see ceres.hpp): its 0.2-0.7s
-    // hold and .3s smoothing are engineering choices with no source.
+    // Free-running wander, driftCents peak (see ceres.hpp, where its depth is
+    // measured): its 0.2-0.7s hold and .3s smoothing have no source.
     CERES_ALWAYS_INLINE void advanceDrift(Voice& v) {
         if (v.driftCountdown-- == 0) {
             v.driftTarget = random.bipolar();

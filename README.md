@@ -25,6 +25,10 @@ The CI-generated demos below play **eight of the circuit engine's 14 research pr
 
 ## Version history
 
+### Unreleased — 1.1.3 — a steadier VCO
+
+- Each board's free-running pitch wander (`drift_cents`) ships at 0.3 cents instead of 1, factory presets included. Its depth is now measured, on sibling evidence: the public CS-80 raw-waveform recordings (the same M board and IG00153 VCO as the CS-50) wander 0.079 cents RMS over a held note's 2.4 s at 220–523 Hz (median of 22 takes, codec noise included, so an upper bound), and the engine measured the same way reads 0.064 at 0.3, against 0.20 at 1. Held notes and chords beat less; the minutes-long thermal drift of a warming instrument is not modelled by this wander and is unchanged. `Tools/measure_cs80_wsc_recordings.py wander` is the protocol.
+
 ### Unreleased — 1.1.2 — an idle Ceres rests
 
 - A second after every board has gone silent, with the output tail already under 2^-24 (below a 24-bit file's last step), the engine rests: it returns exact silence and only keeps the clocks a later note reads (touch, drift, the SUB and PWM phases, the noise streams, the ring carrier), until a note, a patch change or an EXT IN signal wakes it. On this development container an idle four-voice/1x Ceres took 1.6 ms of CPU per second of audio instead of 30 ms (not a Reason host result). Everything before the rest is bit for bit as before. A note after a rest finds the boards' VCOs and filters where they stopped, as a note played a little earlier would; over 40 seeds its level spread matches the always-running engine's.

@@ -122,15 +122,17 @@ struct Patch {
     // on the voices in use. driftCents is the peak excursion of each
     // board's free-running wander about its tuned pitch: a new random target
     // every 0.2-0.7s, followed with a .3s time constant (.41 cents RMS per
-    // cent). Default 1: an OWNER-REQUESTED ENGINEERING VALUE, not a
-    // measurement. It is the most the tuning tolerance leaves room for: each
-    // warmed-up board is set and checked within +/-1 cent (Guide printed p.65
-    // after 10 minutes' warm-up; CS-80 procedure printed pp.3-5 after 30), so
-    // its wander must stay inside that band. No source gives a time course
-    // for it. The documented instability is thermal (Service News E-46; see
-    // boardTemperatureRise) and settles over those 10-30 minute warm-ups, far
-    // slower than this wander, whose time constants have no source.
-    double voiceSpreadCents = 0.0, driftCents = 1.0;
+    // cent). Its time course has no source. Its depth is measured (sibling
+    // evidence): the public CS-80 raw-waveform takes, the same M board and
+    // IG00153 VCO, wander 0.079 cents RMS over a held note's 2.4s at
+    // 220-523Hz (22 takes, median, codec floor included), and the engine
+    // passed through the same protocol reads 0.064 at 0.3, 0.20 at 1 and
+    // 0.36 at 1.8 (Tools/measure_cs80_wsc_recordings.py wander). It is
+    // inside the +/-1 cent each warmed-up board is tuned to (Guide printed
+    // p.65). The documented thermal instability (Service News E-46; see
+    // boardTemperatureRise) settles over the 10-30 minute warm-ups, far
+    // slower than this wander, and is not measured by it.
+    double voiceSpreadCents = 0.0, driftCents = 0.3;
     // Board-to-board tolerance of the four M boards, each 0..1 of the
     // documented spread; 0 keeps the boards identical. Every voice beyond
     // the four is a further board with residuals of its own from the same

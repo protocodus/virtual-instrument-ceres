@@ -40,13 +40,24 @@ then 0.3 s skipped, 0.1 s for PWM, and the last 0.05 s dropped):
   H1, and the median phase of H3 relative to 3x the H1 phase in the sine
   convention (0 deg: flattened peaks, compressive; 180 deg: sharpened peaks,
   triangle-like).
+- WANDER (every pack but PWM, notes whose 16' f0 is 200 Hz or more, where
+  the measurement's own noise is lowest): the steady sustain's f0 band,
+  0.8-1.25 f0, is kept as one analytic signal (FFT band-pass, positive
+  frequencies only); its phase over 50 ms blocks gives the frequency, the
+  first two and last two blocks are dropped, and a straight line through the
+  cents removes tuning and any slow slope. Reported: the residual's RMS and
+  peak-to-peak, and the slope. `wander` also reads WAVs rendered by the
+  engine (ceres_render, one held note named NOTE.wav at 16'), so the model
+  and the recording pass one protocol.
 - Chains (from the report, no audio): each candidate shaper on an ideal
   triangle, then zero to two OTA input stages modelled as differential pairs,
   tanh(a*y)/a, each at a drive a of 0 or 0.02-10 (131 values). For each note,
   the H5 and H7 reachable with H3 within 0.5 dB of the note's, against the
   measurement; and the least rms error to the median H3/H5/H7.
 
-Uncertainty. Codec: MP3 and Vorbis previews of the same note are both
+Uncertainty. Wander: the codec and the band-pass leave a floor that rises as
+f0 falls (0.3 cents RMS at 33 Hz, 0.05 at 523 Hz on these takes), so a
+recording's figure is an upper bound on its VCO's wander. Codec: MP3 and Vorbis previews of the same note are both
 measured where both exist (8 sine notes): H2-H5 agree within 0.6 dB, H6-H9
 within 1.0 dB. Edges: interval spreads are in samples at 44.1 kHz; on every
 PWM note the moving edge's spread is 3.7 to 98 times the fixed edge's (least
@@ -61,6 +72,7 @@ Usage:
   measure_cs80_wsc_recordings.py fetch DIR     # download and verify
   measure_cs80_wsc_recordings.py measure DIR [--report FILE.json]
   measure_cs80_wsc_recordings.py chains FILE.json
+  measure_cs80_wsc_recordings.py wander DIR      # recordings, or engine WAVs
 Requires Python 3 with NumPy, ffmpeg for decoding and curl for fetching.
 """
 from __future__ import annotations
@@ -354,6 +366,47 @@ def chains(report: Path) -> None:
     print(f'differential pair at any k 0.6..4, one stage: best rms error {free:.2f} dB')
 
 
+def wander(x: np.ndarray, f0: float) -> dict:
+    n = len(x)
+    spectrum = np.fft.fft(x)
+    frequency = np.fft.fftfreq(n, 1 / RATE)
+    spectrum[(frequency < .8 * f0) | (frequency > 1.25 * f0)] = 0
+    phase = np.unwrap(np.angle(np.fft.ifft(2 * spectrum)))
+    block = int(.05 * RATE)
+    marks = phase[::block]
+    hz = np.diff(marks) * RATE / block / (2 * np.pi)
+    cents = 1200 * np.log2(hz[2:-2] / np.median(hz[2:-2]))
+    t = np.arange(len(cents)) * .05
+    line = np.polyfit(t, cents, 1)
+    residual = cents - np.polyval(line, t)
+    return {'wander_rms_cents': round(float(residual.std()), 3),
+            'wander_p2p_cents': round(float(np.ptp(residual)), 3),
+            'slope_cents_per_s': round(float(line[0]), 3)}
+
+
+def wander_all(directory: Path) -> None:
+    renders = sorted(directory.glob('*.wav'))
+    if renders:
+        takes = [(path, int(path.stem)) for path in renders]
+    else:
+        takes = []
+        for pack, note, sound, codec, digest in FILES:
+            path = directory / name(pack, note, codec)
+            if pack.startswith('PWM') or nominal(note) < 200:
+                continue
+            if not path.exists() or sha(path) != digest:
+                sys.exit(f'{path}: missing or not the pinned preview; run fetch first')
+            takes.append((path, note))
+    figures = []
+    for path, note in takes:
+        x = sustain(decode(path), .3)
+        entry = {'take': path.name, 'f0_hz': round(nominal(note), 1)} | wander(x, nominal(note))
+        figures.append(entry['wander_rms_cents'])
+        print(json.dumps(entry))
+    print(json.dumps({'median_wander_rms_cents': round(float(np.median(figures)), 3),
+                      'takes': len(figures)}))
+
+
 def measure(directory: Path, report: Path | None) -> None:
     results = []
     for pack, note, sound, codec, digest in FILES:
@@ -382,7 +435,7 @@ def measure(directory: Path, report: Path | None) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split('\n')[0])
-    parser.add_argument('command', choices=['fetch', 'measure', 'chains'])
+    parser.add_argument('command', choices=['fetch', 'measure', 'chains', 'wander'])
     parser.add_argument('path', type=Path,
                         help='download directory, outside the repository (chains: the report)')
     parser.add_argument('--report', type=Path)
@@ -391,6 +444,8 @@ def main() -> None:
         fetch(args.path)
     elif args.command == 'measure':
         measure(args.path, args.report)
+    elif args.command == 'wander':
+        wander_all(args.path)
     else:
         chains(args.path)
 

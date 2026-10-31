@@ -23,8 +23,8 @@
 //    filtered 800 +/-20mVpp at CP4.
 //  - The +/-1 cent of the tuning method again, after the warm-up it asks for
 //    (Guide p.65: 10 minutes; CS-80 printed pp.3, 5: 30 minutes): the
-//    shipping drift_cents (an owner-requested engineering value) keeps each
-//    board's free-running wander inside it.
+//    shipping drift_cents (measured on the CS-80's VCO, see ceres.hpp) keeps
+//    each board's free-running wander inside it.
 #include "ceres.hpp"
 #include <algorithm>
 #include <array>
@@ -618,14 +618,14 @@ void everyVoiceIsItsOwnBoard() {
     }
 }
 
-// drift_cents ships at 1, an owner-requested engineering value: the wander
-// of each board peaks at the +/-1 cent the tuning method holds a warmed-up
+// drift_cents ships at 0.3, the depth the CS-80's IG00153 takes measure
+// (ceres.hpp), inside the +/-1 cent the tuning method holds a warmed-up
 // board to. Its time course has no source and is not checked here.
 void driftStaysInTheTuningBand() {
     const ceres::Patch defaults;
-    require(defaults.driftCents==1,"drift ships at the tuning tolerance");
+    require(defaults.driftCents==.3,"drift ships at the measured depth");
     for(const auto& name:ceres::presetNames())
-        require(ceres::preset(name).driftCents==1,"every factory preset drifts as shipped");
+        require(ceres::preset(name).driftCents==.3,"every factory preset drifts as shipped");
     auto p=plain();p.driftCents=defaults.driftCents;p.vibratoCents=0;
     auto twice=p;twice.driftCents=2;
     // The four boards, then all sixteen voices: every board wanders.
@@ -643,17 +643,18 @@ void driftStaysInTheTuningBand() {
             for(unsigned k=0;k<voices;++k) {
                 require(a[k].note==60 && a[k].held,"every board holds one key");
                 const double c=cents(a[k].oscillatorFrequency,keyHz(60));
-                near(cents(b[k].oscillatorFrequency,keyHz(60)),2*c,1e-9,"drift_cents is the wander's peak depth");
+                near(cents(b[k].oscillatorFrequency,keyHz(60)),twice.driftCents/p.driftCents*c,1e-9,"drift_cents is the wander's peak depth");
                 peak[k]=std::max(peak[k],std::abs(c));power[k]+=c*c;
             }
             apart+=std::pow(cents(a[0].oscillatorFrequency,a[1].oscillatorFrequency),2);
             apartLast+=std::pow(cents(a[0].oscillatorFrequency,a[voices-1].oscillatorFrequency),2);++samples;
         }
         for(unsigned k=0;k<voices;++k) {
-            require(peak[k]<=1,"each board's wander stays within +/-1 cent");
-            require(peak[k]>.5 && std::sqrt(power[k]/samples)>.2,"each board wanders");
+            require(peak[k]<=p.driftCents && peak[k]<=1,"each board's wander stays within its depth and +/-1 cent");
+            require(peak[k]>.5*p.driftCents && std::sqrt(power[k]/samples)>.2*p.driftCents,"each board wanders");
         }
-        require(std::sqrt(apart/samples)>.2 && std::sqrt(apartLast/samples)>.2,"the boards wander independently");
+        require(std::sqrt(apart/samples)>.2*p.driftCents && std::sqrt(apartLast/samples)>.2*p.driftCents,
+                "the boards wander independently");
     }
 }
 }

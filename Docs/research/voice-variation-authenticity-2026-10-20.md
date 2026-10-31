@@ -4,7 +4,7 @@ The CS-50 has four separate M voice boards (SM2 printed pp.17-18, PDF 13-14,
 "M1~M4"). Before this pass Ceres ran four bit-identical boards; the only
 differences were the engineering controls `voice_spread_cents` (a fixed
 symmetric spread) and `drift_cents` (a random walk), both VCO-only and
-default 0. Neither is a tolerance model. (`drift_cents` now ships at 1: see
+default 0. Neither is a tolerance model. (`drift_cents` now ships at 0.3: see
 [Free-running drift](#free-running-drift-drift_cents).)
 
 This pass adds the per-board variation the service documents bound, as
@@ -148,8 +148,27 @@ board, peaks 0.91-0.99 cents, 0.59 cents RMS between two boards, the
 autocorrelation down to 1/e in 0.51-0.56 s, about 1 cent per second of
 average slew.
 
-**Default 1 cent: an owner-requested engineering value, not a
-measurement.** The owner asked for a non-zero default. The bound comes from
+**Depth measured, 2026-10-31: 0.3 cents (Ceres 1.1.3, sibling
+evidence).** The public CS-80 raw-waveform takes (Freesound "mogigrumbles",
+fetched and pinned by `Tools/measure_cs80_wsc_recordings.py`; the CS-80's M
+boards are the CS-50's #21233 with the same IG00153 VCO) give a measured
+depth. `measure_cs80_wsc_recordings.py wander` isolates f0 with a band-pass
+(0.8-1.25 f0), takes its phase over 50 ms blocks across the 2.4 s sustain
+and detrends it; the residual RMS is the wander. Over every non-PWM take at
+220-523 Hz (22 takes) it is 0.04-0.12 cents RMS, median 0.079, with codec
+noise included, so an upper bound. The engine rendered through the same
+protocol (single voice, three seeds, 69/72/77/84) reads a median of 0.36 at
+1.8 (the Rack's earlier bank value), 0.20 at 1 and 0.064 at 0.3. 0.3 is the
+largest round depth the recordings admit. It measures the sub-second wander
+only: the takes are 2.4 s long, so they say nothing of the minutes-long
+thermal course below, and nothing of the wander's time constants beyond
+their fitting inside 2.4 s without a slope above 0.06 cents per second.
+
+The earlier default follows, kept for its tuning-band argument, which still
+bounds the model.
+
+**Former default 1 cent (to 1.1.2): an owner-requested engineering value,
+not a measurement.** The owner asked for a non-zero default. The bound comes from
 the tuning method: each warmed-up board is set and checked within +/-1 cent
 at every trim point (Guide printed p.65, after "10 minutes or longer";
 CS-80 procedure printed p.3, "Unit should be allowed to warm up at least 30
@@ -395,10 +414,11 @@ be an invented temperature.
     against -0.011..+0.003 dB with identical boards);
   - the shared noise stream and start phases unchanged; boards fixed across
     polyphony, reset and seed;
-  - `drift_cents` ships at 1, factory presets included; over 30 s each of
-    four boards on one key stays within +/-1 cent and moves (peak over 0.5,
-    RMS over 0.2 cents), two boards wander independently, and 2 cents
-    doubles every excursion exactly. The time course is not checked: it has
+  - `drift_cents` ships at 0.3 (1 before 1.1.3), factory presets included;
+    over 30 s each of four boards on one key stays within its depth and
+    +/-1 cent and moves (peak over half the depth, RMS over a fifth), two
+    boards wander independently, and 2 cents scales every excursion
+    exactly. The time course is not checked: it has
     no source.
 - `Ceres.board_tolerance_audio_parity`: native and embedded produce identical
   audio with every tolerance at full spread, and the tolerances change it
@@ -476,4 +496,5 @@ no number to corroborate. Three findings:
   a board between the 25 and 50 C points E-46 gives.
 - A pitch-against-time log of a warmed-up CS-50 (frequency counter on one
   or more boards for an hour, room temperature alongside), to give
-  `drift_cents` a measured depth and time course.
+  `drift_cents` a CS-50 depth (the 0.3 is a CS-80 measurement) and a time
+  course.

@@ -406,3 +406,25 @@ details summarised here.
   while the keys and EGs run on. It does not license freezing one board
   while others play: that breaks `Ceres.native_dsp_contracts`' "idle
   physical boards must continue charging" and was dropped.
+
+### VCO wander depth, measured (`2026-10-31-vco-wander`)
+
+- **Decided:** the depth of each board's free-running wander,
+  `drift_cents`, which had shipped at 1 (canonical, an owner-requested
+  engineering value) and 1.8 (the Rack bank).
+- **Settled by measurement, not by ear.** The public CS-80 raw-waveform
+  recordings (same M board and IG00153 VCO; sibling evidence) wander 0.079
+  cents RMS over a held 2.4 s at 220-523 Hz (median of 22 takes, codec floor
+  included, an upper bound). The engine through the same protocol
+  (`Tools/measure_cs80_wsc_recordings.py wander`) reads 0.36 at 1.8, 0.20
+  at 1 and 0.064 at 0.3. Details in
+  [voice variation](research/voice-variation-authenticity-2026-10-20.md#free-running-drift-drift_cents).
+- **A:** the Rack bank's 1.8 with `voice_spread_cents` 0.5. **B:** 0.3,
+  all else identical. String 1, Brass 1 and Electric Piano, four voices/4x,
+  48 kHz, seed 50: a held C3 G3 C4 E4 chord, then C4. Whole-file RMS matched
+  (B −0.05 dB), one common +7.87 dB gain. The set was sent for listening and
+  not committed.
+- **Licensed:** `drift_cents` 0.3 as the shipping default, factory presets
+  and the Rack bank included (Ceres 1.1.3). It does not license a wander
+  time course, nor anything about the minutes-long thermal drift, which the
+  2.4 s takes cannot see.
