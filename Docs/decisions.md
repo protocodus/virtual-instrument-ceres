@@ -429,3 +429,12 @@ details summarised here.
   and the Rack bank included (Ceres 1.1.3). It does not license a wander
   time course, nor anything about the minutes-long thermal drift, which the
   2.4 s takes cannot see.
+
+### EXT preamp bandwidth, T71 tablet cutoff coupling, M-board VCA LI RC and bus continuity (`2026-11-03-circuit-completeness`)
+
+- **Decided:**
+  1. Complete the PRA `IC3-1/2` (`NJM4558D`, non-inverting $1 + 100\text{k}/1\text{k} = 101$, SM2 p.22; Guide p.56) closed-loop bandwidth pole at $3\text{ MHz} / 101 = 29.703\text{ kHz}$ ($\tau = 5.358\text{ \mu s}$, using the same NJM4558 3 MHz datasheet GBW already applied to `IC11-1`), driven by the differential error $(\text{target} - y)/101$ up to the $1\text{ V/\mu s}$ tail-current slew limit and bounded by the $\pm 14\text{ V}$ output rails.
+  2. Include the `T71` tone-selector tablet series resistance $R_s = 10\text{ k}\Omega(10/V_{\text{ideal}} - 1)$ ahead of the `1S1555` diode on shared cutoff rows `g` (`FH`) and `i` (`FL`) when a factory tablet preset is active (SM2 pp.10–11, 15), giving the documented $0.07$–$0.09\text{ octave}$ four-board chord filter bloom on the weaker columns while retaining $R_s = 0$ for the `PANEL` follower (`IC4` on `PRA`).
+  3. Model the M-board `R49` ($100\text{ k}\Omega$) and `C20` ($0.01\text{ \mu F}$ to ground) $\tau = 1.0\text{ ms}$ ($159.15\text{ Hz}$) RC low-pass filter on the `LC`/`TLA` control voltage at `IC5` (`IG00151` common VCA II) pin `LI` (SM2 p.16, taking `LI` as high-impedance).
+  4. Keep the shared SUB output, `FH`/`FL` `CutoffBus` shifts, `Q` and common-VCA control buses, and per-board `filterEnvelope` voltage continuous across `silentSample()`, `allSoundOff()`, `reset()` and pre-clock `setPatch()` (Ceres 1.1.4).
+- **Grounded in:** CS-50 Service Manual 1 printed p.14 (`R7`), Service Manual 2 printed pp.8 (`SUB`), 10–11 (`T71`), 15–16 (`R7`/`M`), 22 (`PRA`), Servicing Guide printed pp.33–34, 40–41, 55–56, and the New JRC `NJM4558` datasheet.

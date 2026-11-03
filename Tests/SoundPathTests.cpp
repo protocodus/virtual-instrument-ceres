@@ -48,23 +48,25 @@ double rowCurrent(const BusNetwork& n,double row,const std::vector<double>& inje
     for(double in:injected)i+=(row-(row/rowBranch+in)/(1/rowBranch+n.nodeConductance()))/rowBranch;
     return i;
 }
-// The row voltage for a source behind the diode, given what each of the four
-// physical boards injects into its node.
-double rowVolts(const BusNetwork& n,double source,const std::vector<double>& injected) {
+// The row voltage for a source behind a series resistor Rs and the diode,
+// given what each of the four physical boards injects into its node.
+double rowVolts(const BusNetwork& n,double source,const std::vector<double>& injected,double rs=0) {
     double low=-20,high=20;
     for(int i=0;i<200;++i) {
         const double mid=.5*(low+high);
-        const double diode=diodeIs*std::expm1((source-mid)/diodeNvt);
-        (diode>rowCurrent(n,mid,injected) ? low : high)=mid;
+        const double current=rowCurrent(n,mid,injected);
+        const double diode=diodeIs*std::expm1((source-current*rs-mid)/diodeNvt);
+        (diode>current ? low : high)=mid;
     }
     return .5*(low+high);
 }
 // How far a row at rest volts (the patch's cutoff, 1 oct/V from 62.5Hz of gm)
 // rises when the boards inject these currents.
-double rowShift(const BusNetwork& n,double cutoffHz,const std::vector<double>& injected) {
+double rowShift(const BusNetwork& n,double cutoffHz,const std::vector<double>& injected,double rs=0) {
     const double rest=std::log2((cutoffHz-floorHz)/62.5);
-    const double source=rest+diodeNvt*std::log1p(rowCurrent(n,rest,std::vector<double>(4,0.))/diodeIs);
-    return rowVolts(n,source,injected)-rest;
+    const double restCurrent=rowCurrent(n,rest,std::vector<double>(4,0.));
+    const double source=rest+restCurrent*rs+diodeNvt*std::log1p(restCurrent/diodeIs);
+    return rowVolts(n,source,injected,rs)-rest;
 }
 const BusNetwork lpRow{{2.4e3,330e3+25e3,220e3,47e3,47e3,47e3,47e3},47e3,220e3,1};
 const BusNetwork hpRow{{2.2e3,330e3+25e3,680e3,150e3,150e3,150e3,220e3},220e3,680e3,47./150};
@@ -238,6 +240,39 @@ void commonVcaPlacement() {
         const auto factory=ceres::preset(names[i+1]);
         near(factory.ampLevel,pin(ideal[i])/10,1e-12,"Factory final CV maps to common VCA LEVEL");
         near(factory.volume,.55,0,"Factory LEVEL must not be folded into final master volume");
+    }
+    // M-board R49 (100k) and C20 (.01uF to ground) form a 1ms RC low-pass on
+    // the LC/TLA control voltage at IC5 (IG00151 common VCA II) pin LI.
+    for(double fs:{8000.,48000.}) {
+        ceres::Patch stepPatch;
+        stepPatch.saw=0;stepPatch.sine=1;stepPatch.filterLevel=0;
+        stepPatch.ampAttack=.001;stepPatch.ampSustain=1;stepPatch.ampLevel=.2;
+        stepPatch.boardPitchTolerance=stepPatch.boardFilterTolerance=stepPatch.boardEnvelopeTolerance=0;
+        stepPatch.boardEnvelopeTimeTolerance=stepPatch.boardVcaTolerance=stepPatch.driftCents=0;
+        auto highPatch=stepPatch;highPatch.ampLevel=1.0;
+        ceres::Synth lowRef(fs,33),highRef(fs,33),stepped(fs,33);
+        lowRef.setPatch(stepPatch);highRef.setPatch(highPatch);stepped.setPatch(stepPatch);
+        lowRef.noteOn(60);highRef.noteOn(60);stepped.noteOn(60);
+        const unsigned warmup=static_cast<unsigned>(fs*.2);
+        for(unsigned n=0;n<warmup;++n) {
+            const double yl=lowRef.process(),yh=highRef.process(),ys=stepped.process();
+            require(ys==yl && std::isfinite(yh),"Pre-step common VCA settled");
+        }
+        stepped.setPatch(highPatch);
+        // One internal step into the 1ms RC after the live ampLevel step,
+        // the output is strictly between the 0.2 and 1.0 steady-state rails,
+        // and after 20ms (20 tau) it converges to the 1.0 rail.
+        bool sawIntermediate=false;
+        const unsigned settle=static_cast<unsigned>(32+fs*.025);
+        for(unsigned n=0;n<settle;++n) {
+            const double yl=lowRef.process(),yh=highRef.process(),ys=stepped.process();
+            if(std::abs(yh-yl)>1e-3) {
+                const double frac=(ys-yl)/(yh-yl);
+                if(frac>.1 && frac<.9) sawIntermediate=true;
+            }
+            if(n+1==settle) near(ys,yh,5e-4,"1ms LI RC settles to new LEVEL rail within 25ms");
+        }
+        require(sawIntermediate,"Live LEVEL step follows the 1ms M-board R49/C20 RC at IC5 pin LI");
     }
 }
 void sharedSubPolarity() {
@@ -431,6 +466,45 @@ void sharedCutoffBuses() {
         s.process();const auto m=s.modulationState();const auto v=s.voiceState()[0];
         require(m.hpBus==0 && m.lpBus==0,"Unlifted rows do not move");
         require(v.lpFrequency==300 && v.hpFrequency==80,"Unlifted cutoffs are the patch's");
+    }
+    // Factory T71 tablet presets include the column's series resistor
+    // Rs = 10k*(10/Videal - 1) ahead of the 1S1555 diode on rows g (FH) and
+    // i (FL), coupling .07-.09 octave on four-board chords on the weaker columns.
+    struct TabletCase { const char* name; double gIdeal, iIdeal; };
+    const TabletCase tablets[]={
+        {"string1",5.0,8.70},{"brass2",2.17,3.85},{"flute",1.18,5.24},{"electric_piano",1.28,1.52}
+    };
+    for(const auto& tc:tablets) {
+        auto tp=ceres::preset(tc.name);
+        tp.keyTrack=0;tp.brilliance=0;tp.filterLfo=0;tp.pressureFilter=0;tp.pressureWah=0;
+        tp.filterInitial=0;tp.filterPeak=5;tp.filterAttack=.001;tp.filterDecay=10;
+        tp.boardFilterTolerance=tp.boardEnvelopeTolerance=tp.boardEnvelopeTimeTolerance=0;
+        ceres::Synth ts(8000,1);require(ts.configure(4,1),"Tablet bus configuration");
+        ts.setPatch(tp);
+        for(int k=0;k<4;++k)ts.noteOn(60+k*3);
+        const double rsHp=10e3*(10/tc.gIdeal-1),rsLp=10e3*(10/tc.iIdeal-1);
+        double peakLpBloom=0;
+        for(unsigned n=0;n<120;++n) {
+            ts.process();
+            const auto all=ts.allVoiceState();const auto m=ts.modulationState();
+            std::vector<double> lpIn,hpIn;
+            for(unsigned b=0;b<4;++b) {
+                lpIn.push_back(lpRow.inject(all[b].filterEnvelope,0,0));
+                hpIn.push_back(hpRow.inject(all[b].filterEnvelope,0,0));
+            }
+            const double expectedLp=rowShift(lpRow,tp.lpCutoff,lpIn,rsLp);
+            const double expectedHp=rowShift(hpRow,tp.hpCutoff,hpIn,rsHp);
+            near(m.lpBus,expectedLp,1e-9,"T71 tablet FL row shift matches column series resistance Rs");
+            near(m.hpBus,expectedHp,1e-9,"T71 tablet FH row shift matches column series resistance Rs");
+            peakLpBloom=std::max(peakLpBloom,m.lpBus);
+        }
+        // On the weaker LP columns (brass2 3.85V, electric_piano 1.52V), four
+        // boards at +5V LP EG lift the shared FL row by .07-.09 octave, well
+        // above the PANEL follower's stiff diode clamp (.009-.018 octave).
+        const double panelOnly=rowShift(lpRow,tp.lpCutoff,std::vector<double>(4,lpRow.inject(5,0,0)),0);
+        require(peakLpBloom>panelOnly*2.5,"T71 column series resistor couples more than the PANEL follower");
+        if(tc.iIdeal<4.0)
+            require(peakLpBloom>.07 && peakLpBloom<.095,"Weaker T71 columns bloom .07-.09 octave on 4-board +5V LP EG");
     }
 }
 

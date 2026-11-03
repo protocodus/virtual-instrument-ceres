@@ -1591,17 +1591,19 @@ constexpr double subNoiseRail=15*(100./122.)/1.5;
 // ESTIMATE, as for the noise limiter): a rail-to-rail swing takes 28 us, so an
 // overdriven input, the usual case at x101, reaches SUI as a trapezoid rather
 // than a square, and a full-swing tone loses its edges above about 11 kHz.
-// The 3 MHz gain-bandwidth closes the x101 loop at 29.7 kHz, under .5 dB at
-// 10 kHz and a 5.4 us settling tail; it is left out, so a signal the slew rate
-// does not limit passes as before.
+// The 3 MHz gain-bandwidth closes the x101 loop at 3 MHz / 101 = 29.70 kHz
+// (tau = 5.36 us): the differential input (target - y)/101 drives that pole up
+// to the 1 V/us tail-current slew limit, and the output clips at +/-14 V.
 constexpr double externalPreampRail=14/1.5, externalBufferRail=13/1.5;
+constexpr double externalPreampTau=(1+100e3/1e3)/(2*pi*3e6);
 constexpr double externalPreampSlew=1e6/1.5; // SUB units per second
 constexpr double externalCouplingTauSelected=10e-6*(100e3*100e3/200e3);
 constexpr double externalCouplingTauOpen=10e-6*100e3;
-// One internal step: reach the target, or move by at most the slew step.
-CERES_ALWAYS_INLINE double externalPreampStep(double y,double target,double step) {
-    const double error=target-y;
-    y=inlineAbs(error)<=step ? target : y+(error>0 ? step : -step);
+// One internal step: follow the 29.7 kHz closed-loop pole, slewing at most by
+// the 1 V/us step, then limit at the +/-14 V output rails.
+CERES_ALWAYS_INLINE double externalPreampStep(double y,double target,double alpha,double step) {
+    const double delta=(target-y)*alpha;
+    y+=inlineAbs(delta)<=step ? delta : (delta>0 ? step : -step);
     return clamp(y,-externalPreampRail,externalPreampRail);
 }
 
@@ -2041,29 +2043,61 @@ double panelCutoffHz(double travel,double load) {
 // give at the lever's 1 oct/V), so its 39k draws less from the row, and the row
 // rises under every board. With node conductance Gn and G=1/39k+Gn, the lifts
 // return a current J = sum(u)/(39k^2 G) to the row, which then solves
-// V + Vd(V/rl - J) = S. Near the lever's floor the diode is off and V rises by
-// J*rl: one board at +5V LP EG lifts every board's cutoff .026 octave, four
-// .10; with the lever at 1V (a .52V row) the diode holds four to .009. The source is the PANEL lever's follower
-// and diode: a patch does not say whether a tablet set its cutoff, and a
-// tablet's column resistance couples more (.07-.09 octave with four on the
-// weaker columns). Only the change from unlifted nodes is applied, so with no
+// I*rLoop + J*rl + Vd(I) = S, where I is the T71 diode current and
+// rLoop = rl + Rs includes the active T71 column's series resistor Rs (0 for
+// the PANEL follower IC4 on PRA, 10k*(10/Videal - 1) for a factory tablet
+// column). Near the lever's floor the diode is off and V rises by J*rl: one
+// board at +5V LP EG lifts every board's cutoff .026 octave, four .10; with the
+// PANEL lever at 1V (a .52V row) the diode holds four to .009, while a
+// factory tablet's column resistance couples .07-.09 octave with four on the
+// weaker columns. Only the change from unlifted nodes is applied, so with no
 // lift the cutoffs are exactly the patch's. The bus has the four physical
 // boards' branches; extra virtual boards follow it without loading it.
+double loadedPresetPin(double ideal,double load,double loadReturn) {
+    // Thevenin of the 10k and the load: vl behind rl.
+    const double rl=presetLoad*load/(presetLoad+load);
+    const double vl=loadReturn*presetLoad/(presetLoad+load);
+    if (ideal<=0) return vl;
+    const double share=rl/(presetLoad*(presetSupply/ideal-1)+rl);
+    double pin=vl+(presetSupply-vl-.5)*share;
+    // Each pass scales the error by Vd's slope over Rs+rl, under 1%.
+    for (int i=0;i<8;++i)
+        pin=vl+(presetSupply-vl-presetDiodeVt*std::log((pin-vl)/(rl*presetDiodeIs)))*share;
+    return pin;
+}
+double tabletCutoffSeriesResistance(double cutoffHz,double load,bool hp,double hpEnvScale,double lpEnvScale) {
+    if (inlineAbs(hpEnvScale-leverOctavesPerVolt*39/220)>1e-5 ||
+        inlineAbs(lpEnvScale-leverOctavesPerVolt*39/47)>1e-5)
+        return 0;
+    static constexpr double hpIdeals[]={1.18,1.28,2.17,2.33,2.50,3.85,4.0,5.0,5.24,5.71,6.41};
+    static constexpr double lpIdeals[]={1.52,2.70,3.85,4.76,5.24,5.71,5.95,7.35,7.87,8.70};
+    const double* const begin=hp ? std::begin(hpIdeals) : std::begin(lpIdeals);
+    const double* const end=hp ? std::end(hpIdeals) : std::end(lpIdeals);
+    for (const double* it=begin; it!=end; ++it) {
+        const double bus=loadedPresetPin(*it,load,0);
+        const double tabletHz=filterFrequencyFloor+gmHzAtMiddleC*std::exp2(leverOctavesPerVolt*bus);
+        if (inlineAbs(cutoffHz-tabletHz)<=1e-6*tabletHz)
+            return presetLoad*(presetSupply/(*it)-1);
+    }
+    return 0;
+}
 struct CutoffBus {
-    double source=0, rest=0, restCurrent=0, rl=0, gain=0;
+    double source=0, rest=0, restCurrent=0, rl=0, rLoop=0, jScale=1, gain=0;
     double current=0, lastLift=0, shift=0;
     // The current-only terms of the last Newton step: Vd(I) in log1p form and
-    // the slope 1+Vt/(rl(Is+I)). A settled final step often leaves I bit for
+    // the slope 1+Vt/(rLoop(Is+I)). A settled final step often leaves I bit for
     // bit unchanged (45% of the demos' solves), and the next sample's first
     // step then evaluates the same terms at the same I. Equal doubles of
-    // different bits are only +/-0, whose terms give the same step. rl
+    // different bits are only +/-0, whose terms give the same step. rLoop
     // changes only in configure().
     double termCurrent=0, termLog=0, termSlope=0;
     bool termsReady=false;
     bool conducting=false, settled=true;
-    void configure(double cutoffHz, double node) {
+    void configure(double cutoffHz, double node, double seriesResistance=0) {
         const double load=(39e3+node)/4;
         rl=presetLoad*load/(presetLoad+load);
+        rLoop=rl+seriesResistance;
+        jScale=seriesResistance>0 ? rl/rLoop : 1;
         gain=1/(39e3*39e3*(1/39e3+1/node));
         const double gm=cutoffHz-filterFrequencyFloor;
         rest=gm>0 ? std::log2(gm/gmHzAtMiddleC)/leverOctavesPerVolt : 0;
@@ -2071,30 +2105,31 @@ struct CutoffBus {
         // its lifts alone. (With no gm the shift moves nothing.)
         conducting=gm>0 && rest>=0;
         restCurrent=conducting ? rest/rl : 0;
-        source=conducting ? rest+presetDiodeVt*std::log1p(restCurrent/presetDiodeIs) : 0;
+        source=conducting ? rest+restCurrent*seriesResistance+presetDiodeVt*std::log1p(restCurrent/presetDiodeIs) : 0;
         termsReady=false;
         // A new rest: solve the next sample afresh from it.
         reset();
     }
     void reset() { current=restCurrent; lastLift=shift=0; settled=true; }
     // Bus volts above the unlifted row, from the boards' summed lifts: Newton
-    // on the diode current I, I + J = (S - Vd(I))/rl, from the last sample's
-    // solution, so a moving lift takes a few steps and a held one none once
-    // settled; a step left unsettled carries on the next sample.
+    // on the diode current I, I + J*rl/rLoop = (S - Vd(I))/rLoop, from the last
+    // sample's solution, so a moving lift takes a few steps and a held one none
+    // once settled; a step left unsettled carries on the next sample.
     double update(double lift) {
         const double j=gain*lift;
         if (!conducting) return shift=j*rl;
         if (lift==0) { current=restCurrent; lastLift=0; settled=true; return shift=0; }
         if (lift==lastLift && settled) return shift;
         settled=false;
+        const double jEff=j*jScale;
         for (int step=0; step<16 && !settled; ++step) {
             if (!termsReady || current!=termCurrent) {
                 termLog=std::log1p(current/presetDiodeIs);
-                termSlope=1+presetDiodeVt/(rl*(presetDiodeIs+current));
+                termSlope=1+presetDiodeVt/(rLoop*(presetDiodeIs+current));
                 termCurrent=current;
                 termsReady=true;
             }
-            const double g=current+j-(source-presetDiodeVt*termLog)/rl;
+            const double g=current+jEff-(source-presetDiodeVt*termLog)/rLoop;
             double next=current-g/termSlope;
             if (next<=-presetDiodeIs) next=.5*(current-presetDiodeIs);
             settled=inlineAbs(next-current)<=1e-14*(inlineAbs(next)+presetDiodeIs);
@@ -2174,7 +2209,7 @@ struct Synth::Impl {
     OutputCoupling busCoupling, lineCoupling;
     // outputCouplingTau at the internal rate: CP3, CP4, bus, line.
     std::array<OutputCoupling::Coefficients,4> couplingCoefficients{};
-    double pressureCoefficient = 0, velocityCoefficient = 0, driftCoefficient = 0;
+    double pressureCoefficient = 0, velocityCoefficient = 0, driftCoefficient = 0, vcaControlCoefficient = 0;
     std::array<double,4> ampCoefficients{}, filterCoefficients{};
     double hpSourceBranches = 3, lastSub = 0;
     OtaNetwork hpFilterNetwork, lpFilterNetwork;
@@ -2191,7 +2226,7 @@ struct Synth::Impl {
     // samples whose output stayed under restLevel.
     bool resting=false;
     std::uint64_t quietSamples=0;
-    double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1;
+    double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1, vcaControl=1;
     double outputTrimGain=1;
     ExpressionNetwork expression;
     double limiterInput=0, limiterOutput=0, limiterPole=0, limiterInnovation=0;
@@ -2207,12 +2242,12 @@ struct Synth::Impl {
     // pink in the prose), not an invented ideal1/f filter. SM2 p.8 (PN3):
     // the FUNCTION switch puts N on SUI, a buffer with100k to ground, so the
     // RC sees22k||100k (pole88.26Hz) and a100/122 divider.
-    double subNoiseMemory = 0, subNoiseG = 0;
+    double subNoiseMemory = 0, subNoiseG = 0, lastSubNoise = 0;
     // SUB-EXT: the host input (held between calls), the previous host value
     // and the interpolated value for this internal step; the coupling
     // capacitor between the EXT preamp and EXO/SUI.
     double externalTarget = 0, externalPrevious = 0, externalNow = 0;
-    double externalPreamp = 0, externalPreampSlewStep = 0;
+    double externalPreamp = 0, externalPreampAlpha = 0, externalPreampSlewStep = 0;
     OutputCoupling externalCoupling;
     OutputCoupling::Coefficients externalSelectedCoefficients, externalOpenCoefficients;
     Envelope ringEnvelope;
@@ -2267,6 +2302,10 @@ struct Synth::Impl {
         pressureCoefficient = 1-std::exp(-1/(internalFs*.01));
         velocityCoefficient = 1-std::exp(-1/(internalFs*.005));
         driftCoefficient = 1-std::exp(-1/(internalFs*.3));
+        // SM2 p.16 M-board common VCA II (IC5, IG00151): R49 (100k) and C20
+        // (.01uF to ground) form a 1ms RC low-pass on the LC/TLA control node
+        // at pin LI (taking LI as high-impedance).
+        vcaControlCoefficient = -std::expm1(-1/(internalFs*(100e3*.01e-6)));
         qControlCoefficient=-std::expm1(-1/(internalFs*qControlTau));
         stiCoefficient=-std::expm1(-1/(internalFs*wscSineInputTau));
         subNoiseG=1/(2*internalFs*subNoiseResistance*.1e-6);
@@ -2275,6 +2314,7 @@ struct Synth::Impl {
         pickupCoefficients=OutputCoupling::Coefficients(pickupCouplingTau,limiterRate);
         externalSelectedCoefficients=OutputCoupling::Coefficients(externalCouplingTauSelected,internalFs);
         externalOpenCoefficients=OutputCoupling::Coefficients(externalCouplingTauOpen,internalFs);
+        externalPreampAlpha=-std::expm1(-1/(internalFs*externalPreampTau));
         externalPreampSlewStep=externalPreampSlew/internalFs;
         ringSignalCoefficients=OutputCoupling::Coefficients(ringSignalCouplingTau,internalFs);
         ringWetCoefficients=OutputCoupling::Coefficients(ringWetCouplingTau,internalFs);
@@ -2309,8 +2349,10 @@ struct Synth::Impl {
         updateBoardScales();
     }
     void updateBoardScales() {
-        hpBus.configure(patch.hpCutoff,hpCutoffNode);
-        lpBus.configure(patch.lpCutoff,lpCutoffNode);
+        hpBus.configure(patch.hpCutoff,hpCutoffNode,
+            tabletCutoffSeriesResistance(patch.hpCutoff,fhBusLoad,true,patch.hpEnvelopeScale,patch.lpEnvelopeScale));
+        lpBus.configure(patch.lpCutoff,lpCutoffNode,
+            tabletCutoffSeriesResistance(patch.lpCutoff,flBusLoad,false,patch.hpEnvelopeScale,patch.lpEnvelopeScale));
         const double envelope=patch.boardEnvelopeTolerance, time=patch.boardEnvelopeTimeTolerance;
         const double vca=patch.boardVcaTolerance;
         const double filterRelease=effectiveRelease(patch.filterRelease,patch.globalRelease);
@@ -2443,7 +2485,7 @@ struct Synth::Impl {
         pedal = false; busCoupling={}; lineCoupling={};
         physicalKeys.fill(0); firstPress.fill(0); nextPress.fill(0);
         physicalKeyPresses=0; lastAssignedKey=60;
-        subNoiseMemory=limiterInput=limiterOutput=0; pickupCoupling={};
+        subNoiseMemory=lastSubNoise=limiterInput=limiterOutput=0; pickupCoupling={};
         externalTarget=externalPrevious=externalNow=externalPreamp=0; externalCoupling={};
         limiterRandom=Random(seed^0xd1b54a32d192ed03ULL); ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={}; ringSignalCoupling={};
@@ -2456,7 +2498,7 @@ struct Synth::Impl {
         hpResonanceAnchor=patch.hpResonance; lpResonanceAnchor=patch.lpResonance;
         hasProcessed=false; resting=false; quietSamples=0;
         effectiveHpResonance=patch.hpResonance; effectiveLpResonance=patch.lpResonance;
-        commonVcaGain=patch.ampLevel;
+        commonVcaGain=vcaControl=patch.ampLevel;
         decimator.clear(); expression.clear();
         // Preserve the original four-board random initialization and shared
         // audio/drift stream exactly. Extra virtual boards never consume that
@@ -2466,7 +2508,7 @@ struct Synth::Impl {
             auto& voice=voices[i];
             auto& initialRandom=i<Synth::voiceCount ? random : extra;
             voice.osc.phase = initialRandom.unit();
-            voice.filter.voltage = patch.filterInitial;
+            voice.filter.voltage = voice.filterEnvelope = patch.filterInitial;
             voice.amp.voltage = ampEnvelopeFloor;
             voice.driftTarget = initialRandom.bipolar();
             voice.driftCountdown = static_cast<unsigned>(internalFs * (.1 + initialRandom.unit()*.5));
@@ -2570,7 +2612,8 @@ struct Synth::Impl {
     // switch-loaded coupling capacitor, then the IC1-1 follower's swing.
     // The preamp and capacitor run whatever FUNCTION selects.
     CERES_ALWAYS_INLINE double advanceExternal() {
-        externalPreamp=externalPreampStep(externalPreamp,patch.extLevel*externalNow,externalPreampSlewStep);
+        externalPreamp=externalPreampStep(externalPreamp,patch.extLevel*externalNow,
+            externalPreampAlpha,externalPreampSlewStep);
         return clamp(externalCoupling.process(externalPreamp,
             patch.lfoWaveform==5 ? externalSelectedCoefficients : externalOpenCoefficients),
             -externalBufferRail,externalBufferRail);
@@ -2610,21 +2653,50 @@ struct Synth::Impl {
     // One internal sample with the audio path paused (processSilently(), and
     // at rest): everything a later note reads advances exactly as in
     // sample(), in its order: touch, both random streams (the noise source's
-    // draws, which drift shares), EXT, Q, the SUB and PWM phases, each
-    // board's velocity, EGs, drift and key CV, and the ring carrier. The
-    // boards' VCOs, filters and couplings, the CutoffBus solution, the noise
-    // limiter and the output stages hold.
+    // draws, which drift shares), EXT, SUB, Q and common-VCA control buses,
+    // the SUB and PWM phases, each board's velocity, EGs, the CutoffBus
+    // solution, drift and key CV, and the ring carrier. The boards' VCOs,
+    // filters and couplings, the noise limiter and the output stages hold.
     void silentSample() {
         hasProcessed=true;
         const double dt = 1 / internalFs;
         pressureValue += (pressureTarget-pressureValue) * pressureCoefficient;
         random.skip(1);
         limiterRandom.skip(limiterSteps-1);
-        advanceExternal();
+        const bool external=patch.lfoWaveform==5;
+        const double externalSub=advanceExternal();
+        const double lfo = external ? externalSub
+            : subWaveform(lfoPhase,patch.lfoRate*dt,patch.lfoWaveform,lastSubNoise);
+        lastSub=lfo;
         advanceQAnchors();
+        effectiveHpResonance=clamp(hpResonanceAnchor-qVoltageOffset*.1,0,1);
+        effectiveLpResonance=clamp(lpResonanceAnchor-qVoltageOffset*.1,0,1);
+        const double levelControl=patch.ampLevel
+            +tremoloScale*leverFraction(patch.tremolo,tremoloLeverRatio)*lfo;
+        vcaControl+=(levelControl-vcaControl)*vcaControlCoefficient;
+        commonVcaGain=std::max(0.0,levelControl);
         lfoPhase = wrapUnit(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrapUnit(pwmPhase + patch.pwmRate*dt);
-        for (unsigned i = 0; i < std::max(voiceLimit,Synth::voiceCount); ++i) advanceBoardControls(voices[i]);
+        const double touchFilterDepth = patch.pressureFilter+lfo*patch.pressureWah;
+        const double filterLfoHp = patch.filterLfo*hpSubRelativeScale;
+        const double hpBrillianceLift=patch.brilliance*hpBrillianceScale/leverOctavesPerVolt;
+        const double lpBrillianceLift=patch.brilliance*lpBrillianceScale/leverOctavesPerVolt;
+        double hpLift=0, lpLift=0;
+        for (unsigned i = 0; i < std::max(voiceLimit,Synth::voiceCount); ++i) {
+            auto& v = voices[i];
+            advanceBoardControls(v);
+            if (i<Synth::voiceCount) {
+                const double expression=patch.expressionSource==1 ? v.velocityValue : pressureValue;
+                const double touchOctaves=expression*touchFilterDepth;
+                const double egLift=v.filterEnvelope*v.board.filterEnvelopeLevel;
+                hpLift+=(egLift*patch.hpEnvelopeScale+touchOctaves*hpSubRelativeScale+lfo*filterLfoHp)
+                    /leverOctavesPerVolt+hpBrillianceLift;
+                lpLift+=(egLift*patch.lpEnvelopeScale+touchOctaves+lfo*patch.filterLfo)/leverOctavesPerVolt
+                    +lpBrillianceLift;
+            }
+        }
+        hpBus.update(hpLift);
+        lpBus.update(lpLift);
         for (unsigned i = 0; i < voiceLimit; ++i) {
             auto& v = voices[i];
             advanceDrift(v);
@@ -2678,6 +2750,7 @@ struct Synth::Impl {
             noise=limiterSum/limiterSteps;
             subNoise=(subNoiseMemory+subNoiseG*noise)/(1+subNoiseG);
             subNoiseMemory=2*subNoise-subNoiseMemory;
+            lastSubNoise=subNoise*subNoiseRail;
         } else {
             random.skip(1);
             limiterRandom.skip(limiterSteps-1);
@@ -2705,6 +2778,7 @@ struct Synth::Impl {
         // the VCA below zero gain.
         const double levelControl=patch.ampLevel
             +tremoloScale*leverFraction(patch.tremolo,tremoloLeverRatio)*lfo;
+        vcaControl+=(levelControl-vcaControl)*vcaControlCoefficient;
         commonVcaGain=std::max(0.0,levelControl);
         const double pwm = sinTurn(pwmPhase+patch.pwmPhase);
         lfoPhase = wrapUnit(lfoPhase + patch.lfoRate*dt);
@@ -2903,12 +2977,14 @@ struct Synth::Impl {
             // feedthrough is zero here. What remains at that minimum, and
             // IC5's own tremolo feedthrough, is unpublished. The IG00151's transfer above 10V LI (touch adds
             // up to 1.08 of full LEVEL, tremolo .3375) is unpublished too, so
-            // it stays linear. The LEVEL levers' 100k/.01uF at LI (1ms with a
-            // high-impedance pin) is not modelled: LI's impedance is unknown.
+            // it stays linear. M-board R49 (100k) and C20 (.01uF to ground)
+            // form a 1ms RC low-pass on the LC control voltage at IC5's LI
+            // pin (SM2 p.16, taking LI as high-impedance); touchLevel is
+            // already smoothed by its controller RC.
             if (ampEnvelope > 0.0) {
                 const double velocityGain = 1-patch.velocitySensitivity*(1-v.velocityValue);
                 const double touchLevel=patch.pressureVolume*expression*touchLevelScale;
-                mixed += beforeVca * ampEnvelope * board.ampEnvelopeGain * velocityGain * std::max(0.0,levelControl+touchLevel);
+                mixed += beforeVca * ampEnvelope * board.ampEnvelopeGain * velocityGain * std::max(0.0,vcaControl+touchLevel);
             }
         }
         // The PRA output preamp (outputPreamp) is linear up to its derived
@@ -2968,8 +3044,9 @@ void Synth::setPatch(const Patch& patch) {
         impl_->lpResonanceAnchor=validated.lpResonance;
         impl_->effectiveHpResonance=validated.hpResonance;
         impl_->effectiveLpResonance=validated.lpResonance;
+        impl_->commonVcaGain=impl_->vcaControl=validated.ampLevel;
         for (auto& voice : impl_->voices) {
-            if (voice.filter.stage == Envelope::Idle) voice.filter.voltage = validated.filterInitial;
+            if (voice.filter.stage == Envelope::Idle) voice.filter.voltage = voice.filterEnvelope = validated.filterInitial;
             // ... and an idle VCA EG at its board's floor (VR17).
             if (voice.amp.stage == Envelope::Idle) voice.amp.voltage = voice.board.ampFloor;
         }
@@ -3088,12 +3165,14 @@ void Synth::allSoundOff() {
     impl_->ringSignalInput=impl_->ringSignalOutput=0;
     impl_->ringCarrierCoupling.clear();impl_->ringCoupledCarrier=0;
     impl_->ringSwitchGain=ringSteering(ringDifferentialDc);
+    impl_->hpBus.reset(); impl_->lpBus.reset();
     for (auto& voice : impl_->voices) {
         voice.held = voice.pedalHeld = false;
         voice.amp = {};
         voice.amp.voltage = voice.board.ampFloor;
         voice.filter = {};
-        voice.filter.voltage = impl_->patch.filterInitial;
+        voice.filter.voltage = voice.filterEnvelope = impl_->patch.filterInitial;
+        voice.expCacheReady = false;
         voice.filters = {}; voice.filteredCoupling={}; voice.commonCoupling={};
     }
     impl_->decimator.clear(); impl_->expression.clear();
@@ -3360,18 +3439,6 @@ Patch preset(const std::string& name) {
     // Rs recovered from the printed bare divider, Rs = 10k(10/Videal - 1); a
     // zero column leaves the row at the load's own Thevenin voltage.
     constexpr double qBusLoad=qBranchLoad/4;
-    const auto loadedPresetPin=[](double ideal,double load,double loadReturn) {
-        // Thevenin of the 10k and the load: vl behind rl.
-        const double rl=presetLoad*load/(presetLoad+load);
-        const double vl=loadReturn*presetLoad/(presetLoad+load);
-        if (ideal<=0) return vl;
-        const double share=rl/(presetLoad*(presetSupply/ideal-1)+rl);
-        double pin=vl+(presetSupply-vl-.5)*share;
-        // Each pass scales the error by Vd's slope over Rs+rl, under 1%.
-        for (int i=0;i<8;++i)
-            pin=vl+(presetSupply-vl-presetDiodeVt*std::log((pin-vl)/(rl*presetDiodeIs)))*share;
-        return pin;
-    };
     std::string canonical = name;
     if (canonical == "strings_1" || canonical == "strings1" || canonical == "string_1") canonical="string1";
     if (canonical == "strings_2" || canonical == "strings2" || canonical == "string_2") canonical="string2";
@@ -3440,10 +3507,10 @@ Patch preset(const std::string& name) {
         // 1 oct/V the EG moves the cutoffs 39/220 and 39/47 octave per EG
         // volt, relative to the loaded bus voltage above. A board's EG also
         // lifts its pin-4 node, which unloads the shared bus and raises every
-        // board's cutoff a little (CutoffBus). That is solved behind the
-        // PANEL lever's diode; a tablet's column couples more than the lever
-        // above its floor: .07-.09 octave with four boards at +5V LP EG on
-        // the weaker columns.
+        // board's cutoff a little (CutoffBus): a tablet's column series
+        // resistance Rs = 10k*(10/Videal - 1) couples more than the PANEL
+        // lever follower above its floor (.07-.09 octave with four boards at
+        // +5V LP EG on the weaker columns).
         p.hpEnvelopeScale=leverOctavesPerVolt*39/220;
         p.lpEnvelopeScale=leverOctavesPerVolt*39/47;
         // Q columns h (HP) and j (LP): each pin 7 takes its preset Q bus P

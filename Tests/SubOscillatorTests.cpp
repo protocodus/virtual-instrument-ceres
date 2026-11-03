@@ -126,7 +126,8 @@ void vibratoThroughEngine() {
 }
 
 // SUB-EXT, FUNCTION EXT (lfo_waveform 5). The jack signal passes the LEVEL
-// ratio, the non-inverting preamp's 1+100k/1k, a 10uF capacitor into EXO's
+// ratio, the non-inverting preamp's 1+100k/1k (with the NJM4558's typical
+// 3 MHz GBW closing that x101 loop at 29.70 kHz), a 10uF capacitor into EXO's
 // 100k (with SUI's 100k in parallel while EXT is selected), and the two
 // NJM4558 output swings, datasheet typicals and so an ESTIMATE: +/-14 V into
 // the preamp's >=10k load, +/-13 V into the levers' >=2k. The preamp slews at
@@ -135,6 +136,7 @@ void vibratoThroughEngine() {
 constexpr double pi=3.14159265358979323846;
 constexpr double subPeakVolts=1.5;
 constexpr double extPreampGain=1+100e3/1e3;
+constexpr double extPreampTau=extPreampGain/(2*pi*3e6);
 constexpr double extTauSelected=10e-6*(100e3*100e3/(100e3+100e3));
 constexpr double extTauOpen=10e-6*100e3;
 constexpr double extPreampSwing=14/subPeakVolts, extFollowerSwing=13/subPeakVolts;
@@ -183,33 +185,66 @@ void externalSelector() {
 }
 
 void externalPassband() {
-    // A 200 Hz sine from t=0 into an uncharged capacitor: the RC high-pass
-    // solution, transient included, at every host instant and quality.
+    // A 200 Hz sine from t=0 into an uncharged preamp (29.70 kHz closed-loop
+    // pole) and coupling capacitor (.318 Hz high-pass): check against both the
+    // continuous-time two-pole solution and an independent component-level
+    // discrete reference at every host instant and quality.
     struct Case {double fs;unsigned factor;};
     for(const Case c:{Case{48000,1},Case{48000,2},Case{48000,4},Case{44100,1},Case{96000,4}}) {
         auto p=externalPatch();p.extLevel=.75;
         auto s=configured(c.fs,c.factor,p);
-        const double amplitude=.8,w=2*pi*200,wt=w*extTauSelected;
+        const double amplitude=.8,w=2*pi*200,wc=w*extTauSelected,wp=w*extPreampTau;
+        const double denom=(1+wc*wc)*(1+wp*wp),ratio=extTauSelected/(extTauSelected-extPreampTau);
+        const double intFs=c.fs*c.factor,alpha=1-std::exp(-1/(intFs*extPreampTau)),g=1/(2*intFs*extTauSelected);
+        double prevJack=0,preamp=0,capMem=0;
         for(unsigned n=0;n<static_cast<unsigned>(c.fs/2);++n) {
-            const double t=n/c.fs;
-            s.externalInput(amplitude*std::sin(w*t));s.process();
-            near(s.modulationState().sub,p.extLevel*amplitude*wt/(1+wt*wt)
-                 *(wt*std::sin(w*t)+std::cos(w*t)-std::exp(-t/extTauSelected)),1e-6,
-                 "EXT passband: LEVEL times the jack in SUB units, after the .318 Hz coupling");
+            const double t=n/c.fs,jack=amplitude*std::sin(w*t);
+            s.externalInput(jack);s.process();
+            double subRef=0;
+            for(unsigned i=0;i<c.factor;++i) {
+                const double u=prevJack+(jack-prevJack)*(i+1)/c.factor;
+                preamp+=(p.extLevel*u-preamp)*alpha;
+                subRef=(preamp-capMem)/(1+g);
+                capMem+=2*g*subRef;
+            }
+            prevJack=jack;
+            near(s.modulationState().sub,subRef,1e-12,
+                 "EXT passband matches independent two-stage RC reference");
+            const double steady=wc/denom*((wc+wp)*std::sin(w*t)+(1-wc*wp)*std::cos(w*t));
+            const double transient=ratio*(wc/(1+wc*wc)*std::exp(-t/extTauSelected)
+                                         -wp/(1+wp*wp)*std::exp(-t/extPreampTau));
+            near(s.modulationState().sub,p.extLevel*amplitude*(steady-transient),4.5e-3,
+                 "EXT passband: LEVEL times the jack in SUB units, through the 29.7 kHz preamp and .318 Hz coupling");
         }
     }
+    // Closed-loop -3 dB corner at 3 MHz / 101 = 29.703 kHz: a small-signal
+    // tone at the corner frequency is attenuated by 1/sqrt(2) without hitting
+    // the 1 V/us slew limit (peak slope 2*pi*fc*.1*1.5 V = .028 V/us << 1 V/us).
+    const double fs=384000,fc=1/(2*pi*extPreampTau),alpha=1-std::exp(-1/(fs*extPreampTau));
+    auto s=configured(fs,1,externalPatch());
+    double peak=0;
+    for(unsigned n=0;n<3840;++n) {
+        s.externalInput(.1*std::sin(2*pi*fc*n/fs));s.process();
+        if(n>1920)peak=std::max(peak,std::abs(s.modulationState().sub));
+    }
+    const double expectedGain=alpha/std::sqrt(1-2*(1-alpha)*std::cos(2*pi*fc/fs)+(1-alpha)*(1-alpha));
+    near(peak/.1,expectedGain,2e-3,"EXT preamp closed-loop -3 dB pole at 3 MHz / 101 = 29.703 kHz");
+    near(expectedGain,1/std::sqrt(2.),8e-3,"EXT preamp corner gain is -3 dB");
 }
 
 void externalCoupling() {
     for(unsigned factor:{1u,4u}) {
-        // A held DC step, fed once. The host step is centred half a host
-        // period before the sample it lands on, so the charge decays from there.
-        const double fs=48000,T=1/fs;
+        // A held DC step, fed once. Once the 5.36 us preamp pole has settled
+        // (well before 8 host samples), its ZOH tail shifts the 10uF coupling
+        // capacitor's decay by h / (exp(h / tau_p) - 1).
+        const double fs=48000,T=1/fs,h=T/factor;
+        const double preampLag=h/std::expm1(h/extPreampTau);
         auto s=configured(fs,factor,externalPatch());s.externalInput(.5);
         for(unsigned n=0;n<48000;++n) {
             s.process();
-            near(s.modulationState().sub,.5*std::exp(-(n+.5)*T/extTauSelected),1e-9,
-                 "EXT selected: 10uF into 100k||100k");
+            if(n>=8)
+                near(s.modulationState().sub,.5*std::exp(-((n+.5)*T-preampLag)/extTauSelected),1e-9,
+                     "EXT selected: 10uF into 100k||100k");
         }
         // FUNCTION elsewhere: EXO's own 100k charges the capacitor; selecting
         // EXT carries that charge on, with SUI's 100k added. The switch lands
@@ -219,7 +254,7 @@ void externalCoupling() {
         constexpr unsigned open=24000;
         for(unsigned n=0;n<open;++n)t.process();
         p.lfoWaveform=5;t.setPatch(p);
-        const double switched=(open-.5)*T,atSwitch=.5*std::exp(-(switched+T/2)/extTauOpen);
+        const double switched=(open-.5)*T,atSwitch=.5*std::exp(-(switched+T/2-preampLag)/extTauOpen);
         for(unsigned n=open;n<open+24000;++n) {
             t.process();
             near(t.modulationState().sub,atSwitch*std::exp(-(n*T-switched)/extTauSelected),1e-5,
@@ -232,15 +267,17 @@ void externalSwings() {
     // Overdrive: the preamp clips at its swing, the capacitor passes that
     // step, and the IC1-1 follower clips it again until it decays below its
     // own swing. LEVEL is ahead of the preamp, so it sets the headroom.
-    struct Case {double level,input,start;};
+    struct Case {double level,input,start;bool clipped;};
     for(const double fs:{44100.,48000.})
-    for(const Case c:{Case{1,20,extPreampSwing},Case{1,-20,-extPreampSwing},
-                      Case{.25,40,extPreampSwing},Case{.2,40,8}}) {
+    for(const Case c:{Case{1,20,extPreampSwing,true},Case{1,-20,-extPreampSwing,true},
+                      Case{.25,40,extPreampSwing,true},Case{.2,40,8,false}}) {
         auto p=externalPatch();p.extLevel=c.level;
         auto s=configured(fs,1,p);s.externalInput(c.input);
+        const double shift=c.clipped ? 0 : (1/fs)/std::expm1(1/(fs*extPreampTau));
         for(unsigned n=0;n<static_cast<unsigned>(fs/4);++n) {
             s.process();
-            const double decayed=c.start*std::exp(-(n+.5)/fs/extTauSelected);
+            if(!c.clipped && n<8)continue;
+            const double decayed=c.start*std::exp(-((n+.5)/fs-shift)/extTauSelected);
             near(s.modulationState().sub,std::max(-extFollowerSwing,std::min(extFollowerSwing,decayed)),1e-8,
                  "EXT preamp and follower swings");
         }
@@ -317,9 +354,10 @@ void externalInert() {
 void externalRoutes() {
     // The same SUI signal from EXT and from an internal source moves every
     // route identically. The internal engine's SUB is turned into the jack
-    // signal that reproduces it after the selected coupling, by inverting the
-    // trapezoidal RC high-pass at 1x (internal rate = host rate).
-    const double fs=48000,g=1/(2*fs*extTauSelected);
+    // signal that reproduces it after the selected coupling and the 29.7 kHz
+    // preamp pole, by inverting the trapezoidal RC high-pass and ZOH pole at
+    // 1x (internal rate = host rate).
+    const double fs=48000,g=1/(2*fs*extTauSelected),alpha=1-std::exp(-1/(fs*extPreampTau));
     for(unsigned route=0;route<5;++route) {
         auto p=quiet();p.lfoRate=7;p.lfoWaveform=route==1 ? 1:0;
         p.lpCutoff=1000;
@@ -331,11 +369,12 @@ void externalRoutes() {
         auto q=p;q.lfoWaveform=5;q.extLevel=.8;
         auto internal=configured(fs,1,p,13),external=configured(fs,1,q,13);
         internal.pressure(.7);external.pressure(.7);internal.noteOn(57,.9);external.noteOn(57,.9);
-        double memory=0,low=1e9,high=-1e9;
+        double memory=0,prevPreamp=0,low=1e9,high=-1e9;
         for(unsigned n=0;n<9600;++n) {
             const float a=internal.process();
             const double target=internal.modulationState().sub;
-            const double jack=target*(1+g)+memory;memory+=2*g*target;
+            const double preamp=target*(1+g)+memory;memory+=2*g*target;
+            const double jack=prevPreamp+(preamp-prevPreamp)/alpha;prevPreamp=preamp;
             external.externalInput(jack/q.extLevel);
             const float b=external.process();
             near(external.modulationState().sub,target,1e-12,"EXT reproduces the internal SUI signal");

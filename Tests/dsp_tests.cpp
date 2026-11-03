@@ -1347,9 +1347,14 @@ void silentProcessing() {
                         a[i].filterEnvelope==b[i].filterEnvelope,
                         "Silent processing keeps every board's keys, pedal and EGs");
             const auto x=heard.modulationState(),y=silent.modulationState();
-            require(x.ringEnvelope==y.ringEnvelope && x.ringCarrier==y.ringCarrier &&
+            require(x.sub==y.sub && x.hpBus==y.hpBus && x.lpBus==y.lpBus &&
+                    x.ringEnvelope==y.ringEnvelope && x.ringCarrier==y.ringCarrier &&
                     x.ringCoupledCarrier==y.ringCoupledCarrier && x.physicalKeyPresses==y.physicalKeyPresses,
-                    "Silent processing keeps the ring EG, carrier and key ledger");
+                    "Silent processing keeps SUB, shared cutoff buses, ring EG, carrier and key ledger");
+            const auto sa=heard.soundPathState(),sb=silent.soundPathState();
+            require(sa.hpResonance==sb.hpResonance && sa.lpResonance==sb.lpResonance &&
+                    sa.commonVcaGain==sb.commonVcaGain,
+                    "Silent processing keeps Q and common-VCA control buses live");
         }
     }
     double energy=0;
@@ -1382,8 +1387,9 @@ void restingWhenSilent() {
     for(std::size_t n=0;n<9600;++n){awake.externalInput(1e-300);awake.process();const double y=resting.process();energy+=y*y;}
     require(energy>1e-3,"A note wakes a resting engine");
     const auto r=resting.modulationState(),a=awake.modulationState();
-    require(r.ringCarrier==a.ringCarrier && r.ringCoupledCarrier==a.ringCoupledCarrier && r.ringFrequency==a.ringFrequency,
-            "The ring carrier keeps time through a rest");
+    require(r.sub==a.sub && r.hpBus==a.hpBus && r.lpBus==a.lpBus &&
+            r.ringCarrier==a.ringCarrier && r.ringCoupledCarrier==a.ringCoupledCarrier && r.ringFrequency==a.ringFrequency,
+            "SUB, shared cutoff rows and the ring carrier keep time through a rest");
     // A live EXT signal keeps the engine awake, as it moves the SUB path.
     ceres::Synth fed(fs,5);fed.setPatch(p);fed.noteOn(60);
     std::size_t zeros=0;
