@@ -1433,6 +1433,8 @@ struct ExpressionNetwork {
 // pin 6 are not modelled (the source impedance is unpublished).
 struct RingCarrierCoupling {
     std::array<std::array<double,4>,4> inverse{};
+    // inverse by row pairs, [pair][column][row in pair], for the lanes.
+    alignas(16) double rowPairs[2][4][2]{};
     std::array<double,4> memory{};
     void configure(double fs) {
         std::array<std::array<double,4>,4> g{};
@@ -1463,15 +1465,27 @@ struct RingCarrierCoupling {
             }
         }
         for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j)inverse[i][j]=augmented[i][j+4];
+        for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j)rowPairs[i/2][j][i%2]=inverse[i][j];
         clear();
     }
     void clear() {memory.fill(0);}
     CERES_ALWAYS_INLINE double process(double source) {
         const double r0=memory[0]+source, r1=memory[1], r2=memory[2], r3=memory[3];
+#if defined(CERES_FILTER_LANES)
+        // Rows 0-1 and 2-3 in two-double lanes, each lane's sum in the
+        // scalar order below.
+        const auto& w=rowPairs;
+        const Lanes a=(((Lanes{w[0][0][0],w[0][0][1]}*r0+Lanes{w[0][1][0],w[0][1][1]}*r1)
+            +Lanes{w[0][2][0],w[0][2][1]}*r2)+Lanes{w[0][3][0],w[0][3][1]}*r3);
+        const Lanes c=(((Lanes{w[1][0][0],w[1][0][1]}*r0+Lanes{w[1][1][0],w[1][1][1]}*r1)
+            +Lanes{w[1][2][0],w[1][2][1]}*r2)+Lanes{w[1][3][0],w[1][3][1]}*r3);
+        const double n0=a[0], n1=a[1], n2=c[0], n3=c[1];
+#else
         const double n0=inverse[0][0]*r0+inverse[0][1]*r1+inverse[0][2]*r2+inverse[0][3]*r3;
         const double n1=inverse[1][0]*r0+inverse[1][1]*r1+inverse[1][2]*r2+inverse[1][3]*r3;
         const double n2=inverse[2][0]*r0+inverse[2][1]*r1+inverse[2][2]*r2+inverse[2][3]*r3;
         const double n3=inverse[3][0]*r0+inverse[3][1]*r1+inverse[3][2]*r2+inverse[3][3]*r3;
+#endif
         memory[0]=2*(n0-source)-memory[0];
         memory[1]=2*n1-r1;
         memory[2]=2*n2-r2;
