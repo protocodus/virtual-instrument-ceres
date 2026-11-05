@@ -1044,22 +1044,28 @@ struct OtaSvf {
     // same iteration. A board at the floor takes the scalar path.
     struct PairSolve {
         OtaSvf *first, *second;
-        double firstInput, firstQ, secondInput, secondQ, firstNonlinear, secondNonlinear;
-        Lanes nonlinear, qConstant, sl, sb, b, tb, tanhArgument, tanhValue;
+        double firstNonlinear, secondNonlinear;
+        Lanes input, nonlinear, qConstant, sl, sb, sz, sy, b, tb, tanhArgument, tanhValue;
         LaneMask converged;
         int iteration;
         bool running;
     };
+    // begin(), settledLow() and end() in lanes too: the same operations in
+    // the same order on each lane, with only the rare unconverged tanh(b)
+    // left to fastTanh() per lane.
     static CERES_ALWAYS_INLINE void beginPair(PairSolve& p, OtaSvf& first, OtaSvf& second,
             double firstSource, double secondSource, double firstFrequency, double secondFrequency,
             const OtaNetwork& network) {
         p.first=&first; p.second=&second;
-        first.begin(firstSource,network,p.firstInput,p.firstQ);
-        second.begin(secondSource,network,p.secondInput,p.secondQ);
+        const double ratio=network.ratio, qBlend=network.qBlend;
+        const double sourceBlend=network.sourceBlend, divisor=network.divisor;
+        p.sz = Lanes{first.sz, second.sz}; p.sy = Lanes{first.sy, second.sy};
+        p.input=2*ratio*Lanes{firstSource, secondSource};
+        p.qConstant=((1-qBlend)*p.sz+
+            qBlend*(1-sourceBlend)*(p.input-ratio*p.sy))/divisor;
         p.firstNonlinear = first.nonlinearGain(firstFrequency,network);
         p.secondNonlinear = second.nonlinearGain(secondFrequency,network);
         p.nonlinear = Lanes{p.firstNonlinear, p.secondNonlinear};
-        p.qConstant = Lanes{p.firstQ, p.secondQ};
         p.sl = Lanes{first.sl, second.sl}; p.sb = Lanes{first.sb, second.sb};
         p.tb = Lanes{first.previousTanhB, second.previousTanhB};
         p.b = Lanes{first.previousB, second.previousB};
@@ -1088,16 +1094,41 @@ struct OtaSvf {
                                             double& firstOut, double& secondOut) {
         const double effectiveDamping=network.effectiveDamping, linear=network.linear;
         OtaSvf& first=*p.first; OtaSvf& second=*p.second;
-        double firstB = p.b[0], firstArgument = p.tanhArgument[0], firstValue = p.tanhValue[0];
-        double secondB = p.b[1], secondArgument = p.tanhArgument[1], secondValue = p.tanhValue[1];
-        if (!p.converged[0])
-            first.solve(p.iteration,firstB,firstArgument,firstValue,p.firstNonlinear,p.firstQ,effectiveDamping,linear);
-        if (!p.converged[1])
-            second.solve(p.iteration,secondB,secondArgument,secondValue,p.secondNonlinear,p.secondQ,effectiveDamping,linear);
-        const double firstLow = first.settledLow(firstB,firstArgument,firstValue,p.firstNonlinear,linear);
-        const double secondLow = second.settledLow(secondB,secondArgument,secondValue,p.secondNonlinear,linear);
-        firstOut = first.end(firstB,firstLow,p.firstInput,p.firstQ,highPass,network);
-        secondOut = second.end(secondB,secondLow,p.secondInput,p.secondQ,highPass,network);
+        Lanes b = p.b, tanhArgument = p.tanhArgument, tanhValue = p.tanhValue;
+        if (!p.converged[0]) {
+            double lane = b[0], argument = tanhArgument[0], value = tanhValue[0];
+            first.solve(p.iteration,lane,argument,value,p.firstNonlinear,p.qConstant[0],effectiveDamping,linear);
+            b[0] = lane; tanhArgument[0] = argument; tanhValue[0] = value;
+        }
+        if (!p.converged[1]) {
+            double lane = b[1], argument = tanhArgument[1], value = tanhValue[1];
+            second.solve(p.iteration,lane,argument,value,p.secondNonlinear,p.qConstant[1],effectiveDamping,linear);
+            b[1] = lane; tanhArgument[1] = argument; tanhValue[1] = value;
+        }
+        // settledLow()
+        const Lanes tolerance = {1e-9, 1e-9};
+        const Lanes step = b - tanhArgument;
+        Lanes tanhB = tanhValue + (1.0 - tanhValue*tanhValue)*step;
+        const LaneMask near = (LaneMask)(laneAbs(step) < tolerance);
+        if (CERES_UNLIKELY(!(near[0] & near[1]))) {
+            if (!near[0]) tanhB[0] = fastTanh(b[0]);
+            if (!near[1]) tanhB[1] = fastTanh(b[1]);
+        }
+        first.previousTanhB = tanhB[0]; second.previousTanhB = tanhB[1];
+        const Lanes l = p.sl + p.nonlinear*tanhB + linear*b;
+        // end()
+        const double sourceBlend=network.sourceBlend;
+        const Lanes z = p.qConstant+network.qBand*b;
+        const Lanes h = z - 2*b - l;
+        const Lanes y=(1-sourceBlend)*p.sy+sourceBlend*(-z+2*b)+network.sourceInput*p.input;
+        const Lanes sb = 2 * b - p.sb, sl = 2 * l - p.sl, sz = 2 * z - p.sz, sy = 2 * y - p.sy;
+        first.sb = sb[0]; second.sb = sb[1];
+        first.sl = sl[0]; second.sl = sl[1];
+        first.sz = sz[0]; second.sz = sz[1];
+        first.sy = sy[0]; second.sy = sy[1];
+        first.previousB = b[0]; second.previousB = b[1];
+        const Lanes out = highPass ? h : l;
+        firstOut = out[0]; secondOut = out[1];
     }
     static CERES_ALWAYS_INLINE void processPair(OtaSvf& first, OtaSvf& second,
             double firstSource, double secondSource, double firstFrequency, double secondFrequency,
