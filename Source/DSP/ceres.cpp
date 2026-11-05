@@ -2827,12 +2827,16 @@ struct Synth::Impl {
             +tremoloScale*leverFraction(patch.tremolo,tremoloLeverRatio)*lfo;
         vcaControl+=(levelControl-vcaControl)*vcaControlCoefficient;
         commonVcaGain=std::max(0.0,levelControl);
-        const double pwm = sinTurn(pwmPhase+patch.pwmPhase);
+        // The PWM sine reaches only the pulse's comparator level: with the
+        // pulse muted or no PWM depth (pulseWidth+0, clamped in process())
+        // it is not evaluated. Its phase runs on regardless.
+        const bool pulseEnabled = patch.pulse!=0;
+        const double pwm = pulseEnabled && patch.pwmDepth!=0 ? sinTurn(pwmPhase+patch.pwmPhase) : 0;
         lfoPhase = wrapUnit(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrapUnit(pwmPhase + patch.pwmRate*dt);
         const double pulseWidthMod = patch.pulseWidth+pwm*patch.pwmDepth;
         const double resetSeconds = patch.resetMicroseconds*1e-6;
-        const bool sineEnabled = patch.sine!=0, sawEnabled = patch.saw!=0, pulseEnabled = patch.pulse!=0;
+        const bool sineEnabled = patch.sine!=0, sawEnabled = patch.saw!=0;
         const double spreadCenter = .5*(voiceLimit-1);
         const bool checkBoardPitch = patch.boardPitchTolerance>0 || patch.boardTemperatureRise!=0;
         const double noiseTerm = patch.noise*noise;
