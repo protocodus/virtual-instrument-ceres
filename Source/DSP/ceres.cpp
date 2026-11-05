@@ -2090,7 +2090,14 @@ struct CutoffBus {
     // step then evaluates the same terms at the same I. Equal doubles of
     // different bits are only +/-0, whose terms give the same step. rLoop
     // changes only in configure().
+    // From one step to the next I moves by under 1e-5 of Is+I on nearly all
+    // the factory presets' steps (most often 1e-6..1e-8), so Vd's log1p is
+    // carried from the last one: log1p(I'/Is) = log1p(I/Is) + log1p(r) with
+    // r = (I'-I)/(Is+I), and log1p(r) = r - r^2/2 + r^3/3 to under 3e-21.
+    // Each hop rounds once, at most half an ulp of the term; an exact log1p
+    // every eight hops keeps that from accumulating past glibc's own error.
     double termCurrent=0, termLog=0, termSlope=0;
+    unsigned termHops=0;
     bool termsReady=false;
     bool conducting=false, settled=true;
     void configure(double cutoffHz, double node, double seriesResistance=0) {
@@ -2124,7 +2131,15 @@ struct CutoffBus {
         const double jEff=j*jScale;
         for (int step=0; step<16 && !settled; ++step) {
             if (!termsReady || current!=termCurrent) {
-                termLog=std::log1p(current/presetDiodeIs);
+                const double r=termsReady && termHops<8
+                    ? (current-termCurrent)/(presetDiodeIs+termCurrent) : 1;
+                if (inlineAbs(r)<1e-5) {
+                    termLog+=r*(1-r*(.5-r*(1/3.)));
+                    ++termHops;
+                } else {
+                    termLog=std::log1p(current/presetDiodeIs);
+                    termHops=0;
+                }
                 termSlope=1+presetDiodeVt/(rLoop*(presetDiodeIs+current));
                 termCurrent=current;
                 termsReady=true;
