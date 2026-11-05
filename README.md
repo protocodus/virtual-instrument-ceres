@@ -25,6 +25,10 @@ The CI-generated demos below play **eight of the circuit engine's 14 research pr
 
 ## Version history
 
+### Unreleased — 1.1.5 — lower CPU cost
+
+- Five more CPU reductions, with audio bit for bit unchanged: the CPU regression stream (every factory preset at 1, 4 and 16 voices and 1x/2x/4x, four host rates, live controls) gives the same double-precision output as 1.1.4 under GCC, GCC with FMA contraction and Clang with the Rack's `-fno-builtin`. The factory presets take 7.5% fewer instructions at four voices (1x and 4x), 6.9% at one voice and 6.1% at sixteen; on this development container the native benchmark's median thread CPU fell 3–9%. Not a Reason host result ([measurements](Docs/benchmarks/cpu-steps-2026-11-05.md)).
+
 ### Unreleased — 1.1.4 — T71 tablet cutoff coupling, M-board VCA LI RC and EXT preamp bandwidth
 
 - Factory tone-selector tablets now include their T71 matrix column series resistor $R_s = 10\text{ k}\Omega(10/V_{\text{ideal}} - 1)$ ahead of the `1S1555` diode on the shared `FH` (`g`) and `FL` (`i`) cutoff rows (SM2 pp.10–11, 15). Four boards at $+5\text{ V}$ of LP EG lift each other's cutoff by $0.07$–$0.09\text{ octave}$ ($89$–$107\text{ cents}$) on the weaker columns (`Electric Piano`, `Guitar 2`, `Brass 2`) instead of the `PANEL` follower's $0.009$–$0.018\text{ octave}$. `PANEL` and custom patches keep the `IC4` follower's $R_s = 0$.
