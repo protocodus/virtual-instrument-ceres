@@ -4,6 +4,7 @@
 //
 //   CeresParameterMatrixTests [--jobs N] [--rotation] [--shard K/N]
 //                             [--case LABEL] [--count] [--list]
+//   CeresParameterMatrixTests --reach [--jobs N] [--case PARAMETER]
 //
 // The command line is the shared protocodus::matrix::Main's (U9): shards are
 // numbered from 0, and --case reruns the case a FAIL line names.
@@ -20,6 +21,7 @@
 #include <cstdlib>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace
 {
@@ -86,6 +88,104 @@ public:
                               + CeresAudioProcessor::kBusCouplingSeconds * std::log (std::max (1.0, ceiling));
         limits.soundsWhileHeld = ! closesBeforeRamp (c);
         return limits;
+    }
+
+    // U11. Parameters the default patch leaves silent are tested on the first
+    // factory preset that uses them, or here with what makes them audible.
+    protocodus::matrix::ReachRule ReachFor (std::size_t index, float) const override
+    {
+        using protocodus::matrix::Reach;
+        std::vector<protocodus::matrix::Parameter> all = Parameters();
+        for (const auto& p : EditorOnlyParameters())
+            all.push_back (p);
+        const auto at = [&] (const char* name)
+        {
+            for (std::size_t i = 0; i < all.size(); ++i)
+                if (all[i].name == name)
+                    return i;
+            std::fprintf (stderr, "no parameter %s\n", name);
+            std::abort();
+        };
+        const std::string& name = all[index].name;
+        // Each envelope runs its attack and decay once per key press (the
+        // EG's own segments, ceres.cpp advanceAmpEnvelope): half a second in,
+        // the held chord has finished them.
+        if (name == "VCA EG attack" || name == "VCA EG attack headroom" || name == "VCF EG attack"
+            || name == "VCF EG attack level" || name == "VCF EG decay" || name == "VCF EG attack headroom")
+            return { Reach::NewNotes, "an attack or decay segment the held chord has finished" };
+        // At its top a current limit ten times the EG's span is never
+        // reached, so the attack follows the RC law, as at 0.
+        if (name == "VCA EG attack saturation" || name == "VCF EG attack saturation")
+            return { Reach::Exempt, "a limit the attack never reaches at either end" };
+        // The ring carrier's EG starts at each key press (advanceRingCarrier).
+        if (name == "Ring attack time" || name == "Ring decay time")
+            return { Reach::NewNotes, "the ring carrier's sweep, which each key press starts",
+                     { { at ("Ring modulation"), 1.0f }, { at ("Ring depth"), 0.5f } } };
+        if (name == "Ring depth")
+            return { Reach::NewNotes, "the depth of the ring carrier's sweep, which each key press starts",
+                     { { at ("Ring modulation"), 1.0f } } };
+        if (name == "Ring speed")
+            return { Reach::Held, "", { { at ("Ring modulation"), 1.0f } },
+                     "the ring carrier runs free, so after a change it is in the phase the old speed left" };
+        // The phrase sends no aftertouch, so touch is tested with velocity as
+        // its source; brilliance with the LPF low enough to open further.
+        if (name == "Touch VCO" || name == "Touch VCF" || name == "Touch level")
+            return { Reach::Held, "", { { at ("Touch source"), 1.0f } } };
+        if (name == "Touch brilliance")
+            return { Reach::Held, "", { { at ("Touch source"), 1.0f }, { at ("LPF cutoff"), 0.6f } } };
+        if (name == "Touch source")
+            return { Reach::Held, "", { { at ("Touch level"), 1.0f } } };
+        if (name == "Sub osc function")
+            return { Reach::Held, "", { { at ("Sub osc VCO"), 0.5f } } };
+        if (name == "Sub osc speed")
+            return { Reach::Held, "", { { at ("Sub osc VCO"), 0.5f } },
+                     "the sub-oscillator runs free, so after a change it is in the phase the old speed left" };
+        // A board glides from the key it last played to the one it is given.
+        if (name == "Portamento mode")
+            return { Reach::NewNotes, "a glide into each new key" };
+        if (name == "Portamento speed")
+            return { Reach::NewNotes, "a glide into each new key", { { at ("Portamento mode"), 0.5f } },
+                     "each board glides from wherever the glides before left it" };
+        if (name == "EXT level")
+            return { Reach::Exempt, "the EXT IN jack's level; the phrase plays nothing into it" };
+        if (name == "PWM phase")
+            return { Reach::Exempt, "1 is a whole cycle, the same phase as 0" };
+        // Near middle C, where the law pivots, tracking moves a 6 kHz cutoff
+        // too little to hear; at a lower cutoff the held chord follows.
+        if (name == "Filter key tracking")
+            return { Reach::Held, "", { { at ("LPF cutoff"), 0.6f } } };
+        // At its default the HPF corner sits under the chord, where its peak
+        // has nothing to lift.
+        if (name == "HPF resonance")
+            return { Reach::Held, "", { { at ("HPF cutoff"), 0.4f } } };
+        // The free-running VCOs keep their phases, so after a retune they
+        // beat as the instrument's history leaves them.
+        if (name == "Drift" || name == "Board pitch tolerance" || name == "Temperature rise")
+            return { Reach::Held, "", {}, "the boards beat in the phase their old tuning left" };
+        // The EG level and time residuals (updateBoardScales) meet the
+        // segments each key press runs; held notes keep only the floor's.
+        if (name == "Board envelope tolerance")
+            return { Reach::NewNotes, "each board's EG peaks, which only new notes reach" };
+        // Both are spreads of a few percent between the boards, under a
+        // level JND on any chord even with the stage they act on exposed.
+        if (name == "Board envelope time tolerance")
+            return { Reach::Exempt, "a few percent of EG time between boards; Ceres.board_tolerance_contracts" };
+        if (name == "Board VCA tolerance")
+            return { Reach::Exempt, "a few percent of sine against filtered level between boards; "
+                                    "Ceres.board_tolerance_contracts" };
+        // FilterChain divides the drive out again: it only matters where it
+        // drives the OTAs into their curve, above the default.
+        if (name == "Drive")
+            return { Reach::Exempt, "below the default the OTAs are already linear" };
+        // The saw's reset lasts at most 60 us: at the probe's pitches it only
+        // trims the top octave, under a level JND even with the LPF open.
+        if (name == "VCO reset time")
+            return { Reach::Exempt, "a reset of at most 60 us; Ceres.oscillator_circuit_contracts" };
+        // CeresAudioProcessor::advanceConfiguration applies both once every
+        // note has ended, behind a fade.
+        if (name == "Voices" || name == "Oversampling")
+            return { Reach::NewNotes, "applied once every note has ended" };
+        return {};
     }
 
 private:

@@ -480,6 +480,10 @@ if(BUILD_TESTING)
                  COMMAND CeresParameterMatrixTests --rotation --shard 0/50 --jobs 4)
         set_tests_properties(Ceres.ParameterMatrix PROPERTIES TIMEOUT 1800 LABELS fuzz)
 
+        # U11: every parameter reaches held and new notes after long play.
+        add_test(NAME Ceres.ParameterReach COMMAND CeresParameterMatrixTests --reach --jobs 4)
+        set_tests_properties(Ceres.ParameterReach PROPERTIES TIMEOUT 1800 LABELS unit)
+
         if(Python3_Interpreter_FOUND)
             add_test(NAME Ceres.EditorRender
                      COMMAND "${Python3_EXECUTABLE}" -B
