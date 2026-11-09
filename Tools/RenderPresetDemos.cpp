@@ -21,6 +21,10 @@ public:
     CeresVoice (const std::string& presetName, double sampleRate, std::uint32_t seed)
         : engine (sampleRate, seed)
     {
+        // A freshly loaded plug-in's voices and oversampling (U13).
+        if (! engine.configure (static_cast<unsigned> (ceres_plugin::kDefaultVoices),
+                                static_cast<unsigned> (ceres_plugin::kOversamplingFactors[ceres_plugin::kDefaultOversamplingIndex])))
+            throw std::runtime_error ("the plug-in's default configuration was refused");
         engine.setPatch (ceres::preset (presetName));
     }
 

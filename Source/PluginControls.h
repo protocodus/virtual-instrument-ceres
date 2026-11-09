@@ -209,7 +209,9 @@ inline constexpr const char* kVoiceCountId = "voice_count";
 inline constexpr const char* kOversamplingId = "oversampling";
 inline constexpr int kDefaultVoices = 4;           // the CS-50's four boards
 inline constexpr int kOversamplingFactors[] { 1, 2, 4 };
-inline constexpr int kDefaultOversamplingIndex = 2; // 4x, the engine's reference quality
+// 1x: every portfolio instrument starts at its lowest oversampling (U13);
+// 4x stays the engine's reference quality, one choice away.
+inline constexpr int kDefaultOversamplingIndex = 0;
 
 inline const Control* findControl (const char* key) noexcept
 {

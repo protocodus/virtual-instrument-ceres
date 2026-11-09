@@ -378,8 +378,8 @@ void parameterContract()
                && voiceCount->get() == ceres_plugin::kDefaultVoices,
            "Voices offers 1-16, default 4");
     auto* factors = dynamic_cast<juce::AudioParameterChoice*> (&quality);
-    check (factors != nullptr && factors->choices == juce::StringArray ("1x", "2x", "4x") && factors->getIndex() == 2,
-           "Oversampling offers 1x, 2x and 4x, default 4x");
+    check (factors != nullptr && factors->choices == juce::StringArray ("1x", "2x", "4x") && factors->getIndex() == 0,
+           "Oversampling offers 1x, 2x and 4x, default 1x");
     check (! voices.isAutomatable() && ! quality.isAutomatable(), "the voice and quality settings are not automatable");
 
     check (p.getParameters().size() == static_cast<int> (ceres::parameterCount()) + 2,
@@ -707,9 +707,9 @@ void configurationContract()
     {
         CeresAudioProcessor p;
         setSetting (p, ceres_plugin::kVoiceCountId, 8.0f);
-        setSetting (p, ceres_plugin::kOversamplingId, 0.0f);
+        setSetting (p, ceres_plugin::kOversamplingId, 2.0f);
         prepare (p, 256);
-        check (p.appliedVoices() == 8 && p.appliedOversampling() == 1 && ! p.configurationPending(),
+        check (p.appliedVoices() == 8 && p.appliedOversampling() == 4 && ! p.configurationPending(),
                "prepareToPlay applies the voice and quality settings");
     }
 
@@ -741,7 +741,7 @@ void configurationContract()
     prepare (r, 64);
     const auto withFade = play (q, 9600, 64, { noteOn (0, 60, 100) });
     const auto plain = play (r, 9600 + 64 * 4, 64, { noteOn (64 * 4, 60, 100) });
-    check (q.appliedOversampling() == 4, "a note during the fade-out keeps the running quality");
+    check (q.appliedOversampling() == 1, "a note during the fade-out keeps the running quality");
     check (peak (withFade.left) > 0.5 * peak (plain.left), "a note during the fade-out sounds");
 }
 
