@@ -165,7 +165,7 @@ CERES_ALWAYS_INLINE double fastExp2(double x) {
 }
 // The filters' TPT prewarp, tan(pi*fc/fs), is evaluated whenever a cutoff
 // moves (every sample under envelope, SUB or glide). The argument is at most
-// .22 pi (the cutoff clamp), inside Cephes tan.c's |x| <= pi/4 rational,
+// .22 pi (prewarpKnee), inside Cephes tan.c's |x| <= pi/4 rational,
 // x + x^3 P(x^2)/Q(x^2): at most 1 ulp (2.2e-16 relative) against glibc over
 // 1e-7..0.22 pi, at about a third of glibc's instructions.
 CERES_ALWAYS_INLINE double prewarpTan(double x) {
@@ -885,7 +885,7 @@ struct BoardTolerance {
 struct OtaNetwork {
     double fs=0, conductance=0, referenceConductance=0, ratio=0;
     double qBlend=0, sourceBlend=0, divisor=0, linear=0, sourceInput=0;
-    double resonance=0, qBand=0, effectiveDamping=0;
+    double resonance=0, damping=0, qBand=0, effectiveDamping=0;
     bool resonanceReady=false;
     void configure(double rate, double sourceConductance=1/150e3,
                    double referenceSourceConductance=1/150e3) {
@@ -904,7 +904,7 @@ struct OtaNetwork {
     void setResonance(double value) {
         if (resonanceReady && value==resonance) return;
         // resonance r is 1-VQ/10, so d=.2*10^(VQ/10)=2*10^-r.
-        const double damping=2*std::pow(10.0,-clamp(value,0,1))*referenceConductance/conductance;
+        damping=2*std::pow(10.0,-clamp(value,0,1))*referenceConductance/conductance;
         qBand=qBlend*(2-damping-2*ratio*sourceBlend)/divisor;
         effectiveDamping=(2*(1-qBlend)+qBlend*damping)/divisor;
         resonance=value;
@@ -918,7 +918,8 @@ struct OtaSvf {
     // the Newton warm start does not recompute it: same argument, same bits.
     double previousTanhB = 0;
     bool previousTanhReady = true;
-    double cachedCutoff=0, cachedRate=0, cachedG=0, cachedNonlinear=0;
+    double cachedCutoff=0, cachedRate=0, cachedDamping=0, cachedG=0, cachedNonlinear=0;
+    double cachedDecramp=0;
     double process(double sourceVoltage, double frequency, double resonance,
                    double fs, bool highPass, double sourceConductance = 1/150e3,
                    double referenceSourceConductance = 1/150e3) {
@@ -943,15 +944,46 @@ struct OtaSvf {
     }
     // Above the floor: the OTA's gain beyond its feed resistor, and tanh of
     // the Newton warm start.
+    //
+    // Trapezoidal integration bends the frequency axis: the prewarp puts the
+    // cutoff where it belongs, but a 12dB/oct skirt still falls to nothing at
+    // fs/2, and tan() cannot place a cutoff near or above fs/2 at all. Until
+    // 1.1.7 the cutoff stopped at .22 fs (10.6kHz at 48kHz, 1x) and the skirt
+    // was left bent: against this same network run at 768kHz, a 6kHz low pass
+    // at 48kHz read -1.4dB at 10kHz, -3.2dB at 12.5kHz and -8.4dB at 16kHz,
+    // and the open filter (20kHz) reached -3dB at 7.2kHz instead of 11.8kHz.
+    // Two corrections, both exact in the limit fc/fs -> 0:
+    //  - Above prewarpKnee the integrator gain continues in proportion to
+    //    the cutoff, to prewarpCeiling: it stays finite and monotone, and the
+    //    audible band below the cutoff keeps opening as the circuit's does.
+    //  - The low-pass output is l - decramp*h. The high-pass node carries the
+    //    skirt the warped low-pass node lost: with t=pi*fc/fs, matching the
+    //    circuit's asymptote needs t^2*(1/x^2 - cot(x)^2) at x=pi*f/fs, which
+    //    is t^2*2/3 for f well under fs/2. The law below is that term with
+    //    its roll-off towards high cutoff and damping d, FITTED by least
+    //    squares to the 768kHz responses of this network (cutoff 300Hz..42kHz,
+    //    resonance 0..1, 44.1 and 48kHz, to 16kHz, bands within 36dB of the
+    //    passband): .69 t^2/(1+.63 d^2 t^2+.18 t^4). The constants are
+    //    numerical, not circuit values. Residual at 48kHz, 1x: within 1.1dB
+    //    to 12.5kHz and 1.3dB at 16kHz for cutoffs to 8kHz. A cutoff above
+    //    10kHz at high resonance stays rough, to +2.6dB at 12.5kHz and -6dB
+    //    at 16kHz: a peak near fs/2 that no 1x response can place.
+    // Tests/FilterRateTests.cpp holds the 1x response to the reference.
+    static constexpr double prewarpKnee=.22, prewarpCeiling=.88;
     CERES_ALWAYS_INLINE double nonlinearGain(double frequency, const OtaNetwork& network) {
-        const double cutoff = std::min(frequency, .22 * network.fs);
-        if (cutoff!=cachedCutoff || network.fs!=cachedRate) {
+        const double cutoff = std::min(frequency, prewarpCeiling * network.fs);
+        if (cutoff!=cachedCutoff || network.fs!=cachedRate || network.damping!=cachedDamping) {
             // Exact input equality only: moving cutoff CVs retain the same
             // capacitor TPT prewarp, with no control-rate approximation.
-            cachedG=prewarpTan(pi * cutoff / network.fs);
+            const double knee = prewarpKnee * network.fs;
+            cachedG=cutoff<=knee ? prewarpTan(pi * cutoff / network.fs)
+                : prewarpTan(pi * prewarpKnee) * (cutoff / knee);
             cachedNonlinear=std::max(0.0,cachedG-network.linear);
+            const double t = pi * cutoff / network.fs, t2 = t*t;
+            cachedDecramp=.69*t2/(1+.63*network.damping*network.damping*t2+.18*t2*t2);
             cachedCutoff=cutoff;
             cachedRate=network.fs;
+            cachedDamping=network.damping;
         }
         if (!previousTanhReady) {
             previousTanhB = fastTanh(previousB);
@@ -970,7 +1002,7 @@ struct OtaSvf {
         return sl + nonlinear*tanhB + linear*b;
     }
     CERES_ALWAYS_INLINE double end(double b, double l, double input, double qConstant,
-                                   bool highPass, const OtaNetwork& network) {
+                                   bool highPass, double decramp, const OtaNetwork& network) {
         const double sourceBlend=network.sourceBlend;
         const double z = qConstant+network.qBand*b;
         const double h = z - 2*b - l;
@@ -982,7 +1014,7 @@ struct OtaSvf {
         sz = 2 * z - sz;
         sy = 2 * y - sy;
         previousB = b;
-        return highPass ? h : l;
+        return highPass ? h : l - decramp*h;
     }
     // Newton on b from the given iteration (0 starts from the warm start's
     // tanh), keeping the last tanh(b) evaluated and its argument.
@@ -1005,8 +1037,46 @@ struct OtaSvf {
             // earlier 1e-12 bought a further pair of tanh evaluations about a
             // third of the time (2.34 to 2.02 iterations per solve, measured
             // on the factory presets) and no change at the float output.
-            if (inlineAbs(delta) < 1e-9) break;
+            if (inlineAbs(delta) < 1e-9) return;
         }
+        b = solveBracketed(b,nonlinear,qConstant,effectiveDamping,linear);
+        tanhArgument = b; tanhValue = fastTanh(b);
+    }
+    // Newton's own steps settle every solve while the integrator gain stays
+    // near 1. Past about 1.3 (a cutoff above .35 fs) a stage driven deep into
+    // both tanh knees can send them back and forth across the root: with the
+    // ceiling at .88 fs, 0.4% of the solves of randomised patches at full
+    // drive and resonance were still open after seven steps (none at ordinary
+    // high-pass settings, open low pass and full drive included). The
+    // residual rises at least one for one with b, so the root lies within
+    // |residual| of any b: keep Newton's step where it lands inside that
+    // bracket and is under half the step before, and halve the bracket
+    // where it is not, so each step is at most half the last.
+    CERES_NOINLINE double solveBracketed(double b, double nonlinear, double qConstant,
+                                         double effectiveDamping, double linear) const {
+        const auto evaluate = [&](double x, double& derivative) {
+            const double tx = fastTanh(x);
+            const double h = qConstant - effectiveDamping*x - (sl + nonlinear*tx + linear*x);
+            const double th = fastTanh(h);
+            derivative = 1 + (nonlinear*(1-th*th)+linear)*(effectiveDamping+nonlinear*(1-tx*tx)+linear);
+            return x - sb - nonlinear*th - linear*h;
+        };
+        double derivative;
+        double residual = evaluate(b,derivative);
+        double low = residual > 0 ? b - residual : b, high = residual > 0 ? b : b - residual;
+        double delta = high - low;
+        for (int iteration = 0; iteration < 64; ++iteration) {
+            const double newton = residual/derivative;
+            double next = b - newton;
+            if (!(next > low && next < high) || inlineAbs(2*newton) > inlineAbs(delta))
+                next = .5*(low+high);
+            delta = next - b;
+            b = next;
+            if (inlineAbs(delta) < 1e-9) break;
+            residual = evaluate(b,derivative);
+            (residual > 0 ? high : low) = b;
+        }
+        return b;
     }
     CERES_ALWAYS_INLINE double process(double sourceVoltage, double frequency, bool highPass, const OtaNetwork& network) {
         double input, qConstant;
@@ -1014,7 +1084,7 @@ struct OtaSvf {
         const double effectiveDamping=network.effectiveDamping;
         const double linear = network.linear;
         double b = previousB;
-        double l = 0;
+        double l = 0, decramp = 0;
         if (frequency <= filterFrequencyFloor) {
             const double dl = linear;
             const double derivative = 1 + linear * (effectiveDamping + dl);
@@ -1030,12 +1100,13 @@ struct OtaSvf {
             previousTanhReady = false;
         } else {
             const double nonlinear = nonlinearGain(frequency,network);
+            decramp = cachedDecramp;
             // The last tanh(b) the iterations evaluated, and its argument.
             double tanhArgument = previousB, tanhValue = previousTanhB;
             solve(0,b,tanhArgument,tanhValue,nonlinear,qConstant,effectiveDamping,linear);
             l = settledLow(b,tanhArgument,tanhValue,nonlinear,linear);
         }
-        return end(b,l,input,qConstant,highPass,network);
+        return end(b,l,input,qConstant,highPass,decramp,network);
     }
 #if defined(CERES_FILTER_LANES)
     // Two boards' filters on the same network, each exactly as process()
@@ -1045,7 +1116,7 @@ struct OtaSvf {
     struct PairSolve {
         OtaSvf *first, *second;
         double firstNonlinear, secondNonlinear;
-        Lanes input, nonlinear, qConstant, sl, sb, sz, sy, b, tb, tanhArgument, tanhValue;
+        Lanes input, nonlinear, decramp, qConstant, sl, sb, sz, sy, b, tb, tanhArgument, tanhValue;
         LaneMask converged;
         int iteration;
         bool running;
@@ -1066,6 +1137,7 @@ struct OtaSvf {
         p.firstNonlinear = first.nonlinearGain(firstFrequency,network);
         p.secondNonlinear = second.nonlinearGain(secondFrequency,network);
         p.nonlinear = Lanes{p.firstNonlinear, p.secondNonlinear};
+        p.decramp = Lanes{first.cachedDecramp, second.cachedDecramp};
         p.sl = Lanes{first.sl, second.sl}; p.sb = Lanes{first.sb, second.sb};
         p.tb = Lanes{first.previousTanhB, second.previousTanhB};
         p.b = Lanes{first.previousB, second.previousB};
@@ -1127,7 +1199,7 @@ struct OtaSvf {
         first.sz = sz[0]; second.sz = sz[1];
         first.sy = sy[0]; second.sy = sy[1];
         first.previousB = b[0]; second.previousB = b[1];
-        const Lanes out = highPass ? h : l;
+        const Lanes out = highPass ? h : l - p.decramp*h;
         firstOut = out[0]; secondOut = out[1];
     }
     static CERES_ALWAYS_INLINE void processPair(OtaSvf& first, OtaSvf& second,
@@ -1847,6 +1919,25 @@ struct Oscillator {
     }
 };
 
+// blep() and blamp() are a step and a corner drawn through a two-sample
+// triangle, so every harmonic leaves the Oscillator at sinc^2(f/fs) of the
+// circuit's level: -.8dB at 8kHz, -2.0dB at 12.7kHz and -3.3dB at 16kHz at
+// 48kHz, 1x, against -.2dB at 16kHz at 4x (measured on the sine output, 1x
+// against 4x). EdgeLevel gives the level back before the filters and the
+// sine VCA see the waves: the minimum-phase form of (-1/8, 5/4, -1/8),
+// 1+sin^2(pi f/fs)/2, within .25dB of 1/sinc^2 to .27 fs and .5dB under it
+// at fs/3. Its two zeros sit at 5-sqrt(24), so the taps are 1/(8z), -1/4
+// and z/8. Aliases at a frequency rise with the harmonics there.
+struct EdgeLevel {
+    double x1 = 0, x2 = 0;
+    CERES_ALWAYS_INLINE double operator()(double x) {
+        constexpr double zero = 0.10102051443364381;
+        const double y = x/(8*zero) - .25*x1 + zero/8*x2;
+        x2 = x1; x1 = x;
+        return y;
+    }
+};
+
 double besselI0(double x) {
     double term = 1, sum = 1;
     for (int k = 1; k < 40; ++k) {
@@ -2238,6 +2329,7 @@ struct Synth::Impl {
         std::uint64_t assignedAt = 0;
         bool assignedSilent = false;
         Oscillator osc;
+        EdgeLevel filteredEdge, sineEdge;
         FilterChain filters;
         // Physical board capacitor histories persist across allocation and Idle.
         OutputCoupling filteredCoupling, commonCoupling;
@@ -2996,12 +3088,12 @@ struct Synth::Impl {
                 }
             }
             v.expCacheReady = true;
-            const double source = patch.saw*waves.saw + patch.pulse*waves.pulse + noiseTerm;
+            const double source = v.filteredEdge(patch.saw*waves.saw + patch.pulse*waves.pulse) + noiseTerm;
 #if !defined(CERES_EMBEDDED_TARGET)
             v.oscillatorFrequency=frequency; v.hpFrequency=hpFrequency; v.lpFrequency=lpFrequency;
 #endif
             filterSource[i]=source; hpCutoffHz[i]=hpFrequency; lpCutoffHz[i]=lpFrequency;
-            sineWave[i]=waves.sine; ampLevel[i]=ampEnvelope; boardExpression[i]=expression;
+            sineWave[i]=v.sineEdge(waves.sine); ampLevel[i]=ampEnvelope; boardExpression[i]=expression;
         }
         unsigned solved = 0;
 #if defined(CERES_FILTER_LANES)

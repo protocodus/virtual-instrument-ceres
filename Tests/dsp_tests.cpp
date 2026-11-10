@@ -63,7 +63,13 @@ std::complex<double> physicalFilter(double f,double rate,double omega,double dam
     const auto d=ys+1/33e3+1/1.2e6+s*180e-12;
     const auto n=gmQ+1/1.2e6+s*180e-12;
     const auto denominator=d*(s*s+omega*omega)+2*omega*n*s;
-    const auto numerator=highPass ? s*s : std::complex<double>(omega*omega,0);
+    // Since 1.1.7 the low-pass output is the LP node less `decramp` of the HP
+    // node (OtaSvf::nonlinearGain in ceres.cpp): the same two node voltages,
+    // so the branch-current equations still give both terms.
+    const double t=std::atan(omega/(2*rate));
+    const double stageDamping=damping*gReference/(sourceConductance+1/33e3+1/1.2e6);
+    const double decramp=.69*t*t/(1+.63*stageDamping*stageDamping*t*t+.18*t*t*t*t);
+    const auto numerator=highPass ? s*s : omega*omega-decramp*s*s;
     return 2.0*ys*numerator/denominator;
 }
 void parametersAndConstruction() {
@@ -426,13 +432,17 @@ void outputLifecycleAndPolarity() {
     // the RC phase it measures .99987, under the bound; against the shaped
     // waveform it is .99997 (an ideal sine is cos(2*pi*phase), which the
     // previous engine met at .99999). The reference follows the waveform.
+    // Since 1.1.7 the waves pass EdgeLevel (ceres.cpp) on the way: minimum
+    // phase, two zeros at z=5-sqrt(24), so it leads by 2z/(1-z)=.2247
+    // internal samples at 440Hz. The bound is tight enough to see that 1.2us,
+    // so the reference carries it.
     ceres::Synth sign(48000,1); p.volume=.01; sign.setPatch(p); sign.noteOn(69);
     constexpr std::size_t start=96000;
     render(sign,start);
     const auto audio=render(sign,4800);
     double cross=0,energy=0,referenceEnergy=0;
     for (std::size_t i=0;i<audio.size();++i) {
-        const double phase=.5665615751722809+440*(double(start+i)-121.0/4)/48000;
+        const double phase=.5665615751722809+440*(double(start+i)-(121.0-.2247)/4)/48000;
         const double tri=2*std::abs(1-2*(phase-std::floor(phase)))-1;
         const double reference=std::tanh(1.4020*tri)/std::tanh(1.4020);
         cross+=audio[i]*reference; energy+=audio[i]*audio[i]; referenceEnergy+=reference*reference;

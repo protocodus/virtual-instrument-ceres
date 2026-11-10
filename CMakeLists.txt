@@ -22,7 +22,7 @@ endif()
 
 # C is required in addition to C++: JUCE's macOS plug-in wrappers (AU and
 # Standalone) compile C/Objective-C sources with non-Xcode generators too.
-project(Ceres VERSION 1.1.6 LANGUAGES C CXX)
+project(Ceres VERSION 1.1.7 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -307,6 +307,9 @@ if(BUILD_TESTING)
   add_executable(ceres_vcf_key_voltage_tests Tests/VcfKeyVoltageTests.cpp)
   target_link_libraries(ceres_vcf_key_voltage_tests PRIVATE ceres_native)
   add_test(NAME Ceres.vcf_key_voltage_contracts COMMAND ceres_vcf_key_voltage_tests)
+  add_executable(ceres_filter_rate_tests Tests/FilterRateTests.cpp)
+  target_link_libraries(ceres_filter_rate_tests PRIVATE ceres_native)
+  add_test(NAME Ceres.filter_rate_contracts COMMAND ceres_filter_rate_tests)
   add_executable(ceres_envelope_circuit_tests Tests/EnvelopeCircuitTests.cpp)
   target_link_libraries(ceres_envelope_circuit_tests PRIVATE ceres_native)
   set_target_properties(ceres_envelope_circuit_tests PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
