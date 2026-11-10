@@ -353,6 +353,17 @@ void parameterContract()
             check (juce::exactlyEqual (number->convertFrom0to1 (0.0f), number->range.start)
                        && juce::exactlyEqual (number->convertFrom0to1 (1.0f), number->range.end),
                    juce::String (info.key) + ": the ends of travel are the ends of the range");
+            // A host reads a value back as travel and sets it again on
+            // every restore, so a value the range produced must map back
+            // to itself.
+            int moved = 0;
+            for (int step = 0; step <= 4096; ++step)
+            {
+                const float plain = number->convertFrom0to1 (static_cast<float> (step) / 4096.0f);
+                moved += ! juce::exactlyEqual (number->convertFrom0to1 (number->convertTo0to1 (plain)), plain);
+            }
+            check (moved == 0, juce::String (info.key) + " returns each value through travel and back ("
+                                   + juce::String (moved) + " of 4097 moved)");
             // Displayed text reads back to (nearly) the same lever position.
             for (const float position : { 0.0f, 0.37f, 1.0f })
             {
@@ -442,8 +453,8 @@ juce::MemoryBlock save (CeresAudioProcessor& p)
     return block;
 }
 
-// A new instance draws its own unit; restoring another instance's state makes
-// it that unit, with that instance's parameters.
+// Restoring another instance's state makes it that unit, with that instance's
+// parameters.
 void restore (CeresAudioProcessor& p, const juce::MemoryBlock& state)
 {
     p.setStateInformation (state.getData(), static_cast<int> (state.getSize()));
@@ -477,10 +488,15 @@ void stateContract()
     check (saved.getSize() > 0, "state is written");
 
     CeresAudioProcessor b;
-    check (b.unitSeed() != a.unitSeed(), "each new instance draws its own unit");
+    check (b.unitSeed() == CeresAudioProcessor::kFixedUnit, "a new instance is the fixed unit");
     restore (b, saved);
     check (save (b) == saved, "a restored state saves the same bytes");
     check (b.unitSeed() == a.unitSeed(), "a restored state reopens as the unit it was saved with");
+    CeresAudioProcessor other;
+    auto otherUnit = stateXml (saved);
+    otherUnit->setAttribute ("unit", "123456789");
+    restore (other, binary (*otherUnit));
+    check (other.unitSeed() == 123456789u, "a state saved by another unit reopens as that unit");
     check (b.getCurrentProgram() == 3, "the program number is restored");
     bool same = true;
     for (int i = 0; i < a.getParameters().size(); ++i)
@@ -655,9 +671,14 @@ void unitContract()
     prepare (a, 512);
     prepare (b, 512);
     const auto first = play (a, total, 512, chord);
-    check (play (b, total, 512, chord).left != first.left, "two new instances are two different units");
+    check (play (b, total, 512, chord).left == first.left, "two new instances are the same unit");
 
     // A state restored while the engine runs rebuilds it as the saved unit.
+    auto xml = stateXml (save (a));
+    xml->setAttribute ("unit", "123456789");
+    restore (b, binary (*xml));
+    const auto other = play (b, total, 512, chord);
+    check (other.left != first.left, "a state that names another unit plays that unit");
     restore (b, save (a));
     const auto replay = play (b, total, 512, chord);
     check (replay.left == first.left, "a state restored while the engine runs plays the saved unit");

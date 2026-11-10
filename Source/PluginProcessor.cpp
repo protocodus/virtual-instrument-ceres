@@ -120,11 +120,29 @@ juce::NormalisableRange<float> rangeFor (const ceres::ParameterInfo& info, const
                  },
                  [low, high] (float, float, float v) { return juce::jlimit (low, high, v); } };
     }
-    juce::NormalisableRange<float> range (low, high);
     if (control != nullptr && control->scale == Scale::Centred && control->centre > info.minimum
         && control->centre < info.maximum)
-        range.setSkewForCentre (static_cast<float> (control->centre));
-    return range;
+    {
+        // juce::NormalisableRange's own skew works in float and does not
+        // return one in seven of the values it produced, so each save and
+        // restore moved such a value a float step. In double, rounded once,
+        // a value maps back to itself.
+        const double bottom = info.minimum, span = info.maximum - info.minimum,
+                     skew = std::log (0.5) / std::log ((control->centre - bottom) / span);
+        return { low, high,
+                 [bottom, span, skew, low, high] (float, float, float x)
+                 {
+                     return x <= 0.0f ? low : x >= 1.0f ? high
+                                        : juce::jlimit (low, high, static_cast<float> (bottom + span * std::pow (static_cast<double> (x), 1.0 / skew)));
+                 },
+                 [bottom, span, skew, low, high] (float, float, float v)
+                 {
+                     return v <= low ? 0.0f : v >= high ? 1.0f
+                                         : static_cast<float> (std::pow ((v - bottom) / span, skew));
+                 },
+                 [low, high] (float, float, float v) { return juce::jlimit (low, high, v); } };
+    }
+    return { low, high };
 }
 
 std::unique_ptr<juce::RangedAudioParameter> makeParameter (const ceres::ParameterInfo& info, const Control* control)
@@ -160,7 +178,7 @@ CeresAudioProcessor::CeresAudioProcessor()
                           .withInput ("EXT IN", juce::AudioChannelSet::mono(), false)
                           .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
       parameters (*this, nullptr, kStateType, createLayout()),
-      unit (static_cast<std::uint64_t> (juce::Random().nextInt64()))
+      unit (kFixedUnit)
 {
     for (std::size_t i = 0; i < ceres::parameterCount(); ++i)
     {

@@ -25,13 +25,15 @@ class CeresAudioProcessor final : public juce::AudioProcessor
 #endif
 {
 public:
-    // Each instance is its own unit: the engine's seed fixes each board's
-    // tolerances, oscillator phases and noise. A new instance draws one at
-    // random and its state keeps it, so a saved session reopens as the same
-    // unit.
+    // The engine's seed fixes each board's tolerances, oscillator phases and
+    // noise. A new instance is kFixedUnit; its state keeps the seed, so a
+    // session saved by 0.6.4 to 1.1.7, when each instance drew its own at
+    // random, reopens as the unit it was saved with.
     std::uint64_t unitSeed() const noexcept { return unit; }
-    // The one unit every instance was before 0.6.4, and the README demos'
-    // seed: a state that names no unit was saved by it, so opens as it.
+    // The README demos' seed, and the unit of every new instance. Instances
+    // that differ would save different bytes from identical settings, which
+    // the CLAP validator's state-reproducibility test rejects. A state that
+    // names no unit was saved before 0.6.4 by this one.
     static constexpr std::uint64_t kFixedUnit = 20261017u;
     // MIDI pitch bend reaches the engine as +/-2 semitones, as in the demos.
     static constexpr double kBendSemitones = 2.0;
