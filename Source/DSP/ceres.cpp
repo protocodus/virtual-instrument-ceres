@@ -1459,6 +1459,30 @@ constexpr double expressionShuntCap=.33e-6, expressionOutCap=.0033e-6;
 constexpr double expressionLoad=10e3+330;
 // Decibels at travel 0, .1, ... 1 of the graph's 28 degrees.
 constexpr double expressionCurve[]={0,-1.4,-3.8,-7.2,-11.5,-16.5,-22,-27.3,-32.4,-37.1,-39.8};
+// A level a host writes once per block, brought to its target along a short
+// straight line. The CS-50's levers and pedal move continuously under a hand
+// or foot; a block-sized step in an audio gain clicks instead (a full VOLUME
+// sweep in half a second, written every 512 samples, put zipper noise 35 dB
+// above the same sweep written every sample). Digital dezippering only, no
+// invented analog RC: a value at rest is exactly its target, so a patch that
+// does not move plays bit for bit as before.
+struct Dezipper {
+    double value=0, target=0, increment=0;
+    unsigned remaining=0;
+    void snap(double to) { value=target=to; increment=0; remaining=0; }
+    // Starts from the value now reached. Writing the same target again does
+    // not prolong the transition.
+    void retarget(double to, unsigned samples) {
+        if (to==target) return;
+        target=to; remaining=std::max(1u,samples); increment=(to-value)/remaining;
+    }
+    void advance() {
+        if (!remaining) return;
+        if (--remaining==0) value=target;
+        else value+=increment;
+    }
+};
+
 // H(s) = (n0+n1.s)/(d0+d1.s+d2.s^2) for the two-node network above, bilinear.
 struct ExpressionNetwork {
     double b0=1,b1=0,b2=0,a1=0,a2=0;
@@ -1494,6 +1518,10 @@ struct ExpressionNetwork {
         x2=x1; x1=x; y2=y1; y1=y;
         return y;
     }
+    // The fully open pedal is a wire. Its history follows the signal, so a
+    // pedal leaving full travel starts from where the wire was, not from the
+    // last time the cell conducted.
+    void follow(double x) { x2=x1; x1=x; y2=y1; y1=x; }
 };
 
 // Direct CS-50 PRA: four 100uF capacitors around the uA796 carrier input.
@@ -2382,6 +2410,13 @@ struct Synth::Impl {
     double effectiveHpResonance=0, effectiveLpResonance=0, commonVcaGain=1, vcaControl=1;
     double outputTrimGain=1;
     ExpressionNetwork expression;
+    // The audio-path levels a host can move while notes sound (see Dezipper),
+    // over 5 ms. The output trim is not one of them: it is a set-and-forget
+    // utility gain that acts at once, with no history (SoundPathTests.cpp).
+    Dezipper sawLevel, pulseLevel, noiseLevel, sineLevel, filterLevel, ringMix, expressionLevel, volume;
+    unsigned dezipperSamples=1;
+    // One test per sample while every level rests.
+    bool levelsMoving=false;
     double limiterInput=0, limiterOutput=0, limiterPole=0, limiterInnovation=0;
     double limiterRate=0, limiterStep=0;
     unsigned limiterSteps=1;
@@ -2406,8 +2441,7 @@ struct Synth::Impl {
     Envelope ringEnvelope;
     std::array<double,4> ringCoefficients{};
     double ringPhase = 0, ringCarrier = 0, ringFrequency = 30;
-    double ringDepthValue = 0, ringDepthIncrement = 0;
-    unsigned ringDepthRemaining = 0;
+    Dezipper ringDepth;
     double cachedRingExp = 0, cachedRingFactor = 1;
     // FH and FL, the shared cutoff buses.
     CutoffBus hpBus, lpBus;
@@ -2444,6 +2478,7 @@ struct Synth::Impl {
     }
     void configureRate() {
         internalFs=fs*rateFactor; rateScale=1/double(rateFactor);
+        dezipperSamples=static_cast<unsigned>(std::ceil(internalFs*.005));
         limiterSteps=static_cast<unsigned>(std::ceil(limiterSubstepRate/internalFs));
         limiterRate=internalFs*limiterSteps;
         limiterPole=std::exp(-1/(limiterRate*limiterTau));
@@ -2476,7 +2511,6 @@ struct Synth::Impl {
     }
     void updateCoefficients() {
         outputTrimGain=std::pow(10,patch.outputTrimDb/20);
-        if (patch.expression<1) expression.configure(patch.expression,internalFs);
         const double glideTau=patch.glideRate<glideMediumAbove ? glideTauLarge
             : patch.glideRate<glideDirectAbove ? glideTauMedium : 0;
         glideAlpha=(patch.glideMode==2 || glideTau==0) ? 1.0 : -std::expm1(-(1/internalFs)/glideTau);
@@ -2609,7 +2643,7 @@ struct Synth::Impl {
     // a note played a little earlier or later would.
     static constexpr float restLevel=0x1p-24f;
     bool canRest() const {
-        if (physicalKeyPresses || ringEnvelope.stage!=Envelope::Idle || ringDepthRemaining) return false;
+        if (physicalKeyPresses || ringEnvelope.stage!=Envelope::Idle || levelsMoving) return false;
         if (externalTarget!=0 || externalPreamp!=0 || inlineAbs(externalCoupling.memory)>1e-9) return false;
         for (unsigned i=0; i<std::max(voiceLimit,Synth::voiceCount); ++i) {
             const auto& v=voices[i];
@@ -2630,6 +2664,34 @@ struct Synth::Impl {
         else quietSamples-=64; // look again 64 samples on
     }
     void wake() { resting=false; quietSamples=0; }
+    void configureExpression() {
+        if (expressionLevel.value<1) expression.configure(expressionLevel.value,internalFs);
+    }
+    void snapLevels() {
+        sawLevel.snap(patch.saw); pulseLevel.snap(patch.pulse); noiseLevel.snap(patch.noise);
+        sineLevel.snap(patch.sine); filterLevel.snap(patch.filterLevel); ringMix.snap(patch.ringMix);
+        expressionLevel.snap(patch.expression); volume.snap(patch.volume);
+        ringDepth.snap(patch.ringDepth);
+        configureExpression();
+        levelsMoving=false;
+    }
+    void retargetLevels() {
+        sawLevel.retarget(patch.saw,dezipperSamples); pulseLevel.retarget(patch.pulse,dezipperSamples);
+        noiseLevel.retarget(patch.noise,dezipperSamples); sineLevel.retarget(patch.sine,dezipperSamples);
+        filterLevel.retarget(patch.filterLevel,dezipperSamples); ringMix.retarget(patch.ringMix,dezipperSamples);
+        expressionLevel.retarget(patch.expression,dezipperSamples); volume.retarget(patch.volume,dezipperSamples);
+        // Ring depth keeps its 20 ms.
+        ringDepth.retarget(patch.ringDepth,static_cast<unsigned>(std::ceil(internalFs*.020)));
+        levelsMoving=true;
+    }
+    CERES_NOINLINE void advanceLevels() {
+        sawLevel.advance(); pulseLevel.advance(); noiseLevel.advance(); sineLevel.advance();
+        filterLevel.advance(); ringMix.advance(); volume.advance(); ringDepth.advance();
+        if (expressionLevel.remaining) { expressionLevel.advance(); configureExpression(); }
+        levelsMoving=sawLevel.remaining || pulseLevel.remaining || noiseLevel.remaining || sineLevel.remaining ||
+            filterLevel.remaining || ringMix.remaining || expressionLevel.remaining || volume.remaining ||
+            ringDepth.remaining;
+    }
     void reset() {
         random = Random(seed);
         voices = {}; hostSamples = 0;
@@ -2642,7 +2704,7 @@ struct Synth::Impl {
         externalTarget=externalPrevious=externalNow=externalPreamp=0; externalCoupling={};
         limiterRandom=Random(seed^0xd1b54a32d192ed03ULL); ringEnvelope={}; ringPhase=ringCarrier=0;
         ringFrequency=patch.ringRate; ringWetCoupling={}; ringSignalCoupling={};
-        ringDepthValue=patch.ringDepth; ringDepthIncrement=0; ringDepthRemaining=0;
+        snapLevels();
         cachedRingExp=0; cachedRingFactor=1;
         ringCarrierCoupling.clear();ringCoupledCarrier=0;
         ringSwitchGain=ringSteering(ringDifferentialDc);
@@ -2742,11 +2804,7 @@ struct Synth::Impl {
         // Digital control dezippering only: retain the physical EG trajectory,
         // free carrier phase and frequency cap. Static configured patches use
         // the exact target, including at startup; no invented analog RC.
-        if (ringDepthRemaining) {
-            if (--ringDepthRemaining==0) ringDepthValue=patch.ringDepth;
-            else ringDepthValue+=ringDepthIncrement;
-        }
-        const double ringExp = ringDepthValue * ringControl;
+        const double ringExp = ringDepth.value * ringControl;
         if (ringExp != cachedRingExp) {
             cachedRingExp = ringExp;
             cachedRingFactor = ringExp == 0.0 ? 1.0 : std::exp2(ringExp);
@@ -2888,7 +2946,9 @@ struct Synth::Impl {
         // coupling's settling (about 25 ms) is a different realisation of
         // the same noise than an always-running limiter would have given.
         // At 1x the source alone was a quarter of a voice's cost.
-        const bool noiseUsed=patch.noise!=0 || patch.lfoWaveform==4;
+        if (levelsMoving) advanceLevels();
+        const double noiseGain=noiseLevel.value;
+        const bool noiseUsed=noiseGain!=0 || patch.lfoWaveform==4;
         double noise=0, subNoise=0;
         if (noiseUsed) {
             double limiterSum=0;
@@ -2936,16 +2996,18 @@ struct Synth::Impl {
         // The PWM sine reaches only the pulse's comparator level: with the
         // pulse muted or no PWM depth (pulseWidth+0, clamped in process())
         // it is not evaluated. Its phase runs on regardless.
-        const bool pulseEnabled = patch.pulse!=0;
+        const double sawGain=sawLevel.value, pulseGain=pulseLevel.value;
+        const double sineGain=sineLevel.value, filteredGain=filterLevel.value;
+        const bool pulseEnabled = pulseGain!=0;
         const double pwm = pulseEnabled && patch.pwmDepth!=0 ? sinTurn(pwmPhase+patch.pwmPhase) : 0;
         lfoPhase = wrapUnit(lfoPhase + patch.lfoRate*dt);
         pwmPhase = wrapUnit(pwmPhase + patch.pwmRate*dt);
         const double pulseWidthMod = patch.pulseWidth+pwm*patch.pwmDepth;
         const double resetSeconds = patch.resetMicroseconds*1e-6;
-        const bool sineEnabled = patch.sine!=0, sawEnabled = patch.saw!=0;
+        const bool sineEnabled = sineGain!=0, sawEnabled = sawGain!=0;
         const double spreadCenter = .5*(voiceLimit-1);
         const bool checkBoardPitch = patch.boardPitchTolerance>0 || patch.boardTemperatureRise!=0;
-        const double noiseTerm = patch.noise*noise;
+        const double noiseTerm = noiseGain*noise;
         const double octaveSemitones = 12*patch.octave;
         const double tuneOctaves = patch.tuneCents/1200;
         const double touchFilterDepth = patch.pressureFilter+lfo*patch.pressureWah;
@@ -3088,7 +3150,7 @@ struct Synth::Impl {
                 }
             }
             v.expCacheReady = true;
-            const double source = v.filteredEdge(patch.saw*waves.saw + patch.pulse*waves.pulse) + noiseTerm;
+            const double source = v.filteredEdge(sawGain*waves.saw + pulseGain*waves.pulse) + noiseTerm;
 #if !defined(CERES_EMBEDDED_TARGET)
             v.oscillatorFrequency=frequency; v.hpFrequency=hpFrequency; v.lpFrequency=lpFrequency;
 #endif
@@ -3122,7 +3184,7 @@ struct Synth::Impl {
             const double filtered=v.filteredCoupling.process(low,couplingCoefficients[0]);
             // The sine's VR11/VR12 balance against the filtered path (VCA
             // amount); exactly 1 when off.
-            const double summed=filtered*patch.filterLevel + sineWave[i]*patch.sine*board.sineGain;
+            const double summed=filtered*filteredGain + sineWave[i]*sineGain*board.sineGain;
             const double beforeVca=v.commonCoupling.process(summed,couplingCoefficients[1]);
             // IG00151 gain is LINEAR in envelope CV (guide pp.40–41). The
             // optional velocity term is zero in factory-derived presets.
@@ -3166,13 +3228,17 @@ struct Synth::Impl {
         ringSignalOutput=ringSignalPair(ringSignalInput);
         const double wet=ringWetGain*ringWetCoupling.process(ringSignalOutput*ringSwitchGain,ringWetCoefficients);
         // Explicit bypass avoids even a rounding change for old patches.
-        const double ringMixRatio=10e3/(patch.expression>=1 ? ringMixLoad : expression.load);
-        const double ringed=patch.ringMix==0 ? bus
-            : (bus+patch.ringMix*(wet-bus))/(1+patch.ringMix*(1-patch.ringMix)*ringMixRatio);
+        const bool pedalOpen=expressionLevel.value>=1;
+        const double ringMixRatio=10e3/(pedalOpen ? ringMixLoad : expression.load);
+        const double mix=ringMix.value;
+        const double ringed=mix==0 ? bus
+            : (bus+mix*(wet-bus))/(1+mix*(1-mix)*ringMixRatio);
         // MI to MO. A fully open pedal is the fully conducting cell, which is
         // the path this engine was calibrated on, so it stays a bare wire.
-        const double expressed=patch.expression>=1 ? ringed : expression.process(ringed);
-        const double rail=outputPreamp(expressed,patch.volume);
+        double expressed=ringed;
+        if (pedalOpen) expression.follow(ringed);
+        else expressed=expression.process(ringed);
+        const double rail=outputPreamp(expressed,volume.value);
         // HIGH output, 33uF into its LO divider and the 10k-loaded HO, after
         // the documented inverting preamp. No recording EQ.
         return -lineCoupling.process(rail,couplingCoefficients[3]);
@@ -3187,7 +3253,6 @@ void Synth::setPatch(const Patch& patch) {
     const Patch validated = validatePatch(patch);
     impl_->wake();
     const bool openingKeyHold=impl_->patch.sustainMode!=2 && validated.sustainMode==2;
-    const bool changingRingDepth=impl_->patch.ringDepth!=validated.ringDepth;
     impl_->patch = validated;
     impl_->updateCoefficients();
     if (openingKeyHold) impl_->followFreeKeys();
@@ -3195,8 +3260,7 @@ void Synth::setPatch(const Patch& patch) {
     // anchors/IL. Once even silence has been processed, preset recall only
     // changes targets; it cannot erase continuously connected charge.
     if (!impl_->hasProcessed) {
-        impl_->ringDepthValue=validated.ringDepth;
-        impl_->ringDepthIncrement=0; impl_->ringDepthRemaining=0;
+        impl_->snapLevels();
         impl_->hpResonanceAnchor=validated.hpResonance;
         impl_->lpResonanceAnchor=validated.lpResonance;
         impl_->effectiveHpResonance=validated.hpResonance;
@@ -3207,12 +3271,7 @@ void Synth::setPatch(const Patch& patch) {
             // ... and an idle VCA EG at its board's floor (VR17).
             if (voice.amp.stage == Envelope::Idle) voice.amp.voltage = voice.board.ampFloor;
         }
-    } else if (changingRingDepth) {
-        // Retarget from the actual interpolated value. Repeated patch writes
-        // with the same target do not prolong the finite20ms transition.
-        impl_->ringDepthRemaining=std::max(1u,static_cast<unsigned>(std::ceil(impl_->internalFs*.020)));
-        impl_->ringDepthIncrement=(validated.ringDepth-impl_->ringDepthValue)/impl_->ringDepthRemaining;
-    }
+    } else impl_->retargetLevels();
 }
 void Synth::noteOn(int note, double velocity) {
     if (note < 0 || note > 127 || !std::isfinite(velocity)) return;
@@ -3403,7 +3462,7 @@ std::array<Synth::VoiceState,Synth::maxVoiceCount> Synth::allVoiceState() const 
 }
 Synth::ModulationState Synth::modulationState() const {
     return {impl_->lastSub,impl_->ringEnvelope.voltage,impl_->ringFrequency,
-        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier,impl_->ringSwitchGain,impl_->ringDepthValue,
+        impl_->ringCarrier,impl_->physicalKeyPresses,impl_->ringCoupledCarrier,impl_->ringSwitchGain,impl_->ringDepth.value,
         impl_->ringSignalInput,impl_->ringSignalOutput,impl_->hpBus.shift,impl_->lpBus.shift};
 }
 Synth::SoundPathState Synth::soundPathState() const {
