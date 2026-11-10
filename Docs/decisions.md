@@ -438,3 +438,34 @@ details summarised here.
   3. Model the M-board `R49` ($100\text{ k}\Omega$) and `C20` ($0.01\text{ \mu F}$ to ground) $\tau = 1.0\text{ ms}$ ($159.15\text{ Hz}$) RC low-pass filter on the `LC`/`TLA` control voltage at `IC5` (`IG00151` common VCA II) pin `LI` (SM2 p.16, taking `LI` as high-impedance).
   4. Keep the shared SUB output, `FH`/`FL` `CutoffBus` shifts, `Q` and common-VCA control buses, and per-board `filterEnvelope` voltage continuous across `silentSample()`, `allSoundOff()`, `reset()` and pre-clock `setPatch()` (Ceres 1.1.4).
 - **Grounded in:** CS-50 Service Manual 1 printed p.14 (`R7`), Service Manual 2 printed pp.8 (`SUB`), 10–11 (`T71`), 15–16 (`R7`/`M`), 22 (`PRA`), Servicing Guide printed pp.33–34, 40–41, 55–56, and the New JRC `NJM4558` datasheet.
+
+## 2026-11-10: the owner chose B for the top octave at 1×
+
+### Tone at 1× oversampling (`2026-11-10-1x-top-octave`)
+
+- **Decided:** what the 1× setting, where every instance and patch starts,
+  sounds like above 8 kHz. The measurements settle that 1.1.6 at 1× sat a
+  median 2 to 11 dB under the 4× reference from 8 to 16 kHz
+  ([measurements](validation/rate-tone-2026-11-10.md)); they cannot settle
+  whether the corrected top is worth the oscillator aliasing it no longer
+  hides on high notes at 1×.
+- **A:** Ceres 1.1.6 at 1×, the shipping engine.
+- **B:** Ceres 1.1.7 at 1×: the low-pass output keeps the circuit's slope to
+  the band edge, the cutoff runs to 0.88 of the sample rate, and the saw,
+  pulse and sine get back the level their band-limited edges lose.
+- **C:** B without the oscillator edge correction.
+- **Reference, not a candidate:** 1.1.6 at 4×.
+- **Material:** a Clavichord riff, Brass 1 chords and a held C6 saw with the
+  filter open, bent up two semitones and back; 16 s, 48 kHz, four voices,
+  seed 20261017, identical notes for every letter. Matched on whole-file RMS
+  to A (B −0.25 dB, C −0.17 dB, reference −0.18 dB), then +9 dB on every
+  file. The set was sent to the owner and is not committed.
+- **Chosen:** B. The owner asked for the key first, then answered "B", so
+  the choice was made knowing what each letter was.
+- **Licensed:** 1.1.7's tone corrections as they stand. On these files B's
+  12–16 kHz band reads −28.6 dB against the reference's −27.3 dB (A −39.8 dB,
+  C −30.9 dB). The price is recorded, not removed: a held C6 saw aliases at
+  −41.3 dB above 10 kHz at 1× (A −54.5 dB, C −43.9 dB, 4× −78.6 dB), which
+  stays a Known gap. The choice does not license any constant: the filter
+  correction's law is fitted to the network's own 768 kHz response, and the
+  edge correction is derived from the band-limiting kernel.
