@@ -204,9 +204,12 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-  # U4: the long libFuzzer run. Not a dependency of the media commit; a
-  # failure still fails the build and uploads its reproducers.
+  # U4: the long libFuzzer run, nightly and on demand: a push already ran
+  # ci.yml's short run, and 20 more minutes of runner delayed every build.
+  # Not a dependency of the media commit; a failure still fails the build and
+  # uploads its reproducers.
   fuzz-long:
+    if: github.event_name != 'push'
     name: Fuzz the DSP for 20 minutes
     runs-on: ubuntu-24.04
     timeout-minutes: 40
