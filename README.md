@@ -25,40 +25,40 @@ The CI-generated demos below play **eight of the circuit engine's 14 research pr
 
 ## Version history
 
-### Unreleased — 1.1.8 — a new instance is the reference unit
+### 1.1.8 — 2026-11-10 — a new instance is the reference unit
 
 - A new plug-in instance opens as the one reference unit (seed 20261017, the README demos' unit) again, instead of drawing its own at random as 0.6.4 to 1.1.7 did. Two instances with identical settings saved different bytes, which the CLAP validator's state-reproducibility test rejects, and that kept the main build red from 29 October. A session saved by 0.6.4 to 1.1.7 still reopens as the unit it was saved with, and a program now sounds like its demo sample for sample. The centred controls `filter_attack_saturation`, `amp_attack_saturation` and `global_release` no longer move a float step on every save and restore, and their text reads back as the same value.
 
-### Unreleased — 1.1.7 — 1× keeps its top octave
+### 1.1.7 — 2026-11-10 — 1× keeps its top octave
 
 - At 1× oversampling, the default since 1.1.6, bright sounds were duller than the same patch at 4×: across the 14 factory presets at 48 kHz the median loss was 2 dB at 8 kHz, 3.5 dB at 10 kHz, 5.7 dB at 12.7 kHz and 11 dB at 16 kHz, and as much as 18 dB. None of it was the circuit. The filter's integrators were sampled in a way that bends the low-pass slope down to nothing at half the sample rate, the cutoff stopped at 0.22 of the sample rate (10.6 kHz at 48 kHz, where the CS-50's levers reach past 20 kHz), and the oscillator's band-limited edges lost level towards the top. The low-pass output now carries the circuit's slope up to the band edge, the cutoff runs on to 0.88 of the sample rate, and the saw, pulse and sine keep their harmonics' level. At 1× those bands now sit a median 0.3–0.5 dB above the earlier 4× up to 12.7 kHz and 1.3 dB below it at 16 kHz (worst 3.3 dB); at 44.1 kHz the worst is 5.5 dB at 16 kHz instead of 21.9 dB. 2× and 4× gain at most 1.4 dB and 0.7 dB at 16 kHz, where they were themselves a little under the circuit. A session saved at 1× sounds brighter; tuning, envelopes and levers are unchanged. The correction costs CPU: the factory presets take 4.9% more instructions at four voices, at 1× and at 4×. The price is that 1× no longer hides the oscillators' aliasing above 10 kHz (Known gaps). [Measurements](Docs/validation/rate-tone-2026-11-10.md).
 - Moving VOLUME, a mixer level (saw, pulse, noise, sine or the filtered level), the ring modulator's mix or the expression pedal no longer clicks. A front end hands the engine its controls once per host buffer, and these levels jumped there. They now glide to the new value over 5 ms, as the ring depth already did over 20 ms. Under a held 220 Hz sine, a VOLUME step from 1 to 0.5 left a click 43 dB under the tone above 4 kHz and now leaves 79 dB; the pedal from 1 to 0.8 went from 42 to 81 dB under, and the ring mix from 0 to 1 from 38 to 72 dB. A patch that does not move plays bit for bit as before, and the glides at rest cost 0.4% more instructions. The output trim still acts at once. [Measurements](Docs/validation/level-moves-2026-11-10.md).
 
-### Unreleased — 1.1.6 — 1× oversampling by default
+### 1.1.6 — 2026-11-09 — 1× oversampling by default
 
 - A new plug-in instance starts at 1× oversampling instead of 4×, as every Protocodus instrument now starts at its lowest setting; 4× remains one choice away and is still the engine's reference quality. Saved sessions keep the oversampling they were saved with, and the README demos play at 1×, as a fresh instance does.
 
-### Unreleased — 1.1.5 — lower CPU cost
+### 1.1.5 — 2026-11-05 — lower CPU cost
 
 - Five more CPU reductions, with audio bit for bit unchanged: the CPU regression stream (every factory preset at 1, 4 and 16 voices and 1x/2x/4x, four host rates, live controls) gives the same double-precision output as 1.1.4 under GCC, GCC with FMA contraction and Clang with the Rack's `-fno-builtin`. The factory presets take 7.5% fewer instructions at four voices (1x and 4x), 6.9% at one voice and 6.1% at sixteen; on this development container the native benchmark's median thread CPU fell 3–9%. Not a Reason host result ([measurements](Docs/benchmarks/cpu-steps-2026-11-05.md)).
 
-### Unreleased — 1.1.4 — T71 tablet cutoff coupling, M-board VCA LI RC and EXT preamp bandwidth
+### 1.1.4 — 2026-11-03 — T71 tablet cutoff coupling, M-board VCA LI RC and EXT preamp bandwidth
 
 - Factory tone-selector tablets now include their T71 matrix column series resistor $R_s = 10\text{ k}\Omega(10/V_{\text{ideal}} - 1)$ ahead of the `1S1555` diode on the shared `FH` (`g`) and `FL` (`i`) cutoff rows (SM2 pp.10–11, 15). Four boards at $+5\text{ V}$ of LP EG lift each other's cutoff by $0.07$–$0.09\text{ octave}$ ($89$–$107\text{ cents}$) on the weaker columns (`Electric Piano`, `Guitar 2`, `Brass 2`) instead of the `PANEL` follower's $0.009$–$0.018\text{ octave}$. `PANEL` and custom patches keep the `IC4` follower's $R_s = 0$.
 - Each M board's common VCA II (`IC5`, `IG00151`) control pin `LI` now passes the schematic `R49` ($100\text{ k}\Omega$) and `C20` ($0.01\text{ µF}$ to ground) $1.0\text{ ms}$ ($159.15\text{ Hz}$) RC low-pass filter on the summed `LC` (`LEVEL` + `SUB` tremolo) and `TLA` (`touch LEVEL`) voltage (SM2 p.16), softening square-wave and noise tremolo edges and smoothing live `amp_level` steps.
 - The rear `EXT IN` ×101 preamp (`IC3-1/2`, `NJM4558D`, SM2 p.22; Guide p.56) now includes its $3\text{ MHz} / 101 = 29.70\text{ kHz}$ ($\tau = 5.36\text{ µs}$) closed-loop pole ahead of its $1\text{ V/µs}$ slew limit and $\pm 14\text{ V}$ rails, and `silentSample()`, `allSoundOff()`, `reset()` and pre-clock `setPatch()` keep the shared `SUB`, `FH`/`FL` `CutoffBus`, `Q` and common-VCA states continuous.
 
-### Unreleased — 1.1.3 — a steadier VCO
+### 1.1.3 — 2026-10-31 — a steadier VCO
 
 - Each board's free-running pitch wander (`drift_cents`) ships at 0.3 cents instead of 1, factory presets included. Its depth is now measured, on sibling evidence: the public CS-80 raw-waveform recordings (the same M board and IG00153 VCO as the CS-50) wander 0.079 cents RMS over a held note's 2.4 s at 220–523 Hz (median of 22 takes, codec noise included, so an upper bound), and the engine measured the same way reads 0.064 at 0.3, against 0.20 at 1. Held notes and chords beat less; the minutes-long thermal drift of a warming instrument is not modelled by this wander and is unchanged. `Tools/measure_cs80_wsc_recordings.py wander` is the protocol.
 
-### Unreleased — 1.1.2 — an idle Ceres rests
+### 1.1.2 — 2026-10-30 — an idle Ceres rests
 
 - A second after every board has gone silent, with the output tail already under 2^-24 (below a 24-bit file's last step), the engine rests: it returns exact silence and only keeps the clocks a later note reads (touch, drift, the SUB and PWM phases, the noise streams, the ring carrier), until a note, a patch change or an EXT IN signal wakes it. On this development container an idle four-voice/1x Ceres took 1.6 ms of CPU per second of audio instead of 30 ms (not a Reason host result). Everything before the rest is bit for bit as before. A note after a rest finds the boards' VCOs and filters where they stopped, as a note played a little earlier would; over 40 seeds its level spread matches the always-running engine's.
 - Four boards' filters are now solved as two interleaved pairs, so each pair's Newton steps fill the other's waits. Audio is bit for bit unchanged. On this development container a playing Ceres took 17% less CPU at four voices/1x (GCC, and Clang with the Rack's `-fno-builtin`), 14% less at 4x and 22% less at 16 voices; one voice is unchanged. Not a Reason host result.
 - `Synth::processSilently()` advances an unheard engine with its audio path paused: keys, pedal, EGs, glide, touch, drift, Q, the SUB and PWM clocks and the ring carrier keep exact time, and the VCOs, filters and couplings resume where they stopped. A front end that keeps a muted layer warm (the Rack's Double layer in Mono) pays about a tenth of a running engine for it. Resting now runs the same path, at about 9% of a running engine.
 
-### Unreleased — 1.1.1 — lower CPU cost
+### 1.1.1 — 2026-10-29 — lower CPU cost
 
 - Two boards' filters are solved side by side in two-double lanes, and the cutoff rows' diode solver reuses the terms of a step that left its current unchanged. Audio is unchanged: every factory preset at 1, 4 and 16 voices and 1x/2x/4x gives the same double-precision output bits as 1.1.0 (GCC and Clang, with and without FMA contraction), the 439,296-sample CPU regression stream matches byte for byte and the demos re-render identically. On this development container the eight README demos (four voices, 4x, 48 kHz) took 29% less median CPU time, and the factory presets at four voices/1x 31% less; a one-voice configuration, which keeps the scalar solve, is unchanged within noise. Not a Reason host result.
 
