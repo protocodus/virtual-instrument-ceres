@@ -209,7 +209,7 @@ Reuse the previous sample's exact final `tanh` value at the next filter solve. C
 ## Downloads
 
 <!-- build-download-begin -->
-**[Download main build 86](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/44074681538/artifacts/14330781735)**, built from [`770fc3cc5088`](https://github.com/protocodus/virtual-instrument-ceres/commit/770fc3cc5088656f8929e8829d46e4152b6c091d). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
+**[Download main build 87](https://github.com/protocodus/virtual-instrument-ceres/actions/runs/44292523527/artifacts/14428002663)**, built from [`c39dfb4dda76`](https://github.com/protocodus/virtual-instrument-ceres/commit/c39dfb4dda7645ea762485faea219cee09d4f291). It holds the macOS, Windows and Linux packages, `SHA256SUMS` and `BUILD.txt`.
 <!-- build-download-end -->
 
 ---
